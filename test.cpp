@@ -72,7 +72,7 @@ int main(int argc, char** args)
 
     dataset.Load(reader);
     clock_t end = clock();
-    cout<<"time elapsed: "<<(float)(end - start) / CLOCKS_PER_SEC<<" ms"<<endl;
+    cout<<"time elapsed: "<<(float)(end - start) / CLOCKS_PER_SEC<<" s"<<endl;
 
     return 0;
 }

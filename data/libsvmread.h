@@ -78,6 +78,8 @@ namespace SOL
                 printf("no input file is opened for reading!\n");
                 return false;
             }
+            LabelType labelVal;
+
             char *idx, *val, *label;
             if(readline(fp) == NULL)
                 return false;
@@ -90,7 +92,7 @@ namespace SOL
             }
 
             char *endptr;
-            LabelType labelVal = (LabelType)strtod(label,&endptr);
+            labelVal = (LabelType)strtod(label,&endptr);
             if(endptr == label || *endptr != '\0')
                 return false;
 
@@ -105,10 +107,10 @@ namespace SOL
                     break;
 
                 index = (int)strtol(idx,&endptr,10) ; // precomputed kernel has <index> start from 0
+
                 if (index < 1)
                 {
                     printf("index should be no less than 1\n");
-                    return false;
                 }
                 errno = 0;
                 feat =  strtod(val,&endptr);
