@@ -105,10 +105,10 @@ namespace SOL
                     break;
 
                 index = (int)strtol(idx,&endptr,10) ; // precomputed kernel has <index> start from 0
-
                 if (index < 1)
                 {
                     printf("index should be no less than 1\n");
+                    return false;
                 }
                 errno = 0;
                 feat =  strtod(val,&endptr);
@@ -120,7 +120,7 @@ namespace SOL
                 }
                 data.AddNewFeat(index,feat);
             }
-	    data.label = labelVal;
+            data.label = labelVal;
             return true;
         }
 		
