@@ -1,4 +1,4 @@
-DEBUG_FLAG=1
+DEBUG_FLAG=0
 
 DEBUG=-g -Wall
 RELEASE=-O2 -s
@@ -7,7 +7,7 @@ INCLUDE=-I . -I ./data
 VPATH=.:./data
 
 CFLAGS=-c $(INCLUDE)
-LDFLAGS=
+LDFLAGS=-lpthread
 
 ifeq ($(DEBUG_FLAG),1)
 	CFLAGS += $(DEBUG)

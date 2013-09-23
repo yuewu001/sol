@@ -20,6 +20,7 @@ namespace SOL
 		virtual bool GetNextData(DataPoint<FeatType, LabelType> &data) = 0;
 		virtual void Rewind() = 0;
         virtual void Close() = 0;
+        virtual inline bool Good() = 0;
 	};
 
 }

@@ -53,7 +53,7 @@ namespace SOL
                     if (begin != NULL)
                         delete []begin;
                     begin = new_begin;
-                    end = begin + old_len;
+                    end = begin + newSize;
                     capacity = newSize;
                 }
             }
@@ -77,7 +77,7 @@ namespace SOL
                 this->capacity = arr.capacity;
                 this->count = arr.count;
                 ++(*count);
-		return *this;
+                return *this;
             }
 
             void release()

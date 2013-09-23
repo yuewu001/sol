@@ -16,62 +16,53 @@
 using namespace std;
 using namespace SOL;
 
-void TestIO_Cpp(const string &fileName)
+void Test_Thread(DataSet<float,char> &dataset)
 {
-    ifstream inFile(fileName.c_str(),ios::in);
-    string line;
-    int lineNum = 0;
-    size_t len = 0;
-    while(inFile.good())
+    int dataNum = 0;
+    int featNum = 0;
+//    dataset.BeginRead();
+    while(1)
     {
-        getline(inFile,line);
-        lineNum++;
-        len += line.length();
+        const DataPoint<float,char> &data = dataset.GetDataRd();
+        if(data.indexes.size() == 0)
+        {
+            cout<<"all the data has been processed!"<<endl;
+            break;
+        }
+        featNum += data.indexes.size();
+        dataNum++;
+        dataset.FinishRead();
     }
-    inFile.close();
-    cout<<"Read "<<lineNum<<" lines!"<<endl;
-    cout<<"total line "<<len<<endl;
-}
-
-void TestIO_C(const char* fileName)
-{
-    FILE *fp = fopen(fileName,"r");
-    if(fp == NULL)
-    {
-        printf("Open file failed!\n");
-        return;
-    }
-    int lineNum = 0;
-    int maxLen = 40960;
-    char* line = new char[maxLen];
-    while(fgets(line,maxLen,fp) != NULL)
-        lineNum++;
-
-    fclose(fp);
-    printf("line number: %d\n",lineNum);
+    cout<<"\nread data number: "<<dataNum<<endl;
+    cout<<"data number : "<<dataset.size()<<endl;
 }
 
 int main(int argc, char** args)
 {
-    string fileName = "../data/rcv1.train";
+    string fileName = "/home/matthew/SOL/data/rcv1.train";
+    cout<<"Usage: test passNum bufSize"<<endl;
+    if (argc == 1)
+    {
+        return 0;
+    }
+    int passNum = atoi(args[1]);
+    int bufSize = 128;
+    if (argc > 2)
+        bufSize = atoi(args[2]);
 
-    /*
-    clock_t time1 = clock();
-    TestIO_C(fileName.c_str());
-    clock_t time2 = clock();
-    cout<<"time elapsed for c "<<(float)(time2 - time1)/CLOCKS_PER_SEC * 1000 <<" ms"<<endl;
-    TestIO_Cpp(fileName);
-    clock_t time3 = clock();
-    cout<<"time elapsed for c++ "<<(float)(time3 - time2)/CLOCKS_PER_SEC * 1000 <<" ms"<<endl;
-    return 0;
-    */
+    //LibSVMReader reader(fileName);
+    DataSet<float,char> dataset(passNum,bufSize);
 
     clock_t start = clock();
-    LibSVMReader reader(fileName);
-    DataSet<float,char> dataset(1,5000);
-
-    dataset.Load(reader);
+    //dataset.Load(reader,"cache.sol");
     clock_t end = clock();
+    //cout<<"time elapsed: "<<(float)(end - start) / CLOCKS_PER_SEC<<" s"<<endl;
+    //cout<<"data number : "<<dataset.size()<<endl;
+
+    start = clock();
+    dataset.LoadCache("/home/matthew/SOL/code/cache.sol");
+    Test_Thread(dataset);
+    end = clock();
     cout<<"time elapsed: "<<(float)(end - start) / CLOCKS_PER_SEC<<" s"<<endl;
 
     return 0;
