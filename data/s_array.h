@@ -28,6 +28,7 @@ namespace SOL
             bool empty() const {return begin == end;}
             size_t size() const {return end - begin;}
             T& operator[] (size_t i) {return begin[i];}
+            const T& operator[] (size_t i) const { return begin[i];}
 
             void resize(size_t newSize, bool isClear = false)
             {
@@ -61,8 +62,12 @@ namespace SOL
 
             void push_back(const T& elem)
             {
-                if (size() == capacity) //full array
+                size_t old_len = size();
+                if (old_len == capacity) //full array
+                {
                     resize(2 * size() + 3);
+                    end = begin + old_len;
+                }
                 *(end++) = elem;
             }
 

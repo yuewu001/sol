@@ -13,6 +13,7 @@
 
 namespace SOL
 {
+    static const int chunk_buf_size = 256; 
     /**
      *  Definitions of DataPoint: one lable, and DataPoints
      *
@@ -89,4 +90,19 @@ namespace SOL
             }
 
     };
+    template <typename FeatType, typename LabelType> struct DataChunk
+    {
+        DataPoint<FeatType, LabelType> data[chunk_buf_size];
+        size_t dataNum;
+        DataChunk *next;
+
+        DataChunk():dataNum(0),next(NULL){}
+        void erase()
+        {
+            for (int i = 0; i < dataNum; i++)
+                data[i].erase();
+            dataNum = 0;
+        }
+    };
+
 }

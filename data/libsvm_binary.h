@@ -85,22 +85,33 @@ namespace SOL
                 return file.good();
             }
 
-            bool GetNextData(DataPoint<FeatType, LabelType> &data)
+            bool GetNextData(DataPoint<FeatType, LabelType> &chunk)
             {
-                size_t featNum = 0;
-                file.read((char*)&featNum,sizeof(size_t));
-                if (featNum > 0)
+                return true;
+            }
+
+            bool GetNextData(DataChunk<FeatType, LabelType> &chunk)
+            {
+                for (int i = 0; i < chunk_buf_size; i++)
                 {
-                    file.read((char*)&data.label,sizeof(LabelType));
-                    data.indexes.resize(featNum);
-                    file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
-                    data.features.resize(featNum);
-                    file.read((char*)data.features.begin,sizeof(FeatType) * featNum);
-                    //file.read((char*)data.weights.begin,sizeof(float) * featNum);
-                    return true;
+                    DataPoint<FeatType,LabelType> &data = chunk.data[i];
+
+                    size_t featNum = 0;
+                    file.read((char*)&featNum,sizeof(size_t));
+                    if (featNum > 0)
+                    {
+                        file.read((char*)&data.label,sizeof(LabelType));
+                        data.indexes.resize(featNum);
+                        file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
+                        data.features.resize(featNum);
+                        file.read((char*)data.features.begin,sizeof(FeatType) * featNum);
+                        //file.read((char*)data.weights.begin,sizeof(float) * featNum);
+                        chunk.dataNum++;
+                    }
+                    else
+                        return false;
                 }
-                else
-                    return false;
+                return true;
             }
 
             bool WriteData(DataPoint<FeatType, LabelType> &data)

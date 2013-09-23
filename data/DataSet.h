@@ -36,28 +36,33 @@ namespace SOL
             for (size_t pass= 0; pass < dataset->passNum; pass++)
             {
                 reader.Rewind();
-                while(reader.Good())
+
+                bool is_file_end = false;
+                do
                 {
-                    DataPoint<T1,T2> &data = dataset->wt_ptr->data; 
-                    data.erase();
+                    DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
+                    chunk.erase();
+                    is_file_end = reader.GetNextData(chunk);
 
-                    if (reader.GetNextData(data) == true)
+                    mutex_lock(&dataset->data_lock); 
+                    //notice that there is data available
+                    dataset->wt_ptr = dataset->wt_ptr->next;
+                    dataset->curChunkNum++; 
+                    dataset->dataNum += chunk.dataNum;
+                    condition_variable_signal_all(&dataset->data_available);
+
+                    if (dataset->curChunkNum == dataset->bufSize) //buffer full
                     {
-                        mutex_lock(&dataset->data_lock); 
-                        //notice that there is data available
-                        dataset->wt_ptr = dataset->wt_ptr->next;
-                        dataset->curDataNum++;
-                        dataset->dataNum++;
-                        condition_variable_signal_all(&dataset->data_available);
-
-                        if (dataset->curDataNum == dataset->bufSize) //buffer full
-                            condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-                        mutex_unlock(&dataset->data_lock);
+                        condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
                     }
-                    else
+                    mutex_unlock(&dataset->data_lock);
+
+                    if (dataset->dataNum == 1000)
                         break;
-                }
+
+                }while(is_file_end == true);
             }
+
             //notice that the all the data has been loaded
             mutex_lock(&dataset->data_lock);
             dataset->load_finished = true;
@@ -68,29 +73,23 @@ namespace SOL
         }
         return NULL;
     }
-
+    
     //data set, can work in both read-and-write mode and read-once mode
     template <typename FeatType, typename LabelType> class DataSet
     {		
         private:
-            struct DataItem
-            {
-                DataPoint<FeatType, LabelType> data;
-                DataItem *next;
-            };
-
             string cache_fileName;
 
             size_t bufSize; //buffer to load data
             size_t passNum; //number of passes
             size_t dataNum; //total data number
         public:
-            size_t curDataNum;  //data number in buffer
+            size_t curChunkNum;  //data number in buffer
 
             //pointer to the first element, circlar linked list will be used
-            DataItem *head; 
-            DataItem *wt_ptr; //pointer to the write location
-            DataItem *rd_ptr; //pointer to the read location
+            DataChunk<FeatType,LabelType> *head; 
+            DataChunk<FeatType,LabelType> *wt_ptr; //pointer to the write location
+            DataChunk<FeatType,LabelType> *rd_ptr; //pointer to the read location
 
             bool load_finished;
             //thread-safety
@@ -107,7 +106,7 @@ namespace SOL
 
                 this->passNum = passes; 
                 this->dataNum = 0;
-                this->curDataNum = 0;
+                this->curChunkNum = 0;
 
                 this->load_finished = false;
 
@@ -131,11 +130,11 @@ namespace SOL
                 if (this->bufSize <= 0)
                     return true;
 
-                this->head = new DataItem;
-                DataItem *p = this->head;
+                this->head = new DataChunk<FeatType,LabelType>;
+                DataChunk<FeatType,LabelType> *p = this->head;
                 for (size_t i = 1; i < this->bufSize; i++)
                 {
-                    p->next = new DataItem;
+                    p->next = new DataChunk<FeatType,LabelType>;
                     p = p->next;
                 }
                 p->next = this->head;
@@ -148,28 +147,28 @@ namespace SOL
         private:
             void ClearBuffer()
             {
-                DataItem *p = this->head;
+                DataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
                 p = p->next;
                 while (p != this->head)
                 {
-                    p->data.erase();
+                    p->erase();
                     p = p->next;
                 }
-                p->data.erase();
+                p->erase();
                 this->dataNum = 0;
-                this->curDataNum = 0;
+                this->curChunkNum = 0;
                 this->wt_ptr = this->head;
                 this->rd_ptr = this->head;
 
             }
             void ReleaseBuffer()
             {
-                DataItem *p = this->head;
+                DataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
-                DataItem *q = p->next;
+                DataChunk<FeatType,LabelType> *q = p->next;
                 while (q != this->head)
                 {
                     p = q->next;
@@ -199,9 +198,7 @@ namespace SOL
             {
                 libsvm_binary writer(cache_file);
                 if (writer.OpenWriting() == false)
-                {
                     return false;
-                }
 
                 if (reader.OpenReading() == true)
                 {
@@ -234,40 +231,39 @@ namespace SOL
             /////////////Data Access/////////////////////
         public:
             //get the data to read
-            inline const DataPoint<FeatType, LabelType>& GetDataRd()
+            inline const DataChunk<FeatType, LabelType>& GetChunk()
             {
                 mutex_lock(&this->data_lock);
-                
+
                 //check if there is available data
-                if (this->curDataNum <= 0) //no available data
+                if (this->curChunkNum <= 0) //no available data
                 {
                     //suspend the current thread
                     if (this->load_finished == false)
                     {
                         condition_variable_wait(&this->data_available,&this->data_lock);
                         mutex_unlock(&this->data_lock);
-                        return this->GetDataRd();
+                        return this->GetChunk();
                     }
                     else
                     {
-                        this->rd_ptr->data.erase();
+                        this->rd_ptr->erase();
                         mutex_unlock(&this->data_lock);
-                        return this->rd_ptr->data; //return an invalid data
+                        return *this->rd_ptr; //return an invalid data
                     }
                 }
-                DataPoint<FeatType,LabelType>&data = this->rd_ptr->data;
+                DataChunk<FeatType,LabelType> &chunk = *this->rd_ptr;
                 //notice to conitnue to read
                 mutex_unlock(&this->data_lock);
 
-                return data;
+                return chunk;
             }
             void FinishRead()
             {
                 mutex_lock(&this->data_lock);
                 this->rd_ptr = this->rd_ptr->next;
-                this->curDataNum--;
+                this->curChunkNum--;
                 //notice that the last data have been processed
-                //condition_variable_signal(&this->data_inuse);
                 condition_variable_signal_all(&this->buffer_full);
                 mutex_unlock(&this->data_lock);
             }
