@@ -14,14 +14,9 @@ namespace SOL
 	class LogisticLoss: public LossFunction<FeatType, LabelType>
 	{
 		public:
-			virtual bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-				return Sgn(predict) == x.Label() ? true: false;
-			} 
-
 			virtual double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict)
 			{
-				double tmp = -predict * x.Label();
+				double tmp = -predict * x.label;
 				if (tmp > 100)
 					return tmp; 
 				else if (tmp < -100)
@@ -30,33 +25,16 @@ namespace SOL
 					return std::log(1.0 + std::exp(tmp));
 			}
 
-			virtual double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict, int index)
+            //aggressive learning 
+			virtual double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict)
 			{
-				/*
-				if (this->IsCorrect(x,predict) == true)
-					return 0;
-					*/
-				double tmp = predict * x.Label();
+				double tmp = predict * x.label;
 				if (tmp > 100) //to reject numeric problems
 					return 0;
 				else if (tmp  < -100)
-					return -x.Label() * x[index];
+					return -x.label; 
 				else
-					return -x.Label() * x[index] / (1 + std::exp(tmp)); 
-			}
-
-			virtual double GetBiasGradient(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-				if (this->IsCorrect(x,predict) == true)
-					return 0;
-
-				double tmp = predict * x.Label();
-				if (tmp > 100) //to reject numeric problems
-					return 0;
-				else if (tmp < -100)
-					return -x.Label();
-				else
-					return -x.Label()  / (1 + std::exp(tmp)); 
+					return -x.label / (1 + std::exp(tmp)); 
 			}
 	};
 }

@@ -12,7 +12,7 @@ and online optimization[J]. The Journal of Machine Learning Research,
 #pragma once
 
 #include "Optimizer.h"
-#include "../util.h"
+#include "../common/util.h"
 #include <cmath>
 
 namespace SOL
@@ -25,27 +25,18 @@ namespace SOL
 		~RDA_L1();
 
 	public:
-		virtual void BestParameter() {}
 		void SetParameterEx(double lambda, double gamma = -1, double rou = -1);
-
-	public:
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(int newDim);
-
-
+        //try and get the best parameter
+        virtual void BestParameter(){} 
+	
 	protected:
-		//
 		//this is the core of different updating algorithms
 		//return the predict
 		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-
-		//called when a pass ends
-		virtual void PassEnd() {}
-		//called when a round ended
-		virtual void RoundEnd() {}
-
 		//reset the optimizer to this initialization
-		void Reset();
+		void BeginTrain();
+        //Change the dimension of weights
+		virtual void UpdateWeightSize(int newDim);
 
 	protected:
 		double rou;
@@ -62,7 +53,6 @@ namespace SOL
 		this->gamma = 5000;
 		this->rou = 0.005;
 		this->gtVec = new double[this->weightDim];
-		this->Reset();
 	}
 
 
@@ -84,47 +74,43 @@ namespace SOL
 		double coeff1 = 1.0 / this->curIterNum;
 		double coeff2 = coeff1 * (this->curIterNum - 1);
 		double coeff3 = std::sqrt((double)this->curIterNum);
-
 		double lambda_t = this->lambda + this->gamma * this->rou / coeff3;
 
-		int featDim = x.Dim();
-		for (int i = 0; i < featDim; i++)
-		{
-			this->gtVec[i] = coeff2 * this->gtVec[i]; 
-			if (x[i] != 0)
-			{
-				double gt_i = this->lossFunc->GetGradient(x,y,i);
-				this->gtVec[i] += coeff1 * gt_i;
-			}
+        double gt_i = this->lossFunc->GetGradient(x,y);
 
+		int featDim = x.indexes.size();
+        size_t index_i = 0;
+
+        for (int i = 1; i < this->weightDim; i++)
+            this->gtVec[i] *= coeff2;
+		for (int i = 0; i < featDim; i++)
+        {
+            this->gtVec[x.indexes[i]] += coeff1 * gt_i * x.features[i];
+            cout<<this->gtVec[x.indexes[i]];
+        }
+        for  (int i = 1; i < this->weightDim; i++)
+        {
 			//update weights
 			if (this->gtVec[i] <= lambda_t && this->gtVec[i] >= -lambda_t)
 				this->weightVec[i] = 0;
 			else
-			{
 				this->weightVec[i] = (- coeff3 / this->gamma) * 
 					(this->gtVec[i] - lambda_t * Sgn(this->gtVec[i]));
-			}
 		}
 
 		//bias term
-		double gt_i = this->lossFunc->GetBiasGradient(x,y);
-		this->gtVec[this->weightDim - 1] = coeff2 * this->gtVec[this->weightDim - 1] + coeff1 * gt_i;
-		this->weightVec[this->weightDim - 1] = (-coeff3 / this->gamma) * this->gtVec[this->weightDim - 1];
+		this->gtVec[0] = coeff2 * this->gtVec[0] + coeff1 * gt_i;
+		this->weightVec[0] = (-coeff3 / this->gamma) * this->gtVec[0];
 
-		//loss
-		if (this->lossFunc->IsCorrect(x,y) == false)
-			return false;
-		else
-			return true;
+        return y;
 	}
 
 	//
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void RDA_L1<FeatType, LabelType>::Reset()
+	void RDA_L1<FeatType, LabelType>::BeginTrain()
 	{
-		Optimizer<FeatType, LabelType>::Reset();
+		Optimizer<FeatType, LabelType>::BeginTrain();
 		memset(this->gtVec, 0, sizeof(double) * this->weightDim);
 	}
 
@@ -141,18 +127,20 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	void RDA_L1<FeatType, LabelType>::UpdateWeightSize(int newDim)
 	{
-		if (newDim < this->weightDim - 1)
+		if (newDim < this->weightDim)
 			return;
 		else
 		{
-			double* newT = new double[newDim + 1];
-			memset(newT,0,sizeof(double) * (newDim + 1));
-			memcpy(newT,this->gtVec,sizeof(double) * (this->weightDim - 1));
-			newT[newDim] = this->gtVec[this->weightDim - 1];
+            newDim++;
+			double* newT = new double[newDim];
+            //copy info
+			memcpy(newT,this->gtVec,sizeof(double) * this->weightDim);
+            //set the rest to zero
+			memset(newT + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
 			delete []this->gtVec;
 			this->gtVec = newT;
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
 		}
 	}
 }

@@ -85,9 +85,25 @@ namespace SOL
                 return file.good();
             }
 
-            bool GetNextData(DataPoint<FeatType, LabelType> &chunk)
+            virtual int GetMinIndex()  const {return 1;}
+            
+            bool GetNextData(DataPoint<FeatType, LabelType> &data)
             {
-                return true;
+                size_t featNum = 0;
+                file.read((char*)&featNum,sizeof(size_t));
+                if (featNum > 0)
+                {
+                    file.read((char*)&(data.max_index),sizeof(size_t));
+                    file.read((char*)&data.label,sizeof(LabelType));
+                    data.indexes.resize(featNum);
+                    file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
+                    data.features.resize(featNum);
+                    file.read((char*)data.features.begin,sizeof(FeatType) * featNum);
+                    //file.read((char*)data.weights.begin,sizeof(float) * featNum);
+                    return true;
+                }
+                else
+                    return false;
             }
 
             bool GetNextData(DataChunk<FeatType, LabelType> &chunk)
@@ -100,6 +116,7 @@ namespace SOL
                     file.read((char*)&featNum,sizeof(size_t));
                     if (featNum > 0)
                     {
+                        file.read((char*)&(data.max_index),sizeof(size_t));
                         file.read((char*)&data.label,sizeof(LabelType));
                         data.indexes.resize(featNum);
                         file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
@@ -109,7 +126,9 @@ namespace SOL
                         chunk.dataNum++;
                     }
                     else
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
@@ -118,6 +137,7 @@ namespace SOL
             {
                 size_t featNum = data.indexes.size();
                 file.write((const char*)&featNum,sizeof(size_t));
+                file.write((const char*)&(data.max_index),sizeof(size_t));
                 file.write((const char*)&data.label,sizeof(LabelType));
                 file.write((const char*)data.indexes.begin,sizeof(size_t) * featNum);
                 file.write((const char*)data.features.begin,sizeof(FeatType) * featNum);

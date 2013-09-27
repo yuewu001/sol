@@ -21,6 +21,7 @@ namespace SOL
 		virtual void Rewind() = 0;
         virtual void Close() = 0;
         virtual inline bool Good() = 0;
+        virtual int GetMinIndex() const = 0;
 	};
 
 }

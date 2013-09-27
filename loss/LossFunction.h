@@ -7,25 +7,28 @@
 
 #pragma once
 #include <cmath>
-#include "../util.h"
+#include "../common/util.h"
 
 namespace SOL
 {
 	template <typename FeatType, typename LabelType>
 	class LossFunction
 	{
-        public:
-		virtual bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
-        virtual double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
-        virtual double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict, int index) = 0;
-        virtual double GetBiasGradient(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
-
-        void GetGradient(const DataPoint<FeatType, LabelType> &x, double predict, double *gt) 
+        char Sign(double x)
         {
-            int dim = x.Dim();
-            for (int i = 0; i < dim; i++)
-                gt[i] = this->GetGradient(x,predict, i);
+            if (x >= 0) 
+                return 1;
+            else
+                return -1;
         }
 
+        public:
+		bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict)
+        {
+            return this->Sign(predict) == x.label ? true : false;
+        }
+
+        virtual double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
+        virtual double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
     };
 }

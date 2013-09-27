@@ -28,6 +28,7 @@ namespace SOL
             s_array<float> weights;
             LabelType label;
 
+            size_t max_index;
             //for copy and release control
             int *count;
 
@@ -62,6 +63,7 @@ namespace SOL
                 this->features = data.features;
                 this->weights = data.weights;
                 this->label = data.label;
+                this->max_index = 0;
                 this->count = data.count;
                 ++(*count);
                 return *this;
@@ -71,6 +73,9 @@ namespace SOL
             {
                 this->indexes.push_back(index);
                 this->features.push_back(feat);
+
+                if (index > this->max_index)
+                    this->max_index = index;
             }
 
             void erase()
@@ -78,7 +83,10 @@ namespace SOL
                 this->indexes.erase();
                 this->features.erase();
                 this->weights.erase();
+                this->max_index = 0;
             }
+
+            size_t dim() const {return this->max_index;}
 
         private:
             void release()
@@ -99,7 +107,7 @@ namespace SOL
         DataChunk():dataNum(0),next(NULL){}
         void erase()
         {
-            for (int i = 0; i < dataNum; i++)
+            for (size_t i = 0; i < dataNum; i++)
                 data[i].erase();
             dataNum = 0;
         }

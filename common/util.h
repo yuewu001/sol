@@ -9,6 +9,18 @@
 #include <cstring>
 #include <numeric>
 #include <cmath>
+#include <ctype.h>
+
+#if WIN32
+#include <direct.h>
+#include <io.h>
+#define SOL_ACCESS(x) _access(x,0)
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#define SOL_ACCESS(x) access(x,F_OK)
+#endif
+
 
 template <typename T>
 char Sgn(T x) 
@@ -52,3 +64,5 @@ double Variance(const T* data, int dim)
 		var += (data[i] - ave) * (data[i] - ave);
 	return sqrt(var / (dim - 1));
 }
+
+

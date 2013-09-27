@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <limits>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ namespace SOL
 
             char *line;
             int max_line_len;
+            int min_index;
 
 
         public:
@@ -35,6 +37,7 @@ namespace SOL
         {
             this->max_line_len = 4096;
             this->fileName = fileName;
+            this->min_index = numeric_limits<int>::max();
 
             line = (char *) malloc(max_line_len*sizeof(char));
         }
@@ -70,6 +73,8 @@ namespace SOL
                     fclose(fp);
                 fp = NULL;
             }
+
+            virtual int GetMinIndex() const { return min_index; }
 
             virtual inline bool Good()
             {
@@ -126,6 +131,9 @@ namespace SOL
                         printf("Wrong input format at line \n");
                         return false;
                     }
+                    if (min_index > index)
+                        min_index = index;
+
                     data.AddNewFeat(index,feat);
                 }
                 data.label = labelVal;

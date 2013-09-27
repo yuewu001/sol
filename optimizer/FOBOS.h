@@ -14,8 +14,8 @@
  ************************************************************************/
 
 #pragma once
-#include "../global.h"
-#include "../util.h"
+#include "../common/global.h"
+#include "../common/util.h"
 
 #include "Optimizer.h"
 
@@ -33,22 +33,17 @@ namespace SOL
 			LossFunction<FeatType, LabelType> &lossFunc, NormType normType = NormType_L1);
 		~FOBOS();
 
-	public:
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(int newDim);
-
 	protected:
 		//this is the core of different updating algorithms
 		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 		double UpdateWeightVec_L1(const DataPoint<FeatType, LabelType> &x);
 		double UpdateWeightVec_L2S(const DataPoint<FeatType, LabelType> &x);
 
+        //Change the dimension of weights
+		virtual void UpdateWeightSize(int newDim);
+
 		//reset
-		virtual void Reset();
-		//called when a pass ends
-		virtual void PassEnd();
-		//called when a round ended
-		virtual void RoundEnd(); 
+		virtual void BeginTrain();
 
 	protected:
 		NormType normType;
@@ -64,7 +59,6 @@ namespace SOL
 	{
 		this->normType = normType;
 		this->timeStamp = new size_t[this->weightDim];
-		this->Reset();
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -105,36 +99,29 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double FOBOS<FeatType,LabelType>::UpdateWeightVec_L1(const DataPoint<FeatType, LabelType> &x)
 	{
-		int featDim = x.Dim();
+		int featDim = x.indexes.size();
+        int index_i = 0;
 		for (int i = 0; i < featDim; i++)
 		{
+            index_i = x.indexes[i];
 			//lazy update
-			if (x[i] != 0)
-			{
-				//in this process, we obtained w_(t)', that needs to be updated by stochastic gradient
-				int stepK = this->curIterNum - this->timeStamp[i];
-				this->timeStamp[i] = this->curIterNum;
+            
+            //in this process, we obtained w_(t)', that needs to be updated by stochastic gradient
+            int stepK = this->curIterNum - this->timeStamp[index_i];
+            this->timeStamp[index_i] = this->curIterNum;
 
-				double alpha =  stepK * this->eta * this->lambda;
-				double tmp = std::abs(this->weightVec[i]) - alpha;
-				this->weightVec[i] = Sgn(this->weightVec[i]) * std::max(0.0,tmp);
-				
-			}
+            double alpha =  stepK * this->eta * this->lambda;
+            double tmp = std::abs(this->weightVec[index_i]) - alpha;
+            this->weightVec[index_i] = Sgn(this->weightVec[index_i]) * std::max(0.0,tmp);
 		}
+
 		double y = this->Predict(x);
+        double gt_i = this->lossFunc->GetGradient(x,y);
 		for (int i = 0; i < featDim; i++)
-		{
-			if (x[i] != 0)
-			{
-				//update the weight
-				double gt_i = this->lossFunc->GetGradient(x,y,i);
-				this->weightVec[i] -= this->eta * gt_i;
-			}
-		}
+            this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];//update the weight
 		
 		//update bias term
-		double gt_i = this->lossFunc->GetBiasGradient(x,y);
-		this->weightVec[this->weightDim - 1] -= this->eta * gt_i;
+		this->weightVec[0] -= this->eta * gt_i;
 
 		return y;
 	}
@@ -151,99 +138,56 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double FOBOS<FeatType,LabelType>::UpdateWeightVec_L2S(const DataPoint<FeatType, LabelType> &x)
 	{
-		int featDim = x.Dim();
+		int featDim = x.indexes.size();
+        int index_i = 0;
 		for (int i = 0; i < featDim; i++)
-		{
-			//lazy update
-			if (x[i] != 0)
-			{
-				int stepK = this->curIterNum - this->timeStamp[i];
-				this->timeStamp[i] = this->curIterNum;
-				this->weightVec[i] /= std::pow(1 + this->lambda,stepK);
-			}
-		}
+        {
+            //lazy update
+            index_i = x.indexes[i];
+            int stepK = this->curIterNum - this->timeStamp[index_i];
+            this->timeStamp[index_i] = this->curIterNum;
+            this->weightVec[index_i] /= std::pow(1 + this->lambda,stepK);
+        }
 
 		double y = this->Predict(x);
+        double gt_i = this->lossFunc->GetGradient(x,y);
+
 		for (int i = 0; i < featDim; i++)
-		{
-			if (x[i] != 0)
-			{
-				//update the weight
-				double gt_i = this->lossFunc->GetGradient(x,y,i);
-				this->weightVec[i] -= this->eta * gt_i;
-			}
-		}
+            this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];		//update the weight
+
 		//update bias term
-		double gt_i = this->lossFunc->GetBiasGradient(x,y);
-		this->weightVec[this->weightDim - 1] -= this->eta * gt_i;
+		this->weightVec[0] -= this->eta * gt_i;
 		return y;
 	}
 
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType, LabelType>::Reset()
+	void FOBOS<FeatType, LabelType>::BeginTrain()
 	{
-		Optimizer<FeatType, LabelType>::Reset();
+		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
 		memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
-	}
-
-	//called when a pass ends
-	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType,LabelType>::PassEnd()
-	{
-	}
-
-	//called when a pass ends
-	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType,LabelType>::RoundEnd()
-	{
-		//here we need to bound the weights again
-		int featDim = this->weightDim - 1;
-		switch(normType)
-		{
-			case NormType_L1:
-				for (int i = 0; i < featDim; i++)
-				{
-					int stepK = this->curIterNum - this->timeStamp[i];
-					double tmp = std::abs(this->weightVec[i]) - stepK * this->eta * this->lambda;
-					this->weightVec[i] = Sgn(this->weightVec[i]) * std::max(0.0,tmp);
-				}
-				break;
-			case NormType_L2S:
-				for (int i = 0; i < featDim; i++)
-				{
-					//truncatedd gradient
-					int stepK = (this->curIterNum - this->timeStamp[i]); 
-					double denorm = std::pow(1 + this->lambda,stepK);
-					this->weightVec[i] /= denorm;
-				}
-				break;
-			default:
-				throw invalid_argument("Unsupported update rule!");
-				break;
-		}
-		
 	}
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
 	void FOBOS<FeatType, LabelType>::UpdateWeightSize(int newDim)
 	{
-		if (newDim <= this->weightDim - 1)
+		if (newDim < this->weightDim)
 			return;
 		else
 		{
-			size_t* newT = new size_t[newDim + 1];
-			memset(newT,0,sizeof(size_t) * (newDim + 1));
-			memcpy(newT,this->timeStamp,sizeof(size_t) * (this->weightDim - 1));
-			newT[newDim] = this->timeStamp[this->weightDim - 1];
+            newDim++;
+			size_t* newT = new size_t[newDim];
+            //copy info
+			memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
+            //set the rest to zero
+			memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
 			delete []this->timeStamp;
 			this->timeStamp = newT;
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
 		}
 	}
 }
-
 

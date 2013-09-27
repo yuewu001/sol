@@ -45,22 +45,18 @@ namespace SOL
 		//select the best parameters for the model
 		virtual void BestParameter();
 
-	public:
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(int newDim);
-		
+				
 	protected:
 		//this is the core of different updating algorithms
 		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 		double UpdateWeightVec_PSU(const DataPoint<FeatType, LabelType> &x);
 		double UpdateWeightVec_CMD(const DataPoint<FeatType, LabelType> &x);
 
+        //Change the dimension of weights
+		virtual void UpdateWeightSize(int newDim);
+
 		//reset
-		virtual void Reset();
-		//called when a pass ends
-		virtual void PassEnd();
-		//called when a round ended
-		virtual void RoundEnd();
+		virtual void BeginTrain();
 
 	protected:
 		ASM_UpdateRule updateRule;
@@ -83,7 +79,6 @@ namespace SOL
 		this->timeStamp = new size_t[this->weightDim];
 		this->s = new double[this->weightDim];
 		this->u_t = new double[this->weightDim];
-		this->Reset();
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -118,41 +113,39 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double ASM_L1<FeatType,LabelType>::UpdateWeightVec_PSU(const DataPoint<FeatType, LabelType> &x)
 	{
-		int featDim = x.Dim();
+		int featDim = x.indexes.size();
+        int index_i = 0;
 		for (int i = 0; i < featDim; i++)
-		{
-			//lazy update
-			if (x[i] != 0)
-			{
-				//update s[i]
-				double Htii = this->delta + s[i];
-				this->weightVec[i] =  Sgn(-u_t[i]) * this->eta / Htii * 
-					std::max(0.0,std::abs(u_t[i]) - this->lambda * this->curIterNum);
-			}
-		}
+        {
+            index_i = x.indexes[i];
+            //lazy update
+            //update s[i]
+            double Htii = this->delta + s[index_i];
+            this->weightVec[index_i] =  Sgn(-u_t[index_i]) * this->eta / Htii * 
+                std::max(0.0,std::abs(u_t[index_i]) - this->lambda * this->curIterNum);
+        }
 		
 		//predict 
 		double y = this->Predict(x);
+        //get gradient
+        double gt = this->lossFunc->GetGradient(x,y);
+
+        double gt_i = 0;
 		//update
 		for (int i = 0; i < featDim; i++)
 		{
-			//lazy update
-			if (x[i] != 0)
-			{
-				//get gradient
-				double gt_i = this->lossFunc->GetGradient(x,y,i);
-				//update s[i]
-				this->s[i] = sqrt(this->s[i] * this->s[i] + gt_i * gt_i);
-				this->u_t[i] += gt_i;
-			}
+            index_i = x.indexes[i];
+            gt_i = gt * x.features[i];
+
+            this->s[index_i] = sqrt(this->s[index_i] * this->s[index_i] + gt_i * gt_i);
+            this->u_t[index_i] += gt_i;
 		}
 		//bias term
-		double gt_i = this->lossFunc->GetBiasGradient(x,y);
-		this->s[this->weightDim - 1] = sqrt(s[this->weightDim - 1] * s[this->weightDim - 1] + gt_i * gt_i);
-		this->u_t[this->weightDim - 1] += gt_i;
-		double Htii = this->delta + s[this->weightDim - 1];
-		this->weightVec[this->weightDim - 1] =  Sgn(-u_t[this->weightDim - 1]) * this->eta / Htii * 
-			std::max(0.0,std::abs(u_t[this->weightDim - 1]) - this->lambda * this->curIterNum);
+		this->s[0] = sqrt(s[0] * s[0] + gt * gt);
+		this->u_t[0] += gt;
+		double Htii = this->delta + s[0];
+		this->weightVec[0] =  Sgn(-u_t[0]) * this->eta / Htii * 
+			std::max(0.0,std::abs(u_t[0]) - this->lambda * this->curIterNum);
 
 		return y;
 	}
@@ -162,102 +155,61 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double ASM_L1<FeatType,LabelType>::UpdateWeightVec_CMD(const DataPoint<FeatType, LabelType> &x)
 	{
-		int featDim = x.Dim();
+		int featDim = x.indexes.size();
+        int index_i = 0;
 		for (int i = 0; i < featDim; i++)
-		{
-			//lazy update
-			if (x[i] != 0)
-			{
-				//update s[i]
-				double Ht0i = this->delta + s[i];
+        {
+            index_i = x.indexes[i];
+            //update s[i]
+            double Ht0i = this->delta + s[index_i];
 
-				//to obtain w_(t + 1),i, first calculate w_t,i
-				double tmp = std::abs(this->weightVec[i]) - 
-					this->lambda * this->eta * (this->curIterNum - this->timeStamp[i]) / Ht0i;
-				this->weightVec[i] = Sgn(this->weightVec[i]) * std::max(0.0,tmp);
-				//update the time stamp
-				this->timeStamp[i] = this->curIterNum;
-			}
-		}
+            //to obtain w_(t + 1),i, first calculate w_t,i
+            double tmp = std::abs(this->weightVec[index_i]) - 
+                this->lambda * this->eta * (this->curIterNum - this->timeStamp[index_i]) / Ht0i;
+            this->weightVec[index_i] = Sgn(this->weightVec[index_i]) * std::max(0.0,tmp);
+            //update the time stamp
+            this->timeStamp[index_i] = this->curIterNum;
+        }
 		double y = this->Predict(x);
+        //get gradient
+        double gt = this->lossFunc->GetGradient(x,y);
+        double gt_i = 0;
 
 		//update s[i]
 		for (int i = 0; i < featDim; i++)
 		{
-			if (x[i] != 0)
-			{
-				//get gradient
-				double gt_i = this->lossFunc->GetGradient(x,y,i);
-				this->s[i] = sqrt(s[i] * s[i] + gt_i * gt_i);
-				double Htii = this->delta + s[i];
-				//obtain w_(t + 1),i
-				this->weightVec[i] -= this->eta * gt_i / Htii;
-			}
+            index_i = x.indexes[i];
+            gt_i = gt * x.features[i];
+
+            this->s[index_i] = sqrt(s[index_i] * s[index_i] + gt_i * gt_i);
+            double Htii = this->delta + s[index_i];
+            //obtain w_(t + 1),i
+            this->weightVec[index_i] -= this->eta * gt_i / Htii;
 		}
 
 		//bias term
-		double gt_i = this->lossFunc->GetBiasGradient(x,y);
 		//update s[i]
-		this->s[this->weightDim - 1] = sqrt(s[this->weightDim - 1] * s[this->weightDim - 1] + gt_i * gt_i);
-		double Htii = this->delta + s[this->weightDim - 1];
+		this->s[0] = sqrt(s[0] * s[0] + gt * gt);
+		double Htii = this->delta + s[0];
 		//obtain w_t,i
-		double tmp = this->weightVec[this->weightDim - 1] - this->eta * gt_i / Htii;
-		this->weightVec[this->weightDim - 1] = Sgn(tmp) * std::max(std::abs(tmp) - this->lambda * this->eta / Htii,0.0);
+		double tmp = this->weightVec[0] - this->eta * gt / Htii;
+		this->weightVec[0] = Sgn(tmp) * std::max(std::abs(tmp) - this->lambda * this->eta / Htii,0.0);
 
 		return y;
 	}
 
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void ASM_L1<FeatType, LabelType>::Reset()
+	void ASM_L1<FeatType, LabelType>::BeginTrain()
 	{
-		Optimizer<FeatType, LabelType>::Reset();
+		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
 		memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
 		memset(this->s,0,sizeof(double) * this->weightDim);
 		memset(this->u_t, 0 ,sizeof(double) * this->weightDim);
 	}
 
-	//called when a pass ends
-	template <typename FeatType, typename LabelType>
-	void ASM_L1<FeatType,LabelType>::PassEnd()
-	{
-	}
-	
-	//called when a round ended
-	template <typename FeatType, typename LabelType>
-	void ASM_L1<FeatType,LabelType>::RoundEnd()
-	{
-		switch(updateRule)
-		{
-		case ASM_Update_PSU:
-			{
-				for (int i = 0; i < this->weightDim; i++)
-				{
-					double Htii = this->delta + s[i];
-					this->weightVec[i] =  Sgn(-u_t[i]) * this->eta / Htii * 
-						std::max(0.0,std::abs(u_t[i]) - this->lambda * (this->curIterNum - 1));
-				}
-			}
-			break;
-		case ASM_Update_CMDU:
-			{
-				for (int i = 0; i < this->weightDim ; i++)
-				{
-					double Ht0i = this->delta + this->s[i];
-					double tmp = std::abs(this->weightVec[i]) - 
-						this->lambda * this->eta * (this->curIterNum - this->timeStamp[i]) / Ht0i;
-					this->weightVec[i] = Sgn(this->weightVec[i]) * std::max(0.0,tmp);
-				}
-			}
-			break;
-		default:
-			throw invalid_argument("Unkonw update rule!");
-			break;
-		}
-	}
-
-	//get the best model parameter
+    //get the best model parameter
 	template <typename FeatType, typename LabelType>
 	void ASM_L1<FeatType, LabelType>::BestParameter()
 	{
@@ -274,8 +226,6 @@ namespace SOL
 		double bestEta = 1;
 		double bestDelta = 1;
 
-		this->dataSet.RandomOrder();
-
 		for (double eta_c = eta_min; eta_c<= eta_max; eta_c *= 10)
 		{
 			this->eta = eta_c;
@@ -284,11 +234,7 @@ namespace SOL
 				cout<<"eta = "<<eta_c<<" delta= "<<delt;
 				this->delta = delt;
 				float errorRate(0);
-				//for(int k = 1; k < 10; k++)
-				{
-					errorRate += this->RunOnce();
-				}
-				//errorRate /= 10;
+                errorRate += this->Train();
 
 				if (errorRate < min_errorRate)
 				{
@@ -319,32 +265,32 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	void ASM_L1<FeatType, LabelType>::UpdateWeightSize(int newDim)
 	{
-		if (newDim < this->weightDim - 1)
+		if (newDim < this->weightDim)
 			return;
 		else
 		{
-			size_t* newT = new size_t[newDim + 1];
-			memset(newT,0,sizeof(size_t) * (newDim + 1));
-			memcpy(newT,this->timeStamp,sizeof(size_t) * (this->weightDim - 1));
-			newT[newDim] = this->timeStamp[this->weightDim - 1];
-			delete []this->timeStamp;
-			this->timeStamp = newT;
-
+            newDim++;
+			size_t* newT = new size_t[newDim];
 			double* newS = new double[newDim + 1];
-			memset(newS,0,sizeof(double) * (newDim + 1));
-			memcpy(newS,this->s,sizeof(double) * (this->weightDim - 1));
-			newS[newDim] = this->s[this->weightDim - 1];
-			delete []this->s;
-			this->s = newS;
-
 			double* newUt = new double[newDim + 1];
-			memset(newUt,0,sizeof(double) * (newDim + 1));
-			memcpy(newUt,this->u_t,sizeof(double) * (this->weightDim - 1));
-			newUt[newDim] = this->u_t[this->weightDim - 1];
+            //copy info
+			memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
+			memcpy(newS,this->s,sizeof(double) * this->weightDim);
+			memcpy(newUt,this->u_t,sizeof(double) * this->weightDim);
+            //set the rest to zero
+			memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
+			memset(newS + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
+			memset(newUt + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
+
+			delete []this->timeStamp;
+			delete []this->s;
 			delete []this->u_t;
+
+			this->timeStamp = newT;
+			this->s = newS;
 			this->u_t = newUt;
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
 		}
 	}
 }

@@ -1,12 +1,12 @@
-DEBUG_FLAG=0
+DEBUG_FLAG=1
 
 DEBUG=-g -Wall
 RELEASE=-O2 -s
 
-INCLUDE=-I . -I ./data
-VPATH=.:./data
+INCLUDE=-I . -I ./data -I ./loss -I./optimizer
+VPATH=.:./data:./loss:./optimizer
 
-CFLAGS=-c $(INCLUDE)
+CFLAGS=-c $(INCLUDE) -Wno-write-strings
 LDFLAGS=-lpthread
 
 ifeq ($(DEBUG_FLAG),1)
@@ -15,7 +15,7 @@ else
 	CFLAGS += $(RELEASE)
 endif
 
-OBJS=test.o
+OBJS=test.o Params.o
 TARGET=test
 
 all:$(TARGET)

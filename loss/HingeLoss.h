@@ -14,30 +14,17 @@ namespace SOL
 	class HingeLoss: public LossFunction<FeatType, LabelType>
 	{
 		public:
-			virtual  bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-				return Sgn(predict) == x.Label() ? true : false;
-			} 
-
 			virtual  double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict)
 			{
-				if (this->IsCorrect(x,predict) == false)
-					return std::max(0.0, 1 - predict * x.Label());
-				else
-					return 0;
+                return std::max(0.0, 1 - predict * x.label);
 			}
 
-			virtual  double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict, int index)
+			virtual  double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict)
 			{
-				if (this->IsCorrect(x,predict) == true)
+                if (this->GetLoss(x,predict) > 0)
+                    return -x.label;
+                else
 					return 0;
-				return - x.Label() * x[index];
-			}
-			virtual  double GetBiasGradient(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-				if (this->IsCorrect(x,predict) == true)
-					return 0;
-				return -x.Label();
 			}
 	};
 }
