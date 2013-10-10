@@ -104,7 +104,7 @@ int main(int argc, char** args)
 
     delete lossFunc;
     delete opti;
-    //delete []argv;
+    delete []argv;
 
     return 0;
 }
@@ -218,8 +218,9 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 
 void FakeInput(int &argc, char **args, char** &argv)
 {
-    char* fileName = "/home/matthew/SOL/data/rcv1.train";
-    char* cache_fileName = "/home/matthew/SOL/data/cache_rcv1";
+    char* fileName = "../data/rcv1.train";
+    //char* cache_fileName = "../data/cache_rcv1";
+    char* testFileName = "../data/rcv1.test";
     /*
 #if WIN32
     char* fileName = "D:/Skydrive/Coding/Projects/SOL/data/MNIST/train-images-idx3-ubyte";
@@ -233,15 +234,17 @@ void FakeInput(int &argc, char **args, char** &argv)
     char* testLabelFile = "/home/matthew/SOL/data/MNIST/t10k-labels-idx1-ubyte";
 #endif
 */
-    int app_len = 4;
+    int app_len = 6;
     argv = new char*[argc + app_len];
     for (int i = 0; i < argc; i++)
         argv[i] = args[i];
 
     argv[argc] = "-i";
     argv[argc + 1] = fileName;
-    argv[argc + 2] = "-c";
-    argv[argc + 3] = cache_fileName;
+    argv[argc + 2] = "-t";
+    argv[argc + 3] = testFileName;
+    argv[argc + 4] = "-opt";
+    argv[argc + 5] = "RDA_E";
     /*
     argv[argc + 2] = "-il";
     argv[argc + 3] = labelFile;

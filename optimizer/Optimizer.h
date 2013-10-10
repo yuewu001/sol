@@ -168,6 +168,7 @@ namespace SOL
 					errorNum++;
 			}
 			dataSet.FinishRead();
+            cout<<this->curIterNum<<endl;
 		}
 		this->EndTrain();
 
