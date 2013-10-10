@@ -107,6 +107,7 @@ namespace SOL
                 if(endptr == label || *endptr != '\0')
                     return false;
 
+                data.erase();
                 int index;
                 FeatType feat;
                 // features
@@ -124,7 +125,7 @@ namespace SOL
                         printf("index should be no less than 1\n");
                     }
                     errno = 0;
-                    feat =  strtod(val,&endptr);
+                    feat =  static_cast<float>(strtod(val,&endptr));
                     if (endptr == val || errno != 0 || 
                             (*endptr != '\0' && !isspace(*endptr)))
                     {

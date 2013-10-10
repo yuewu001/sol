@@ -25,7 +25,7 @@ namespace SOL
         public:
 		bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict)
         {
-            return this->Sign(predict) == x.label ? true : false;
+            return Sign(predict) == x.label ? true : false;
         }
 
         virtual double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict) = 0;

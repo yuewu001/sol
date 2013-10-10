@@ -20,12 +20,17 @@ namespace SOL
     {
         //dataset for binary classification
         DataSet_Type_BC = 0x00000100,
-        //dataset for multiclass classification
-        DataSet_Type_MC = 0x00001000,
+        //dataset 0or multiclass classi0ication
+        DataSet_Type_MC = 0x00000200,
         //LibSVM DataSet
-        DataSet_LibSVM  = 1,
+        DataSet_LibSVM  = 0x00000001,
         //MNISTDATASET
-        DataSet_MNIST   = 2,
+        DataSet_MNIST   = 0x00000002,
+
+		//clear bc/mc
+		DataSet_Work_Type_Clear = 0xffff00ff,
+		//clear data type
+		DataSet_Data_Type_Clear = 0xffffff00,
     };
 
     //optimization method
@@ -34,9 +39,10 @@ namespace SOL
         Opti_SGD        = 0,
         Opti_STG        = 1,
         Opti_RDA        = 2,
-        Opti_FOBOS      = 3,
-        Opti_Ada_RDA    = 4,
-        Opti_Ada_FOBOS  = 5,
+		Opti_RDA_E		= 3,
+        Opti_FOBOS      = 4,
+        Opti_Ada_RDA    = 5,
+        Opti_Ada_FOBOS  = 6,
     };
 
     enum NormType

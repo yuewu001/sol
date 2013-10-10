@@ -27,10 +27,13 @@ using namespace std;
  */
 namespace SOL
 {
-    static const int init_buf_size = 2;
-
     template <typename T1, typename T2> class DataSet;
-    template <typename T1, typename T2> void* thread_LoadCache(void* param)
+    template <typename T1, typename T2> 
+#if WIN32
+	DWORD WINAPI thread_LoadCache(LPVOID param)
+#else
+	void* thread_LoadCache(void* param)
+#endif
     {
         DataSet<T1,T2>* dataset = static_cast<DataSet<T1,T2>*>(param);
         libsvm_binary_<T1,T2>* reader = dataset->reader;
@@ -46,7 +49,6 @@ namespace SOL
                     DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
                     chunk.erase();
                     not_file_end = reader->GetNextData(chunk);
-
                     mutex_lock(&dataset->data_lock); 
                     //notice that there is data available
                     dataset->wt_ptr = dataset->wt_ptr->next;
@@ -68,7 +70,6 @@ namespace SOL
             dataset->load_finished = true;
             dataset->is_on_loading = false;
             condition_variable_signal_all(&dataset->data_available);
-            cout<<"Load data finished!"<<endl;
             mutex_unlock(&dataset->data_lock);
 
             return NULL;
@@ -116,7 +117,7 @@ namespace SOL
                 this->wt_ptr = NULL;
                 this->rd_ptr = NULL;
 
-                this->passNum = passes; 
+                this->passNum = passes > 0 ? passes : 1; 
                 this->dataNum = 0;
                 this->curChunkNum = 0;
 
@@ -199,7 +200,11 @@ namespace SOL
             } 
 
         public:
+#if WIN32
+            template <typename T1, typename T2> friend DWORD WINAPI thread_LoadCache(LPVOID param);
+#else
             template <typename T1, typename T2> friend void* thread_LoadCache(void* param);
+#endif
 
             //bind a data reader to the dataset
             bool Load(const string &fileName)
@@ -273,8 +278,12 @@ namespace SOL
                 this->is_on_loading = true;
                 mutex_unlock(&this->data_lock);
 
-                pthread_t thread1;
-                pthread_create(&thread1,NULL,thread_LoadCache<FeatType,LabelType>,this);
+#if WIN32
+				HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadCache<FeatType,LabelType>), this, NULL, NULL);
+#else
+                pthread_t thread;
+                pthread_create(&thread,NULL,thread_LoadCache<FeatType,LabelType>,this);
+#endif
                 return true;
             }
     };

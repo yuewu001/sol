@@ -32,10 +32,12 @@ namespace SOL
 		LossFunction<FeatType, LabelType> &lossFunc,
 			NormType type): Optimizer<FeatType, LabelType>(dataset, lossFunc) 
 	{
+        this->id_str = "SGD";
 		this->normType = type;
 
         //sparse soft threshold
-        this->sparse_soft_thresh = 1e-6;
+		if (this->normType == NormType_L1)
+			this->sparse_soft_thresh = init_sparse_soft_thresh;
 	}
 
 	template <typename FeatType, typename LabelType>

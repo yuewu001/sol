@@ -8,12 +8,12 @@
 #pragma once
 
 #include "s_array.h"
+#include "../common/init_param.h"
 
 #include <cstring>
 
 namespace SOL
 {
-    static const int chunk_buf_size = 256; 
     /**
      *  Definitions of DataPoint: one lable, and DataPoints
      *
@@ -23,12 +23,12 @@ namespace SOL
     {
         public:
             //////////////Member Variables
-            s_array<size_t> indexes;
+            s_array<int> indexes;
             s_array<FeatType> features;
             s_array<float> weights;
             LabelType label;
 
-            size_t max_index;
+            int max_index;
             //for copy and release control
             int *count;
 
@@ -69,7 +69,7 @@ namespace SOL
                 return *this;
             }
             //set new index-value pair
-            void AddNewFeat(const size_t &index, const FeatType &feat, const float weight = 0)
+            void AddNewFeat(const int &index, const FeatType &feat, const float weight = 0)
             {
                 this->indexes.push_back(index);
                 this->features.push_back(feat);
@@ -86,7 +86,7 @@ namespace SOL
                 this->max_index = 0;
             }
 
-            size_t dim() const {return this->max_index;}
+            int dim() const {return this->max_index;}
 
         private:
             void release()
@@ -100,7 +100,7 @@ namespace SOL
     };
     template <typename FeatType, typename LabelType> struct DataChunk
     {
-        DataPoint<FeatType, LabelType> data[chunk_buf_size];
+        DataPoint<FeatType, LabelType> data[init_chunk_size];
         size_t dataNum;
         DataChunk *next;
 

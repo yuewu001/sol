@@ -99,27 +99,30 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double FOBOS<FeatType,LabelType>::UpdateWeightVec_L1(const DataPoint<FeatType, LabelType> &x)
 	{
+		double y = this->Predict(x);
 		int featDim = x.indexes.size();
+		double gt_i = this->lossFunc->GetGradient(x,y);
+
         int index_i = 0;
+		double w_abs = 0;
 		for (int i = 0; i < featDim; i++)
 		{
             index_i = x.indexes[i];
+			//update the weight
+                this->weightVec[index_i] -= this->eta * gt_i * x.features[i];
 			//lazy update
-            
-            //in this process, we obtained w_(t)', that needs to be updated by stochastic gradient
             int stepK = this->curIterNum - this->timeStamp[index_i];
             this->timeStamp[index_i] = this->curIterNum;
 
+			w_abs = std::abs(this->weightVec[index_i]); 
             double alpha =  stepK * this->eta * this->lambda;
-            double tmp = std::abs(this->weightVec[index_i]) - alpha;
-            this->weightVec[index_i] = Sgn(this->weightVec[index_i]) * std::max(0.0,tmp);
+			if (w_abs > alpha)
+				this->weightVec[index_i] = this->weightVec[index_i] -
+				alpha * Sgn(this->weightVec[index_i]);
+			else
+				this->weightVec[index_i] = 0;
 		}
 
-		double y = this->Predict(x);
-        double gt_i = this->lossFunc->GetGradient(x,y);
-		for (int i = 0; i < featDim; i++)
-            this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];//update the weight
-		
 		//update bias term
 		this->weightVec[0] -= this->eta * gt_i;
 

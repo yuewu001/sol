@@ -15,8 +15,6 @@
 #pragma once
 #include "DataSet.h"
 
-#include <iostream>
-#include <vector>
 #include <limits>
 
 namespace SOL
@@ -34,8 +32,8 @@ namespace SOL
 
             int min_index;
 
-			size_t trainFileStartPos;
-			size_t labelFileStartPos;
+			std::streamoff trainFileStartPos;
+			std::streamoff labelFileStartPos;
 
             unsigned char* rd_buf;
 
@@ -45,7 +43,7 @@ namespace SOL
 			trainFileName(trainFile),labelFileName(labelFile),
 			num1(digit1),num2(digit2)
         {
-            min_index = numeric_limits<int>::max();
+			this->min_index = (std::numeric_limits<int>::max)();
             featDim = 0;
             imgNum = 0;
             rd_buf = NULL;
@@ -134,6 +132,7 @@ namespace SOL
 				if (!inTrainFile.good() || !inLabelFile.good())
 					return false;
 
+				data.erase();
 				//get next label
 				char label;
 				inLabelFile.read((char*)&label,sizeof(char)); 

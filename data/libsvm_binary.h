@@ -89,14 +89,15 @@ namespace SOL
             
             bool GetNextData(DataPoint<FeatType, LabelType> &data)
             {
-                size_t featNum = 0;
-                file.read((char*)&featNum,sizeof(size_t));
+				data.erase();
+                int featNum = 0;
+                file.read((char*)&featNum,sizeof(int));
                 if (featNum > 0)
                 {
-                    file.read((char*)&(data.max_index),sizeof(size_t));
+                    file.read((char*)&(data.max_index),sizeof(int));
                     file.read((char*)&data.label,sizeof(LabelType));
                     data.indexes.resize(featNum);
-                    file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
+                    file.read((char*)data.indexes.begin,sizeof(int) * featNum);
                     data.features.resize(featNum);
                     file.read((char*)data.features.begin,sizeof(FeatType) * featNum);
                     //file.read((char*)data.weights.begin,sizeof(float) * featNum);
@@ -108,18 +109,19 @@ namespace SOL
 
             bool GetNextData(DataChunk<FeatType, LabelType> &chunk)
             {
-                for (int i = 0; i < chunk_buf_size; i++)
+				chunk.erase();
+                for (int i = 0; i < init_chunk_size; i++)
                 {
                     DataPoint<FeatType,LabelType> &data = chunk.data[i];
 
-                    size_t featNum = 0;
-                    file.read((char*)&featNum,sizeof(size_t));
+                    int featNum = 0;
+                    file.read((char*)&featNum,sizeof(int));
                     if (featNum > 0)
                     {
-                        file.read((char*)&(data.max_index),sizeof(size_t));
+                        file.read((char*)&(data.max_index),sizeof(int));
                         file.read((char*)&data.label,sizeof(LabelType));
                         data.indexes.resize(featNum);
-                        file.read((char*)data.indexes.begin,sizeof(size_t) * featNum);
+                        file.read((char*)data.indexes.begin,sizeof(int) * featNum);
                         data.features.resize(featNum);
                         file.read((char*)data.features.begin,sizeof(FeatType) * featNum);
                         //file.read((char*)data.weights.begin,sizeof(float) * featNum);
@@ -135,11 +137,11 @@ namespace SOL
 
             bool WriteData(DataPoint<FeatType, LabelType> &data)
             {
-                size_t featNum = data.indexes.size();
-                file.write((const char*)&featNum,sizeof(size_t));
-                file.write((const char*)&(data.max_index),sizeof(size_t));
+                int featNum = data.indexes.size();
+                file.write((const char*)&featNum,sizeof(int));
+                file.write((const char*)&(data.max_index),sizeof(int));
                 file.write((const char*)&data.label,sizeof(LabelType));
-                file.write((const char*)data.indexes.begin,sizeof(size_t) * featNum);
+                file.write((const char*)data.indexes.begin,sizeof(int) * featNum);
                 file.write((const char*)data.features.begin,sizeof(FeatType) * featNum);
                 //file.write((const char*)data.weights.begin,sizeof(float) * featNum);
                 return true;

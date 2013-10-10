@@ -11,6 +11,7 @@
 #include "data/libsvmread.h"
 #include "data/libsvm_binary.h"
 #include "data/MNISTReader.h"
+#include "common/init_param.h"
 #include "Params.h"
 
 
@@ -19,22 +20,27 @@ using namespace std;
 
 namespace SOL
 {
-    template <typename FeatType, typename LabelType> class DataSet_Converter_
+    template <typename FeatType, typename LabelType> class DataSet_Converter
     {
         public:
-            static bool Convert(const Params &param)
+            static bool Convert(const Params &param, bool is_test_file = false)
             {
-                string tmpFileName = "tmp~";
-                libsvm_binary writer(tmpFileName);
+                string cache_file;
+                if (is_test_file == false)
+                    cache_file = param.cache_fileName;
+                else
+                    cache_file = param.test_cache_fileName;
+
+                libsvm_binary_<FeatType, LabelType> writer(cache_file);
                 if (writer.OpenWriting() == false)
                     return false;
 
                 DataReader<FeatType, LabelType> *reader = NULL;
-                GetDataReader(param,reader);
+                GetDataReader(param,reader,is_test_file);
                 if (reader == NULL)
                     return false;
 
-                bool is_bc = (param.data_type && DataSet_Type_BC) == 0;
+                bool is_bc = ((param.data_type && DataSet_Type_BC) != 0);
                 DataPoint<FeatType, LabelType> data;
                 size_t dataNum = 0;
                 if (reader->OpenReading() == true)
@@ -42,7 +48,6 @@ namespace SOL
                     reader->Rewind();
                     while(true)
                     {
-                        data.erase();
                         if (reader->GetNextData(data) == true)
                         {
                             if (data.indexes.size() == 0)
@@ -67,61 +72,52 @@ namespace SOL
                 reader->Close();
                 writer.Close();
 
-                return NormalizeData(min_index, tmpFileName, param.cache_fileName);
+				if (min_index < 1)
+				{
+					cout<<"feature index should no less than 1!"<<endl;
+					return false;
+				}
+                return true;
             }
 
         private:
-            static bool NormalizeData(int min_index, const string& tmpFileName, const string &cache_file)
-            {
-                //check if the min_index is 1
-                if (min_index == 1) //rename the temp file to 
-                {
-                    string cmd = "mv -f \"" + tmpFileName + "\" " + "\"" + cache_file + "\"";
-                    int status = system(cmd.c_str());
-                    return true;
-                }
-                else
-                {
-                    libsvm_binary inFile(tmpFileName);
-                    libsvm_binary outFile(cache_file);
-                    if (outFile.OpenWriting() == false)
-                        return false;
+            static bool NormalizeData(int min_index, const string &cache_file)
+			{
+#if WIN32
+				string cmd = "ren \"" + init_tmp_file + "\" " + "\"" + cache_file + "\"";
+#else
+				string cmd = "mv -f \"" + init_tmp_file + "\" " + "\"" + cache_file + "\"";
+#endif
+				int status = system(cmd.c_str());
+				if (status != 0)
+				{
+					cout<<"Convert data set failed!"<<endl;
+					return false;
+				}
 
-                    if (inFile.OpenReading() == true)
-                    {
-                        int offset = min_index - 1;
-                        DataPoint<FeatType, LabelType> data;
-                        while(true)
-                        {
-                            data.erase();
-                            if (inFile.GetNextData(data) == true)
-                            {
-                                int dim = data.indexes.size();
-                                for (int i = 0; i < dim; i++)
-                                    data.indexes[i] -= offset; 
-                                data.max_index -= offset;
-                                outFile.WriteData(data);
-                            }
-                            else
-                                break;
-                        }
-                    }
-                    else
-                        return false;
-                    return true;
-                }
-            }
+				return true;
+			}
 
-            static void GetDataReader(const Params &param, DataReader<FeatType, LabelType> *&reader)
+            static void GetDataReader(const Params &param, DataReader<FeatType, LabelType> *&reader, bool is_test_file = false)
             {
-                switch(param.data_type)
+				enum_DataSet_Type data_type = static_cast<enum_DataSet_Type>(param.data_type & DataSet_Work_Type_Clear);
+                switch(data_type)
                 {
                     case DataSet_LibSVM:
-                        reader = new LibSVMReader_<FeatType, LabelType>(param.fileName);
+						if (is_test_file == false)
+							reader = new LibSVMReader_<FeatType, LabelType>(param.fileName);
+						else
+							reader = new LibSVMReader_<FeatType, LabelType>(param.test_fileName);
                         break;
                     case DataSet_MNIST:
-                        reader = new MNISTReader<FeatType,LabelType>(param.fileName,param.labelFile,param.digit_1,param.digit_2);
+						{
+						if (is_test_file == false)
+							reader = new MNISTReader<FeatType,LabelType>(param.fileName,param.labelFile,param.digit_1,param.digit_2);
+						else
+							reader = new MNISTReader<FeatType,LabelType>(param.test_fileName,param.test_label_fileName,param.digit_1,param.digit_2);
+
                         break;
+						}
                     default:
                         reader = NULL;
                         break;
@@ -130,7 +126,5 @@ namespace SOL
 
             
     };
-
-    typedef DataSet_Converter_<float,char> DataSet_Converter;
 }
 

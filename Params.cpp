@@ -7,6 +7,7 @@
 #include "Params.h"
 #include "common/md5.h"
 #include "common/util.h"
+#include "common/init_param.h"
 
 #include <cstdlib>
 
@@ -74,42 +75,56 @@ namespace SOL
                 this->digit_1 = atoi(args[i+1]);
             else if (strcmp(args[i],"-d2") == 0 && i + 1  <argc)
                 this->digit_2 = atoi(args[i + 1]);
-            else if (strcmp(args[i],"-cs") == 0 && i + 1 < argc)
-                this->chunk_size = atoi(args[i+1]);
+            else if (strcmp(args[i],"-bs") == 0 && i + 1 < argc)
+                this->buf_size = atoi(args[i+1]);
             else if(strcmp(args[i],"-lt") == 0 && i + 1 < argc)
                 this->loss_type = this->GetLossType(args[i+1]);
             else if (strcmp(args[i],"-g") == 0 && i + 1 < argc)
                 this->gamma = strtod(args[i+1],NULL);
-            else if (strcmp(args[i],"-r") == 0 && i + 1 < argc)
+            else if (strcmp(args[i],"-rou") == 0 && i + 1 < argc)
                 this->rou = strtod(args[i + 1],NULL);
+			else if (strcmp(args[i],"-rand") == 0)
+				this->is_rand = true;
+			else if (strcmp(args[i],"-rn") == 0 && i + 1 < argc)
+				this->round_num = atoi(args[i + 1]);
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else
                 continue;
-            i++; 
         }
         //check if cache file exists
-        if (this->cache_fileName.size() == 0)
+		if (this->cache_fileName.size() == 0 && this->fileName.length() != 0)
             this->cache_fileName = "tmp_" + md5(this->fileName);
+		if(this->test_cache_fileName.size() == 0 && this->test_fileName.length() != 0)
+			this->test_cache_fileName = "tmp_" + md5(this->test_fileName);
+
+		if ((this->data_type & DataSet_MNIST) != 0 && 
+			(this->digit_1 == -1 || this->digit_2 == -1))
+		{
+			cout<<"you must specify two numbers to classify for MINST dataset"<<endl;
+			exit(0);
+		}
     }
 
     //default parameter settings
     void Params::Default()
     {
-        this->data_type = DataSet_LibSVM;
-        this->opti_method = Opti_RDA;
+        this->data_type = init_data_type;
+        this->opti_method = init_opti_method;
+        this->loss_type = init_loss_type;
         this->passNum = 1;
         this->eta = -1;
-        this->lambda = 0;
+        this->lambda = -1;
         this->theta = -1;
         this->delta = -1;
-        this->K = 10;
-        this->digit_1 = -1;
-        this->digit_2 = -1;
-        this->chunk_size = -1;
+        this->K = -1;
+        this->digit_1 = 6;
+        this->digit_2 = 7;
+        this->buf_size = -1;
         this->gamma = -1;
         this->rou = -1;
-        this->loss_type = Loss_Type_Logit;
+		this->is_rand = init_is_random;
+		this->round_num = init_round_num;
     }
 
     void Params::ParseOptiMethod(char *str_method)
@@ -123,11 +138,13 @@ namespace SOL
             this->opti_method = Opti_STG;
         else if (strcmp(c_str,"RDA") == 0)
             this->opti_method = Opti_RDA;
+		else if (strcmp(c_str,"RDA_E") == 0)
+			this->opti_method = Opti_RDA_E;
         else if (strcmp(c_str,"FOBOS") == 0)
             this->opti_method = Opti_FOBOS;
-        else if (strcmp(c_str, "ADARDA") == 0)
+        else if (strcmp(c_str, "ADA-RDA") == 0)
             this->opti_method = Opti_Ada_RDA;
-        else if (strcmp(c_str, "ADAFOBOS") == 0)
+        else if (strcmp(c_str, "ADA-FOBOS") == 0)
             this->opti_method = Opti_Ada_FOBOS;
         else
         {
@@ -142,9 +159,15 @@ namespace SOL
         ToUpperCase(str);
         const char* c_str = str.c_str();
         if (strcmp(c_str,"LIBSVM") == 0)
-            this->data_type = DataSet_LibSVM;
+		{
+			this->data_type &= DataSet_Data_Type_Clear;
+            this->data_type |= DataSet_LibSVM;
+		}
         else if (strcmp(c_str,"MNIST") == 0)
-            this->data_type = DataSet_MNIST;
+		{
+			this->data_type &= DataSet_Data_Type_Clear;
+            this->data_type |= DataSet_MNIST;
+		}
         else
         {
             cout<<"Unrecognized Dataset Type!"<<endl;
@@ -176,25 +199,27 @@ namespace SOL
     {
         cout<<"test -i input_data [-c cache_file] [option | value]\n";
         cout<<"Options: \n";
-        cout<<"-il:\t input label file (MINIST)\n";
         cout<<"-c:\t cache file name\n";
-        cout<<"-t:\t test file name\n";
+        cout<<"-t:\t test file name\n\n";
+        cout<<"-il:\t input label file (MINIST)\n";
         cout<<"-tl:\t test label file (MINST)\n";
         cout<<"-tc:\t test cache file (MINST)\n";
-        cout<<"-p:\t number of passes\n";
-        cout<<"-l1:\t value of l1 regularization\n";
-        cout<<"-k:\t number of K in truncated gradient\n";
-        cout<<"-eta:\t learning rate\n";
-        cout<<"-theta:\t value of truncated threshold\n";
-        cout<<"-delta:\t value of delta for Adaptive algorithms\n";
-        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|FOBOS|Ada-RDA|ADa-FOBOS\n";
-        cout<<"-dt:\t data type: \n\t\tLibSVM | MNIST\n";
         cout<<"-d1:\t digit value in MNIST\n";
-        cout<<"-d2:\t digit value in MNIST\n";
-        cout<<"-cs:\t number of chunks for buffering\n";
-        cout<<"-lt:\t loss function type\n\t\tHinge|Logit|Square\n";
+        cout<<"-dt:\t data type: \n\t\tLibSVM | MNIST\n";
+        cout<<"-d2:\t digit value in MNIST\n\n";
+        cout<<"-bs:\t number of chunks for buffering\n";
+        cout<<"-eta:\t learning rate\n";
+        cout<<"-delta:\t value of delta for Adaptive algorithms\n";
         cout<<"-g\t gamma\n";
-        cout<<"-r\t rou\n";
+        cout<<"-k:\t number of K in truncated gradient\n";
+        cout<<"-l1:\t value of l1 regularization\n";
+        cout<<"-lt:\t loss function type\n\t\tHinge|Logit|Square\n";
+        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|FOBOS|Ada-RDA|ADa-FOBOS\n";
+        cout<<"-p:\t number of passes\n";
+        cout<<"-rou:\t rou\n";
+		cout<<"-rand:\t randomize the order of data\n";
+		cout<<"-rn:\t number of rounds to test the performance of the algorithm\n";
+        cout<<"-theta:\t value of truncated threshold\n";
         exit(0);
     }
 }

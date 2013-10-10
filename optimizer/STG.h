@@ -25,7 +25,6 @@ namespace SOL
         protected:
             int K;
             double theta; //truncate threshold
-            double lambda; //truncate intensity, works as in L1 penalty
 
         protected:
             size_t*timeStamp;
@@ -36,13 +35,15 @@ namespace SOL
             virtual ~STG();
 
         public:
-            void SetParameterEx(double lambda = -1,int K = 10, 
+            void SetParameterEx(double lambda = -1,int K = -1, 
                     double eta = -1,double theta = -1);
         protected:
             //this is the core of different updating algorithms
             virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
             //reset the optimizer to this initialization
             virtual void BeginTrain();
+			 //called when a train ends
+            virtual void EndTrain();
 
             //Change the dimension of weights
             virtual void UpdateWeightSize(int newDim);
@@ -53,9 +54,14 @@ namespace SOL
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , timeStamp(NULL)
     {
-        this->K = 1;
-        this->theta = std::numeric_limits<double>::max();
+        this->id_str = "STG";
+        this->K = init_k;
+        this->theta = (std::numeric_limits<double>::max)();
         this->timeStamp = new size_t[this->weightDim];
+		if (this->K != 1)
+			this->sparse_soft_thresh = init_sparse_soft_thresh;
+		else
+			this->sparse_soft_thresh = 0;
     }
 
     template <typename FeatType, typename LabelType>
@@ -76,7 +82,7 @@ namespace SOL
             double gt_i = this->lossFunc->GetGradient(x,y);
 
             int index_i = 0;
-            double w_abs = 0;
+            double w_abs = 0, alpha = 0;
             for (int i = 0; i < featDim; i++)
             {
                 index_i = x.indexes[i];
@@ -96,16 +102,17 @@ namespace SOL
                 }
                 else
                     this->timeStamp[index_i] += stepK;
+				if (stepK == 0)
+					continue;
 
                 w_abs = std::abs(this->weightVec[index_i]); 
                 if (w_abs > this->theta)
                     continue;
                 else 
                 {
-                    double alpha =  stepK * this->eta * this->lambda;
+                    alpha =  stepK * this->eta * this->lambda;
                     if (w_abs > alpha)
-                        this->weightVec[index_i] = this->weightVec[index_i] -
-                            alpha * Sgn(this->weightVec[index_i]);
+                        this->weightVec[index_i] -= alpha * Sgn(this->weightVec[index_i]);
                     else
                         this->weightVec[index_i] = 0;
                 }
@@ -125,6 +132,35 @@ namespace SOL
             memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
         }
 
+		//called when a train ends
+    template <typename FeatType, typename LabelType>
+        void STG<FeatType, LabelType>::EndTrain()
+        {
+			double w_abs = 0, alpha = 0;
+			for (int index_i = 1; index_i < this->weightDim; index_i++)
+			{
+				//truncated gradient
+				int stepK = ((this->curIterNum - this->timeStamp[index_i]) / this->K) 
+					* this->K;
+
+				if (stepK == 0)
+					continue;
+
+				w_abs = std::abs(this->weightVec[index_i]); 
+				if (w_abs > this->theta)
+					continue;
+				else 
+				{
+					alpha =  stepK * this->eta * this->lambda;
+					if (w_abs > alpha)
+						this->weightVec[index_i] -= alpha * Sgn(this->weightVec[index_i]);
+					else
+						this->weightVec[index_i] = 0;
+				}
+			}
+            Optimizer<FeatType, LabelType>::EndTrain();
+        }
+
     template <typename FeatType, typename LabelType>
         void STG<FeatType, LabelType>::SetParameterEx(double lambda , int k,
                 double Eta,  double Theta) 
@@ -133,6 +169,10 @@ namespace SOL
             this->K = k > 0 ? k : this->K;
             this->theta = Theta > 0 ? Theta : this->theta;
             this->eta = Eta > 0 ? Eta : this->eta;
+			if (this->K == 1)
+				this->sparse_soft_thresh = 0;
+			else
+				this->sparse_soft_thresh = init_sparse_soft_thresh;
         }
 
     //Change the dimension of weights

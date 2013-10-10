@@ -16,7 +16,7 @@ namespace SOL
 		public:
 			virtual  double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict)
 			{
-                return std::max(0.0, 1 - predict * x.label);
+                return (std::max)(0.0, 1 - predict * x.label);
 			}
 
 			virtual  double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict)

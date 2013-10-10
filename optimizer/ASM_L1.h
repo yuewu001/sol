@@ -43,7 +43,7 @@ namespace SOL
 		void SetParameterEx(double lambda = -1, double delta = -1, double eta = -1);
 
 		//select the best parameters for the model
-		virtual void BestParameter();
+//		virtual void BestParameter();
 
 				
 	protected:
@@ -57,6 +57,10 @@ namespace SOL
 
 		//reset
 		virtual void BeginTrain();
+		//called when a train ends
+		virtual void EndTrain();
+		void EndTrain_PSU();
+		void EndTrain_CMD();
 
 	protected:
 		ASM_UpdateRule updateRule;
@@ -73,12 +77,25 @@ namespace SOL
 	Optimizer<FeatType, LabelType>(dataset, lossFunc), timeStamp(NULL),
 	s(NULL), u_t(NULL)
 	{
-		this->delta = 1;
+		this->delta = init_delta;;
 		this->updateRule = updateRule;
 
 		this->timeStamp = new size_t[this->weightDim];
 		this->s = new double[this->weightDim];
 		this->u_t = new double[this->weightDim];
+
+        switch(this->updateRule)
+        {
+			case ASM_Update_PSU:
+                this->id_str = "Adaptive RDA";
+				break;
+			case ASM_Update_CMDU:
+                this->id_str = "Adaptive FOBOS";
+				break;
+			default:
+				throw invalid_argument("Unkonw update rule!");
+				break;
+        }
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -115,6 +132,8 @@ namespace SOL
 	{
 		int featDim = x.indexes.size();
         int index_i = 0;
+
+		//obtain w_t
 		for (int i = 0; i < featDim; i++)
         {
             index_i = x.indexes[i];
@@ -122,7 +141,7 @@ namespace SOL
             //update s[i]
             double Htii = this->delta + s[index_i];
             this->weightVec[index_i] =  Sgn(-u_t[index_i]) * this->eta / Htii * 
-                std::max(0.0,std::abs(u_t[index_i]) - this->lambda * this->curIterNum);
+                (std::max)(0.0,std::abs(u_t[index_i]) - this->lambda * (this->curIterNum - 1));
         }
 		
 		//predict 
@@ -144,12 +163,9 @@ namespace SOL
 		this->s[0] = sqrt(s[0] * s[0] + gt * gt);
 		this->u_t[0] += gt;
 		double Htii = this->delta + s[0];
-		this->weightVec[0] =  Sgn(-u_t[0]) * this->eta / Htii * 
-			std::max(0.0,std::abs(u_t[0]) - this->lambda * this->curIterNum);
-
+		this->weightVec[0] = -u_t[0] * this->eta / Htii; 
 		return y;
 	}
-
 	
 	//update witt Composite Mirror-Descent
 	template <typename FeatType, typename LabelType>
@@ -157,6 +173,7 @@ namespace SOL
 	{
 		int featDim = x.indexes.size();
         int index_i = 0;
+		double w_abs = 0, alpha = 0;
 		for (int i = 0; i < featDim; i++)
         {
             index_i = x.indexes[i];
@@ -164,9 +181,14 @@ namespace SOL
             double Ht0i = this->delta + s[index_i];
 
             //to obtain w_(t + 1),i, first calculate w_t,i
-            double tmp = std::abs(this->weightVec[index_i]) - 
-                this->lambda * this->eta * (this->curIterNum - this->timeStamp[index_i]) / Ht0i;
-            this->weightVec[index_i] = Sgn(this->weightVec[index_i]) * std::max(0.0,tmp);
+			w_abs = std::abs(this->weightVec[index_i]); 
+			alpha = this->lambda * this->eta * (this->curIterNum - this->timeStamp[index_i]) / Ht0i;
+
+			if (w_abs > alpha)
+				this->weightVec[index_i] -= alpha * Sgn(this->weightVec[index_i]); 
+			else
+				this->weightVec[index_i] = 0;
+                
             //update the time stamp
             this->timeStamp[index_i] = this->curIterNum;
         }
@@ -188,12 +210,9 @@ namespace SOL
 		}
 
 		//bias term
-		//update s[i]
 		this->s[0] = sqrt(s[0] * s[0] + gt * gt);
 		double Htii = this->delta + s[0];
-		//obtain w_t,i
-		double tmp = this->weightVec[0] - this->eta * gt / Htii;
-		this->weightVec[0] = Sgn(tmp) * std::max(std::abs(tmp) - this->lambda * this->eta / Htii,0.0);
+		this->weightVec[0] -= this->eta * gt / Htii;
 
 		return y;
 	}
@@ -208,33 +227,79 @@ namespace SOL
 		memset(this->s,0,sizeof(double) * this->weightDim);
 		memset(this->u_t, 0 ,sizeof(double) * this->weightDim);
 	}
+	//called when a train ends
+	template <typename FeatType, typename LabelType>
+	void ASM_L1<FeatType, LabelType>::EndTrain()
+	{
+		switch(updateRule)
+		{
+			case ASM_Update_PSU:
+				return this->EndTrain_PSU();
+				break;
+			case ASM_Update_CMDU:
+				return this->EndTrain_CMD();
+				break;
+			default:
+				throw invalid_argument("Unkonw update rule!");
+				break;
+		}
+		Optimizer<FeatType, LabelType>::EndTrain();
+	}
 
-    //get the best model parameter
+	template <typename FeatType, typename LabelType>
+	void ASM_L1<FeatType, LabelType>::EndTrain_PSU()
+	{
+		for (int i = 1; i < this->weightDim; i++)
+		{
+			//lazy update
+			//update s[i]
+			double Htii = this->delta + s[i];
+			this->weightVec[i] =  Sgn(-u_t[i]) * this->eta / Htii * 
+				(std::max)(0.0,std::abs(u_t[i]) - this->lambda * this->curIterNum); 
+		}
+	}
+
+	template <typename FeatType, typename LabelType>
+	void ASM_L1<FeatType, LabelType>::EndTrain_CMD()
+	{
+		size_t iterNum = this->curIterNum + 1;
+		double w_abs = 0, alpha = 0;
+		for (int index_i = 1; index_i < this->weightDim; index_i++)
+		{
+			//update s[i]
+			double Ht0i = this->delta + s[index_i];
+			w_abs = std::abs(this->weightVec[index_i]); 
+			alpha = this->lambda * this->eta * (iterNum - this->timeStamp[index_i]) / Ht0i;
+
+			if (w_abs > alpha)
+				this->weightVec[index_i] -= alpha * Sgn(this->weightVec[index_i]); 
+			else
+				this->weightVec[index_i] = 0;
+		}
+	}
+
+    /*
+	//get the best model parameter
 	template <typename FeatType, typename LabelType>
 	void ASM_L1<FeatType, LabelType>::BestParameter()
 	{
 		double prevLambda = this->lambda;
-		this->lambda = 1;
+		this->lambda = 0;
 
 		//Select the best eta
-		double eta_min = 1e-10;
-		double eta_max = 1;
-		double delt_min = 0.1;
-		double delt_max = 10;
-
-		float min_errorRate = 1;
+		double min_errorRate = 1;
 		double bestEta = 1;
 		double bestDelta = 1;
 
-		for (double eta_c = eta_min; eta_c<= eta_max; eta_c *= 10)
+		for (double eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step)
 		{
 			this->eta = eta_c;
-			for (double delt = delt_min; delt <= delt_max; delt *= 10)
+			for (double delt = init_delta_min; delt <= init_delta_max; delt *= init_delta_step)
 			{
 				cout<<"eta = "<<eta_c<<" delta= "<<delt;
 				this->delta = delt;
-				float errorRate(0);
-                errorRate += this->Train();
+				double errorRate(0);
+				errorRate = this->Train();
 
 				if (errorRate < min_errorRate)
 				{
@@ -245,12 +310,13 @@ namespace SOL
 				cout<<" mistake rate: "<<errorRate * 100<<" %\n";
 			}
 		}
-		
+
 		this->eta = bestEta;
 		this->delta = bestDelta;
 		this->lambda = prevLambda;
-		cout<<"Best Parameter:\n\teta = "<<this->eta<<"\tdelta = "<<this->delta<<"\n\n";
+		cout<<"Best Parameter:\teta = "<<this->eta<<"\tdelta = "<<this->delta<<"\n\n";
 	}
+    */
 
 	//set parameters for specific optimizers
 	template <typename FeatType, typename LabelType>
@@ -269,15 +335,15 @@ namespace SOL
 			return;
 		else
 		{
-            newDim++;
+			newDim++;
 			size_t* newT = new size_t[newDim];
 			double* newS = new double[newDim + 1];
 			double* newUt = new double[newDim + 1];
-            //copy info
+			//copy info
 			memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
 			memcpy(newS,this->s,sizeof(double) * this->weightDim);
 			memcpy(newUt,this->u_t,sizeof(double) * this->weightDim);
-            //set the rest to zero
+			//set the rest to zero
 			memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
 			memset(newS + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
 			memset(newUt + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
@@ -293,6 +359,6 @@ namespace SOL
 			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
 		}
 	}
+
+
 }
-
-
