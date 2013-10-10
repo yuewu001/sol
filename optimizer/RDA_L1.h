@@ -25,7 +25,7 @@ namespace SOL
 		~RDA_L1();
 
 	public:
-		void SetParameterEx(double lambda, double gamma = -1, double rou = -1);
+		void SetParameterEx(double lambda, double rou = -1);
         //try and get the best parameter
         virtual void BestParameter(); 
 	
@@ -33,10 +33,6 @@ namespace SOL
 		//this is the core of different updating algorithms
 		//return the predict
 		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-		//standard RDA
-		virtual double UpdateWeightVec_S(const DataPoint<FeatType, LabelType> &x);
-		//enhanced RDA
-		virtual double UpdateWeightVec_E(const DataPoint<FeatType, LabelType> &x);
 		//reset the optimizer to this initialization
 		virtual void BeginTrain();
 		//called when a train ends
@@ -46,11 +42,10 @@ namespace SOL
 
 	protected:
 		double rou;
-		double gamma;
 
 		double * gtVec; //average gradient vector
 
-		bool is_enchanced;
+		bool is_enhanced;
 
 	};
 
@@ -59,10 +54,9 @@ namespace SOL
 	Optimizer<FeatType, LabelType>(dataset, lossFunc) 
 	{
         this->id_str = "RDA";
-		this->gamma = init_gamma;
 		this->rou = init_rou;
 		this->gtVec = new double[this->weightDim];
-		this->is_enchanced = enchance;
+		this->is_enhanced = enchance;
 	}
 
 
@@ -76,26 +70,15 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	double RDA_L1<FeatType,LabelType>::UpdateWeightVec(const DataPoint<FeatType, LabelType> &x)
 	{
-		switch(this->is_enchanced)
-		{
-		case true:
-			return this->UpdateWeightVec_E(x);
-			break;
-		case false:
-			return this->UpdateWeightVec_S(x);
-			break;
-		}
-		return 0;
-	}
-	//standard RDA
-	template <typename FeatType, typename LabelType>
-	double RDA_L1<FeatType,LabelType>::UpdateWeightVec_S(const DataPoint<FeatType, LabelType> &x)
-	{
 		size_t featDim = x.indexes.size();
 		int index_i = 0;
 		//obtain w_t
 		double coeff = -this->eta / std::sqrt(this->curIterNum - 1);
 		double lambda_t = this->lambda * (this->curIterNum - 1);
+        if (this->is_enhanced == true){
+            lambda_t += this->rou * std::sqrt(this->curIterNum - 1) / this->eta;
+        }
+
 		for (size_t i = 0; i < featDim; i++)
 		{
 			index_i = x.indexes[i];
@@ -119,44 +102,6 @@ namespace SOL
 
         return y;
 	}
-	//enhanced RDA
-	template <typename FeatType, typename LabelType>
-	double RDA_L1<FeatType,LabelType>::UpdateWeightVec_E(const DataPoint<FeatType, LabelType> &x)
-	{
-		double y = this->Predict(x);
-
-		//update average gradient
-		double coeff1 = 1.0 / this->curIterNum;
-		double coeff2 = 1.0 - coeff1;
-		double coeff3 = std::sqrt((double)this->curIterNum);
-		double lambda_t = this->lambda + this->gamma * this->rou / coeff3;
-
-        double gt_i = this->lossFunc->GetGradient(x,y);
-
-		int featDim = x.indexes.size();
-
-        for (int i = 1; i < this->weightDim; i++)
-            this->gtVec[i] *= coeff2;
-		for (int i = 0; i < featDim; i++)
-        {
-            this->gtVec[x.indexes[i]] += coeff1 * gt_i * x.features[i];
-        }
-        for  (int i = 1; i < this->weightDim; i++)
-        {
-			//update weights
-			if (this->gtVec[i] <= lambda_t && this->gtVec[i] >= -lambda_t)
-				this->weightVec[i] = 0;
-			else
-				this->weightVec[i] = (- coeff3 / this->gamma) * 
-					(this->gtVec[i] - lambda_t * Sgn(this->gtVec[i]));
-		}
-
-		//bias term
-		this->gtVec[0] = coeff2 * this->gtVec[0] + coeff1 * gt_i;
-		this->weightVec[0] = (-coeff3 / this->gamma) * this->gtVec[0];
-
-        return y;
-	}
 
 	//
 	//reset the optimizer to this initialization
@@ -171,10 +116,13 @@ namespace SOL
 	template <typename FeatType, typename LabelType>
 	void RDA_L1<FeatType, LabelType>::EndTrain()
 	{
-		if (this->is_enchanced == true || this->curIterNum == 0)
+		if (this->curIterNum == 0)
 			return;
 		double coeff = -this->eta / std::sqrt((double)this->curIterNum);
 		double lambda_t = this->lambda * this->curIterNum;
+        if (this->is_enhanced == true){
+            lambda_t += this->rou * std::sqrt(this->curIterNum) / this->eta;
+        }
 
 		for (int index_i = 1; index_i < this->weightDim; index_i++)
 		{
@@ -188,9 +136,8 @@ namespace SOL
 	}
 
 	template <typename FeatType, typename LabelType>
-	void RDA_L1<FeatType,LabelType>::SetParameterEx(double lambda,double gamma, double rou)
+	void RDA_L1<FeatType,LabelType>::SetParameterEx(double lambda, double rou)
 	{
-		this->gamma = gamma > 0 ? gamma : this->gamma;
 		this->rou = rou >= 0 ? rou : this->rou;
 		this->lambda = lambda >= 0 ? lambda : this->lambda;
 	}
@@ -215,11 +162,11 @@ namespace SOL
 			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
 		}
 	}
+
 	//try and get the best parameter
 	template <typename FeatType, typename LabelType>
 	void RDA_L1<FeatType, LabelType>::BestParameter()
 	{
-		if (this->is_enchanced == false)
-			Optimizer<FeatType,LabelType>::BestParameter();
+        Optimizer<FeatType,LabelType>::BestParameter();
 	}
 }

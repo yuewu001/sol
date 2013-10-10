@@ -11,6 +11,7 @@
 
 namespace SOL
 {
+//
 	/////////////////////Optimizer Initalization parameters//////////////////
 	//
     //value to be determined
@@ -35,7 +36,7 @@ namespace SOL
 	static const int init_round_num = 1;
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
-	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
+	static const int init_data_type = DataSet_Type_BC | DataSet_MNIST;
 	static const enum_Opti_Method init_opti_method = Opti_Ada_RDA;
 
 	//trying the optimal parameters
