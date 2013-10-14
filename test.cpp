@@ -13,6 +13,7 @@
 #include "optimizer/RDA_L1.h"
 #include "optimizer/FOBOS.h"
 #include "optimizer/ASM_L1.h"
+#include "optimizer/DAROW.h"
 
 #include "loss/LogisticLoss.h"
 #include "loss/HingeLoss.h"
@@ -210,6 +211,13 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
                 return opti;
                 break;
             }
+        case Opti_AROW:
+            {
+                DAROW<T1,T2> *opti = new DAROW<T1, T2>(dataset,lossFunc);
+                opti->SetParameterEx(param.lambda, param.r);
+                return opti;
+                break;
+            }
         default:
             break;
     }
@@ -218,23 +226,24 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 
 void FakeInput(int &argc, char **args, char** &argv)
 {
-    /*
-    char* fileName = "../data/rcv1.train";
+    char* fileName = "/home/matthew/work/data/rcv1.train";
     //char* cache_fileName = "../data/cache_rcv1";
-    char* testFileName = "../data/rcv1.test";
-    */
+    char* testFileName = "/home/matthew/work/data/rcv1.test";
+    /*
 #if WIN32
     char* fileName = "D:/Skydrive/Coding/Projects/SOL/data/MNIST/train-images-idx3-ubyte";
     char* labelFile = "D:/Skydrive/Coding/Projects/SOL/data/MNIST/train-labels-idx1-ubyte";
     char* testFileName = "D:/Skydrive/Coding/Projects/SOL/data/MNIST/t10k-images-idx3-ubyte";
     char* testLabelFile = "D:/Skydrive/Coding/Projects/SOL/data/MNIST/t10k-labels-idx1-ubyte";
 #else
-	char* fileName = "/home/matthew/SOL/data/MNIST/train-images-idx3-ubyte";
-    char* labelFile = "/home/matthew/SOL/data/MNIST/train-labels-idx1-ubyte";
-    char* testFileName = "/home/matthew/SOL/data/MNIST/t10k-images-idx3-ubyte";
-    char* testLabelFile = "/home/matthew/SOL/data/MNIST/t10k-labels-idx1-ubyte";
+	char* fileName = "/home/matthew/work/data/MNIST/train-images-idx3-ubyte";
+    char* labelFile = "/home/matthew/work/data/MNIST/train-labels-idx1-ubyte";
+    char* testFileName = "/home/matthew/work/data/MNIST/t10k-images-idx3-ubyte";
+    char* testLabelFile = "/home/matthew/work/data/MNIST/t10k-labels-idx1-ubyte";
 #endif
-    int app_len = 8;
+*/
+
+    int app_len = 4;
     argv = new char*[argc + app_len];
     for (int i = 0; i < argc; i++)
         argv[i] = args[i];
@@ -246,10 +255,10 @@ void FakeInput(int &argc, char **args, char** &argv)
 //    argv[argc + 4] = "-opt";
  //   argv[argc + 5] = "RDA_E";
 
-    argv[argc + 4] = "-il";
-    argv[argc + 5] = labelFile;
-    argv[argc + 6] = "-tl";
-    argv[argc + 7] = testLabelFile;
+//    argv[argc + 4] = "-il";
+//    argv[argc + 5] = labelFile;
+//    argv[argc + 6] = "-tl";
+//    argv[argc + 7] = testLabelFile;
 
     argc += app_len;
 }

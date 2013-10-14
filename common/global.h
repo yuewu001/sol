@@ -43,6 +43,7 @@ namespace SOL
         Opti_FOBOS      = 4,
         Opti_Ada_RDA    = 5,
         Opti_Ada_FOBOS  = 6,
+        Opti_AROW       = 7,
     };
 
     enum NormType

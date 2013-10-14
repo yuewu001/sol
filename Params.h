@@ -42,6 +42,7 @@ namespace SOL
 		double gamma; //fro RDA
 		double rou; //for RDA
 		double delta; //for Ada-
+        double r; //for AROW
 
 		int digit_1;	//digit number to be classified in MINST dataset
 		int digit_2;	//digit number to be classified in MINST dataset

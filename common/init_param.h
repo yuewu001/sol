@@ -34,9 +34,15 @@ namespace SOL
 	static const bool init_is_random = false;
 	//number of rounds to run to test the performances of the algorithm
 	static const int init_round_num = 1;
+    //trade-off parameter in AROW
+    static const int init_r = 1;
+    //skip value in SVM2SGD
+    static const int init_skip = 16;
+    //t0 to avoid large parameter updates in the few updates
+    static const int init_t0 = 10e4;
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
-	static const int init_data_type = DataSet_Type_BC | DataSet_MNIST;
+	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
 	static const enum_Opti_Method init_opti_method = Opti_Ada_RDA;
 
 	//trying the optimal parameters

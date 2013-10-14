@@ -65,6 +65,8 @@ namespace SOL
                 this->eta = strtod(args[i+1],NULL);
             else if (strcmp(args[i],"-theta") == 0 && i + 1 <argc)
                 this->theta = strtod(args[i+1],NULL);
+            else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
+                this->r = strtod(args[i+1], NULL);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
                 this->delta = strtod(args[i + 1],NULL);
             else if (strcmp(args[i],"-opt") == 0 && i + 1 < argc) //opti method
@@ -125,6 +127,7 @@ namespace SOL
         this->rou = -1;
 		this->is_rand = init_is_random;
 		this->round_num = init_round_num;
+        this->r = init_r;
     }
 
     void Params::ParseOptiMethod(char *str_method)
@@ -146,6 +149,8 @@ namespace SOL
             this->opti_method = Opti_Ada_RDA;
         else if (strcmp(c_str, "ADA-FOBOS") == 0)
             this->opti_method = Opti_Ada_FOBOS;
+        else if (strcmp(c_str, "AROW") == 0)
+            this->opti_method = Opti_AROW;
         else
         {
             cerr<<"Unrecognized Optimization method!"<<endl;
@@ -214,7 +219,7 @@ namespace SOL
         cout<<"-k:\t number of K in truncated gradient\n";
         cout<<"-l1:\t value of l1 regularization\n";
         cout<<"-lt:\t loss function type\n\t\tHinge|Logit|Square\n";
-        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|FOBOS|Ada-RDA|ADa-FOBOS\n";
+        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|FOBOS|Ada-RDA|ADa-FOBOS|AROW\n";
         cout<<"-p:\t number of passes\n";
         cout<<"-rou:\t rou\n";
 		cout<<"-rand:\t randomize the order of data\n";
