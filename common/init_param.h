@@ -43,7 +43,7 @@ namespace SOL
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
 	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
-	static const enum_Opti_Method init_opti_method = Opti_Ada_RDA;
+	static const enum_Opti_Method init_opti_method = Opti_RDA;
 
 	//trying the optimal parameters
 	static const double init_eta_max = 1;

@@ -12,6 +12,8 @@
 
 #include <algorithm>
 #include <numeric>
+#include <cstdio>
+
 
 /**
 *  namespace: Sparse Online Learning
@@ -52,6 +54,16 @@ namespace SOL
         
     protected:
         string id_str;
+
+    public:
+        /* by yuewuTue 15 Oct 2013 09:46:02 AM PDT*/
+        /**
+         * PrintOptInfo print the info of optimization algorithm
+         */
+        void PrintOptInfo()const {
+            printf("--------------------------------------------------\n");
+            printf("Algorithm: %s\n",this->Id_Str().c_str());
+        }
 
 	public:
 		Optimizer(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
@@ -179,8 +191,6 @@ namespace SOL
 	double Optimizer<FeatType, LabelType>::Learn(double &aveErrRate, double &varErrRate, 
 		double &sparseRate, int numOfTimes)
 	{
-		cout<<"\nLearning the model...\n";
-
 		double* errorRateVec = new double[numOfTimes];
 		double * sparseRateVec = new double[numOfTimes];
 

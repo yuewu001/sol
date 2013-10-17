@@ -11,7 +11,6 @@
 
 #include <cstdlib>
 
-
 namespace SOL
 {
     void ToUpperCase(string &str)

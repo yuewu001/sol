@@ -43,10 +43,10 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 
 int main(int argc, char** args)
 {
-    char** argv;
-    FakeInput(argc, args, argv);
-    Params param(argc, argv);
-    //Params param(argc, args);
+    //char** argv;
+    //FakeInput(argc, args, argv);
+    //Params param(argc, argv);
+    Params param(argc, args);
 
     if (PrepareDataset(param) == false)
         return -1;
@@ -66,6 +66,8 @@ int main(int argc, char** args)
 	//learn the best parameters
     opti->BestParameter();
 
+    opti->PrintOptInfo();
+
     double l_errRate(0), l_varErr(0);	//learning error rate
 	double sparseRate(0);
 
@@ -76,9 +78,7 @@ int main(int argc, char** args)
 
     clock_t time2 = clock();
 
-	printf("--------------------------------------------------\n");
-	printf("Algorithm: %s\n",opti->Id_Str().c_str());
-    printf("learning error rate %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
+    printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
 	clock_t time3 = 0;
 	//test the model
@@ -92,7 +92,7 @@ int main(int argc, char** args)
 			t_errRate = opti->Test(testset);
 			time3 = clock();
 
-			printf("Test error rate %.2f %%\n",t_errRate * 100); 
+			printf("Test error rate: %.2f %%\n",t_errRate * 100); 
 		}
         else
             cout<<"load test set failed!"<<endl;
@@ -105,7 +105,6 @@ int main(int argc, char** args)
 
     delete lossFunc;
     delete opti;
-    delete []argv;
 
     return 0;
 }

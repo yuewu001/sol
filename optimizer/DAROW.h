@@ -23,6 +23,8 @@ namespace SOL
             double r;
             double* sigma_w;
 
+            size_t* timeStamp;
+
         public:
             DAROW(DataSet<FeatType, LabelType> &dataset, 
                     LossFunction<FeatType, LabelType> &lossFunc);
@@ -54,6 +56,7 @@ namespace SOL
         this->id_str = "DAROW";
         this->r = init_r;
         this->sigma_w = new double[this->weightDim];
+        this->timeStamp = new size_t[this->weightDim];
         this->sparse_soft_thresh = 0;
     }
 
@@ -62,6 +65,8 @@ namespace SOL
         {
             if(this->sigma_w != NULL)
                 delete []this->sigma_w;
+            if (this->timeStamp != NULL)
+                delete []this->timeStamp;
         }
 
     //this is the core of different updating algorithms
@@ -70,6 +75,7 @@ namespace SOL
         double DAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             double y = this->Predict(x);
+            //y /= this->curIterNum;
             double alpha_t = 1 - x.label * y;
             if(alpha_t > 0){
                 int featDim = x.indexes.size();
@@ -85,9 +91,22 @@ namespace SOL
                     int index_i = x.indexes[i];
                     //update u_t
                     this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
+                    //L1 lazy update
+                    int stepK = this->curIterNum - this->timeStamp[index_i];
+                    this->timeStamp[index_i] = this->curIterNum;
+
+                    double w_abs = std::abs(this->weightVec[index_i]); 
+                    double alpha =  stepK * this->lambda;
+                    if (w_abs > alpha)
+                        this->weightVec[index_i] = this->weightVec[index_i] -
+                            alpha * Sgn(this->weightVec[index_i]);
+                    else
+                        this->weightVec[index_i] = 0;
+
                     //update sigma_w
                     this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
                 }
+
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
@@ -100,6 +119,7 @@ namespace SOL
         {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
+            memset(this->timeStamp,0 ,sizeof(size_t) * this->weightDim);
             for (int i = 0; i < this->weightDim; i++)
                 this->sigma_w[i] = 1;
         }
@@ -107,6 +127,22 @@ namespace SOL
 		//called when a train ends
     template <typename FeatType, typename LabelType>
         void DAROW<FeatType, LabelType>::EndTrain() {
+            double w_abs = 0, alpha = 0;
+            for (int index_i = 1; index_i < this->weightDim; index_i++) {
+                    //L1 lazy update
+                    int stepK = this->curIterNum - this->timeStamp[index_i];
+                    if (stepK == 0)
+                        continue;
+                    this->timeStamp[index_i] = this->curIterNum;
+
+                    double w_abs = std::abs(this->weightVec[index_i]); 
+                    double alpha =  stepK * this->lambda;
+                    if (w_abs > alpha)
+                        this->weightVec[index_i] = this->weightVec[index_i] -
+                            alpha * Sgn(this->weightVec[index_i]);
+                    else
+                        this->weightVec[index_i] = 0;
+            }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
 
@@ -136,9 +172,15 @@ namespace SOL
                 delete []this->sigma_w;
                 this->sigma_w= newS;
 
+                size_t* newT = new size_t[newDim];
+                //copy info
+                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
+                //set the rest to zero
+                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
+                delete []this->timeStamp;
+                this->timeStamp = newT;
+
                 Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
             }
         }
 }
-
-
