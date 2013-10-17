@@ -7,7 +7,7 @@ import re
 def Usage():
     print 'Usage: run_experiment.py opt_name'
 
-exe_name = './test'
+exe_name = './SOL'
 if len(sys.argv) < 2:
     Usage()
     sys.exit()

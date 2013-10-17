@@ -51,11 +51,11 @@ figure(1) %learning error rate
 title('learing error rate vs sparsity')
 ylabel('learning error rate (%)')
 xlabel('sparsity (%)')
-axis([0 100 0 50])
+axis([0 100 0 5])
 legend(legend_content,0)
 figure(2) %test error rate
 title('test error rate vs sparsity')
 ylabel('test error rate (%)')
 xlabel('sparsity (%)')
-axis([0 100 0 50])
+axis([0 100 0 5])
 legend(legend_content,0)
