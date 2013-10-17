@@ -15,8 +15,8 @@ else
 	CFLAGS += $(RELEASE)
 endif
 
-OBJS=test.o Params.o
-TARGET=test
+OBJS=main.o Params.o
+TARGET=SOL
 
 all:$(TARGET)
 
@@ -28,4 +28,4 @@ $(TARGET):$(OBJS)
 
 .PHONY:clean
 clean:
-	-rm -f *.o $(TARGET) $(addsuffix .exe, $(TARGET))
+	-rm -f *.o $(TARGET) $(addsuffix .exe, $(TARGET)) tags cscope*

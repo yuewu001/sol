@@ -93,18 +93,21 @@ namespace SOL
             else
                 continue;
         }
+        if (this->cache_fileName.size() == 0 && this->fileName.length() == 0){
+            cerr<<"you must specify the training data"<<endl;
+            exit(0);
+        }
+        if ((this->data_type & DataSet_MNIST) != 0 && 
+			(this->digit_1 == -1 || this->digit_2 == -1)) {
+			cerr<<"you must specify two numbers to classify for MINST dataset"<<endl;
+			exit(0);
+		}
+
         //check if cache file exists
 		if (this->cache_fileName.size() == 0 && this->fileName.length() != 0)
             this->cache_fileName = "tmp_" + md5(this->fileName);
 		if(this->test_cache_fileName.size() == 0 && this->test_fileName.length() != 0)
 			this->test_cache_fileName = "tmp_" + md5(this->test_fileName);
-
-		if ((this->data_type & DataSet_MNIST) != 0 && 
-			(this->digit_1 == -1 || this->digit_2 == -1))
-		{
-			cout<<"you must specify two numbers to classify for MINST dataset"<<endl;
-			exit(0);
-		}
     }
 
     //default parameter settings
