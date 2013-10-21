@@ -105,9 +105,9 @@ namespace SOL
 
         //check if cache file exists
 		if (this->cache_fileName.size() == 0 && this->fileName.length() != 0)
-            this->cache_fileName = "tmp_" + md5(this->fileName);
+            this->cache_fileName = "cache_" + md5(this->fileName);
 		if(this->test_cache_fileName.size() == 0 && this->test_fileName.length() != 0)
-			this->test_cache_fileName = "tmp_" + md5(this->test_fileName);
+			this->test_cache_fileName = "cache_" + md5(this->test_fileName);
     }
 
     //default parameter settings
