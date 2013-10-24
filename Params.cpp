@@ -177,7 +177,7 @@ namespace SOL {
         cout<<"-k:\t number of K in truncated gradient\n";
         cout<<"-l1:\t value of l1 regularization\n";
         cout<<"-loss:\t loss function type\n\t\tHinge|Logit|Square\n";
-        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|FOBOS|Ada-RDA|ADa-FOBOS|AROW\n";
+        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|ADa-FOBOS|AROW\n";
         cout<<"-passes:\t number of passes\n";
         cout<<"-rou:\t rou\n";
         cout<<"-theta:\t value of truncated threshold\n";

@@ -53,7 +53,10 @@ namespace SOL
 	RDA_L1<FeatType, LabelType>::RDA_L1(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc, bool enchance):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc) 
 	{
-        this->id_str = "RDA";
+        if(enchance == true)
+            this->id_str = "RDA_E";
+        else
+            this->id_str = "RDA";
 		this->rou = init_rou;
 		this->gtVec = new double[this->weightDim];
 		this->is_enhanced = enchance;
