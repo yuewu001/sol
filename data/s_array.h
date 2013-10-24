@@ -65,7 +65,7 @@ namespace SOL
                 size_t old_len = size();
                 if (old_len == capacity) //full array
                 {
-                    resize(2 * size() + 3);
+                    resize(2 * old_len + 3);
                     end = begin + old_len;
                 }
                 *(end++) = elem;
