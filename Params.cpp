@@ -5,10 +5,10 @@
   > Functions: Class for Parsing parameters
  ************************************************************************/
 #include "Params.h"
-#include "common/md5.h"
 #include "common/util.h"
 #include "common/init_param.h"
 
+#include <iostream>
 #include <cstdlib>
 
 using namespace std;

@@ -154,7 +154,6 @@ class MD5
         }
         std::string hexdigest() const
         {
-
             if (!finalized)
                 return "";
 

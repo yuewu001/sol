@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{a97d0b4e-5457-44f5-ae17-b9f1ee626187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loss">
+      <UniqueIdentifier>{c4016f90-95d8-4584-a9cf-a6a88ffad959}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="optimizer">
+      <UniqueIdentifier>{0494dfec-54c7-4e47-add8-2c7bb86bf36d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{6b670355-2dca-4e33-97bd-4310b9b3ca7b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\data\DataPoint.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\DataReader.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\DataSet.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\libsvm_binary.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\libsvmread.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\MNISTReader.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\s_array.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\data\thread_primitive.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loss\HingeLoss.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loss\LogisticLoss.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loss\LossFunction.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loss\SquareLoss.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\global.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\init_param.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\util.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\ASM_L1.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\DAROW.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\FOBOS.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\Optimizer.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\RDA_L1.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\SGD.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\SGD_QN.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\optimizer\STG.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Params.h" />
+    <ClInclude Include="..\..\data\DataSetHelper.h">
+      <Filter>data</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\main.cpp" />
+    <ClCompile Include="..\..\Params.cpp" />
+  </ItemGroup>
+</Project>

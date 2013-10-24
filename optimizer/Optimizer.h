@@ -94,7 +94,7 @@ namespace SOL
 		//learn a model
 		inline double Learn(int numOfTimes = 1);
 		//learn a model and return the mistake rate and its variance
-		double Learn(double &aveErrRate, double &varErrRate, double &sparseRate, int numOfTimes = 20);
+		double Learn(double &aveErrRate, double &varErrRate, double &sparseRate, int numOfTimes = 1);
 		//test the performance on the given set
 		double Test(DataSet<FeatType, LabelType> &testSet);
 

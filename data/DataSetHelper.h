@@ -6,8 +6,8 @@
  ************************************************************************/
 #pragma once
 
-#include "DataReader.h"
 #include "libsvm_binary.h"
+#include "thread_primitive.h"
 
 namespace SOL{
     template <typename T1, typename T2> class DataSet;
@@ -48,17 +48,19 @@ namespace SOL{
                         }
                     }
 
-                    mutex_lock(&dataset->data_lock); 
-                    //notice that there is data available
-                    dataset->wt_ptr = dataset->wt_ptr->next;
-                    dataset->curChunkNum++; 
-                    dataset->dataNum += chunk.dataNum;
-                    condition_variable_signal_all(&dataset->data_available);
+					if(chunk.dataNum > 0){
+						mutex_lock(&dataset->data_lock); 
+						//notice that there is data available
+						dataset->wt_ptr = dataset->wt_ptr->next;
+						dataset->curChunkNum++; 
+						dataset->dataNum += chunk.dataNum;
+						condition_variable_signal_all(&dataset->data_available);
 
-                    if (dataset->curChunkNum == dataset->bufSize){ //buffer full
-                        condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-                    }
-                    mutex_unlock(&dataset->data_lock);
+						if (dataset->curChunkNum == dataset->bufSize){ //buffer full
+							condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
+						}
+						mutex_unlock(&dataset->data_lock);
+					}
 
                 }while(not_file_end == true);
             }
@@ -99,17 +101,19 @@ namespace SOL{
                                 chunk.dataNum++;
                         }
 
-                        mutex_lock(&dataset->data_lock); 
-                        //notice that there is data available
-                        dataset->wt_ptr = dataset->wt_ptr->next;
-                        dataset->curChunkNum++; 
-                        dataset->dataNum += chunk.dataNum;
-                        condition_variable_signal_all(&dataset->data_available);
+						if (chunk.dataNum > 0){
+							mutex_lock(&dataset->data_lock); 
+							//notice that there is data available
+							dataset->wt_ptr = dataset->wt_ptr->next;
+							dataset->curChunkNum++; 
+							dataset->dataNum += chunk.dataNum;
+							condition_variable_signal_all(&dataset->data_available);
 
-                        if (dataset->curChunkNum == dataset->bufSize){ //buffer full
-                            condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-                        }
-                        mutex_unlock(&dataset->data_lock);
+							if (dataset->curChunkNum == dataset->bufSize){ //buffer full
+								condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
+							}
+							mutex_unlock(&dataset->data_lock);
+						}
 
                     }while(not_file_end == true);
                 }

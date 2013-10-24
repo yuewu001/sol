@@ -43,7 +43,7 @@ namespace SOL
 		{
 			this->max_line_len = 4096;
 			this->fileName = fileName;
-			this->min_index = numeric_limits<int>::max();
+			this->min_index = (numeric_limits<int>::max)();
 
 			line = (char *) malloc(max_line_len*sizeof(char));
 		}
@@ -60,12 +60,20 @@ namespace SOL
 		{
 			this->Close();
 
+#if _WIN32
+			int ret = fopen_s(&fp, fileName.c_str(), "r");
+			if (ret != 0){
+				printf("error %d: can't open input file %s\n",ret, fileName.c_str());
+				return false;
+			}
+
+#else
 			fp = fopen(fileName.c_str(), "r");
-			if(fp == NULL)
-			{
+			if(fp == NULL) {
 				printf("can't open input file %s\n",fileName.c_str());
 				return false;
 			}
+#endif
 			return true;
 		}
 		virtual void Rewind()
