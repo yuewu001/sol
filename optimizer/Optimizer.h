@@ -44,11 +44,6 @@ namespace SOL
 	protected:
 		double sparse_soft_thresh;
 
-		//randomize order of data
-	protected:
-		bool is_random;
-		vector<size_t> random_index_vec;
-
 	protected:
 		LossFunction<FeatType, LabelType> *lossFunc;
         
@@ -91,12 +86,6 @@ namespace SOL
 		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) = 0;
 
 	public:
-		//set whether to randomize the order of elements
-		void RandomOrder(bool is_rand) 
-        {
-            this->is_random = is_rand;
-            srand(unsigned(time(0)));
-        }
 		void SetParameter(double lambda = -1, double eta = -1);
 		//try and get the best parameter
 		virtual void BestParameter(); 
@@ -131,8 +120,6 @@ namespace SOL
 		this->curIterNum = 0;
 
 		this->sparse_soft_thresh = 0;
-
-		this->is_random = init_is_random;
 	}
 
 	//reset the optimizer to this initialization
@@ -159,20 +146,10 @@ namespace SOL
 			if(chunk.dataNum  == 0) 
 				break;
 
-			if (this->random_index_vec.size() != chunk.dataNum)
-			{
-				this->random_index_vec.resize(chunk.dataNum);
-				for (size_t i = 0; i < chunk.dataNum; i++)
-					this->random_index_vec[i] = i;
-			}
-
-            if (this->is_random)
-                random_shuffle(this->random_index_vec.begin(),this->random_index_vec.end());
-
 			for (size_t i = 0; i < chunk.dataNum; i++)
 			{
 				this->curIterNum++;
-				const DataPoint<FeatType, LabelType> &data = chunk.data[this->random_index_vec[i]];
+				const DataPoint<FeatType, LabelType> &data = chunk.data[i];
 				this->UpdateWeightSize(data.max_index);
 				double y = this->UpdateWeightVec(data); 
 				//loss
@@ -283,8 +260,6 @@ namespace SOL
 	{
         if (this->eta != init_tbd)
             return;
-        bool prev_is_rand = this->is_random;
-        this->is_random = false;
         double prev_lambda = this->lambda;
         this->lambda = 0;
 		//1. Select the best eta
@@ -310,7 +285,6 @@ namespace SOL
 		}
 		this->eta = bestEta;
         this->lambda = prev_lambda;
-        this->is_random = prev_is_rand;
 		cout<<"Best Parameter:\teta = "<<this->eta<<"\n\n";
 	}
 

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "DataSetHelper.h"
 #include "DataPoint.h"
 #include "DataReader.h"
 #include "libsvm_binary.h"
@@ -25,67 +26,15 @@ using namespace std;
 /**
  *  namespace: Sparse Online Learning
  */
-namespace SOL
-{
-    template <typename T1, typename T2> class DataSet;
-    template <typename T1, typename T2> 
-#if WIN32
-	DWORD WINAPI thread_LoadCache(LPVOID param)
-#else
-	void* thread_LoadCache(void* param)
-#endif
-    {
-        DataSet<T1,T2>* dataset = static_cast<DataSet<T1,T2>*>(param);
-        libsvm_binary_<T1,T2>* reader = dataset->reader;
-
-        if (reader->Good())
-        {
-            for (size_t pass= 0; pass < dataset->passNum; pass++)
-            {
-                reader->Rewind();
-                bool not_file_end = false;
-                do
-                {
-                    DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
-                    chunk.erase();
-                    not_file_end = reader->GetNextData(chunk);
-                    mutex_lock(&dataset->data_lock); 
-                    //notice that there is data available
-                    dataset->wt_ptr = dataset->wt_ptr->next;
-                    dataset->curChunkNum++; 
-                    dataset->dataNum += chunk.dataNum;
-                    condition_variable_signal_all(&dataset->data_available);
-
-                    if (dataset->curChunkNum == dataset->bufSize) //buffer full
-                    {
-                        condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-                    }
-                    mutex_unlock(&dataset->data_lock);
-
-                }while(not_file_end == true);
-            }
-
-            //notice that the all the data has been loaded
-            mutex_lock(&dataset->data_lock);
-            dataset->load_finished = true;
-            dataset->is_on_loading = false;
-            condition_variable_signal_all(&dataset->data_available);
-            mutex_unlock(&dataset->data_lock);
-
-            return NULL;
-        }
-        else
-        {
-            cout<<"reader is incorrect!"<<endl;
-        }
-        return NULL;
-    }
-
+namespace SOL {
+    
     //data set, can work in both read-and-write mode and read-once mode
-    template <typename FeatType, typename LabelType> class DataSet
-    {		
+    template <typename FeatType, typename LabelType> class DataSet {		
         private:
+            string fileName;
             string cache_fileName;
+            bool is_cache;
+
             enum_DataSet_Type dataset_type;
 
             size_t bufSize; //buffer to load data
@@ -102,7 +51,7 @@ namespace SOL
             bool load_finished; //this is used for GetChunk to test if current loading has finished
             bool is_on_loading; //this is used for Rewind to test if rewind can be performed
 
-            libsvm_binary_<FeatType,LabelType> *reader;
+            DataReader<FeatType,LabelType> *reader;
 
             //thread-safety
             MUTEX data_lock;
@@ -110,8 +59,7 @@ namespace SOL
             CV buffer_full;
 
         public:
-            DataSet(size_t passes = 1, int buf_size = -1)
-            {
+            DataSet(size_t passes = 1, int buf_size = -1) {
                 this->dataset_type = DataSet_Type_BC;
                 this->head = NULL;
                 this->wt_ptr = NULL;
@@ -124,6 +72,7 @@ namespace SOL
                 this->load_finished = false;
                 this->is_on_loading = false;
                 this->reader = NULL;
+                this->is_cache = false;
 
                 this->CreateBuffer(buf_size);
 
@@ -132,16 +81,14 @@ namespace SOL
                 initialize_condition_variable(&data_available);
                 initialize_condition_variable(&buffer_full);
             }
-            ~DataSet()
-            {
+            ~DataSet() {
                 delete_mutex(&data_lock);
                 if (this->reader != NULL)
                     delete this->reader;
             }
 
         private:
-            bool CreateBuffer(int buf_size = 0)
-            {
+            bool CreateBuffer(int buf_size = 0) {
                 this->bufSize = buf_size > 0 ? buf_size : init_buf_size;
                 this->ReleaseBuffer();
                 if (this->bufSize <= 0)
@@ -149,8 +96,7 @@ namespace SOL
 
                 this->head = new DataChunk<FeatType,LabelType>;
                 DataChunk<FeatType,LabelType> *p = this->head;
-                for (size_t i = 1; i < this->bufSize; i++)
-                {
+                for (size_t i = 1; i < this->bufSize; i++) {
                     p->next = new DataChunk<FeatType,LabelType>;
                     p = p->next;
                 }
@@ -162,14 +108,12 @@ namespace SOL
             }
 
         private:
-            void ClearBuffer()
-            {
+            void ClearBuffer() {
                 DataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
                 p = p->next;
-                while (p != this->head)
-                {
+                while (p != this->head) {
                     p->erase();
                     p = p->next;
                 }
@@ -180,14 +124,12 @@ namespace SOL
                 this->rd_ptr = this->head;
             }
 
-            void ReleaseBuffer()
-            {
+            void ReleaseBuffer() {
                 DataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
                 DataChunk<FeatType,LabelType> *q = p->next;
-                while (q != this->head)
-                {
+                while (q != this->head) {
                     p = q->next;
                     delete q;
                     q = p;
@@ -201,21 +143,43 @@ namespace SOL
 
         public:
 #if WIN32
-            template <typename T1, typename T2> friend DWORD WINAPI thread_LoadCache(LPVOID param);
+            template <typename T1, typename T2> friend DWORD WINAPI thread_LoadData(LPVOID param);
 #else
-            template <typename T1, typename T2> friend void* thread_LoadCache(void* param);
+            template <typename T1, typename T2> friend void* thread_LoadData(void* param);
 #endif
 
             //bind a data reader to the dataset
-            bool Load(const string &fileName)
-            {
-                this->cache_fileName = fileName;
+            bool Load(const string& filename,  const string& cache_filename) {
+                this->fileName = filename;
+                this->cache_fileName = cache_filename;
 
                 if (this->reader != NULL)
                     delete this->reader;
-                this->reader = new libsvm_binary_<FeatType, LabelType>(this->cache_fileName);
-                if (this->reader->OpenReading() == false)
+                this->reader = NULL;
+
+                if (SOL_ACCESS(this->cache_fileName.c_str()) == 0){ //already cached
+                    this->is_cache = false;
+                    this->reader = new libsvm_binary_<FeatType, LabelType>(this->cache_fileName);
+                }
+                else if(SOL_ACCESS(this->fileName.c_str()) == 0){
+                    this->reader = new LibSVMReader_<FeatType, LabelType>(this->fileName);
+                    if (this->cache_fileName.length() == 0 && this->passNum > 1){ 
+                        this->cache_fileName = "cache_file";
+                        this->is_cache = true;
+                    }
+                    else if (this->cache_fileName.length() > 0)
+                        this->is_cache = true;
+                }
+                else
                     return false;
+
+                if (this->reader != NULL){
+                    if (this->reader->OpenReading() == false){
+                        delete this->reader;
+                        this->reader = NULL;
+                        return false;
+                    }
+                }
 
                 return true;
             }
@@ -223,36 +187,31 @@ namespace SOL
             /////////////Data Access/////////////////////
         public:
             //get the data to read
-            inline const DataChunk<FeatType, LabelType>& GetChunk()
-            {
+            inline const DataChunk<FeatType, LabelType>& GetChunk() {
                 mutex_lock(&this->data_lock);
 
                 //check if there is available data
-                if (this->curChunkNum <= 0) //no available data
-                {
+                if (this->curChunkNum <= 0) {//no available data 
                     //suspend the current thread
-                    if (this->load_finished == false)
-                    {
+                    if (this->load_finished == false) {
                         condition_variable_wait(&this->data_available,&this->data_lock);
                         mutex_unlock(&this->data_lock);
                         return this->GetChunk();
                     }
-                    else
-                    {
+                    else {
                         this->rd_ptr->erase();
                         mutex_unlock(&this->data_lock);
                         return *this->rd_ptr; //return an invalid data
                     }
                 }
-                DataChunk<FeatType,LabelType> &chunk = *this->rd_ptr;
+                DataChunk<FeatType,LabelType> &chunk = *(this->rd_ptr);
                 //notice to conitnue to read
                 mutex_unlock(&this->data_lock);
 
                 return chunk;
             }
 
-            void FinishRead()
-            {
+            void FinishRead() {
                 mutex_lock(&this->data_lock);
                 this->rd_ptr = this->rd_ptr->next;
                 this->curChunkNum--;
@@ -263,11 +222,9 @@ namespace SOL
 
             //the number of features
             inline size_t size() const {return this->dataNum; }
-            bool Rewind()
-            {
+            bool Rewind() {
                 mutex_lock(&this->data_lock);
-                if (this->is_on_loading == true)
-                {
+                if (this->is_on_loading == true) {
                     cout<<"data is on loading"<<endl;
                     mutex_unlock(&this->data_lock);
                     return false;
@@ -279,10 +236,10 @@ namespace SOL
                 mutex_unlock(&this->data_lock);
 
 #if WIN32
-				HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadCache<FeatType,LabelType>), this, NULL, NULL);
+				HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType,LabelType>), this, NULL, NULL);
 #else
                 pthread_t thread;
-                pthread_create(&thread,NULL,thread_LoadCache<FeatType,LabelType>,this);
+                pthread_create(&thread,NULL,thread_LoadData<FeatType,LabelType>,this);
 #endif
                 return true;
             }

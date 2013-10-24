@@ -30,10 +30,6 @@ namespace SOL
 	static const double init_rou = 0.005;
 	//delta in adaptive algorithms
 	static const double init_delta = 10;
-	//whether to randomize the order of elements
-	static const bool init_is_random = false;
-	//number of rounds to run to test the performances of the algorithm
-	static const int init_round_num = 1;
     //trade-off parameter in AROW
     static const int init_r = 1;
     //skip value in SVM2SGD

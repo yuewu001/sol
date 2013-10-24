@@ -26,6 +26,9 @@ $(TARGET):$(OBJS)
 %.o:%.cpp
 	g++ $< -o $@ $(CFLAGS)
 
-.PHONY:clean
+.PHONY:clean analysis
 clean:
 	-rm -f *.o $(TARGET) $(addsuffix .exe, $(TARGET)) tags cscope*
+
+analysis:data_analysis.o
+	g++ $< -o $@

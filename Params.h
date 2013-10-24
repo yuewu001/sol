@@ -10,7 +10,10 @@
 #include "common/global.h"
 
 #include <string>
-using namespace std;
+#include <map>
+
+using std::string;
+using std::map;
 
 namespace SOL
 {
@@ -19,10 +22,8 @@ namespace SOL
 	public:
 		//input data
 		string fileName; //source file name
-		string labelFile; //label file name
 		string cache_fileName; //cached file name
 		string test_fileName; //test file name
-		string test_label_fileName; //test label file name
 		string test_cache_fileName; //cached test file name
 
 		//dataset type
@@ -44,13 +45,7 @@ namespace SOL
 		double delta; //for Ada-
         double r; //for AROW
 
-		int digit_1;	//digit number to be classified in MINST dataset
-		int digit_2;	//digit number to be classified in MINST dataset
-
 		int buf_size; //number of chunks in dataset 
-
-		bool is_rand;	//whether to randomize the order of data
-		int round_num;	//number of rounds to run to test the performance
 
 	public:
 		Params(){}
