@@ -178,6 +178,7 @@ namespace SOL
 					return 0;
 				}
 				int s = 1;
+                if (*p == '+')p++;
 				if (*p == '-') {
 					s = -1; p++;
 				}
@@ -188,6 +189,7 @@ namespace SOL
 				int exp_acc = 0;
 				if(*p == 'e' || *p == 'E'){
 					p++;
+                    if (*p == '+')p++;
 					while (*p >= '0' && *p <= '9')
 						exp_acc = exp_acc * 10 + *p++ - '0';
 					acc *= (int)(powf(10,(float)(exp_acc)));
@@ -210,6 +212,7 @@ namespace SOL
 					return 0;
 				}
 				int s = 1;
+                if (*p == '+') p++;
 				if (*p == '-') {
 					s = -1; p++;
 				}
@@ -220,6 +223,7 @@ namespace SOL
 				int exp_acc = 0;
 				if(*p == 'e' || *p == 'E'){
 					p++;
+                    if (*p == '+') p++;
 					while (*p >= '0' && *p <= '9')
 						exp_acc = exp_acc * 10 + *p++ - '0';
 					acc *= (int)(powf(10,(float)(exp_acc)));
@@ -248,6 +252,7 @@ namespace SOL
 					return 0;
 				}
 				int s = 1;
+                if (*p == '+') p++;
 				if (*p == '-') {
 					s = -1; p++;
 				}
@@ -268,6 +273,7 @@ namespace SOL
 				if(*p == 'e' || *p == 'E'){
 					p++;
 					int exp_s = 1;
+                    if (*p == '+') p++;
 					if (*p == '-') {
 						exp_s = -1; p++;
 					}

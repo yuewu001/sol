@@ -39,10 +39,12 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
+                /*
                 if (dataNum % 1000 == 0){
                     cout<<"data number  : "<<dataNum<<"    ";
                     cout<<"valid dim    : "<<max_index<<"\r";
                 }
+                */
             }
             else
                 break;
@@ -55,7 +57,6 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
     reader->Close();
     for(int i = 0; i < 128; i++)
         cout<<" ";
-    cout<<"\r";
     cout<<"data number  : "<<dataNum<<"\n";
     cout<<"valid dim    : "<<max_index<<"\n";
     cout<<"nonzero feat : "<<index_set.size()<<"\n";

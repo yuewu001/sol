@@ -43,6 +43,9 @@ for k = 1:1:opt_num
     figure(2)
     hold on
     plot(sparse_vec, t_err_vec, color_shape, 'LineWidth',2);
+    figure(3)
+    hold on
+    plot(sparse_vec, l_time_vec, color_shape, 'LineWidth',2);
 
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -70,3 +73,11 @@ xlabel('sparsity (%)')
 axis([0 100 ymin ymax])
 legend(legend_content,0)
 print(strcat(folder_name,'test_sparse.jpg'),'-djpg')
+figure(3) %learning time
+title('training time vs sparsity')
+ylabel('training time (s)')
+xlabel('sparsity (%)')
+%axis([0 100 0 10])
+legend(legend_content,0)
+print(strcat(folder_name,'time_sparse.jpg'),'-djpg')
+
