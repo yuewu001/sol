@@ -164,7 +164,7 @@ namespace SOL {
     }
 
     void Params::Help() {
-        cout<<"SOL -i input_data [-c cache_file] [option | value]\n";
+        cout<<"SOL -i input_data [-c cache_file] [option value]\n";
         cout<<"Options: \n";
         cout<<"-c:\t cache file name\n";
         cout<<"-t:\t test file name\n";
