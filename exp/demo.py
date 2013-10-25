@@ -4,21 +4,31 @@ import sys
 opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw']
 #opt_list = ['vw']
 
-dataset = 'rcv1'
-
 rootDir = '/home/matthew/data/'
+if len(sys.argv) == 2:
+    dataset = sys.argv[1]
+else:
+    dataset = 'rcv1'
 
 if dataset == 'a6a':
     train_file = rootDir + 'uci/a6a'
     test_file = rootDir + '/uci/a6a.t'
 
-    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 0.01'
+elif dataset == 'a9a':
+    train_file = rootDir + 'uci/a9a'
+    test_file = rootDir + 'uci/a9a.t'
 
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 0.01'
 elif dataset == 'rcv1':
     train_file = rootDir + 'rcv1/rcv1.train' 
     test_file = rootDir + '/rcv1/rcv1.test'
 
     cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 1.0'
+else:
+    print 'unrecoginized dataset'
+    sys.exit()
+
 
 cache_train_file = train_file + '_cache'
 cache_test_file = test_file + '_cache'
@@ -31,7 +41,7 @@ dst_folder = '%s' %dataset + '_result'
 dataset_info_file = train_file + '_info.txt'
 if os.path.exists(dataset_info_file) == False:
     print 'analyze dataset'
-    cmd = './analysis %s' %train_file +' >> %s' %dataset_info_file
+    cmd = '../analysis %s' %train_file +' >> %s' %dataset_info_file
     os.system(cmd)
 
 #train model

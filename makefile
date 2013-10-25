@@ -18,17 +18,19 @@ endif
 OBJS=main.o Params.o
 TARGET=SOL
 
-all:$(TARGET)
+all:$(TARGET) analysis
 
 $(TARGET):$(OBJS)
 	g++ $^ -o $@ $(LDFLAGS)
 
+analysis:data_analysis.o
+	g++ $< -o $@
+
 %.o:%.cpp
 	g++ $< -o $@ $(CFLAGS)
 
-.PHONY:clean analysis
+.PHONY:clean
 clean:
 	-rm -f *.o $(TARGET) $(addsuffix .exe, $(TARGET)) tags cscope*
 
-analysis:data_analysis.o
-	g++ $< -o $@
+

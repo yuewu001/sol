@@ -4,12 +4,16 @@ import sys
 import os
 import re
 import time
+import l1_def
+
+from l1_def import *
 
 def Usage():
     print 'Usage: run_experiment.py dst_folder trainfile cache_train testfile cache_test'
 
 def get_valid_dim(trainfile):
     filename = trainfile + '_info.txt'
+    print filename
     dim = 0
     pattern = re.compile(r'valid dim\s*:\s*(\d+)')
     result_list = pattern.findall(open(filename,'r').read())
@@ -47,7 +51,7 @@ def get_model_size(model_file):
     
     return model_size
 
-if len(sys.argv) != 6:
+if len(sys.argv) < 6:
     Usage()
     sys.exit()
 
@@ -59,6 +63,14 @@ trainfile = sys.argv[2]
 cache_train = sys.argv[3]
 testfile = sys.argv[4]
 cache_test = sys.argv[5]
+
+is_l1 = True
+is_cache = True
+for k in range(6,len(sys.argv)):
+    if sys.argv[k] == 'no_l1':
+        is_l1 = False
+    if sys.argv[k] == 'no_cache':
+        is_cache = False
 
 valid_dim = get_valid_dim(trainfile)
 
@@ -73,10 +85,6 @@ cache_train += ".vw"
 testfile += ".vw"
 cache_test += ".vw"
 
-lambda_start = 1e-8
-lambda_end = 10
-lambda_step = 10
-
 #make the result dir
 cmd = 'mkdir -p ./%s' %dst_folder
 os.system(cmd)
@@ -88,20 +96,29 @@ cmd = exe_name
 cmd += extra_cmd
 
 #evaluate the result
-l1 = lambda_start
-train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile +' --cache_file %s ' %cache_train
-test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i model --cache_file %s ' %cache_test
+if is_cache == True:
+    train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile +' --cache_file %s ' %cache_train
+    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i model --cache_file %s ' %cache_test
+else:
+    train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile
+    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i model' 
+
 cmd_postfix = ' 2> vw_tmp.txt'
+
 
 result_list = []
 
 dec_pattern = "(\d+\.?\d*)"
 err_pattern = re.compile(r'average loss = ' + dec_pattern) 
 
+l1 = lambda_start
 while l1 <= lambda_end:
     result_item = [0,0,0,0]
     #train
-    cmd = train_cmd_prefix + ' --l1 %e' %l1 + extra_cmd +  cmd_postfix
+    if is_l1 == False:
+        cmd = train_cmd_prefix + extra_cmd +  cmd_postfix
+    else:
+        cmd = train_cmd_prefix + ' --l1 %e' %l1 + extra_cmd +  cmd_postfix
     print cmd
     start_time =time.time()
     os.system(cmd)
@@ -135,9 +152,12 @@ while l1 <= lambda_end:
     result_list.append(result_item)
 
     l1 *= lambda_step
+    if is_l1 == False:
+        break;
 
 #write the result to file
 parse_file = './%s' %dst_folder +'/vw.txt'
+open(parse_file,'w').close()
 print 'write parsed result %s' %parse_file
 try:
     file_handler = open(parse_file,'w')

@@ -4,6 +4,8 @@ import sys
 import os
 import re
 
+from l1_def import *
+
 def Usage():
     print 'Usage: run_experiment.py opt_name dst_folder [parameters]'
 
@@ -17,15 +19,16 @@ dst_folder = sys.argv[2]
 exe_name = '../SOL'
 
 is_best_param = True
+is_l1 = True
 extra_cmd = ' '
 for k in range(3,len(sys.argv)):
-    extra_cmd = extra_cmd + sys.argv[k] + ' '
+    if sys.argv[k] == 'no_l1':
+        is_l1 = False
+        continue
     if sys.argv[k] == '-eta':
         is_best_param = False
+    extra_cmd = extra_cmd + sys.argv[k] + ' '
 
-lambda_start = 1e-8
-lambda_end = 10
-lambda_step = 10
 
 #make the result dir
 cmd = 'mkdir -p ./%s' %dst_folder
@@ -76,7 +79,6 @@ def best_param():
     return best_eta
     
 #evaluate the result
-l1 = lambda_start
 cmd_prefix = exe_name + extra_cmd + ' -opt %s' %opt_name 
 cmd_postfix = ' >> %s' %result_file
 
@@ -85,11 +87,17 @@ if is_best_param == True:
     best_eta = best_param() 
     cmd_prefix += ' -eta %e' %best_eta
 
-while l1 <= lambda_end:
-    cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
+if is_l1 == True:
+    l1 = lambda_start
+    while l1 <= lambda_end:
+        cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
+        print cmd
+        os.system(cmd)
+        l1 *= lambda_step
+else:
+    cmd = cmd_prefix + cmd_postfix
     print cmd
     os.system(cmd)
-    l1 *= lambda_step
 
 print 'parsing result...'
 #parse the result to a format for matlab to recognize
@@ -103,6 +111,7 @@ result_list = pattern.findall(open(result_file,'r').read())
 
 #write the result to file
 parse_file = './%s' %dst_folder +'/%s' %opt_name + '.txt'
+open(parse_file,'w').close()
 print 'write parsed result %s' %parse_file
 try:
     file_handler = open(parse_file,'w')
@@ -115,3 +124,4 @@ except IOError as e:
     sys.exit()
 else:
     file_handler.close()
+
