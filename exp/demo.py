@@ -6,7 +6,7 @@ opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw']
 
 dataset = 'rcv1'
 
-rootDir = '/home/matthew/work/Data/'
+rootDir = '/home/matthew/data/'
 
 if dataset == 'a6a':
     train_file = rootDir + 'uci/a6a'
@@ -25,7 +25,7 @@ cache_test_file = test_file + '_cache'
 cmd_data += ' -c %s' %cache_train_file
 cmd_data += ' -tc %s' %cache_test_file
 
-dst_folder = '%s' %dataset + '_result2'
+dst_folder = '%s' %dataset + '_result'
 
 #analyze dataset
 dataset_info_file = train_file + '_info.txt'
