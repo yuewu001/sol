@@ -93,7 +93,7 @@ int main(int argc, char** args) {
 
     printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
-	clock_t time3 = 0;
+	double time3 = 0;
 	//test the model
     bool is_test = param.test_cache_fileName.length() > 0 || param.test_fileName.length() > 0;
 	if ( is_test) {
