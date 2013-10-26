@@ -10,11 +10,9 @@
 #include "../common/global.h"
 #include "Optimizer.h"
 
-namespace SOL
-{
+namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class SGD: public Optimizer<FeatType, LabelType>
-	{
+	class SGD: public Optimizer<FeatType, LabelType> {
 	public:
 		SGD(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc,
 			NormType type = NormType_None);
@@ -22,43 +20,27 @@ namespace SOL
 
 	protected:
 		//this is the core of different updating algorithms
-		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-    protected:
-		NormType normType;
+		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 	};
 
 	template <typename FeatType, typename LabelType>
 	SGD<FeatType, LabelType>::SGD(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc,
-			NormType type): Optimizer<FeatType, LabelType>(dataset, lossFunc) 
-	{
+			NormType type): Optimizer<FeatType, LabelType>(dataset, lossFunc) {
         this->id_str = "SGD";
-		this->normType = type;
-
-        //sparse soft threshold
-		if (this->normType == NormType_L1)
-			this->sparse_soft_thresh = init_sparse_soft_thresh;
+        this->sparse_soft_thresh = init_sparse_soft_thresh;
 	}
 
 	template <typename FeatType, typename LabelType>
-	SGD<FeatType, LabelType>::~SGD()
-	{
+	SGD<FeatType, LabelType>::~SGD() {
 	}
 
 	//update weight vector with stochastic gradient descent
 	template <typename FeatType, typename LabelType>
-	double SGD<FeatType,LabelType>::UpdateWeightVec(const DataPoint<FeatType, LabelType> &x)
-	{
-		double y = this->Predict(x);
+	float SGD<FeatType,LabelType>::UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) {
+		float y = this->Predict(x);
         int featDim = x.indexes.size();
-        double gt_i = this->lossFunc->GetGradient(x,y);
-
-        if(this->normType == NormType_L1) //normalize with L1
-        {
-            double coeff = this->eta * this->lambda;
-            for(int i = 1; i < this->weightDim; i++)
-                this->weightVec[i] -= coeff * Sgn(this->weightVec[i]);
-        }
+        float gt_i = this->lossFunc->GetGradient(x.label,y);
 
         for (int i = 0; i < featDim; i++)
             this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];

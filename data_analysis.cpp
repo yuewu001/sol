@@ -31,7 +31,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
             if (reader->GetNextData(data) == true) {
                 if (data.indexes.size() == 0)
                     continue;
-                for (int i = 0; i < data.indexes.size(); i++){
+                for (size_t i = 0; i < data.indexes.size(); i++){
                     index_set.insert(data.indexes[i]);
                 }
                 if (max_index < data.max_index){

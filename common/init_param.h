@@ -15,21 +15,21 @@ namespace SOL
 	/////////////////////Optimizer Initalization parameters//////////////////
 	//
     //value to be determined
-    static const double init_tbd = 1e10;
+    static const float init_tbd = 1e10;
 	//learning rate
-	static const double init_eta = 0.01;
+	static const float init_eta = 0.01;
 	//l1 regularization
-	static const double init_lambda = 0.0;
+	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
-	static const double init_sparse_soft_thresh = 1e-5;
+	static const float init_sparse_soft_thresh = 1e-5;
 	//truncate gradients every K steps
 	static const int init_k = 10;
 	//gamma in enchanced RDA
-	static const double init_gamma = 5000;
+	static const float init_gamma = 5000;
 	//rou in enchanced RDA
-	static const double init_rou = 0.005;
+	static const float init_rou = 0.005;
 	//delta in adaptive algorithms
-	static const double init_delta = 10;
+	static const float init_delta = 10;
     //trade-off parameter in AROW
     static const int init_r = 1;
     //skip value in SVM2SGD
@@ -39,15 +39,15 @@ namespace SOL
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
 	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
-	static const enum_Opti_Method init_opti_method = Opti_RDA;
+	static const enum_Opti_Method init_opti_method = Opti_STG;
 
 	//trying the optimal parameters
-	static const double init_eta_max = 1;
-	static const double init_eta_min = 1e-10;
-	static const double init_eta_step = 10;
-	static const double init_delta_max = 10;
-	static const double init_delta_min = 0.1;
-	static const double init_delta_step = 10;
+	static const float init_eta_max = 1;
+	static const float init_eta_min = 1e-10;
+	static const float init_eta_step = 10;
+	static const float init_delta_max = 10;
+	static const float init_delta_min = 0.1;
+	static const float init_delta_step = 10;
 
 	////////////////////Data Set Reader Parameters///////////////////////////
 	static const int init_chunk_size = 256;

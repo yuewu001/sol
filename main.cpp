@@ -12,7 +12,8 @@
 #include "optimizer/STG.h"
 #include "optimizer/RDA_L1.h"
 #include "optimizer/FOBOS.h"
-#include "optimizer/ASM_L1.h"
+#include "optimizer/Ada_FOBOS.h"
+#include "optimizer/Ada_RDA.h"
 #include "optimizer/DAROW.h"
 
 #include "loss/LogisticLoss.h"
@@ -40,11 +41,24 @@ template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
 
 int main(int argc, char** args) {
-    Params param(argc, args);
+    int new_argc = 2;
+    char** argv = new char*[argc + new_argc];
+    for(int i = 0; i < argc; i++)
+        argv[i] = args[i];
+    argv[argc] = "-c";
+    argv[argc + 1] = "/home/matthew/data/rcv1/rcv1.train_cache";
+//    argv[argc + 2] = "-eta";
+ //   argv[argc + 3] = "0.1";
+    argc += new_argc;
+
+    Params param(argc, argv);
+    delete []argv;
 
     DataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size);
-    if (dataset.Load(param.fileName, param.cache_fileName) == false)
+    if (dataset.Load(param.fileName, param.cache_fileName) == false){
+        cerr<<"Load dataset "<<param.fileName<<" failed!"<<endl;
 		return -1;
+    }
     LossFunction<FeatType, LabelType> *lossFunc = GetLossFunc<FeatType, LabelType>(param);
 	if(lossFunc == NULL)
 		return -1;
@@ -59,8 +73,8 @@ int main(int argc, char** args) {
 
     opti->PrintOptInfo();
 
-    double l_errRate(0), l_varErr(0);	//learning error rate
-	double sparseRate(0);
+    float l_errRate(0), l_varErr(0);	//learning error rate
+	float sparseRate(0);
 
 	//learning the model
     clock_t time1 = clock();
@@ -77,7 +91,7 @@ int main(int argc, char** args) {
 	if ( is_test) {
 		DataSet<FeatType, LabelType> testset(1,param.buf_size);
 		if (testset.Load(param.test_fileName, param.test_cache_fileName) == true) {
-			double t_errRate(0);	//test error rate
+			float t_errRate(0);	//test error rate
 			t_errRate = opti->Test(testset);
 			time3 = clock();
 
@@ -116,50 +130,57 @@ LossFunction<T1,T2>* GetLossFunc(const Params &param) {
 template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFunc) {
     switch(param.opti_method) {
-        case Opti_SGD: {
-            SGD<T1,T2> *opti = new SGD<T1,T2>(dataset,lossFunc);
-            opti->SetParameter(param.lambda,param.eta);
-            return opti;
-            break;
-            }
-        case Opti_STG: {
-                STG<T1,T2> *opti = new STG<T1,T2>(dataset,lossFunc);
-                opti->SetParameterEx(param.lambda,param.K, param.eta,param.theta);
+        case Opti_SGD: 
+            {
+                SGD<T1,T2> *opti = new SGD<T1,T2>(dataset,lossFunc);
+                opti->SetParameter(param.lambda,param.eta);
                 return opti;
                 break;
             }
-        case Opti_RDA: {
+        case Opti_STG: 
+            {
+                STG<T1,T2> *opti = new STG<T1,T2>(dataset,lossFunc);
+                opti->SetParameterEx(param.lambda,param.K, param.eta);
+                return opti;
+                break;
+            }
+        case Opti_RDA: 
+            {
                 RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,false);
                 opti->SetParameterEx(param.lambda,param.rou);
                 return opti;
                 break;
             }
-        case Opti_RDA_E: {
+        case Opti_RDA_E: 
+            {
                 RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,true);
                 opti->SetParameterEx(param.lambda,param.rou);
                 return opti;
                 break;
             }
-        case Opti_FOBOS: {
-               FOBOS<T1,T2> *opti = new FOBOS<T1,T2>(dataset,lossFunc);
+        case Opti_FOBOS: 
+            {
+                FOBOS<T1,T2> *opti = new FOBOS<T1,T2>(dataset,lossFunc);
                 opti->SetParameter(param.lambda,param.eta);
                 return opti;
                 break;
             }
-        case Opti_Ada_RDA: {
-               ASM_L1<T1,T2> *opti = new ASM_L1<T1,T2>(dataset,lossFunc,ASM_Update_PSU);
-                opti->SetParameterEx(param.lambda,param.delta,param.eta);
-               return opti;
-               break;
-            }
-        case Opti_Ada_FOBOS: 
+        case Opti_Ada_RDA: 
             {
-                ASM_L1<T1,T2> *opti = new ASM_L1<T1,T2>(dataset,lossFunc, ASM_Update_CMDU);
+                Ada_RDA<T1,T2> *opti = new Ada_RDA<T1,T2>(dataset,lossFunc);
                 opti->SetParameterEx(param.lambda,param.delta,param.eta);
                 return opti;
                 break;
             }
-        case Opti_AROW: {
+        case Opti_Ada_FOBOS: 
+            {
+                Ada_FOBOS<T1,T2> *opti = new Ada_FOBOS<T1,T2>(dataset,lossFunc);
+                opti->SetParameterEx(param.lambda,param.delta,param.eta);
+                return opti;
+                break;
+            }
+        case Opti_AROW: 
+            {
                 DAROW<T1,T2> *opti = new DAROW<T1, T2>(dataset,lossFunc);
                 opti->SetParameterEx(param.lambda, param.r);
                 return opti;

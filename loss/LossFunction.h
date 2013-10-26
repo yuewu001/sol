@@ -9,26 +9,22 @@
 #include <cmath>
 #include "../common/util.h"
 
-namespace SOL
-{
+namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class LossFunction
-	{
-        char Sign(double x)
-        {
-            if (x >= 0) 
+	class LossFunction {
+        inline char Sign(float x) {
+            if (x >= 0.f) 
                 return 1;
             else
                 return -1;
         }
 
         public:
-		bool IsCorrect(const DataPoint<FeatType, LabelType> &x, double predict)
-        {
-            return Sign(predict) == x.label ? true : false;
+		inline bool IsCorrect(LabelType label, float predict) {
+            return Sign(predict) == label ? true : false;
         }
 
-        virtual double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
-        virtual double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict) = 0;
+        virtual float GetLoss(LabelType label, float predict) = 0;
+        virtual float GetGradient(LabelType label, float predict) = 0;
     };
 }

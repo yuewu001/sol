@@ -13,36 +13,37 @@
 #include <algorithm>
 #include <numeric>
 #include <cstdio>
+#include <math.h>
 
 
 /**
 *  namespace: Sparse Online Learning
 */
-namespace SOL
-{
-	template <typename FeatType, typename LabelType> class Optimizer
-	{
+namespace SOL {
+	template <typename FeatType, typename LabelType> class Optimizer {
 		//Iteration 
 	protected:
 		//iteration number
-		size_t curIterNum;
+		unsigned int curIterNum;
+        unsigned int initial_t;
 		//parameters
-		double lambda;
-		double eta; //learning rate
-		double mistakeRate;
+		float lambda;
+		float eta0; //learning rate
+        float eta;
+		float mistakeRate;
 
 		DataSet<FeatType, LabelType> &dataSet;
 
 		//weight vector
 	protected:
 		//the first element is zero
-		double *weightVec;
+		float *weightVec;
 		//weight dimenstion: can be the same to feature, or with an extra bias
 		int weightDim;
 
 		//For sparse
 	protected:
-		double sparse_soft_thresh;
+		float sparse_soft_thresh;
 
 	protected:
 		LossFunction<FeatType, LabelType> *lossFunc;
@@ -63,8 +64,7 @@ namespace SOL
 	public:
 		Optimizer(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
 
-		virtual ~Optimizer()
-		{
+		virtual ~Optimizer() {
 			if (weightVec != NULL)
 				delete []this->weightVec;
 		}
@@ -77,28 +77,28 @@ namespace SOL
 		//called when a train ends
 		virtual void EndTrain(){}
 		//train the data
-		double Train();
+		float Train();
 		//predict a new feature
-		double Predict(const DataPoint<FeatType, LabelType> &data);
+		float Predict(const DataPoint<FeatType, LabelType> &data);
 
 		//this is the core of different updating algorithms
 		//return the predict
-		virtual double UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) = 0;
+		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) = 0;
 
 	public:
-		void SetParameter(double lambda = -1, double eta = -1);
+		void SetParameter(float lambda = -1, float eta0 = -1);
 		//try and get the best parameter
 		virtual void BestParameter(); 
 
 	public:
 		//learn a model
-		inline double Learn(int numOfTimes = 1);
+		inline float Learn(int numOfTimes = 1);
 		//learn a model and return the mistake rate and its variance
-		double Learn(double &aveErrRate, double &varErrRate, double &sparseRate, int numOfTimes = 1);
+		float Learn(float &aveErrRate, float &varErrRate, float &sparseRate, int numOfTimes = 1);
 		//test the performance on the given set
-		double Test(DataSet<FeatType, LabelType> &testSet);
+		float Test(DataSet<FeatType, LabelType> &testSet);
 
-		double GetSparseRate(int total_len = 0);
+		float GetSparseRate(int total_len = 0);
 
 	protected:
 		//Change the dimension of weights
@@ -107,53 +107,50 @@ namespace SOL
 
 	template <typename FeatType, typename LabelType>
 	Optimizer<FeatType, LabelType>::Optimizer(DataSet<FeatType, LabelType> &dataset, 
-		LossFunction<FeatType, LabelType> &lossFunc): dataSet(dataset)
-	{
-
+		LossFunction<FeatType, LabelType> &lossFunc): dataSet(dataset) {
 		this->lossFunc = &lossFunc;
 		this->weightDim = 1;
 		//weight vector
-		this->weightVec = new double[this->weightDim];
+		this->weightVec = new float[this->weightDim];
 
-		this->eta = init_tbd;
+		this->eta0 = init_tbd;
 		this->lambda = init_lambda;
 		this->curIterNum = 0;
+        this->initial_t = 0;
 
 		this->sparse_soft_thresh = 0;
 	}
 
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::BeginTrain()
-	{
+	void Optimizer<FeatType, LabelType>::BeginTrain() {
 		//reset weight vector
-		memset(this->weightVec,0,sizeof(double) * this->weightDim);
-		this->curIterNum = 0;
+		memset(this->weightVec,0,sizeof(float ) * this->weightDim);
+		this->curIterNum = this->initial_t;
+        this->eta = this->eta0;
 	}
 
 	template <typename FeatType, typename LabelType> 
-	double Optimizer<FeatType, LabelType>::Train()
-	{
+	float Optimizer<FeatType, LabelType>::Train() {
 		if(dataSet.Rewind() == false)
 			exit(0);
 		//reset
 		this->BeginTrain();
-		double errorNum(0);
-		while(1)
-		{
+		float errorNum(0);
+		while(1) {
 			const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
 			//all the data has been processed!
 			if(chunk.dataNum  == 0) 
 				break;
 
-			for (size_t i = 0; i < chunk.dataNum; i++)
-			{
+			for (size_t i = 0; i < chunk.dataNum; i++) {
 				this->curIterNum++;
+
 				const DataPoint<FeatType, LabelType> &data = chunk.data[i];
 				this->UpdateWeightSize(data.max_index);
-				double y = this->UpdateWeightVec(data); 
+				float y = this->UpdateWeightVec(data); 
 				//loss
-				if (this->lossFunc->IsCorrect(data,y) == false)
+				if (this->lossFunc->IsCorrect(data.label,y) == false)
 					errorNum++;
 			}
 			dataSet.FinishRead();
@@ -165,14 +162,12 @@ namespace SOL
 
 	//learn a model and return the mistake rate and its variance
 	template <typename FeatType, typename LabelType>
-	double Optimizer<FeatType, LabelType>::Learn(double &aveErrRate, double &varErrRate, 
-		double &sparseRate, int numOfTimes)
-	{
-		double* errorRateVec = new double[numOfTimes];
-		double * sparseRateVec = new double[numOfTimes];
+	float Optimizer<FeatType, LabelType>::Learn(float &aveErrRate, float &varErrRate, 
+		float &sparseRate, int numOfTimes) {
+		float * errorRateVec = new float[numOfTimes];
+		float * sparseRateVec = new float[numOfTimes];
 
-		for (int i = 0; i < numOfTimes; i++)
-		{
+		for (int i = 0; i < numOfTimes; i++) {
 			//random order
 			errorRateVec[i] = this->Train();
 			sparseRateVec[i] = this->GetSparseRate();
@@ -189,31 +184,27 @@ namespace SOL
 
 	//learn a model
 	template <typename FeatType, typename LabelType>
-	double Optimizer<FeatType, LabelType>::Learn(int numOfTimes)
-	{
-		double aveErrRate, varErrRate, sparseRate;
+	float Optimizer<FeatType, LabelType>::Learn(int numOfTimes) {
+		float aveErrRate, varErrRate, sparseRate;
 		return this->Learn(aveErrRate, varErrRate,sparseRate, numOfTimes);
 	}
 
 	//test the performance on the given set
 	template <typename FeatType, typename LabelType>
-	double Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet)
-	{
+	float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
 		if(testSet.Rewind() == false)
 			exit(0);
-		double errorRate(0);
+		float errorRate(0);
 		//test
-		while(1)
-		{
+		while(1) {
 			const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk();
 			if(chunk.dataNum  == 0) //"all the data has been processed!"
 				break;
-			for (size_t i = 0; i < chunk.dataNum; i++)
-			{
+			for (size_t i = 0; i < chunk.dataNum; i++) {
 				const DataPoint<FeatType , LabelType> &data = chunk.data[i];
 				//predict
-				double predict = this->Predict(data);
-				if (this->lossFunc->IsCorrect(data,predict) == false)
+				float predict = this->Predict(data);
+				if (this->lossFunc->IsCorrect(data.label,predict) == false)
 					errorRate++;
 			}
 			testSet.FinishRead();
@@ -224,9 +215,8 @@ namespace SOL
 
 
 	template <typename FeatType, typename LabelType>
-	double Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data)
-	{
-		double predict = 0;
+	float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
+		float predict = 0;
 		int dim = data.indexes.size();
 		for (int i = 0; i < dim; i++)
 			predict += this->weightVec[data.indexes[i]] * data.features[i];
@@ -236,14 +226,12 @@ namespace SOL
 
 
 	template <typename FeatType, typename LabelType>
-	double Optimizer<FeatType, LabelType>::GetSparseRate(int total_len)
-	{
-		double zeroNum(0);
+	float Optimizer<FeatType, LabelType>::GetSparseRate(int total_len) {
+		float zeroNum(0);
 		if (this->weightDim == 1)
 			return 1;
 
-		for (int i = 1; i < this->weightDim; i++)
-		{
+		for (int i = 1; i < this->weightDim; i++) {
 			if (this->weightVec[i] <= this->sparse_soft_thresh && 
 				this->weightVec[i] >= -this->sparse_soft_thresh)
 				zeroNum++;
@@ -256,61 +244,55 @@ namespace SOL
 
 	//try and get the best parameter
 	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::BestParameter()
-	{
-        if (this->eta != init_tbd)
+	void Optimizer<FeatType, LabelType>::BestParameter() {
+        if (this->eta0 != init_tbd)
             return;
-        double prev_lambda = this->lambda;
+        float prev_lambda = this->lambda;
         this->lambda = 0;
-		//1. Select the best eta
-		double eta_min = 1e-10;
-		double eta_max = 1;
+		//1. Select the best eta0
+		float eta_min = 1e-10;
+		float eta_max = 1;
 
-		double min_errorRate = 1;
-		double bestEta = 1;
+		float min_errorRate = 1;
+		float bestEta = 1;
 
-		for (double eta_c = eta_min; eta_c<= eta_max; eta_c *= 10)
-		{
-			cout<<"eta = "<<eta_c<<"\t";
-			double errorRate(0);
-			this->eta = eta_c;
+		for (float eta_c = eta_min; eta_c<= eta_max; eta_c *= 10) {
+			cout<<"eta0 = "<<eta_c<<"\t";
+			float errorRate(0);
+			this->eta0 = eta_c;
             errorRate += this->Train();
 
-			if (errorRate < min_errorRate)
-			{
+			if (errorRate < min_errorRate) {
 				bestEta = eta_c;
 				min_errorRate = errorRate;
 			}
 			cout<<"mistake rate: "<<errorRate * 100<<" %\n";
 		}
-		this->eta = bestEta;
+		this->eta0 = bestEta;
         this->lambda = prev_lambda;
-		cout<<"Best Parameter:\teta = "<<this->eta<<"\n\n";
+		cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
 	}
 
 	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::SetParameter(double lambda , double eta)
-	{
+	void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0) {
 		this->lambda  = lambda >= 0 ? lambda : this->lambda;
-		this->eta = eta > 0 ? eta : this->eta;
+		this->eta0 = eta0 > 0 ? eta0 : this->eta0;
 	}
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::UpdateWeightSize(int newDim)
-	{
+	void Optimizer<FeatType, LabelType>::UpdateWeightSize(int newDim) {
 		if (newDim < this->weightDim) 
 			return;
-		else
-		{
+		else {
 			newDim++; //reserve the 0-th
-			double* newW = new double[newDim];
-			memset(newW,0,sizeof(double) * newDim); 
+			float* newW = new float[newDim];
+			memset(newW,0,sizeof(float) * newDim); 
 
 			//copy info
-			memcpy(newW,this->weightVec,sizeof(double) * this->weightDim); 
+			memcpy(newW,this->weightVec,sizeof(float) * this->weightDim); 
 			//set the rest to zero
-			memset(newW + this->weightDim,0,sizeof(double) * (newDim - this->weightDim));
+			memset(newW + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
 
 			delete []this->weightVec;
 			this->weightVec = newW;

@@ -8,20 +8,16 @@
 #pragma once
 #include "LossFunction.h"
 
-namespace SOL
-{
+namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class SquareLoss: public LossFunction<FeatType, LabelType>
-    {
+	class SquareLoss: public LossFunction<FeatType, LabelType> {
         public:
-            virtual  double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict)
-            {
-                return (predict - x.label) * (predict - x.label);
+            virtual float GetLoss(LabelType label, float predict) {
+                return (predict - label) * (predict - label);
             }
 
-            virtual  double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict)
-            {
-                return 2 * (predict - x.label); 
+            virtual float GetGradient(LabelType label, float predict) {
+                return 2 * (predict - label); 
             }
     };
 }

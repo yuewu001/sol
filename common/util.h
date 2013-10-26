@@ -8,7 +8,7 @@
 
 #include <cstring>
 #include <numeric>
-#include <cmath>
+#include <math.h>
 #include <ctype.h>
 
 #if WIN32
@@ -23,11 +23,16 @@
 
 
 template <typename T>
-char Sgn(T x) 
-{
+inline char Sgn(T x) {
 	if (x > 0) return 1;
 	else if (x < 0) return -1;
 	else  return 0;
+}
+
+//#define ABS(x) (x > 0 ? x : -x)
+template <typename T>
+inline T ABS(T x) {
+    return x > 0 ? x : -x;
 }
 
 template <typename T>
@@ -48,21 +53,27 @@ int MSB2LSB(T x)
 }
 
 template <typename T>
-inline double Average(const T* data, int dim)
+inline float Average(const T* data, int dim)
 {
-	return std::accumulate(data,data + dim, 0.0) / (double)dim;
+	return std::accumulate(data,data + dim, 0.f) / (float)dim;
 }
 
 template <typename T>
-double Variance(const T* data, int dim)
+float Variance(const T* data, int dim)
 {
 	if (dim <= 1)
 		return 0;
-	double ave = std::accumulate(data, data + dim,0.0) / (double)dim;
+	float ave = std::accumulate(data, data + dim,0.f) / (double)dim;
 	double var(0);
 	for (int i = 0; i < dim; i++)
 		var += (data[i] - ave) * (data[i] - ave);
 	return sqrt(var / (dim - 1));
 }
 
+inline float trunc_weight(float w, float gravity){
+    if (w > 0)
+        return (gravity < w) ? w - gravity : 0.f;
+    else
+        return (gravity < -w) ? w + gravity : 0.f;
+}
 

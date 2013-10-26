@@ -8,21 +8,17 @@
 #pragma once
 #include "LossFunction.h"
 
-namespace SOL
-{
+namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class HingeLoss: public LossFunction<FeatType, LabelType>
-	{
+	class HingeLoss: public LossFunction<FeatType, LabelType> {
 		public:
-			virtual  double GetLoss(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-                return (std::max)(0.0, 1 - predict * x.label);
+			virtual  float GetLoss(LabelType label, float predict) {
+                return (std::max)(0.0f, 1.f - predict * label);
 			}
 
-			virtual  double GetGradient(const DataPoint<FeatType, LabelType> &x, double predict)
-			{
-                if (this->GetLoss(x,predict) > 0)
-                    return -x.label;
+            virtual  float GetGradient(LabelType label, float predict) {
+                if (this->GetLoss(label,predict) > 0)
+                    return -label;
                 else
 					return 0;
 			}
