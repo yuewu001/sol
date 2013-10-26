@@ -14,10 +14,12 @@
 #if WIN32
 #include <direct.h>
 #include <io.h>
+#include <windows.h>
 #define SOL_ACCESS(x) _access(x,0)
 #else
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #define SOL_ACCESS(x) access(x,F_OK)
 #endif
 
@@ -77,3 +79,12 @@ inline float trunc_weight(float w, float gravity){
         return (gravity < -w) ? w + gravity : 0.f;
 }
 
+inline double get_current_time(){
+#if _WIN32
+    return GetTickCount() / 1000.0;
+#else
+    struct timeval tim;
+    gettimeofday(&tim, NULL);
+    return tim.tv_sec + tim.tv_usec / 1000000.0;
+#endif
+}

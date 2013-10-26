@@ -1,7 +1,7 @@
 DEBUG_FLAG=0
 
 DEBUG=-g -Wall
-RELEASE=-O3 -s
+RELEASE=-O2 -s
 
 INCLUDE=-I . -I ./data -I ./loss -I./optimizer
 VPATH=.:./data:./loss:./optimizer

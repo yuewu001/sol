@@ -20,13 +20,20 @@
 #include "loss/HingeLoss.h"
 #include "loss/SquareLoss.h"
 
+#include "common/util.h"
+
 #include "Params.h"
 
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <ctime>
 #include <cmath>
+
+#if _WIN32
+#include <windows.h>
+#else
+#include <sys/time.h>
+#endif
 
 using namespace std;
 using namespace SOL;
@@ -41,6 +48,7 @@ template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
 
 int main(int argc, char** args) {
+    /*
     int new_argc = 2;
     char** argv = new char*[argc + new_argc];
     for(int i = 0; i < argc; i++)
@@ -50,9 +58,9 @@ int main(int argc, char** args) {
 //    argv[argc + 2] = "-eta";
  //   argv[argc + 3] = "0.1";
     argc += new_argc;
-
-    Params param(argc, argv);
-    delete []argv;
+    */
+    Params param(argc, args);
+    //delete []argv;
 
     DataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size);
     if (dataset.Load(param.fileName, param.cache_fileName) == false){
@@ -77,11 +85,11 @@ int main(int argc, char** args) {
 	float sparseRate(0);
 
 	//learning the model
-    clock_t time1 = clock();
+    double time1 = get_current_time();
 
 	opti->Learn(l_errRate,l_varErr,sparseRate);
 
-    clock_t time2 = clock();
+    double time2 = get_current_time();
 
     printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
@@ -93,7 +101,7 @@ int main(int argc, char** args) {
 		if (testset.Load(param.test_fileName, param.test_cache_fileName) == true) {
 			float t_errRate(0);	//test error rate
 			t_errRate = opti->Test(testset);
-			time3 = clock();
+			time3 = get_current_time();
 
 			printf("Test error rate: %.2f %%\n",t_errRate * 100); 
 		}
@@ -102,9 +110,9 @@ int main(int argc, char** args) {
 	}
 
 	printf("Sparsification Rate: %.2f %%\n", sparseRate * 100);
-    printf("Learning time: %.3f s\n", (float)(time2 - time1) / CLOCKS_PER_SEC);
+    printf("Learning time: %.3f s\n", (float)(time2 - time1));
     if (is_test)
-        printf("Test time: %.3f s\n", (float)(time3 - time2) / CLOCKS_PER_SEC);
+        printf("Test time: %.3f s\n", (float)(time3 - time2));
 
     delete lossFunc;
     delete opti;
