@@ -29,11 +29,6 @@
 #include <fstream>
 #include <cmath>
 
-#if _WIN32
-#include <windows.h>
-#else
-#include <sys/time.h>
-#endif
 
 using namespace std;
 using namespace SOL;
