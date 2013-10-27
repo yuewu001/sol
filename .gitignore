@@ -6,4 +6,6 @@ cscope.*
 tags
 test
 tmp*
+exp/result
+exp/tmp
 

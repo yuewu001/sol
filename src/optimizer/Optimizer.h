@@ -73,7 +73,7 @@ namespace SOL {
 		//Reset the optimizer to the initialization status of training
 		virtual void BeginTrain();
 		//called when a train ends
-		virtual void EndTrain(){}
+		virtual void EndTrain();
 		//train the data
 		float Train();
 		//predict a new feature
@@ -116,7 +116,7 @@ namespace SOL {
 		this->curIterNum = 0;
         this->initial_t = 0;
 
-		this->sparse_soft_thresh = 0;
+		this->sparse_soft_thresh = init_sparse_soft_thresh;
 	}
 
 	//reset the optimizer to this initialization
@@ -127,6 +127,17 @@ namespace SOL {
 		this->curIterNum = this->initial_t;
         this->eta = this->eta0;
 	}
+//called when a train ends
+    template <typename FeatType, typename LabelType>
+	void Optimizer<FeatType, LabelType>::EndTrain() {
+        for (int i = 1; i < this->weightDim; i++){
+            if (this->weightVec[i] < this->sparse_soft_thresh && 
+                    this->weightVec[i] > -this->sparse_soft_thresh ){
+                this->weightVec[i] = 0;
+            }
+        }
+    }
+
 
 	template <typename FeatType, typename LabelType> 
 	float Optimizer<FeatType, LabelType>::Train() {
@@ -230,8 +241,7 @@ namespace SOL {
 			return 1;
 
 		for (int i = 1; i < this->weightDim; i++) {
-			if (this->weightVec[i] <= this->sparse_soft_thresh && 
-				this->weightVec[i] >= -this->sparse_soft_thresh)
+			if (this->weightVec[i] == 0)
 				zeroNum++;
 		}
 		if (total_len > 0)

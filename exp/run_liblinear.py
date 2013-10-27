@@ -14,13 +14,16 @@ if len(sys.argv) < 5:
     Usage()
     sys.exit()
 
+os.system('mkdir ./tmp')
+
 dst_folder = sys.argv[1]
 model_file = sys.argv[2]
 train_file = sys.argv[3]
 test_file  = sys.argv[4]
+tmp_file   = './tmp/tmp.txt'
 
-train_exe_name = './train'
-test_exe_name = './predict'
+train_exe_name = '../extern/liblinear/train'
+test_exe_name = '../extern/liblinear/predict'
 
 #make the result dir
 cmd = 'mkdir -p ./%s' %dst_folder
@@ -35,7 +38,7 @@ open(result_file,'w').close()
    
 #evaluate the result
 train_cmd = train_exe_name + ' %s' %train_file + ' %s' %model_file 
-test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' tmp.txt >> %s' %result_file
+test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %tmp_file + '>> %s' %result_file
 
 print train_cmd
 start_time =time.time()

@@ -53,10 +53,6 @@ namespace SOL {
         this->id_str = "STG";
         this->K = init_k;
         this->timeStamp = new unsigned int[this->weightDim];
-		if (this->K != 1)
-			this->sparse_soft_thresh = init_sparse_soft_thresh;
-		else
-			this->sparse_soft_thresh = 0;
     }
 
     template <typename FeatType, typename LabelType>
@@ -136,10 +132,6 @@ namespace SOL {
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->K = k > 0 ? k : this->K;
             this->eta = Eta > 0 ? Eta : this->eta;
-			if (this->K == 1)
-				this->sparse_soft_thresh = 0;
-			else
-				this->sparse_soft_thresh = init_sparse_soft_thresh;
         }
 
     //Change the dimension of weights

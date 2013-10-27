@@ -35,7 +35,7 @@ cache_test_file = test_file + '_cache'
 cmd_data += ' -c %s' %cache_train_file
 cmd_data += ' -tc %s' %cache_test_file
 
-dst_folder = '%s' %dataset + '_result'
+dst_folder = './result/%s' %dataset 
 
 #analyze dataset
 dataset_info_file = train_file + '_info.txt'

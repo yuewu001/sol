@@ -21,7 +21,7 @@ namespace SOL
 	//l1 regularization
 	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
-	static const float init_sparse_soft_thresh = 1e-5;
+	static const float init_sparse_soft_thresh = 1e-6;
 	//truncate gradients every K steps
 	static const int init_k = 10;
 	//gamma in enchanced RDA
@@ -42,8 +42,8 @@ namespace SOL
 	static const enum_Opti_Method init_opti_method = Opti_STG;
 
 	//trying the optimal parameters
-	static const float init_eta_max = 10;
-	static const float init_eta_min = 1e-8;
+	static const float init_eta_max = 100;
+	static const float init_eta_min = 1e-6;
 	static const float init_eta_step = 10;
 	static const float init_delta_max = 10;
 	static const float init_delta_min = 0.1;

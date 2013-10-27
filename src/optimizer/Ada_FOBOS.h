@@ -136,6 +136,8 @@ namespace SOL {
                 alpha = this->lambda * this->eta0 * (iterNum - this->timeStamp[index_i]) / Ht0i;
                 this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], alpha);
             }
+
+            Optimizer<FeatType,LabelType>::EndTrain();
         }
 
     /*

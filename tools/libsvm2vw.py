@@ -3,7 +3,7 @@ import os
 import time
 
 def Usage():
-    print 'Usage: transform.py filename'
+    print 'Usage: libsvm2vw.py filename'
 
 if len(sys.argv) != 2:
     Usage()

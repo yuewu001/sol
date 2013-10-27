@@ -24,13 +24,14 @@ set (SRC_LIST
     )
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -O2 -s")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
     
 add_executable(SOL ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOL pthread)
 ENDIF(UNIX)
+add_executable(analysis src/data_analysis.cpp ${data_files})
 
-install(TARGETS SOL
+install(TARGETS SOL analysis
     DESTINATION .)

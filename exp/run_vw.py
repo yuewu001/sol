@@ -8,8 +8,15 @@ import l1_def
 
 from l1_def import *
 
+exe_name = '../extern/vw/vw'
+model_file = './tmp/vw_model'
+rd_model_file = './tmp/vw_model.txt'
+tmp_file = './tmp/vw_tmp.txt'
+
+os.system('mkdir tmp')
+
 def Usage():
-    print 'Usage: run_experiment.py dst_folder trainfile cache_train testfile cache_test'
+    print 'Usage:run_vw.py dst_folder trainfile cache_train testfile cache_test'
 
 def get_valid_dim(trainfile):
     filename = trainfile + '_info.txt'
@@ -56,9 +63,8 @@ if len(sys.argv) < 6:
     sys.exit()
 
 dst_folder = sys.argv[1]
-exe_name = './vw'
 
-extra_cmd = ' --sgd --binary --loss_function=logistic --readable_model model.txt -f model '
+extra_cmd = ' --sgd --binary --loss_function=logistic --readable_model %s' %rd_model_file + ' -f %s' %model_file
 trainfile = sys.argv[2]
 cache_train = sys.argv[3]
 testfile = sys.argv[4]
@@ -76,9 +82,9 @@ valid_dim = get_valid_dim(trainfile)
 
 #transform into vw format
 if os.path.exists('%s.vw' %trainfile) == False:
-    os.system('python libsvm2vw.py %s' %trainfile)
+    os.system('python ../tools/libsvm2vw.py %s' %trainfile)
 if os.path.exists('%s.vw' %testfile) == False:
-    os.system('python libsvm2vw.py %s' %testfile)
+    os.system('python ../tools/libsvm2vw.py %s' %testfile)
 
 trainfile += ".vw"
 cache_train += ".vw"
@@ -98,13 +104,12 @@ cmd += extra_cmd
 #evaluate the result
 if is_cache == True:
     train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile +' --cache_file %s ' %cache_train
-    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i model --cache_file %s ' %cache_test
+    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file + ' --cache_file %s ' %cache_test
 else:
     train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile
-    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i model' 
+    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file 
 
-cmd_postfix = ' 2> vw_tmp.txt'
-
+cmd_postfix = ' 2> %s' %tmp_file
 
 result_list = []
 
@@ -128,7 +133,7 @@ while l1 <= lambda_end:
     result_item[3] = (float)('%.2f' %result_item[3]) 
 
     #parse learn error rate
-    result_item[0] = (float)(err_pattern.findall(open('vw_tmp.txt','r').read())[0]) * 100
+    result_item[0] = (float)(err_pattern.findall(open(tmp_file,'r').read())[0]) * 100
     result_item[0] = (float)('%.2f' %result_item[0]) 
     if result_item[0] == None:
         print 'parse learning error rate failed'
@@ -140,13 +145,13 @@ while l1 <= lambda_end:
     os.system(cmd)
 
     #parse test error rate
-    result_item[1] = (float)(err_pattern.findall(open('vw_tmp.txt','r').read())[0]) * 100
+    result_item[1] = (float)(err_pattern.findall(open(tmp_file,'r').read())[0]) * 100
     result_item[1] = (float)('%.2f' %result_item[1]) 
     if result_item[1] == None:
         print 'parse test error rate failed'
         sys.exit()
     #parse sparsity
-    model_size = get_model_size('model.txt')
+    model_size = get_model_size(rd_model_file)
     result_item[2] = 100 - (model_size * 100.0 / valid_dim)
 
     result_list.append(result_item)

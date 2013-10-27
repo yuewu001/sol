@@ -133,6 +133,7 @@ namespace SOL {
                 this->weightVec[i] = - this->eta0 / Htii * 
                     trunc_weight(u_t[i], this->lambda * this->curIterNum);
             }
+            Optimizer<FeatType,LabelType>::EndTrain();
         }
 
     /*

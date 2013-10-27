@@ -28,7 +28,6 @@ namespace SOL {
 		LossFunction<FeatType, LabelType> &lossFunc,
 			NormType type): Optimizer<FeatType, LabelType>(dataset, lossFunc) {
         this->id_str = "SGD";
-        this->sparse_soft_thresh = init_sparse_soft_thresh;
 	}
 
 	template <typename FeatType, typename LabelType>
