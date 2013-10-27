@@ -85,8 +85,6 @@ namespace SOL
                 return file.good();
             }
 
-            virtual int GetMinIndex()  const {return 1;}
-            
             bool GetNextData(DataPoint<FeatType, LabelType> &data)
             {
 				data.erase();

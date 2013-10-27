@@ -101,8 +101,6 @@ namespace SOL
                 return this->inTrainFile.good() && this->inLabelFile.good();
             }
 
-            virtual int GetMinIndex() const {return this->min_index;}
-
 			virtual bool GetNextData(DataPoint<FeatType, LabelType> &data)
 			{
 				if (num1 == -1 || num2 == -1)

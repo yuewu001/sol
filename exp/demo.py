@@ -2,7 +2,7 @@ import os
 import sys
 
 opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw']
-#opt_list = ['vw']
+#opt_list = ['STG']
 
 rootDir = '/home/matthew/data/'
 if len(sys.argv) == 2:
@@ -24,7 +24,7 @@ elif dataset == 'rcv1':
     train_file = rootDir + 'rcv1/rcv1.train' 
     test_file = rootDir + '/rcv1/rcv1.test'
 
-    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 1.0'
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' '
 else:
     print 'unrecoginized dataset'
     sys.exit()

@@ -39,8 +39,6 @@ namespace SOL
 		double eta; //learning rate
 		double lambda; //for l1 regularization
 		int K; //for STG method
-		double theta; //for trucated gradient
-		double gamma; //fro RDA
 		double rou; //for RDA
 		double delta; //for Ada-
         double r; //for AROW

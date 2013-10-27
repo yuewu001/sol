@@ -42,8 +42,8 @@ namespace SOL
 	static const enum_Opti_Method init_opti_method = Opti_STG;
 
 	//trying the optimal parameters
-	static const float init_eta_max = 1;
-	static const float init_eta_min = 1e-10;
+	static const float init_eta_max = 10;
+	static const float init_eta_min = 1e-8;
 	static const float init_eta_step = 10;
 	static const float init_delta_max = 10;
 	static const float init_delta_min = 0.1;

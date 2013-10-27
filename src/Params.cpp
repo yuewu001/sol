@@ -59,8 +59,6 @@ namespace SOL {
                 this->K = atoi(args[i + 1]);
             else if (strcmp(args[i],"-eta") == 0 && i + 1 < argc)
                 this->eta = strtod(args[i+1],NULL);
-            else if (strcmp(args[i],"-theta") == 0 && i + 1 <argc)
-                this->theta = strtod(args[i+1],NULL);
             else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
                 this->r = strtod(args[i+1], NULL);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
@@ -73,8 +71,6 @@ namespace SOL {
                 this->buf_size = atoi(args[i+1]);
             else if(strcmp(args[i],"-loss") == 0 && i + 1 < argc)
                 this->loss_type = this->GetLossType(args[i+1]);
-            else if (strcmp(args[i],"-gamma") == 0 && i + 1 < argc)
-                this->gamma = strtod(args[i+1],NULL);
             else if (strcmp(args[i],"-rou") == 0 && i + 1 < argc)
                 this->rou = strtod(args[i + 1],NULL);
             else if (strcmp(args[i],"--help") == 0)
@@ -96,11 +92,9 @@ namespace SOL {
         this->passNum = 1;
         this->eta = -1;
         this->lambda = -1;
-        this->theta = -1;
         this->delta = -1;
         this->K = -1;
         this->buf_size = -1;
-        this->gamma = -1;
         this->rou = -1;
         this->r = init_r;
     }
@@ -164,23 +158,27 @@ namespace SOL {
     }
 
     void Params::Help() {
-        cout<<"SOL -i input_data [-c cache_file] [option value]\n";
-        cout<<"Options: \n";
-        cout<<"-c:\t cache file name\n";
-        cout<<"-t:\t test file name\n";
-        cout<<"-tc:\t test cache file\n";
-        cout<<"-dt:\t data type: LibSVM\n";
-        cout<<"-bs:\t number of chunks for buffering\n";
-        cout<<"-eta:\t learning rate\n";
-        cout<<"-delta:\t value of delta for Adaptive algorithms\n";
-        cout<<"-gamma\t gamma\n";
-        cout<<"-k:\t number of K in truncated gradient\n";
-        cout<<"-l1:\t value of l1 regularization\n";
-        cout<<"-loss:\t loss function type\n\t\tHinge|Logit|Square\n";
-        cout<<"-opt:\t optimization method:\n\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|ADa-FOBOS|AROW\n";
-        cout<<"-passes:\t number of passes\n";
-        cout<<"-rou:\t rou\n";
-        cout<<"-theta:\t value of truncated threshold\n";
+        cout<<"SOL [options]\n";
+        cout<<"Input Options: \n";
+        cout<<"\t-i arg  :\t input file name\n";
+        cout<<"\t-c arg  :\t cache file name\n";
+        cout<<"\t-t arg  :\t test file name\n";
+        cout<<"\t-tc arg :\t test cache file\n";
+        cout<<"\t-dt arg :\t data type: LibSVM\n";
+        cout<<"\t-bs arg :\t number of chunks for buffering\n";
+
+        cout<<"Loss Functions: \n";
+        cout<<"\t-loss arg:\t loss function type\n\t\t\t\tHinge|Logit|Square\n";
+
+        cout<<"Algorithms and Parameters: \n";
+        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW\n";
+        cout<<"\t-eta arg:\t learning rate\n";
+        cout<<"\t-l1 arg:\t value of l1 regularization\n";
+        cout<<"\t-passes arg:\t number of passes\n\n";
+
+        cout<<"\t-k arg:\t\t number of K in truncated gradient(STG)\n";
+        cout<<"\t-rou arg:\t rou(RDA_E)\n";
+        cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-FOBOS, Ada-RDA)\n";
 
         cout<<"\n";
         exit(0);

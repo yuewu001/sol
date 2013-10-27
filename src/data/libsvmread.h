@@ -88,8 +88,6 @@ namespace SOL
 			fp = NULL;
 		}
 
-		virtual int GetMinIndex() const { return min_index; }
-
 		virtual inline bool Good()
 		{
 			return fp != NULL;

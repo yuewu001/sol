@@ -30,7 +30,6 @@ namespace SOL {
 		float lambda;
 		float eta0; //learning rate
         float eta;
-		float mistakeRate;
 
 		DataSet<FeatType, LabelType> &dataSet;
 
@@ -71,8 +70,7 @@ namespace SOL {
         const string& Id_Str() const {return this->id_str;}
 
 	protected:
-		//reset the optimizer to this initialization at the beginning of
-		//training
+		//Reset the optimizer to the initialization status of training
 		virtual void BeginTrain();
 		//called when a train ends
 		virtual void EndTrain(){}
@@ -250,13 +248,11 @@ namespace SOL {
         float prev_lambda = this->lambda;
         this->lambda = 0;
 		//1. Select the best eta0
-		float eta_min = 1e-10;
-		float eta_max = 1;
 
 		float min_errorRate = 1;
 		float bestEta = 1;
 
-		for (float eta_c = eta_min; eta_c<= eta_max; eta_c *= 10) {
+		for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
 			cout<<"eta0 = "<<eta_c<<"\t";
 			float errorRate(0);
 			this->eta0 = eta_c;

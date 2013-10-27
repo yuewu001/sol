@@ -20,7 +20,7 @@ namespace SOL {
         }
 
         public:
-		inline bool IsCorrect(LabelType label, float predict) {
+		virtual inline bool IsCorrect(LabelType label, float predict) {
             return Sign(predict) == label ? true : false;
         }
 
