@@ -82,6 +82,10 @@ verify the efficiency and effectiveness of the library.
 
         source code of large scale sparse online learning algorithms
 
+*   ---tools
+
+    Some tools to standardize datasets
+
 *   ---vs
 
     Microsoft Visual Studio 2012 Projects of the library
