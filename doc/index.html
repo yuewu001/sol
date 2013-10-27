@@ -6,6 +6,21 @@ online classification tasks. The library provide an easy-to-use command-line too
 several scripts for users and developers.  We performed comprehensive experiments to 
 verify the efficiency and effectiveness of the library.</p>
 
+<ol>
+<li><p>First Level</p>
+
+<ol>
+<li><p>Second Level</p>
+
+<ol>
+<li><p>Third Level</p></li>
+<li><p>Third Level</p></li>
+</ol></li>
+<li><p>Second Level</p></li>
+</ol></li>
+<li><p>First Level</p></li>
+</ol>
+
 <h2>Outline</h2>
 
 <ol>
@@ -13,31 +28,33 @@ verify the efficiency and effectiveness of the library.</p>
 <li><p><a href="#cmd_line">Command line</a></p></li>
 <li><p><a href="#tutorial">Tutorial</a></p>
 
-<p>3.1.    <a href="#install">Installation</a></p>
+<p>3.1. <a href="#install">Installation</a></p>
 
-<p>3.2.    <a href="#step_example">A step by step example</a></p></li>
+<p>3.2. <a href="#step_example">A step by step example</a></p></li>
 <li><p><a href="#manual">User Manual &amp; Extend the library</a></p>
 
-<p>4.1.    <a href="#io_handler">IO Handlers</a></p>
+<p>4.1. <a href="#io_handler">IO Handlers</a></p>
 
-<p>4.1.1.  <a href="#parse">Parsing Dataset</a></p>
+<ul style="list-style-type:none;">
+    <li><p><a href="#parse">4.1.1. Parsing Dataset</a></p></li>
+    <li><p><a href="#extend_datareader">4.1.2. Extend the data readers</a></p></li>
+</ul>
 
-<p>4.1.2.  <a href="#extend_datareader">Extend the data readers</a></p>
+<p>4.2. <a href="#loss">Loss Functions</a></p>
 
-<p>4.2.    <a href="#loss">Loss Functions</a></p>
+<p>4.3. <a href="#optimizer">Optimizers</a></p>
 
-<p>4.3.    <a href="#optimizer">Optimizers</a></p>
-
-<p>4.3.1   <a href="#opt_detail">Details of Optimizer</a></p>
-
-<p>4.3.2   <a href="#opt_own">Implement your own algorithms</a></p>
+<p><ul style="list-style-type:none;">
+    <li><p><a href="#opt_detail">4.3.1. Details of Optimizer</a></p></li>
+    <li><p><a href="#opt_own">4.3.2. Implement your own algorithms</a></p></li>
+</ul></p>
 
 <p>4.4. <a href="#common_util">Common Utilities</a></p></li>
 <li><p><a href="#exp">Experimental Results of SOL</a></p>
 
-<p>5.1.    <a href="#exp_rcv1">Experiment on RCV1</a></p>
+<p>5.1. <a href="#exp_rcv1">Experiment on RCV1</a></p>
 
-<p>5.2.    <a href="#exp_kdda">Experiment on kdda</a></p></li>
+<p>5.2. <a href="#exp_kdda">Experiment on kdda</a></p></li>
 </ol>
 
 <h2><a id='struct'>1. Structure of folders</a></h2>
@@ -49,18 +66,22 @@ verify the efficiency and effectiveness of the library.</p>
 <li><p>---exp</p>
 
 <p>some scripts for experiments</p></li>
-<li><p>---src/common</p>
+<li><p>---src</p>
+
+<ul>
+<li><p>---common</p>
 
 <p>source code of common utilities and global definitions</p></li>
-<li><p>---src/data</p>
+<li><p>---data</p>
 
 <p>source code of IO handlers</p></li>
-<li><p>---src/loss</p>
+<li><p>---loss</p>
 
 <p>source code of loss functions</p></li>
-<li><p>---src/optimizer</p>
+<li><p>---optimizer</p>
 
 <p>source code of large scale sparse online learning algorithms</p></li>
+</ul></li>
 <li><p>---vs</p>
 
 <p>Microsoft Visual Studio 2012 Projects of the library</p></li>
@@ -370,16 +391,14 @@ problems. We assign the virtual property to it for the extensibility to multi-cl
 here. To linear classification problems, the gradients on different features share a same part. Take Hinge Loss for
 example:</p>
 
-<pre><code>l(w) = 1 - y wx
-</code></pre>
+<p><i>l(<b>w</b>) = 1 - y <b>w</b> &#8226; <b>x</b></i></p>
 
 <p>The gradient is:</p>
 
-<pre><code>l(w) = -yx
-</code></pre>
+<p><i>l&#39;(<b>w</b>) = -y <b>x</b></i></p>
 
-<p>As a result, we only calculate the shared term '-y' for the gradients of different features for efficiency concern. 
-Users need to multiply the correspondent feature<code>x[i]</code> in the optimization algorithms.</p></li>
+<p>As a result, we only calculate the shared term <code>-y</code> for the gradients of different features for efficiency concern. 
+Users need to multiply the correspondent feature <code>x[i]</code> in the optimization algorithms.</p></li>
 </ul>
 
 <h4>4.2.1 Extend loss functions</h4>

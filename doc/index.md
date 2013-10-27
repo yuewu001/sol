@@ -5,40 +5,54 @@ online classification tasks. The library provide an easy-to-use command-line too
 several scripts for users and developers.  We performed comprehensive experiments to 
 verify the efficiency and effectiveness of the library.
 
+1. First Level
+
+    1. Second Level
+
+        1. Third Level
+
+        2. Third Level
+
+  2. Second Level
+
+2. First Level
+
 ##Outline
-1.  [Structure of folders](#struct)
+1. [Structure of folders](#struct)
 
-2.  [Command line](#cmd_line)
+2. [Command line](#cmd_line)
 
-3.  [Tutorial](#tutorial)
+3. [Tutorial](#tutorial)
 
-    3.1.    [Installation](#install)
+    3.1. [Installation](#install)
 
-    3.2.    [A step by step example](#step_example)
+    3.2. [A step by step example](#step_example)
 
-4.  [User Manual & Extend the library](#manual)
+4. [User Manual & Extend the library](#manual)
 
-    4.1.    [IO Handlers](#io_handler)
+    4.1. [IO Handlers](#io_handler)
+
+    <ul style="list-style-type:none;">
+        <li><p><a href="#parse">4.1.1. Parsing Dataset</a></p></li>
+        <li><p><a href="#extend_datareader">4.1.2. Extend the data readers</a></p></li>
+    </ul>
         
-       4.1.1.  [Parsing Dataset](#parse)
+    4.2. [Loss Functions](#loss)
 
-       4.1.2.  [Extend the data readers](#extend_datareader)
+    4.3. [Optimizers](#optimizer)
 
-    4.2.    [Loss Functions](#loss)
-
-    4.3.    [Optimizers](#optimizer)
-        
-       4.3.1   [Details of Optimizer](#opt_detail)
-
-       4.3.2   [Implement your own algorithms](#opt_own)
-
+     <ul style="list-style-type:none;">
+        <li><p><a href="#opt_detail">4.3.1. Details of Optimizer</a></p></li>
+        <li><p><a href="#opt_own">4.3.2. Implement your own algorithms</a></p></li>
+    </ul>
+   
     4.4. [Common Utilities](#common_util)
 
-5.  [Experimental Results of SOL](#exp)
+5. [Experimental Results of SOL](#exp)
 
-    5.1.    [Experiment on RCV1](#exp_rcv1)
+    5.1. [Experiment on RCV1](#exp_rcv1)
 
-    5.2.    [Experiment on kdda](#exp_kdda)
+    5.2. [Experiment on kdda](#exp_kdda)
 
 
 ## <a id='struct'>1. Structure of folders</a>
@@ -50,21 +64,23 @@ verify the efficiency and effectiveness of the library.
 
     some scripts for experiments
 
-*   ---src/common
+*   ---src
 
-    source code of common utilities and global definitions
+    -   ---common
 
-*   ---src/data
+        source code of common utilities and global definitions
 
-    source code of IO handlers
+    -   ---data
 
-*   ---src/loss
+        source code of IO handlers
 
-    source code of loss functions
+    -   ---loss
 
-*   ---src/optimizer
+        source code of loss functions
 
-    source code of large scale sparse online learning algorithms
+    -   ---optimizer
+
+        source code of large scale sparse online learning algorithms
 
 *   ---vs
 
@@ -346,14 +362,14 @@ Logistic Loss). The interfaces are:
     here. To linear classification problems, the gradients on different features share a same part. Take Hinge Loss for
     example:
 
-        l(w) = 1 - y wx
+    <i>l(<b>w</b>) = 1 - y <b>w</b> &#8226; <b>x</b></i>
 
     The gradient is:
 
-        l(w) = -yx
+    <i>l&#39;(<b>w</b>) = -y <b>x</b></i>
 
-    As a result, we only calculate the shared term '-y' for the gradients of different features for efficiency concern. 
-    Users need to multiply the correspondent feature`x[i]` in the optimization algorithms.
+    As a result, we only calculate the shared term `-y` for the gradients of different features for efficiency concern. 
+    Users need to multiply the correspondent feature `x[i]` in the optimization algorithms.
 
 #### 4.2.1 Extend loss functions
 The files 'HingeLoss.h', 'LogisticLoss.h', and 'SquareLoss.h' are three examples to extend the base class.
