@@ -57,8 +57,6 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         return false;
     }
     reader->Close();
-    for(int i = 0; i < 128; i++)
-        cout<<" ";
     cout<<"data number  : "<<dataNum<<"\n";
     cout<<"feat number  : "<<featNum<<"\n";
     cout<<"valid dim    : "<<max_index<<"\n";
