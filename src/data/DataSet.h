@@ -7,6 +7,10 @@
 
 #pragma once
 
+#if WIN32
+#include <windows.h>
+#endif
+
 #include "DataSetHelper.h"
 #include "DataPoint.h"
 #include "DataReader.h"

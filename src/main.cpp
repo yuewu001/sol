@@ -5,6 +5,10 @@
 	> Functions: 
  ************************************************************************/
 
+#if WIN32
+#include <windows.h>
+#endif
+
 #include "data/DataSet.h"
 #include "data/libsvmread.h"
 
