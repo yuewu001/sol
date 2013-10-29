@@ -21,7 +21,8 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         return false;
     }
 
-    int dataNum = 0;
+    size_t dataNum = 0;
+    size_t featNum = 0;
     int max_index = 0;
     set<int> index_set;
     DataPoint<FeatType, LabelType> data;
@@ -39,6 +40,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
+                featNum += index_set.size();
                 /*
                 if (dataNum % 1000 == 0){
                     cout<<"data number  : "<<dataNum<<"    ";
@@ -58,6 +60,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
     for(int i = 0; i < 128; i++)
         cout<<" ";
     cout<<"data number  : "<<dataNum<<"\n";
+    cout<<"feat number  : "<<featNum<<"\n";
     cout<<"valid dim    : "<<max_index<<"\n";
     cout<<"nonzero feat : "<<index_set.size()<<"\n";
     if (max_index > 0){
