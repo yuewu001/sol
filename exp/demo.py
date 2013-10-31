@@ -25,6 +25,18 @@ elif dataset == 'rcv1':
     test_file = rootDir + '/rcv1/rcv1.test'
 
     cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' '
+
+elif dataset == 'kdda':
+    train_file = rootDir + 'kdda/algebra/kdda'
+    test_file = rootDir + 'kdda/algebra/kdda.t'
+
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' '
+elif dataset == 'epsilon'
+    train_file = rootDir + 'epsilon/epsion_normalized'
+    test_file = rootDir + 'epsilon/epsion_normalized.t'
+
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' '
+
 else:
     print 'unrecoginized dataset'
     sys.exit()

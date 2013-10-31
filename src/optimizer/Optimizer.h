@@ -146,6 +146,10 @@ namespace SOL {
 		//reset
 		this->BeginTrain();
 		float errorNum(0);
+        size_t show_step = 1; //show information every show_step
+        size_t show_count = 3;
+
+        printf("Iterate No.\t\tError Rate\t\t\n");
 		while(1) {
 			const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
 			//all the data has been processed!
@@ -161,6 +165,13 @@ namespace SOL {
 				//loss
 				if (this->lossFunc->IsCorrect(data.label,y) == false)
 					errorNum++;
+                show_count--;
+                if (show_count == 0){
+                    printf("%u\t\t\t%.6f\t\t\n",this->curIterNum, 
+                            errorNum / (float)(this->curIterNum));
+                    show_step *= 2;
+                    show_count = show_step;
+                }
 			}
 			dataSet.FinishRead();
 		}
