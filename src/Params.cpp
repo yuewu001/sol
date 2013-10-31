@@ -119,6 +119,8 @@ namespace SOL {
             this->opti_method = Opti_Ada_FOBOS;
         else if (strcmp(c_str, "AROW") == 0)
             this->opti_method = Opti_AROW;
+        else if (strcmp(c_str, "SAROW") == 0)
+            this->opti_method = Opti_SAROW;
         else {
             cerr<<"Unrecognized Optimization method!"<<endl;
             exit(0);
@@ -171,7 +173,7 @@ namespace SOL {
         cout<<"\t-loss arg:\t loss function type\n\t\t\t\tHinge|Logit|Square\n";
 
         cout<<"Algorithms and Parameters: \n";
-        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW\n";
+        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW\n";
         cout<<"\t-eta arg:\t learning rate\n";
         cout<<"\t-l1 arg:\t value of l1 regularization\n";
         cout<<"\t-passes arg:\t number of passes\n\n";

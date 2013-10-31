@@ -1,25 +1,27 @@
 import os
 import sys
 
-opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw']
-#opt_list = ['STG']
+opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw','SAROW']
+#opt_list = ['vw']
 
-rootDir = '/home/matthew/data/'
+rootDir = '/home/matthew/work/Data/'
 if len(sys.argv) == 2:
     dataset = sys.argv[1]
 else:
-    dataset = 'rcv1'
+    dataset = 'a9a'
 
 if dataset == 'a6a':
     train_file = rootDir + 'uci/a6a'
     test_file = rootDir + '/uci/a6a.t'
 
-    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 0.01'
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -passes 5'
+
 elif dataset == 'a9a':
     train_file = rootDir + 'uci/a9a'
     test_file = rootDir + 'uci/a9a.t'
 
-    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' -eta 0.01'
+    cmd_data = ' -i %s' %train_file + ' -t %s' %test_file  + ' -passes 20'
+
 elif dataset == 'rcv1':
     train_file = rootDir + 'rcv1/rcv1.train' 
     test_file = rootDir + '/rcv1/rcv1.test'
@@ -31,7 +33,7 @@ elif dataset == 'kdda':
     test_file = rootDir + 'kdda/algebra/kdda.t'
 
     cmd_data = ' -i %s' %train_file + ' -t %s' %test_file + ' '
-elif dataset == 'epsilon'
+elif dataset == 'epsilon':
     train_file = rootDir + 'epsilon/epsion_normalized'
     test_file = rootDir + 'epsilon/epsion_normalized.t'
 
@@ -66,6 +68,11 @@ for opt in opt_list:
 
     else:
         cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder
+        if opt == 'RDA': 
+            cmd += ' -eta 100'
+        else:
+            cmd += ' -eta 1'
+
         cmd += cmd_data
         print cmd
         os.system(cmd)
@@ -73,6 +80,7 @@ for opt in opt_list:
 opt_list_file = './%s' %dst_folder + '/opt_list.txt' 
 #clear the file if it already exists
 open(opt_list_file,'w').close()
+
 
 try:
     file_handle = open(opt_list_file,'w')

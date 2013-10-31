@@ -6,9 +6,10 @@ import re
 import time
 import l1_def
 
-from l1_def import *
+from vw_l1_def import *
 
-exe_name = '../extern/vw/vw'
+#exe_name = '../extern/vw/vw'
+exe_name = '~/work/vw/vw'
 model_file = './tmp/vw_model'
 rd_model_file = './tmp/vw_model.txt'
 tmp_file = './tmp/vw_tmp.txt'

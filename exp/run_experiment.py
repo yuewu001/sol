@@ -88,12 +88,16 @@ if is_best_param == True:
     cmd_prefix += ' -eta %e' %best_eta
 
 if is_l1 == True:
-    l1 = lambda_start
-    while l1 <= lambda_end:
+    for l1 in lambda_list:
         cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
         print cmd
         os.system(cmd)
-        l1 *= lambda_step
+        #if (l1 < 0.2):
+        #    lambda_step = 0.05
+        #else:
+        #    lambda_step = 0.2
+        #
+        #l1 += lambda_step
 else:
     cmd = cmd_prefix + cmd_postfix
     print cmd

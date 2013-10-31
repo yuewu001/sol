@@ -10,9 +10,7 @@
 #include "../loss/LossFunction.h"
 #include "../common/init_param.h"
 
-#include <algorithm>
-#include <numeric>
-#include <cstdio>
+#include <stdio.h>
 #include <math.h>
 
 

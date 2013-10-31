@@ -1,5 +1,5 @@
 /*************************************************************************
-> File Name: Diagonal AROW
+> File Name: Sparse Diagonal AROW
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 > Created Time: 2013/8/18 星期日 17:25:54
 > Functions: Diagonal Adaptive Regularization of Weight Vectors
@@ -13,21 +13,33 @@ of weight vectors." Machine Learning (2009): 1-33.
 
 #include "../common/util.h"
 #include "Optimizer.h"
-#include <cmath>
+#include <algorithm>
+#include <math.h>
 #include <limits>
 
 namespace SOL {
+    struct sortItem{
+        unsigned int index;
+        float sigma;
+        friend bool operator < (const sortItem& item1, const sortItem& item2){
+            return item1.sigma < item2.sigma;
+        }
+    };
+
 	template <typename FeatType, typename LabelType>
-	class DAROW: public Optimizer<FeatType, LabelType> {
+	class SAROW: public Optimizer<FeatType, LabelType> {
         protected:
             float r;
             float* sigma_w;
-            unsigned int* timeStamp;
+            unsigned int* forward_pos_list; //record the item of weight in forward direction
+            unsigned int* backward_pos_list; //record the item of weight in backward direction
+
+            int K; //keep top K elemetns
 
         public:
-            DAROW(DataSet<FeatType, LabelType> &dataset, 
+            SAROW(DataSet<FeatType, LabelType> &dataset, 
                     LossFunction<FeatType, LabelType> &lossFunc);
-            virtual ~DAROW();
+            virtual ~SAROW();
 
         public:
             void SetParameterEx(float lambda = -1,float r = -1);
@@ -48,28 +60,27 @@ namespace SOL {
     };
 
     template <typename FeatType, typename LabelType>
-        DAROW<FeatType, LabelType>::DAROW(DataSet<FeatType, LabelType> &dataset, 
+        SAROW<FeatType, LabelType>::SAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
-        this->id_str = "DAROW";
+        this->id_str = "SAROW";
         this->r = init_r;
         this->sigma_w = new float[this->weightDim];
-        this->timeStamp = new unsigned int[this->weightDim];
+        this->forward_pos_list = new unsigned int[this->weightDim];
+        this->backward_pos_list = new unsigned int[this->weightDim];
         this->sparse_soft_thresh = 0;
     }
 
     template <typename FeatType, typename LabelType>
-        DAROW<FeatType, LabelType>::~DAROW() {
+        SAROW<FeatType, LabelType>::~SAROW() {
             if(this->sigma_w != NULL)
                 delete []this->sigma_w;
-            if (this->timeStamp != NULL)
-                delete []this->timeStamp;
         }
 
     //this is the core of different updating algorithms
     //return the predict
     template <typename FeatType, typename LabelType>
-        float DAROW<FeatType,LabelType>::UpdateWeightVec(
+        float SAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             float y = this->Predict(x);
             //y /= this->curIterNum;
@@ -91,12 +102,27 @@ namespace SOL {
                     //update sigma_w
                     this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
 
-                    //L1 lazy update
-                    int stepK = this->curIterNum - this->timeStamp[index_i];
-                    this->timeStamp[index_i] = this->curIterNum;
+                    //update the forward backward position
+                    unsigned int new_pos = this->backward_pos_list[index_i];
+                    while(new_pos > 1){
+                        unsigned int for_pos = this->forward_pos_list[new_pos - 1];
+                        if (this->sigma_w[for_pos] <= 
+                                this->sigma_w[index_i]){
+                            break;
+                        } 
+                        else{
+                            this->forward_pos_list[new_pos] = for_pos;
+                            this->backward_pos_list[for_pos] = new_pos;
+                            new_pos--;
+                        }
+                    }
+                    this->forward_pos_list[new_pos] = index_i;
+                    this->backward_pos_list[index_i] = new_pos;
+                }
 
-                    this->weightVec[index_i]= 
-                        trunc_weight(this->weightVec[index_i],stepK * this->lambda * this->sigma_w[index_i]);
+                //truncate
+                for (int i = this->K + 1; i < this->weightDim; i++){
+                    this->weightVec[this->forward_pos_list[i]] = 0;
                 }
 
                 //bias term
@@ -107,39 +133,34 @@ namespace SOL {
         }
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::BeginTrain() {
+        void SAROW<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
-            memset(this->timeStamp,0 ,sizeof(unsigned int) * this->weightDim);
-            for (int i = 0; i < this->weightDim; i++)
+            for (int i = 0; i < this->weightDim; i++){
                 this->sigma_w[i] = 1;
+                this->forward_pos_list[i] = i;
+                this->backward_pos_list[i] = i;
+            }
+            this->K = this->weightDim * (this->lambda < 1 ? this->lambda : 1);
         }
 
 		//called when a train ends
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::EndTrain() {
+        void SAROW<FeatType, LabelType>::EndTrain() {
             for (int index_i = 1; index_i < this->weightDim; index_i++) {
-                    //L1 lazy update
-                    int stepK = this->curIterNum - this->timeStamp[index_i];
-                    if (stepK == 0)
-                        continue;
-                    this->timeStamp[index_i] = this->curIterNum;
-
-                    this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                            stepK * this->lambda);
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
 
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
+        void SAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->r = r > 0 ? r : this->r;
         }
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void SAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
@@ -154,14 +175,27 @@ namespace SOL {
                 delete []this->sigma_w;
                 this->sigma_w= newS;
 
-                unsigned int* newT = new unsigned int[newDim];
+                unsigned int* newP = new unsigned int[newDim];
                 //copy info
-                memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim);
-                //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim));
-                delete []this->timeStamp;
-                this->timeStamp = newT;
+                memcpy(newP, this->forward_pos_list, sizeof(unsigned int) * this->weightDim);
+                //set the rest 
+                for (int i = this->weightDim; i < newDim; i++){
+                    newP[i] = i;
+                }
+                delete []this->forward_pos_list;
+                this->forward_pos_list = newP;
 
+                newP = new unsigned int[newDim];
+                //copy info
+                memcpy(newP, this->backward_pos_list, sizeof(unsigned int) * this->weightDim);
+                //set the rest 
+                for (int i = this->weightDim; i < newDim; i++){
+                    newP[i] = i;
+                }
+                delete []this->backward_pos_list;
+                this->backward_pos_list = newP;
+
+                this->K = newDim * (this->lambda < 1 ? this->lambda : 1);
                 Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
             }
         }

@@ -19,6 +19,7 @@
 #include "optimizer/Ada_FOBOS.h"
 #include "optimizer/Ada_RDA.h"
 #include "optimizer/DAROW.h"
+#include "optimizer/SAROW.h"
 
 #include "loss/LogisticLoss.h"
 #include "loss/HingeLoss.h"
@@ -193,6 +194,14 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
                 return opti;
                 break;
             }
+        case Opti_SAROW: 
+            {
+                SAROW<T1,T2> *opti = new SAROW<T1, T2>(dataset,lossFunc);
+                opti->SetParameterEx(param.lambda, param.r);
+                return opti;
+                break;
+            }
+
         default:
             break;
     }
