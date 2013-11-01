@@ -4,7 +4,8 @@ import sys
 import os
 import re
 
-from l1_def import *
+from run_util import *
+import l1_def
 
 def Usage():
     print 'Usage: run_experiment.py opt_name dst_folder [parameters]'
@@ -13,10 +14,9 @@ if len(sys.argv) < 3:
     Usage()
     sys.exit()
 
+#parse the arguments
 opt_name = sys.argv[1]
 dst_folder = sys.argv[2]
-
-exe_name = '../SOL'
 
 is_best_param = True
 is_l1 = True
@@ -29,55 +29,10 @@ for k in range(3,len(sys.argv)):
         is_best_param = False
     extra_cmd = extra_cmd + sys.argv[k] + ' '
 
-
-#make the result dir
-cmd = 'mkdir -p ./%s' %dst_folder
-os.system(cmd)
-
-print 'Algorithm: ' + opt_name 
-result_file = './%s' %dst_folder + '/%s' %opt_name + '_result.txt'
-print 'output file %s' %result_file
+result_file = dst_folder + '/%s' %opt_name + '_result.txt'
 #clear the file if it already exists
 open(result_file,'w').close()
 
-def best_param():
-    #select the best learning rate
-    cmd = exe_name + ' -opt %s' %opt_name
-    cmd += extra_cmd
-    cmd += ' >> %s' %result_file
-    print 'learn best parameter...'
-    print cmd
-    os.system(cmd)
-    
-    #open the result file
-    try:
-        file_handler = open(result_file,'r')
-        file_content = file_handler.readlines()
-    except IOError as e:
-        print "I/O error ({0}): {1}".format(e.errno,e.strerror)
-        sys.exit()
-    else:
-        file_handler.close()
-    
-    #parse the file to find out the best learning rate
-    eta_list = re.findall(r'Best Parameter:\s*eta\s*=\s*.*\n',open(result_file,'r').read())
-    if len(eta_list) > 1:
-        print 'incorrect result file'
-        print eta_list
-        sys.exit()
-    elif len(eta_list) == 1:
-        try:
-            best_eta = eta_list[0].split('=')[1].strip()
-            best_eta = float(best_eta)
-        except ValueError as e:
-            print 'convert %s' %best_eta + ' to float value failed!'
-            sys.exit()
-        print 'best eta = {0}'.format(best_eta)  
-    else:
-        best_eta = 0
-
-    return best_eta
-    
 #evaluate the result
 cmd_prefix = exe_name + extra_cmd + ' -opt %s' %opt_name 
 cmd_postfix = ' >> %s' %result_file
@@ -88,44 +43,21 @@ if is_best_param == True:
     cmd_prefix += ' -eta %e' %best_eta
 
 if is_l1 == True:
+    lambda_list = l1_def.get_lambda_list(opt_name)
     for l1 in lambda_list:
-        cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
+        if opt_name == 'ASAROW':
+            l1 = (int)(l1 * 47152)
+            cmd = cmd_prefix + ' -k %d' %l1 + cmd_postfix
+        else:
+            cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
         print cmd
         os.system(cmd)
-        #if (l1 < 0.2):
-        #    lambda_step = 0.05
-        #else:
-        #    lambda_step = 0.2
-        #
-        #l1 += lambda_step
 else:
     cmd = cmd_prefix + cmd_postfix
     print cmd
     os.system(cmd)
 
-print 'parsing result...'
-#parse the result to a format for matlab to recognize
-dec_pattern = "(\d+\.?\d*)"
-pattern = re.compile(r'Learn error rate:\s*' + dec_pattern + '.*\s*' +
-        'Test error rate:\s*' + dec_pattern + '.*\s*' +
-        'Sparsification Rate:\s*' + dec_pattern + '.*\s*' +
-        'Learning time:\s*' +dec_pattern + '\s*s') 
-
-result_list = pattern.findall(open(result_file,'r').read())
-
+print '\nparsing result...'
 #write the result to file
-parse_file = './%s' %dst_folder +'/%s' %opt_name + '.txt'
-open(parse_file,'w').close()
-print 'write parsed result %s' %parse_file
-try:
-    file_handler = open(parse_file,'w')
-    for item in result_list:
-        for val in item:
-            file_handler.write(str(val) + ' ')
-        file_handler.write('\n')
-except IOError as e:
-    print "I/O error ({0}): {1}".format(e.errno,e.strerror)
-    sys.exit()
-else:
-    file_handler.close()
-
+parse_file = dst_folder +'/%s' %opt_name + '.txt'
+parse_result(result_file, parse_file);

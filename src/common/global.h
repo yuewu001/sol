@@ -43,8 +43,9 @@ namespace SOL
         Opti_FOBOS      = 4,
         Opti_Ada_RDA    = 5,
         Opti_Ada_FOBOS  = 6,
-        Opti_AROW       = 7,
-        Opti_SAROW       = 8,
+        Opti_DAROW       = 7,
+        Opti_SSAROW       = 8,
+        Opti_ASAROW       = 9,
     };
 
     enum NormType

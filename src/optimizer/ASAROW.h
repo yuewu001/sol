@@ -15,34 +15,27 @@ of weight vectors." Machine Learning (2009): 1-33.
 #include "Optimizer.h"
 #include <algorithm>
 #include <math.h>
-#include <limits>
+#include <vector>
 
 namespace SOL {
-    struct sortItem{
-        unsigned int index;
-        float sigma;
-        friend bool operator < (const sortItem& item1, const sortItem& item2){
-            return item1.sigma < item2.sigma;
-        }
-    };
-
 	template <typename FeatType, typename LabelType>
-	class SAROW: public Optimizer<FeatType, LabelType> {
+	class ASAROW: public Optimizer<FeatType, LabelType> {
         protected:
             float r;
             float* sigma_w;
-            unsigned int* forward_pos_list; //record the item of weight in forward direction
-            unsigned int* backward_pos_list; //record the item of weight in backward direction
+
+            int* forward_map; //record the sorted position of each weight
+            int* backward_map; //record the index of weight for each sorted position
 
             int K; //keep top K elemetns
 
         public:
-            SAROW(DataSet<FeatType, LabelType> &dataset, 
+            ASAROW(DataSet<FeatType, LabelType> &dataset, 
                     LossFunction<FeatType, LabelType> &lossFunc);
-            virtual ~SAROW();
+            virtual ~ASAROW();
 
         public:
-            void SetParameterEx(float lambda = -1,float r = -1);
+            void SetParameterEx(int k, float lambda = -1,float r = -1);
         protected:
             //this is the core of different updating algorithms
             virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -60,27 +53,32 @@ namespace SOL {
     };
 
     template <typename FeatType, typename LabelType>
-        SAROW<FeatType, LabelType>::SAROW(DataSet<FeatType, LabelType> &dataset, 
+        ASAROW<FeatType, LabelType>::ASAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
-        this->id_str = "SAROW";
+        this->id_str = "ASAROW";
         this->r = init_r;
+        this->K = 0;
+        this->backward_map = NULL;
+        this->forward_map = new int[this->weightDim];
         this->sigma_w = new float[this->weightDim];
-        this->forward_pos_list = new unsigned int[this->weightDim];
-        this->backward_pos_list = new unsigned int[this->weightDim];
         this->sparse_soft_thresh = 0;
     }
 
     template <typename FeatType, typename LabelType>
-        SAROW<FeatType, LabelType>::~SAROW() {
+        ASAROW<FeatType, LabelType>::~ASAROW() {
             if(this->sigma_w != NULL)
                 delete []this->sigma_w;
+            if (this->forward_map != NULL)
+                delete []this->forward_map;
+            if (this->backward_map != NULL)
+                delete []this->backward_map;
         }
 
     //this is the core of different updating algorithms
     //return the predict
     template <typename FeatType, typename LabelType>
-        float SAROW<FeatType,LabelType>::UpdateWeightVec(
+        float ASAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             float y = this->Predict(x);
             //y /= this->curIterNum;
@@ -101,30 +99,37 @@ namespace SOL {
                     this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
                     //update sigma_w
                     this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
-
-                    //update the forward backward position
-                    unsigned int new_pos = this->backward_pos_list[index_i];
-                    while(new_pos > 1){
-                        unsigned int for_pos = this->forward_pos_list[new_pos - 1];
-                        if (this->sigma_w[for_pos] <= 
-                                this->sigma_w[index_i]){
-                            break;
-                        } 
+                    //obtain the current position
+                    int curPos = this->forward_map[index_i];
+                    if (curPos >= this->K){
+                        int index_pos = this->backward_map[this->K - 1];
+                        if (this->sigma_w[index_i] < 
+                                this->sigma_w[index_pos]){
+                            this->weightVec[index_pos] = 0;
+                            this->forward_map[index_pos] = this->K;
+                            this->forward_map[index_i] = this->K - 1;
+                            this->backward_map[this->K - 1] = index_i;
+                            curPos = this->K - 1;
+                        }
                         else{
-                            this->forward_pos_list[new_pos] = for_pos;
-                            this->backward_pos_list[for_pos] = new_pos;
-                            new_pos--;
+                            this->weightVec[index_i] = 0;
+                            break;
                         }
                     }
-                    this->forward_pos_list[new_pos] = index_i;
-                    this->backward_pos_list[index_i] = new_pos;
+                    while(--curPos > 1){
+                        int index_pos =  this->backward_map[curPos];
+                        if (this->sigma_w[index_i] < 
+                                this->sigma_w[index_pos]){
+                            this->forward_map[index_pos] = curPos + 1;
+                            this->backward_map[curPos + 1] = index_pos; 
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    this->forward_map[index_i] = curPos + 1;
+                    this->backward_map[curPos + 1] = index_i;
                 }
-
-                //truncate
-                for (int i = this->K + 1; i < this->weightDim; i++){
-                    this->weightVec[this->forward_pos_list[i]] = 0;
-                }
-
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
@@ -133,34 +138,42 @@ namespace SOL {
         }
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
-        void SAROW<FeatType, LabelType>::BeginTrain() {
+        void ASAROW<FeatType, LabelType>::BeginTrain() {
+            if (this->K < 1){
+                cerr<<"Please specify a valid number of weights to keep!\n";
+                cerr<<"current number: "<<this->K<<endl;
+                exit(0);
+            }
             Optimizer<FeatType, LabelType>::BeginTrain();
 
             for (int i = 0; i < this->weightDim; i++){
                 this->sigma_w[i] = 1;
-                this->forward_pos_list[i] = i;
-                this->backward_pos_list[i] = i;
+                this->forward_map[i] = i;
             }
-            this->K = this->weightDim * (this->lambda < 1 ? this->lambda : 1);
+            for(int i = 0; i < this->K; i++)
+                this->backward_map[i] = i;
         }
 
 		//called when a train ends
     template <typename FeatType, typename LabelType>
-        void SAROW<FeatType, LabelType>::EndTrain() {
-            for (int index_i = 1; index_i < this->weightDim; index_i++) {
-            }
+        void ASAROW<FeatType, LabelType>::EndTrain() {
             Optimizer<FeatType, LabelType>::EndTrain();
         }
 
     template <typename FeatType, typename LabelType>
-        void SAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
+        void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float lambda,float r) {
+            this->K = k > 0 ? k + 1 : this->K; //one another term for bias(k + 1)
+            if (this->K > 0){
+                if (this->backward_map != NULL)
+                    delete []this->backward_map;
+                this->backward_map = new int[this->K];             }
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->r = r > 0 ? r : this->r;
         }
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void SAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void ASAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
@@ -175,27 +188,15 @@ namespace SOL {
                 delete []this->sigma_w;
                 this->sigma_w= newS;
 
-                unsigned int* newP = new unsigned int[newDim];
+                int* newFM = new int[newDim];
                 //copy info
-                memcpy(newP, this->forward_pos_list, sizeof(unsigned int) * this->weightDim);
-                //set the rest 
-                for (int i = this->weightDim; i < newDim; i++){
-                    newP[i] = i;
-                }
-                delete []this->forward_pos_list;
-                this->forward_pos_list = newP;
+                memcpy(newFM, this->forward_map, sizeof(int)* this->weightDim);
+                //set the rest
+                for (int i = this->weightDim; i < newDim; i++)
+                    newFM[i] = i;
+                delete []this->forward_map;
+                this->forward_map = newFM;
 
-                newP = new unsigned int[newDim];
-                //copy info
-                memcpy(newP, this->backward_pos_list, sizeof(unsigned int) * this->weightDim);
-                //set the rest 
-                for (int i = this->weightDim; i < newDim; i++){
-                    newP[i] = i;
-                }
-                delete []this->backward_pos_list;
-                this->backward_pos_list = newP;
-
-                this->K = newDim * (this->lambda < 1 ? this->lambda : 1);
                 Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
             }
         }

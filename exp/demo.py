@@ -1,14 +1,14 @@
 import os
 import sys
 
-opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'vw','SAROW']
+opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW', 'vw']
 #opt_list = ['vw']
 
 rootDir = '/home/matthew/work/Data/'
 if len(sys.argv) == 2:
     dataset = sys.argv[1]
 else:
-    dataset = 'a9a'
+    dataset = 'rcv1'
 
 if dataset == 'a6a':
     train_file = rootDir + 'uci/a6a'
@@ -60,10 +60,12 @@ if os.path.exists(dataset_info_file) == False:
 
 #train model
 for opt in opt_list:
+    print '-----------------------------------'
+    print 'Experiment on %s' %opt
+    print '-----------------------------------'
     if opt == 'vw':
         cmd = 'python run_vw.py %s' %dst_folder + ' %s' %train_file 
         cmd += ' %s'  %cache_train_file + ' %s' %test_file + ' %s' %cache_test_file
-        print cmd
         os.system(cmd)
 
     else:
@@ -74,7 +76,6 @@ for opt in opt_list:
             cmd += ' -eta 1'
 
         cmd += cmd_data
-        print cmd
         os.system(cmd)
 
 opt_list_file = './%s' %dst_folder + '/opt_list.txt' 

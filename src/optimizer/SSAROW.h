@@ -18,16 +18,16 @@ of weight vectors." Machine Learning (2009): 1-33.
 
 namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class DAROW: public Optimizer<FeatType, LabelType> {
+	class SSAROW: public Optimizer<FeatType, LabelType> {
         protected:
             float r;
             float* sigma_w;
             unsigned int* timeStamp;
 
         public:
-            DAROW(DataSet<FeatType, LabelType> &dataset, 
+            SSAROW(DataSet<FeatType, LabelType> &dataset, 
                     LossFunction<FeatType, LabelType> &lossFunc);
-            virtual ~DAROW();
+            virtual ~SSAROW();
 
         public:
             void SetParameterEx(float lambda = -1,float r = -1);
@@ -48,10 +48,10 @@ namespace SOL {
     };
 
     template <typename FeatType, typename LabelType>
-        DAROW<FeatType, LabelType>::DAROW(DataSet<FeatType, LabelType> &dataset, 
+        SSAROW<FeatType, LabelType>::SSAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
-        this->id_str = "DAROW";
+        this->id_str = "SSAROW";
         this->r = init_r;
         this->sigma_w = new float[this->weightDim];
         this->timeStamp = new unsigned int[this->weightDim];
@@ -59,7 +59,7 @@ namespace SOL {
     }
 
     template <typename FeatType, typename LabelType>
-        DAROW<FeatType, LabelType>::~DAROW() {
+        SSAROW<FeatType, LabelType>::~SSAROW() {
             if(this->sigma_w != NULL)
                 delete []this->sigma_w;
             if (this->timeStamp != NULL)
@@ -69,7 +69,7 @@ namespace SOL {
     //this is the core of different updating algorithms
     //return the predict
     template <typename FeatType, typename LabelType>
-        float DAROW<FeatType,LabelType>::UpdateWeightVec(
+        float SSAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             float y = this->Predict(x);
             //y /= this->curIterNum;
@@ -96,7 +96,7 @@ namespace SOL {
                     this->timeStamp[index_i] = this->curIterNum;
 
                     this->weightVec[index_i]= 
-                        trunc_weight(this->weightVec[index_i],stepK * this->lambda);
+                        trunc_weight(this->weightVec[index_i],stepK * this->lambda * this->sigma_w[index_i]);
                 }
 
                 //bias term
@@ -107,7 +107,7 @@ namespace SOL {
         }
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::BeginTrain() {
+        void SSAROW<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
             memset(this->timeStamp,0 ,sizeof(unsigned int) * this->weightDim);
@@ -117,7 +117,7 @@ namespace SOL {
 
 		//called when a train ends
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::EndTrain() {
+        void SSAROW<FeatType, LabelType>::EndTrain() {
             for (int index_i = 1; index_i < this->weightDim; index_i++) {
                     //L1 lazy update
                     int stepK = this->curIterNum - this->timeStamp[index_i];
@@ -132,14 +132,14 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
+        void SSAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->r = r > 0 ? r : this->r;
         }
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void SSAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
             if (newDim < this->weightDim)
                 return;
             else {

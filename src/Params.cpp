@@ -118,9 +118,11 @@ namespace SOL {
         else if (strcmp(c_str, "ADA-FOBOS") == 0)
             this->opti_method = Opti_Ada_FOBOS;
         else if (strcmp(c_str, "AROW") == 0)
-            this->opti_method = Opti_AROW;
-        else if (strcmp(c_str, "SAROW") == 0)
-            this->opti_method = Opti_SAROW;
+            this->opti_method = Opti_DAROW;
+        else if (strcmp(c_str, "SSAROW") == 0)
+            this->opti_method = Opti_SSAROW;
+        else if (strcmp(c_str, "ASAROW") == 0)
+            this->opti_method = Opti_ASAROW;
         else {
             cerr<<"Unrecognized Optimization method!"<<endl;
             exit(0);
