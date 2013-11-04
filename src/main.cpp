@@ -50,18 +50,21 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 
 int main(int argc, char** args) {
     /*
-    int new_argc = 2;
+    int new_argc = 6;
     char** argv = new char*[argc + new_argc];
     for(int i = 0; i < argc; i++)
         argv[i] = args[i];
-    argv[argc] = "-c";
-    argv[argc + 1] = "/home/matthew/data/rcv1/rcv1.train_cache";
-//    argv[argc + 2] = "-eta";
- //   argv[argc + 3] = "0.1";
+    argv[argc + 0] = "-opt";
+    argv[argc + 1] = "AROW";
+    argv[argc + 2] = "-c";
+    argv[argc + 3] = "./cache_file";
+    argv[argc + 4] = "-i";
+    argv[argc + 5] = "./train.data";
     argc += new_argc;
+    Params param(argc, argv);
+    delete []argv;
     */
     Params param(argc, args);
-    //delete []argv;
 
     DataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size);
     if (dataset.Load(param.fileName, param.cache_fileName) == false){

@@ -12,7 +12,7 @@ if len(sys.argv) != 2:
 exename = '~/work/vw/vw_process'
 filename = sys.argv[1]
 output_filename = filename + '.vw'
-tmp_filename = 'tmp'
+tmp_filename = 'tmp.data'
 
 
 start = time.time()

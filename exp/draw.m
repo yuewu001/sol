@@ -26,7 +26,7 @@ legend_content = cell(1,opt_num);
 for k = 1:1:opt_num
     result_file = opt_list{k,1};
     opt_name = strsplit(result_file,'.'){1,1};
-    legend_content{1,k} = opt_name;
+    legend_content{1,k} = strcat('{\fontsize{8}', opt_name);
 
     result = load(strcat(folder_name, result_file));
 
@@ -39,13 +39,13 @@ for k = 1:1:opt_num
     color_shape = strcat(color_shape, shape_list{1,cur_shape_index});
     figure(1)
     hold on
-    plot(sparse_vec, l_err_vec, color_shape, 'LineWidth',2);
+    plot(sparse_vec, l_err_vec, color_shape, 'LineWidth',1,'markersize',3);
     figure(2)
     hold on
-    plot(sparse_vec, t_err_vec, color_shape, 'LineWidth',2);
+    plot(sparse_vec, t_err_vec, color_shape, 'LineWidth',1,'markersize',3);
     figure(3)
     hold on
-    plot(sparse_vec, l_time_vec, color_shape, 'LineWidth',2);
+    plot(sparse_vec, l_time_vec, color_shape, 'LineWidth',1,'markersize',3);
 
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -60,24 +60,24 @@ for k = 1:1:opt_num
 end
 
 figure(1) %learning error rate
-title('learing error rate vs sparsity')
-ylabel('learning error rate (%)')
-xlabel('sparsity (%)')
+title('learing error rate vs sparsity', 'fontsize',14)
+ylabel('learning error rate (%)', 'fontsize',14)
+xlabel('sparsity (%)', 'fontsize',14)
 axis([0 100 ymin ymax])
 legend(legend_content,0)
-print(strcat(folder_name,'learn_sparse.jpg'),'-djpg')
+print(strcat(folder_name,'learn_sparse.svg'),'-dsvg')
 figure(2) %test error rate
-title('test error rate vs sparsity')
-ylabel('test error rate (%)')
-xlabel('sparsity (%)')
+title('test error rate vs sparsity', 'fontsize',14)
+ylabel('test error rate (%)', 'fontsize',14)
+xlabel('sparsity (%)', 'fontsize',14)
 axis([0 100 ymin ymax])
 legend(legend_content,0)
-print(strcat(folder_name,'test_sparse.jpg'),'-djpg')
+print(strcat(folder_name,'test_sparse.svg'),'-dsvg')
 figure(3) %learning time
-title('training time vs sparsity')
-ylabel('training time (s)')
-xlabel('sparsity (%)')
+title('training time vs sparsity', 'fontsize',14)
+ylabel('training time (s)', 'fontsize',14)
+xlabel('sparsity (%)', 'fontsize',14)
 %axis([0 100 0 10])
-legend(legend_content,0)
-print(strcat(folder_name,'time_sparse.jpg'),'-djpg')
-
+legend(legend_content,'location','northeast')
+print(strcat(folder_name,'time_sparse.svg'),'-dsvg')
+%close all

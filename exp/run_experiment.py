@@ -27,6 +27,7 @@ for k in range(3,len(sys.argv)):
         continue
     if sys.argv[k] == '-eta':
         is_best_param = False
+
     extra_cmd = extra_cmd + sys.argv[k] + ' '
 
 result_file = dst_folder + '/%s' %opt_name + '_result.txt'
@@ -39,14 +40,26 @@ cmd_postfix = ' >> %s' %result_file
 
 #learn the best parameter
 if is_best_param == True:
-    best_eta = best_param() 
+    best_eta = best_param(extra_cmd, opt_name) 
     cmd_prefix += ' -eta %e' %best_eta
+
+if opt_name == 'ASAROW':
+    temp_list = extra_cmd.split()
+    train_file = ''
+    for k in range(0,len(temp_list)):
+        if temp_list[k] == '-i':
+            train_file = temp_list[k+1]
+            break;
+    if train_file == '':
+        print 'no input file is specified!'
+        sys.exit()
+    data_valid_dim = get_valid_dim(train_file)
 
 if is_l1 == True:
     lambda_list = l1_def.get_lambda_list(opt_name)
     for l1 in lambda_list:
         if opt_name == 'ASAROW':
-            l1 = (int)(l1 * 47152)
+            l1 = (int)(l1 * data_valid_dim)
             cmd = cmd_prefix + ' -k %d' %l1 + cmd_postfix
         else:
             cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix

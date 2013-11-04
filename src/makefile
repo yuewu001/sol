@@ -1,4 +1,4 @@
-DEBUG_FLAG=0
+DEBUG_FLAG=1
 
 DEBUG=-g -Wall
 RELEASE=-O2 -s

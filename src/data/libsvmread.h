@@ -24,11 +24,9 @@ using namespace std;
 
 
 
-namespace SOL
-{
+namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class LibSVMReader_: public DataReader<FeatType, LabelType>
-	{ 
+	class LibSVMReader_: public DataReader<FeatType, LabelType> { 
 	private:
 		string fileName;
 		FILE* fp;
@@ -39,16 +37,14 @@ namespace SOL
 
 
 	public:
-		LibSVMReader_(const string &fileName):fp(NULL)
-		{
+		LibSVMReader_(const string &fileName):fp(NULL) {
 			this->max_line_len = 4096;
 			this->fileName = fileName;
 			this->min_index = (numeric_limits<int>::max)();
 
 			line = (char *) malloc(max_line_len*sizeof(char));
 		}
-		~LibSVMReader_()
-		{
+		~LibSVMReader_() {
 			this->Close();
 			if (line != NULL)
 				free(line);
@@ -56,45 +52,38 @@ namespace SOL
 
 		//////////////////online mode//////////////////
 	public:
-		virtual bool OpenReading()
-		{
+		virtual bool OpenReading() {
 			this->Close();
 
 #if _WIN32
-			int ret = fopen_s(&fp, fileName.c_str(), "r");
-			if (ret != 0){
+			int ret = fopen_s(&fp, fileName.c_str(), "r"); if (ret != 0){
 				printf("error %d: can't open input file %s\n",ret, fileName.c_str());
 				return false;
 			}
 
 #else
-			fp = fopen(fileName.c_str(), "r");
-			if(fp == NULL) {
+			fp = fopen(fileName.c_str(), "r"); if(fp == NULL) {
 				printf("can't open input file %s\n",fileName.c_str());
 				return false;
 			}
 #endif
 			return true;
 		}
-		virtual void Rewind()
-		{
+		virtual void Rewind() {
 			if(this->fp != NULL)
 				rewind(fp);
 		}
-		virtual void Close()
-		{
+		virtual void Close() {
 			if (this->fp != NULL)
 				fclose(fp);
 			fp = NULL;
 		}
 
-		virtual inline bool Good()
-		{
+		virtual inline bool Good() {
 			return fp != NULL;
 		}
 
-		virtual bool GetNextData(DataPoint<FeatType, LabelType> &data)
-		{
+		virtual bool GetNextData(DataPoint<FeatType, LabelType> &data) {
 			if (fp == NULL) {
 				printf("no input file is opened for reading!\n");
 				return false;
@@ -117,8 +106,7 @@ namespace SOL
 			int index;
 			FeatType feat;
 			// features
-			while(1)
-			{
+			while(1) {
 				p = strip_line(endptr);
 				if (*p == '\0')
 					break;
@@ -147,195 +135,189 @@ namespace SOL
 		}
 		
 		////////////Auxillary Functions//////////////
-		private:
-			char* readline(FILE *input)
-			{
-				int len;
+		private: 
+        char* readline(FILE *input) {
+            int len;
 
-				if(fgets(line,max_line_len,input) == NULL)
-					return NULL;
+            if(fgets(line,max_line_len,input) == NULL)
+                return NULL;
+            while(strrchr(line,'\n') == NULL) {
+                max_line_len *= 2;
+                line = (char *) realloc(line, max_line_len);
+                len = (int) strlen(line);
+                if(fgets(line+len,max_line_len-len,input) == NULL)
+                    break;
+            }
+            return line;
+        }
 
-				while(strrchr(line,'\n') == NULL)
-				{
-					max_line_len *= 2;
-					line = (char *) realloc(line, max_line_len);
-					len = (int) strlen(line);
-					if(fgets(line+len,max_line_len-len,input) == NULL)
-						break;
-				}
-				return line;
-			}
+        //The following function is a home made strtoi
+        inline int parseInt(char * p, char **end) {
+            *end = p;
+            p = strip_line(p);
 
-			//The following function is a home made strtoi
-			inline int parseInt(char * p, char **end)
-			{
-				*end = p;
-				p = strip_line(p);
+            if (*p == '\0'){
+                return 0;
+            }
+            int s = 1;
+            if (*p == '+')p++;
+            if (*p == '-') {
+                s = -1; p++;
+            }
+            int acc = 0;
+            while (*p >= '0' && *p <= '9')
+                acc = acc * 10 + *p++ - '0';
 
-				if (*p == '\0'){
-					return 0;
-				}
-				int s = 1;
+            int exp_acc = 0;
+            if(*p == 'e' || *p == 'E'){
+                p++;
                 if (*p == '+')p++;
-				if (*p == '-') {
-					s = -1; p++;
-				}
-				int acc = 0;
-				while (*p >= '0' && *p <= '9')
-					acc = acc * 10 + *p++ - '0';
+                while (*p >= '0' && *p <= '9')
+                    exp_acc = exp_acc * 10 + *p++ - '0';
+                acc *= (int)(powf(10,(float)(exp_acc)));
+            }
+            if (is_space(p)== true) {//easy case succeeded.
+                *end = p;
+                return s * acc;
+            }
+            else {
+                return 0;
+            }
+        }
+        //The following function is a home made strtoi
+        inline int parseIndex(char * p, char **end) {
+            *end = p;
+            p = strip_line(p);
 
-				int exp_acc = 0;
-				if(*p == 'e' || *p == 'E'){
-					p++;
-                    if (*p == '+')p++;
-					while (*p >= '0' && *p <= '9')
-						exp_acc = exp_acc * 10 + *p++ - '0';
-					acc *= (int)(powf(10,(float)(exp_acc)));
-				}
-				if (is_space(p)== true) {//easy case succeeded.
-					*end = p;
-					return s * acc;
-				}
-				else {
-					return 0;
-				}
-			}
-			//The following function is a home made strtoi
-			inline int parseIndex(char * p, char **end)
-			{
-				*end = p;
-				p = strip_line(p);
+            if (*p == '\0'){
+                return 0;
+            }
+            int s = 1;
+            if (*p == '+') p++;
+            if (*p == '-') {
+                s = -1; p++;
+            }
+            int acc = 0;
+            while (*p >= '0' && *p <= '9')
+                acc = acc * 10 + *p++ - '0';
 
-				if (*p == '\0'){
-					return 0;
-				}
-				int s = 1;
+            int exp_acc = 0;
+            if(*p == 'e' || *p == 'E'){
+                p++;
                 if (*p == '+') p++;
-				if (*p == '-') {
-					s = -1; p++;
-				}
-				int acc = 0;
-				while (*p >= '0' && *p <= '9')
-					acc = acc * 10 + *p++ - '0';
+                while (*p >= '0' && *p <= '9')
+                    exp_acc = exp_acc * 10 + *p++ - '0';
+                acc *= (int)(powf(10,(float)(exp_acc)));
+            }
+            p = strip_line(p);
+            if (*p == ':') {//easy case succeeded.
+                p++;
+                *end = p;
+                return s * acc;
+            }
+            else {
+                return 0;
+            }
+        }
+        // The following function is a home made strtof. The
+        // differences are :
+        //  - much faster (around 50% but depends on the string to parse)
+        //  - less error control, but utilised inside a very strict parser
+        //    in charge of error detection.
+        inline float parseFloat(char * p, char **end) {
+            *end = p;
+            p = strip_line(p);
 
-				int exp_acc = 0;
-				if(*p == 'e' || *p == 'E'){
-					p++;
-                    if (*p == '+') p++;
-					while (*p >= '0' && *p <= '9')
-						exp_acc = exp_acc * 10 + *p++ - '0';
-					acc *= (int)(powf(10,(float)(exp_acc)));
-				}
-				p = strip_line(p);
-				if (*p == ':') {//easy case succeeded.
-					p++;
-					*end = p;
-					return s * acc;
-				}
-				else {
-					return 0;
-				}
-			}
-			// The following function is a home made strtof. The
-			// differences are :
-			//  - much faster (around 50% but depends on the string to parse)
-			//  - less error control, but utilised inside a very strict parser
-			//    in charge of error detection.
-			inline float parseFloat(char * p, char **end)
-			{
-				*end = p;
-				p = strip_line(p);
+            if (*p == '\0'){
+                return 0;
+            }
+            int s = 1;
+            if (*p == '+') p++;
+            if (*p == '-') {
+                s = -1; p++;
+            }
 
-				if (*p == '\0'){
-					return 0;
-				}
-				int s = 1;
+            float acc = 0;
+            while (*p >= '0' && *p <= '9')
+                acc = acc * 10 + *p++ - '0';
+
+            int num_dec = 0;
+            if (*p == '.') {
+                p++;
+                while (*p >= '0' && *p <= '9') {
+                    acc = acc *10 + (*p++ - '0') ;
+                    num_dec++;
+                }
+            }
+            int exp_acc = 0;
+            if(*p == 'e' || *p == 'E'){
+                p++;
+                int exp_s = 1;
                 if (*p == '+') p++;
-				if (*p == '-') {
-					s = -1; p++;
-				}
+                if (*p == '-') {
+                    exp_s = -1; p++;
+                }
+                while (*p >= '0' && *p <= '9')
+                    exp_acc = exp_acc * 10 + *p++ - '0';
+                exp_acc *= exp_s;
 
-				float acc = 0;
-				while (*p >= '0' && *p <= '9')
-					acc = acc * 10 + *p++ - '0';
+            }
+            if (is_space(p) == true){//easy case succeeded.
+                acc *= powf(10,(float)(exp_acc-num_dec));
+                *end = p;
+                return s * acc;
+            }
+            else
+                return 0;
+        }
+        /* Parse S into tokens separated by characters in DELIM.
+           If S is NULL, the saved pointer in SAVE_PTR is used as
+           the next starting point.  For example:
+           char s[] = "-abc-=-def";
+           char *sp;
+           x = strtok_r(s, "-", &sp);      // x = "abc", sp = "=-def"
+           x = strtok_r(NULL, "-=", &sp);  // x = "def", sp = NULL
+           x = strtok_r(NULL, "=", &sp);   // x = NULL
+        // s = "abc\0-def\0"
+        thread safe
+        */
+        char *ts_strtok(char *s, const char *delim, char **save_ptr) {
+            char *token;
 
-				int num_dec = 0;
-				if (*p == '.') {
-					p++;
-					while (*p >= '0' && *p <= '9') {
-						acc = acc *10 + (*p++ - '0') ;
-						num_dec++;
-					}
-				}
-				int exp_acc = 0;
-				if(*p == 'e' || *p == 'E'){
-					p++;
-					int exp_s = 1;
-                    if (*p == '+') p++;
-					if (*p == '-') {
-						exp_s = -1; p++;
-					}
-					while (*p >= '0' && *p <= '9')
-						exp_acc = exp_acc * 10 + *p++ - '0';
-					exp_acc *= exp_s;
+            if (s == NULL) s = *save_ptr;
 
-				}
-				if (is_space(p) == true){//easy case succeeded.
-					acc *= powf(10,(float)(exp_acc-num_dec));
-					*end = p;
-					return s * acc;
-				}
-				else
-					return 0;
-			}
-			/* Parse S into tokens separated by characters in DELIM.
-			If S is NULL, the saved pointer in SAVE_PTR is used as
-			the next starting point.  For example:
-			char s[] = "-abc-=-def";
-			char *sp;
-			x = strtok_r(s, "-", &sp);      // x = "abc", sp = "=-def"
-			x = strtok_r(NULL, "-=", &sp);  // x = "def", sp = NULL
-			x = strtok_r(NULL, "=", &sp);   // x = NULL
-			// s = "abc\0-def\0"
-			thread safe
-			*/
-			char *ts_strtok(char *s, const char *delim, char **save_ptr) {
-				char *token;
+            /* Scan leading delimiters.  */
+            s += strspn(s, delim);
+            if (*s == '\0') 
+                return NULL;
 
-				if (s == NULL) s = *save_ptr;
+            /* Find the end of the token.  */
+            token = s;
+            s = strpbrk(token, delim);
+            if (s == NULL)
+                /* This token finishes the string.  */
+                *save_ptr = strchr(token, '\0');
+            else {
+                /* Terminate the token and make *SAVE_PTR point past it.  */
+                *s = '\0';
+                *save_ptr = s + 1;
+            }
 
-				/* Scan leading delimiters.  */
-				s += strspn(s, delim);
-				if (*s == '\0') 
-					return NULL;
+            return token;
+        }
 
-				/* Find the end of the token.  */
-				token = s;
-				s = strpbrk(token, delim);
-				if (s == NULL)
-					/* This token finishes the string.  */
-						*save_ptr = strchr(token, '\0');
-				else {
-					/* Terminate the token and make *SAVE_PTR point past it.  */
-					*s = '\0';
-					*save_ptr = s + 1;
-				}
-
-				return token;
-			}
-
-			inline char* strip_line(char* p){
-				while(is_space(p) == true)
-					p++;
-				return p;
-			}
-			inline bool is_space(char* p){
-				return (*p == ' ' || *p == '\t' || *p == '\n');
-			}
+        inline char* strip_line(char* p){
+            while(is_space(p) == true)
+                p++;
+            return p;
+        }
+        inline bool is_space(char* p){
+            return (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r');
+        }
 
 
-	};
+    };
 
-	//for special definition
-	typedef LibSVMReader_<float, char> LibSVMReader;
+    //for special definition
+    typedef LibSVMReader_<float, char> LibSVMReader;
 }

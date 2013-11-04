@@ -46,6 +46,9 @@ namespace SOL{
                                 writer->WriteData(data);
                             }
                         }
+                        else{
+                            break;
+                        }
                     }
 
 					if(chunk.dataNum > 0){
@@ -99,6 +102,8 @@ namespace SOL{
                             not_file_end = reader->GetNextData(data);
                             if (not_file_end == true)
                                 chunk.dataNum++;
+                            else
+                                break;
                         }
 
 						if (chunk.dataNum > 0){
@@ -130,6 +135,7 @@ namespace SOL{
             condition_variable_signal_all(&dataset->data_available);
             mutex_unlock(&dataset->data_lock);
 
+            cout<<"data number: "<<dataset->dataNum<<endl;
             return NULL;
         }
 }

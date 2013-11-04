@@ -7,31 +7,19 @@ import time
 import l1_def
 
 from vw_l1_def import *
+from run_util import *
 
 #exe_name = '../extern/vw/vw'
 exe_name = '~/work/vw/vw'
-model_file = './tmp/vw_model'
-rd_model_file = './tmp/vw_model.txt'
-tmp_file = './tmp/vw_tmp.txt'
+model_file = './vw_tmp/vw_model'
+rd_model_file = './vw_tmp/vw_model.txt'
+tmp_file = './vw_tmp/vw_tmp.txt'
 
-os.system('mkdir tmp')
+os.system('mkdir vw_tmp')
 
 def Usage():
     print 'Usage:run_vw.py dst_folder trainfile cache_train testfile cache_test'
 
-def get_valid_dim(trainfile):
-    filename = trainfile + '_info.txt'
-    print filename
-    dim = 0
-    pattern = re.compile(r'valid dim\s*:\s*(\d+)')
-    result_list = pattern.findall(open(filename,'r').read())
-    if len(result_list) != 1:
-        print result_list
-        print 'parse failed'
-        sys.exit()
-    dim = (int)(result_list[0])
-    
-    return dim
 
 def get_model_size(model_file):
     int_pattern = "(\d+)"
@@ -59,17 +47,21 @@ def get_model_size(model_file):
     
     return model_size
 
-if len(sys.argv) < 6:
+if len(sys.argv) < 4:
     Usage()
     sys.exit()
 
 dst_folder = sys.argv[1]
 
-extra_cmd = ' --sgd --binary --loss_function=logistic --readable_model %s' %rd_model_file + ' -f %s' %model_file
+extra_cmd = ' --passes 5 --sgd --binary --loss_function=logistic --readable_model %s' %rd_model_file + ' -f %s' %model_file
 trainfile = sys.argv[2]
 cache_train = sys.argv[3]
-testfile = sys.argv[4]
-cache_test = sys.argv[5]
+
+is_test = False
+if (len(sys.argv) > 4):
+    testfile = sys.argv[4]
+    cache_test = sys.argv[5]
+    is_test = True
 
 is_l1 = True
 is_cache = True
@@ -84,13 +76,15 @@ valid_dim = get_valid_dim(trainfile)
 #transform into vw format
 if os.path.exists('%s.vw' %trainfile) == False:
     os.system('python ../tools/libsvm2vw.py %s' %trainfile)
-if os.path.exists('%s.vw' %testfile) == False:
-    os.system('python ../tools/libsvm2vw.py %s' %testfile)
+if is_test == True:
+    if os.path.exists('%s.vw' %testfile) == False:
+        os.system('python ../tools/libsvm2vw.py %s' %testfile)
 
 trainfile += ".vw"
 cache_train += ".vw"
-testfile += ".vw"
-cache_test += ".vw"
+if is_test == True:
+    testfile += ".vw"
+    cache_test += ".vw"
 
 #make the result dir
 cmd = 'mkdir -p ./%s' %dst_folder
@@ -105,10 +99,12 @@ cmd += extra_cmd
 #evaluate the result
 if is_cache == True:
     train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile +' --cache_file %s ' %cache_train
-    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file + ' --cache_file %s ' %cache_test
+    if is_test == True:
+        test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file + ' --cache_file %s ' %cache_test
 else:
     train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile
-    test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file 
+    if is_test == True:
+        test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file 
 
 cmd_postfix = ' 2> %s' %tmp_file
 
@@ -141,16 +137,20 @@ while l1 <= lambda_end:
         sys.exit()
     
     #test
-    cmd = test_cmd_prefix + cmd_postfix
-    print cmd
-    os.system(cmd)
+    if is_test == True:
+        cmd = test_cmd_prefix + cmd_postfix
+        print cmd
+        os.system(cmd)
 
-    #parse test error rate
-    result_item[1] = (float)(err_pattern.findall(open(tmp_file,'r').read())[0]) * 100
-    result_item[1] = (float)('%.2f' %result_item[1]) 
-    if result_item[1] == None:
-        print 'parse test error rate failed'
-        sys.exit()
+        #parse test error rate
+        result_item[1] = (float)(err_pattern.findall(open(tmp_file,'r').read())[0]) * 100
+        result_item[1] = (float)('%.2f' %result_item[1]) 
+        if result_item[1] == None:
+            print 'parse test error rate failed'
+            sys.exit()
+    else:
+        result_item[1] = result_item[0]
+
     #parse sparsity
     model_size = get_model_size(rd_model_file)
     result_item[2] = 100 - (model_size * 100.0 / valid_dim)

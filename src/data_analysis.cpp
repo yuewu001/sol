@@ -74,6 +74,7 @@ int main(int argc, char** args){
         return 0;
     }
     string filename = args[1];
+    //string filename = "/home/matthew/work/Data/text/text_train";
     LibSVMReader reader(filename);
     if (Analyze(&reader) == false)
         cerr<<"analyze dataset failed!"<<endl;

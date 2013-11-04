@@ -1,0 +1,7 @@
+draw('./result/aut',0,30)
+draw('./result/news',0,20)
+draw('./result/pcmac',0,40)
+draw('./result/physic',3,12)
+draw('./result/rcv1',5,12)
+draw('./result/real-sim',2,12)
+draw('./result/text',12,40)

@@ -76,6 +76,9 @@ namespace SOL {
 		float Train();
 		//predict a new feature
 		float Predict(const DataPoint<FeatType, LabelType> &data);
+		//predict function for test, as we are using sparse learning,dimension of the test data
+        //may be larger than the model
+		float Test_Predict(const DataPoint<FeatType, LabelType> &data);
 
 		//this is the core of different updating algorithms
 		//return the predict
@@ -221,7 +224,7 @@ namespace SOL {
 			for (size_t i = 0; i < chunk.dataNum; i++) {
 				const DataPoint<FeatType , LabelType> &data = chunk.data[i];
 				//predict
-				float predict = this->Predict(data);
+				float predict = this->Test_Predict(data);
 				if (this->lossFunc->IsCorrect(data.label,predict) == false)
 					errorRate++;
 			}
@@ -231,7 +234,17 @@ namespace SOL {
 		return errorRate;
 	}
 
-
+    template <typename FeatType, typename LabelType>
+	float Optimizer<FeatType, LabelType>::Test_Predict(const DataPoint<FeatType, LabelType> &data) {
+		float predict = 0;
+		int dim = data.indexes.size();
+		for (int i = 0; i < dim; i++){
+            if (data.indexes[i] < this->weightDim)
+                predict += this->weightVec[data.indexes[i]] * data.features[i];
+        }
+		predict += this->weightVec[0];
+		return predict;
+	}
 	template <typename FeatType, typename LabelType>
 	float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
 		float predict = 0;
@@ -272,7 +285,7 @@ namespace SOL {
 		float bestEta = 1;
 
 		for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
-			cout<<"eta0 = "<<eta_c<<"\t";
+			cout<<"eta0 = "<<eta_c<<"\n";
 			float errorRate(0);
 			this->eta0 = eta_c;
             errorRate += this->Train();

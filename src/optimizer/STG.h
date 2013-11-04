@@ -112,7 +112,6 @@ namespace SOL {
 		//called when a train ends
     template <typename FeatType, typename LabelType>
         void STG<FeatType, LabelType>::EndTrain() {
-			float w_abs = 0, alpha = 0;
 			for (int index_i = 1; index_i < this->weightDim; index_i++) {
 				//truncated gradient
 				int stepK = this->curIterNum - this->timeStamp[index_i];
