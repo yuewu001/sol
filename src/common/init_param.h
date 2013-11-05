@@ -54,4 +54,7 @@ namespace SOL
 	static const int init_buf_size = 2;
 
 	static const std::string init_tmp_file = "tmp~";
+
+    //////////////////////Zlib Parameters/////////////////////////////
+    static const int zlib_deflate_level = -1; // use default deflate level
 }
