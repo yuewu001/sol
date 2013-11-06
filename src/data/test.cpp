@@ -18,6 +18,7 @@ void Cache(const string &input_file, const string &output_file);
 void De_Cache(const string &input_file, const string &output_file);
 
 int main(int argc, char** args){
+    /*
     if (argc < 3){
         Usage();
         return 0;
@@ -46,6 +47,8 @@ int main(int argc, char** args){
     }
     else
         De_Cache(filename, outFileName);
+        */
+    De_Cache("cache_file","");
 
     return 0;
 }

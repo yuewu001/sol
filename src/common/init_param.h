@@ -57,4 +57,5 @@ namespace SOL
 
     //////////////////////Zlib Parameters/////////////////////////////
     static const int zlib_deflate_level = -1; // use default deflate level
+    static const int zlib_buf_size = 16348; //default buffer size of zlib
 }

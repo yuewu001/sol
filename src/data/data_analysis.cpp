@@ -4,10 +4,10 @@
   > Created Time: Thu 24 Oct 2013 08:09:38 PM
   > Descriptions: analyse the sparsity of data
  ************************************************************************/
-#include "data/DataPoint.h"
-#include "data/DataReader.h"
-#include "data/libsvmread.h"
-#include "data/MNISTReader.h"
+#include "DataPoint.h"
+#include "DataReader.h"
+#include "libsvmread.h"
+#include "MNISTReader.h"
 
 #include <string>
 #include <set>
@@ -40,7 +40,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
-                featNum += index_set.size();
+                featNum += data.indexes.size();
                 /*
                 if (dataNum % 1000 == 0){
                     cout<<"data number  : "<<dataNum<<"    ";
@@ -74,7 +74,7 @@ int main(int argc, char** args){
         return 0;
     }
     string filename = args[1];
-    //string filename = "/home/matthew/work/Data/text/text_train";
+    //string filename = "/home/matthew/work/Data/aut/aut_train";
     LibSVMReader reader(filename);
     if (Analyze(&reader) == false)
         cerr<<"analyze dataset failed!"<<endl;

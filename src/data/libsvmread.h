@@ -11,6 +11,7 @@
 #endif
 
 #include "DataReader.h"
+#include "basic_io.h"
 
 #include <stdio.h>
 #include <vector>
@@ -22,30 +23,25 @@
 
 using namespace std;
 
-
-
 namespace SOL {
 	template <typename FeatType, typename LabelType>
 	class LibSVMReader_: public DataReader<FeatType, LabelType> { 
 	private:
 		string fileName;
-		FILE* fp;
+
+        basic_io reader;
 
 		char *line;
-		int max_line_len;
-		int min_index;
-
+		size_t max_line_len;
 
 	public:
-		LibSVMReader_(const string &fileName):fp(NULL) {
+		LibSVMReader_(const string &fileName) {
 			this->max_line_len = 4096;
 			this->fileName = fileName;
-			this->min_index = (numeric_limits<int>::max)();
-
 			line = (char *) malloc(max_line_len*sizeof(char));
 		}
 		~LibSVMReader_() {
-			this->Close();
+            this->Close();
 			if (line != NULL)
 				free(line);
 		}
@@ -53,43 +49,22 @@ namespace SOL {
 		//////////////////online mode//////////////////
 	public:
 		virtual bool OpenReading() {
-			this->Close();
-
-#if _WIN32
-			int ret = fopen_s(&fp, fileName.c_str(), "r"); if (ret != 0){
-				printf("error %d: can't open input file %s\n",ret, fileName.c_str());
-				return false;
-			}
-
-#else
-			fp = fopen(fileName.c_str(), "r"); if(fp == NULL) {
-				printf("can't open input file %s\n",fileName.c_str());
-				return false;
-			}
-#endif
-			return true;
+            this->Close();
+            return reader.open_file(this->fileName.c_str(), "r");
 		}
 		virtual void Rewind() {
-			if(this->fp != NULL)
-				rewind(fp);
+            reader.rewind();
 		}
 		virtual void Close() {
-			if (this->fp != NULL)
-				fclose(fp);
-			fp = NULL;
-		}
+            reader.close_file();
+        }
 
 		virtual inline bool Good() {
-			return fp != NULL;
+            return reader.good() == 0 ? true: false;
 		}
 
 		virtual bool GetNextData(DataPoint<FeatType, LabelType> &data) {
-			if (fp == NULL) {
-				printf("no input file is opened for reading!\n");
-				return false;
-			}
-
-			if(readline(fp) == NULL)
+			if(reader.read_line(line, max_line_len) == NULL)
 				return false;
 
 			LabelType labelVal;
@@ -134,23 +109,6 @@ namespace SOL {
 			return true;
 		}
 		
-		////////////Auxillary Functions//////////////
-		private: 
-        char* readline(FILE *input) {
-            int len;
-
-            if(fgets(line,max_line_len,input) == NULL)
-                return NULL;
-            while(strrchr(line,'\n') == NULL) {
-                max_line_len *= 2;
-                line = (char *) realloc(line, max_line_len);
-                len = (int) strlen(line);
-                if(fgets(line+len,max_line_len-len,input) == NULL)
-                    break;
-            }
-            return line;
-        }
-
         //The following function is a home made strtoi
         inline int parseInt(char * p, char **end) {
             *end = p;
