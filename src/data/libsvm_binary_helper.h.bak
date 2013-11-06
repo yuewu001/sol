@@ -1,0 +1,83 @@
+/*************************************************************************
+  > File Name: libsvm_binary_helper.h
+  > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
+  > Created Time: Tue 05 Nov 2013 09:29:15 PM
+  > Descriptions: thread function for libsvm binary
+ ************************************************************************/
+#ifndef HEADER_LIBSVM_HEADER
+#define HEADER_LIBSVM_HEADER
+
+#include "thread_primitive.h"
+
+#include <cstdio>
+#include <string>
+#include <assert.h>
+#include "zlib.h"
+
+namespace SOL{
+#define ZLIB_BUF_SIZE 4194304 //4 M
+
+    template <typename T1, typename T2> class libsvm_binary_;
+    template <typename T1, typename T2> 
+#if WIN32
+        DWORD WINAPI thread_write_cache(LPVOID param)
+#else
+        void* thread_write_cache(void* param)
+#endif
+        {
+            libsvm_binary_<T1, T2>* writer = static_cast<libsvm_binary_<T1, T2>*>(param);
+            if (write == NULL) {
+                cerr<<"incorrect input for write thread!"<<endl;
+                exit(1);
+            }
+            //buf
+            unsigned char* buffer = NULL;
+            try{
+                buffer = new unsigned char[ZLIB_BUF_SIZE];
+            }catch(std::bad_alloc &ex){
+                cerr<<"allocate memory for threaded buffer failed!"<<endl;
+                return NULL;
+            }
+            unsigned int to_write_len = 0;
+            int write_flag;
+
+            while(1){
+                mutex_lock(&(writer->write_lock));
+                if (writer->is_bufferring == true){
+                    //cout<<"write thread: sleep for writing"<<endl;
+                    writer->is_writing = false;
+                    condition_variable_wait(&(writer->buf_available), &(writer->write_lock));
+                    //cout<<"write thread: continue to write"<<endl;
+                    writer->is_writing = true;
+                }
+
+                //copy data
+                to_write_len = ZLIB_BUF_SIZE - writer->buf_out_have;
+                write_flag = writer->write_flag;
+                memcpy(buffer, writer->buf_out, to_write_len);
+
+                writer->is_bufferring = true;
+
+                //cout<<"write thread: call parse thread to parse"<<endl;
+                condition_variable_signal_all(&(writer->buf_available));
+                mutex_unlock(&(writer->write_lock));
+
+                if (gzwrite(writer->file, buffer, to_write_len) != to_write_len){
+                    cerr<<"write compressed content failed!"<<endl;
+                    exit(1);
+                }
+                if (write_flag == Z_FINISH){
+                    break;
+                }
+                            }
+
+            if (buffer != NULL)
+                delete []buffer;
+            mutex_lock(&(writer->write_lock));
+            writer->is_writing = false;
+            mutex_unlock(&(writer->write_lock));
+            return NULL;
+        }
+}
+#endif
+
