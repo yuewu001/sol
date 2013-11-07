@@ -16,19 +16,19 @@ namespace SOL{
     bool basic_io::open_file(const char* filename, const char* mode){
         this->close_file();
 #if _WIN32
-			if (fopen_s(&file,filename, mode) != 0){
-				printf("error %d: can't open input file %s\n",ret,filename);
-				return false;
-			}
+        if (fopen_s(&file,filename, mode) != 0){
+            printf("error %d: can't open input file %s\n",ret,filename);
+            return false;
+        }
 
 #else
-            file = fopen(filename, mode);
+        file = fopen(filename, mode);
         if (file == NULL){
             fprintf(stderr,"open file failed!");
             return false;
         }
 #endif
-        if (ferror(file) != 0){
+        if (this->good() != 0){
             this->close_file();
             return false;
         }
@@ -74,10 +74,10 @@ namespace SOL{
      * @Param dst: container to place the read data
      * @Param length: length of data of read in bytes
      *
-     * @Return: size of data read in bytes
+     * @Return: true if succeed
      */
-    size_t basic_io::read_data(char* dst, size_t length){
-        return fread(dst, 1, length, file);
+    bool basic_io::read_data(char* dst, size_t length){
+        return fread(dst, 1, length, file) == length;
     }
 
     /**
@@ -108,10 +108,10 @@ namespace SOL{
      * @Param src: source of the data
      * @Param length: length to write the data
      *
-     * @Return: size of data written to disk in bytes
+     * @Return: true of succeed
      */
-    size_t basic_io::write_data(char* src, size_t length){
-        return fwrite(src, 1, length, file);
+    bool basic_io::write_data(char* src, size_t length){
+        return fwrite(src, 1, length, file) == length;
     }
 }
 

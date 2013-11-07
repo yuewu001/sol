@@ -1,11 +1,14 @@
 FLAGS = -g -Wall
 #FLAGS = -O2 -s
 
-all: analysis test
-analsis:data_analysis.o basic_io.o
+LIBS=basic_io.o zlib_io.o gzip_io.o
+TARGETS=analysis test
+
+all: $(TARGETS)
+analysis:data_analysis.o $(LIBS)
 	g++ $^ -lpthread -lz -o analysis
 
-test:test.o basic_io.o
+test:test.o $(LIBS)
 	g++ $^ -lpthread -lz -o test
 
 %.o:%.cpp
@@ -13,4 +16,4 @@ test:test.o basic_io.o
 
 .PHONY: clean
 clean:
-	-rm test *.o
+	-rm $(TARGETS) *.o

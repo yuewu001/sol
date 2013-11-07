@@ -8,15 +8,19 @@
 #ifndef HEADER_BASIC_IO
 #define HEADER_BASIC_IO
 
+#include "io_interface.h"
 #include <cstdio>
 
 namespace SOL{
-    class basic_io{
+    class basic_io: public io_interface {
         private:
             FILE* file;
 
         public:
             basic_io():file(NULL){}
+            virtual ~basic_io(){
+                this->close_file();
+            }
 
         public:
             virtual bool open_file(const char* filename, const char* mode);
@@ -42,9 +46,9 @@ namespace SOL{
              * @Param dst: container to place the read data
              * @Param length: length of data of read in bytes
              *
-             * @Return: size of data read in bytes
+             * @Return: true if succeed
              */
-            virtual size_t read_data(char* dst, size_t length);
+            virtual bool read_data(char* dst, size_t length);
 
             /**
              * read_line : read a line from disk
@@ -62,9 +66,9 @@ namespace SOL{
              * @Param src: source of the data
              * @Param length: length to write the data
              *
-             * @Return: size of data written to disk in bytes
+             * @Return: true if succeed
              */
-            virtual size_t write_data(char* src, size_t length);
+            virtual bool write_data(char* src, size_t length);
     };
 }
 

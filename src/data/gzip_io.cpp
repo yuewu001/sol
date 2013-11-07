@@ -14,6 +14,9 @@
 #  define SET_BINARY_MODE(file)
 #endif
 
+#include <iostream>
+using namespace std;
+
 namespace SOL{
     bool gzip_io::open_file(const char* filename, const char* mode){
         this->close_file();
@@ -23,7 +26,11 @@ namespace SOL{
             cerr<<"open file failed!"<<endl;
             return false;
         }
-        return this->good();
+        if (this->good() != 0){
+            this->close_file();
+            return false;
+        }
+        return true;
     }
     // bind_stdin: bind the input to stdin
     bool gzip_io::open_stdin(){
@@ -58,6 +65,8 @@ namespace SOL{
         int errCode;
         const char* errmsg = gzerror(file ,&errCode);;
         if (errCode != Z_OK){
+            if (gzeof(file) == 1) //eof is not an error
+                return 0;
             printf("%s\n",errmsg);
         }
         return errCode;
@@ -69,10 +78,10 @@ namespace SOL{
      * @Param dst: container to place the read data
      * @Param length: length of data of read in bytes
      *
-     * @Return: size of data read in bytes
+     * @Return: true if succeed
      */
-    size_t gzip_io::read_data(char* dst, size_t length){
-        return gzread(dst, length, file);
+    bool gzip_io::read_data(char* dst, size_t length){
+        return gzread(file, dst, length) == length;
     }
 
     /**
@@ -94,10 +103,10 @@ namespace SOL{
      * @Param src: source of the data
      * @Param length: length to write the data
      *
-     * @Return: size of data written to disk in bytes
+     * @Return: true if succeed
      */
-    size_t gzip_io::write_data(char* src, size_t length){
-        return fwrite(src, length, file);
+    bool gzip_io::write_data(char* src, size_t length){
+        return gzwrite(file, src, length) == length;
     }
 }
 

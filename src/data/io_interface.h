@@ -7,13 +7,10 @@
 #ifndef HEADER_IO_INTERFACE_
 #define HEADER_IO_INTERFACE_
 
+#include <cstdio>
+
 namespace SOL{
     class io_interface{
-        public:
-            virtual ~io_handler(){
-                this->close_file();
-            }
-
         public:
             virtual bool open_file(const char* filename, const char* mode) = 0;
             // bind_stdin: bind the input to stdin
@@ -37,9 +34,9 @@ namespace SOL{
              * @Param dst: container to place the read data
              * @Param length: length of data of read in bytes
              *
-             * @Return: size of data read in bytes
+             * @Return: true if succeed
              */
-            virtual size_t read_data(char* dst, size_t length) = 0;
+            virtual bool read_data(char* dst, size_t length) = 0;
 
             /**
              * read_line : read a line from disk
@@ -57,9 +54,9 @@ namespace SOL{
              * @Param src: source of the data
              * @Param length: length to write the data
              *
-             * @Return: size of data written to disk in bytes
+             * @Return: true if succeed
              */
-            virtual size_t write_data(char* src, size_t length) = 0;
+            virtual bool write_data(char* src, size_t length) = 0;
     };
 }
 

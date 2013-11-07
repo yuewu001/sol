@@ -9,6 +9,9 @@
 #define HEADER_LIBSVM_BINARY
 
 #include "DataReader.h"
+#include "basic_io.h"
+#include "zlib_io.h"
+#include "gzip_io.h"
 
 #include <new>
 
@@ -23,6 +26,8 @@ namespace SOL {
             private:
                 std::string fileName;
                 basic_io io_handler;
+                //gzip_io io_handler;
+                //zlib_io io_handler;
 
             public:
                 libsvm_binary_(const std::string &fileName) {
@@ -60,71 +65,70 @@ namespace SOL {
                 bool GetNextData(DataPoint<FeatType, LabelType> &data) {
                     data.erase();
                     int featNum = 0;
-                    size_t read_len = 0;
-                    read_len = sizeof(LabelType);
-                    if (io_handler.read_data((char*)&(data.label), read_len) == read_len){
-                        read_len = sizeof(int);
-                        if(io_handler.read_data((char*)&featNum, read_len) == read_len){
-                            if(featNum > 0){
-                                if(io_handler.read_data((char*)&(data.max_index), 
-                                            read_len) == read_len){
-                                    data.indexes.resize(featNum);
-                                    read_len = sizeof(int) * featNum;
-                                    if(io_handler.read_data((char*)(data.indexes.begin), 
-                                            read_len) == read_len){
-                                        data.features.resize(featNum);
-                                        read_len = sizeof(float) * featNum;
-                                        if(io_handler.read_data((char*)(data.features.begin),
-                                            read_len) == read_len){
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                                return true;
+                    if (io_handler.read_data((char*)&(data.label),sizeof(LabelType)) == false){
+                        if (this->Good() == true){
+                            return false;
+                        }
+                        else{
+                            cerr<<"unexpected error occured when loading data!"<<endl;
+                            return false;
                         }
                     }
-                    else if (this->Good() == true){
+                    assert(data.label == 1 || data.label == -1);
+                    if(io_handler.read_data((char*)&featNum,sizeof(int)) == false){
+                        cerr<<"load feature number failed!"<<endl;
                         return false;
                     }
-                    else{
-                        cerr<<"unexpected error occured when loading data!"<<endl;
-                        exit(1);
+
+                    if(io_handler.read_data((char*)&(data.max_index),sizeof(int)) == false){
+                        cerr<<"load max index faile!"<<endl;
+                        return false;
                     }
-                    return false;
+                    data.indexes.resize(featNum);
+                    if(io_handler.read_data((char*)(data.indexes.begin), 
+                                sizeof(int) * featNum) ==false){
+                        cerr<<"load index failed!"<<endl;
+                        return false;
+                    }
+                    data.features.resize(featNum);
+                    if (io_handler.read_data((char*)(data.features.begin), 
+                                sizeof(float) * featNum) ==false){
+                        cerr<<"load features failed!"<<endl;
+                        return false;
+                    }
+                    return true;
                 }
 
                 bool WriteData(DataPoint<FeatType, LabelType> &data) {
                     int featNum = data.indexes.size();
-                    size_t w_len = sizeof(LabelType);
-                    if(io_handler.write_data((char*)&data.label, w_len) == w_len){
-                        w_len = sizeof(int);
-                        if(io_handler.write_data((char*)&featNum, w_len) == w_len){
-                            if (featNum > 0){
-                                if(io_handler.write_data((char*)&(data.max_index), 
-                                            w_len) == w_len){
-                                    w_len = sizeof(int) * featNum;
-                                    if(io_handler.write_data((char*)(data.indexes.begin),
-                                                w_len) == w_len){
-                                        w_len = sizeof(float) * featNum;
-                                        if(io_handler.write_data((char*)(data.features.begin), 
-                                                    w_len) == w_len)
-                                            return true;
-                                    }
-                                }
-                            }
-                            else{
-                                return true;
-                            }
-                        }
+                    if(io_handler.write_data((char*)&data.label,sizeof(LabelType)) == false){
+                        cerr<<"write label failed!"<<endl;
+                        return false;
                     }
-                    return false;
+                    if(io_handler.write_data((char*)&featNum,sizeof(int)) == false){
+                        cerr<<"write feat number failed!"<<endl;
+                        return false;
+                    }
+                    if(io_handler.write_data((char*)&(data.max_index), 
+                                sizeof(int)) == false){
+                        cerr<<"write max_index failed!"<<endl;
+                        return false;
+                    }
+                    if(io_handler.write_data((char*)(data.indexes.begin),
+                                sizeof(int) * featNum) == false){
+                        cerr<<"write indexes failed!"<<endl;
+                        return false;
+                    }
+                    if(io_handler.write_data((char*)(data.features.begin), 
+                                sizeof(int) * featNum) == false){
+                        cerr<<"write features failed!"<<endl;
+                        return false;
+                    }
+                    return true;
                 }
         };
 
     //for special definition
     typedef libsvm_binary_<float, char> libsvm_binary;
 }
-
 #endif

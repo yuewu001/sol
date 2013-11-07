@@ -12,10 +12,8 @@
 #include <stdexcept>
 #include <cstring>
 
-namespace SOL
-{
-    template <typename T> class s_array
-    {
+namespace SOL {
+    template <typename T> class s_array {
         public:
             T* begin; //point to the first element
             T* end; //point to the next postion of the last element
@@ -30,22 +28,29 @@ namespace SOL
             T& operator[] (size_t i) {return begin[i];}
             const T& operator[] (size_t i) const { return begin[i];}
 
-            void resize(size_t newSize, bool isClear = false)
-            {
-                if (capacity >= newSize) //just need to modify the pointer, if resize the array smaller
-                {
+            void resize(size_t newSize, bool isClear = false) {
+                if (capacity >= newSize) {
+                    //just need to modify the pointer, if resize the array smaller
                     end = begin + newSize;
                     if (isClear == true)
                         memset(begin,0,sizeof(T) * newSize);
                 }
-                else if (capacity < newSize) //allocate more memory
-                {
-                    T* new_begin = new T[newSize];
-                    if (new_begin == NULL && sizeof(T) * newSize > 0)
-                    {
-                        std::cerr<<"realloc of "<<newSize<<" failed in resize(). out of memory?\n" 
+                else if (capacity < newSize){ //allocate more memory
+                    T* new_begin = NULL;
+                    try{
+                        new_begin = new T[newSize];
+                    }catch(std::bad_alloc &ex){
+                        std::cerr<<ex.what();
+                        std::cerr<<" realloc of "<<newSize
+                            <<" failed in resize(). out of memory? in file " 
+                            <<__FILE__<<" line "<<__LINE__<<std::endl;
+                        exit(1);
+                    }
+                    if (new_begin == NULL && sizeof(T) * newSize > 0) {
+                        std::cerr<<"realloc of "<<newSize
+                            <<" failed in resize(). out of memory?\n" 
                             <<__FILE__<<"\n"<<__LINE__<<std::endl;
-                        throw std::exception();
+                        exit(1);
                     }
 
                     size_t old_len = this->size();
@@ -60,19 +65,16 @@ namespace SOL
             }
             void erase(void) { resize(0); }
 
-            void push_back(const T& elem)
-            {
+            void push_back(const T& elem) {
                 size_t old_len = size();
-                if (old_len == capacity) //full array
-                {
+                if (old_len == capacity) {//full array
                     resize(2 * old_len + 3);
                     end = begin + old_len;
                 }
                 *(end++) = elem;
             }
 
-            s_array<T>& operator= (const s_array<T> &arr)
-            {
+            s_array<T>& operator= (const s_array<T> &arr) {
                 if (this->count == arr.count)
                     return *this;
                 this->release();
@@ -85,11 +87,9 @@ namespace SOL
                 return *this;
             }
 
-            void release()
-            {
+            void release() {
                 --(*count);
-                if (*count == 0)
-                {
+                if (*count == 0) {
                     if (this->begin != NULL)
                         delete []this->begin;
                     delete this->count;
@@ -100,14 +100,12 @@ namespace SOL
                 this->count = 0;
             }
 
-            s_array()
-            {
+            s_array() {
                 begin = NULL; end = NULL; capacity = 0;
                 count = new int;
                 *count = 1;
             }
-            s_array(const s_array &arr)
-            {
+            s_array(const s_array &arr) {
                 this->begin =arr.begin;
                 this->end = arr.end;
                 this->capacity = arr.capacity;

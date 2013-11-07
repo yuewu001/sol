@@ -7,12 +7,18 @@
 #ifndef HEADER_ZLIB_IO
 #define HEADER_ZLIB_IO
 
+#include "io_interface.h"
+
 #include <cstdio>
+#include <string.h>
+#include <assert.h>
+#include "zlib.h"
+
 
 namespace SOL{
 #define ZLIB_BUF_SIZE  16348
 
-    class zlib_io{
+    class zlib_io: public io_interface{
         private:
             enum RW_MODE{
                 mode_null = 0,
@@ -66,9 +72,9 @@ namespace SOL{
              * @Param dst: container to place the read data
              * @Param length: length of data of read in bytes
              *
-             * @Return: size of data read in bytes
+             * @Return: true if succeed
              */
-            virtual size_t read_data(char* dst, size_t length);
+            virtual bool read_data(char* dst, size_t length);
 
             /**
              * read_line : read a line from disk
@@ -86,9 +92,9 @@ namespace SOL{
              * @Param src: source of the data
              * @Param length: length to write the data
              *
-             * @Return: size of data written to disk in bytes
+             * @Return: true if succeed
              */
-            virtual size_t write_data(char* src, size_t length);
+            virtual bool write_data(char* src, size_t length);
 
         private:
             /**

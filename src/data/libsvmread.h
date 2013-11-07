@@ -12,6 +12,7 @@
 
 #include "DataReader.h"
 #include "basic_io.h"
+#include "parser.h"
 
 #include <stdio.h>
 #include <vector>
@@ -68,7 +69,7 @@ namespace SOL {
 				return false;
 
 			LabelType labelVal;
-			char* p = strip_line(line), *endptr = NULL;
+			char* p = line, *endptr = NULL;
 			if (*p == '\0')
 				return false;
 			labelVal = (LabelType)parseInt(p,&endptr);
@@ -78,23 +79,20 @@ namespace SOL {
 			}
 			 
 			data.erase();
-			int index;
+			unsigned int index;
 			FeatType feat;
 			// features
 			while(1) {
 				p = strip_line(endptr);
 				if (*p == '\0')
 					break;
-				index = parseIndex(p,&endptr);
+				index = parseUint(p,&endptr);
 				if (endptr == p) { //parse index failed
-					fprintf(stderr,"parse index value failed!");
+					fprintf(stderr,"parse index value failed!\n%s", p);
+                    
 					exit(0);
 				}
-
-				if (index < 1) {
-					printf("index should be no less than 1\n");
-					exit(0);
-				}
+				
 				p = endptr;
 				feat = parseFloat(p,&endptr);
 				//feat =(float)(strtod(val,&endptr));
@@ -109,126 +107,7 @@ namespace SOL {
 			return true;
 		}
 		
-        //The following function is a home made strtoi
-        inline int parseInt(char * p, char **end) {
-            *end = p;
-            p = strip_line(p);
-
-            if (*p == '\0'){
-                return 0;
-            }
-            int s = 1;
-            if (*p == '+')p++;
-            if (*p == '-') {
-                s = -1; p++;
-            }
-            int acc = 0;
-            while (*p >= '0' && *p <= '9')
-                acc = acc * 10 + *p++ - '0';
-
-            int exp_acc = 0;
-            if(*p == 'e' || *p == 'E'){
-                p++;
-                if (*p == '+')p++;
-                while (*p >= '0' && *p <= '9')
-                    exp_acc = exp_acc * 10 + *p++ - '0';
-                acc *= (int)(powf(10,(float)(exp_acc)));
-            }
-            if (is_space(p)== true) {//easy case succeeded.
-                *end = p;
-                return s * acc;
-            }
-            else {
-                return 0;
-            }
-        }
-        //The following function is a home made strtoi
-        inline int parseIndex(char * p, char **end) {
-            *end = p;
-            p = strip_line(p);
-
-            if (*p == '\0'){
-                return 0;
-            }
-            int s = 1;
-            if (*p == '+') p++;
-            if (*p == '-') {
-                s = -1; p++;
-            }
-            int acc = 0;
-            while (*p >= '0' && *p <= '9')
-                acc = acc * 10 + *p++ - '0';
-
-            int exp_acc = 0;
-            if(*p == 'e' || *p == 'E'){
-                p++;
-                if (*p == '+') p++;
-                while (*p >= '0' && *p <= '9')
-                    exp_acc = exp_acc * 10 + *p++ - '0';
-                acc *= (int)(powf(10,(float)(exp_acc)));
-            }
-            p = strip_line(p);
-            if (*p == ':') {//easy case succeeded.
-                p++;
-                *end = p;
-                return s * acc;
-            }
-            else {
-                return 0;
-            }
-        }
-        // The following function is a home made strtof. The
-        // differences are :
-        //  - much faster (around 50% but depends on the string to parse)
-        //  - less error control, but utilised inside a very strict parser
-        //    in charge of error detection.
-        inline float parseFloat(char * p, char **end) {
-            *end = p;
-            p = strip_line(p);
-
-            if (*p == '\0'){
-                return 0;
-            }
-            int s = 1;
-            if (*p == '+') p++;
-            if (*p == '-') {
-                s = -1; p++;
-            }
-
-            float acc = 0;
-            while (*p >= '0' && *p <= '9')
-                acc = acc * 10 + *p++ - '0';
-
-            int num_dec = 0;
-            if (*p == '.') {
-                p++;
-                while (*p >= '0' && *p <= '9') {
-                    acc = acc *10 + (*p++ - '0') ;
-                    num_dec++;
-                }
-            }
-            int exp_acc = 0;
-            if(*p == 'e' || *p == 'E'){
-                p++;
-                int exp_s = 1;
-                if (*p == '+') p++;
-                if (*p == '-') {
-                    exp_s = -1; p++;
-                }
-                while (*p >= '0' && *p <= '9')
-                    exp_acc = exp_acc * 10 + *p++ - '0';
-                exp_acc *= exp_s;
-
-            }
-            if (is_space(p) == true){//easy case succeeded.
-                acc *= powf(10,(float)(exp_acc-num_dec));
-                *end = p;
-                return s * acc;
-            }
-            else
-                return 0;
-        }
-        /* Parse S into tokens separated by characters in DELIM.
+                /* Parse S into tokens separated by characters in DELIM.
            If S is NULL, the saved pointer in SAVE_PTR is used as
            the next starting point.  For example:
            char s[] = "-abc-=-def";
@@ -264,14 +143,6 @@ namespace SOL {
             return token;
         }
 
-        inline char* strip_line(char* p){
-            while(is_space(p) == true)
-                p++;
-            return p;
-        }
-        inline bool is_space(char* p){
-            return (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r');
-        }
 
 
     };

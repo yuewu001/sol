@@ -7,7 +7,10 @@
 
 #include "libsvmread.h"
 #include "libsvm_binary.h"
+
 #include <fstream>
+#include <cstdio>
+#include <vector>
 
 using namespace SOL;
 void Usage(){
@@ -18,6 +21,7 @@ void Cache(const string &input_file, const string &output_file);
 void De_Cache(const string &input_file, const string &output_file);
 
 int main(int argc, char** args){
+    De_Cache("cache_file","");
     /*
     if (argc < 3){
         Usage();
@@ -48,7 +52,6 @@ int main(int argc, char** args){
     else
         De_Cache(filename, outFileName);
         */
-    De_Cache("cache_file","");
 
     return 0;
 }
@@ -92,6 +95,7 @@ void De_Cache(const string &input_file, const string &output_file){
     cout<<"De-Caching file..."<<endl;
     libsvm_binary reader(input_file);
     if (reader.OpenReading() == false){
+        cerr<<"open "<<input_file<<" failed!"<<endl;
         return;
     }
     bool is_write = output_file.length() > 0 ? true : false;
