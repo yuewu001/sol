@@ -38,7 +38,7 @@ namespace SOL {
             virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 
             //Change the dimension of weights
-            virtual void UpdateWeightSize(int newDim);
+            virtual void UpdateWeightSize(IndexType newDim);
 
             //reset
             virtual void BeginTrain();
@@ -47,7 +47,7 @@ namespace SOL {
 
         protected:
             float delta;
-            unsigned int*timeStamp;
+            size_t *timeStamp;
             float *s;
             float *u_t;
     };
@@ -58,7 +58,7 @@ namespace SOL {
             Optimizer<FeatType, LabelType>(dataset, lossFunc), 
             timeStamp(NULL), s(NULL), u_t(NULL) {
                 this->delta = init_delta;;
-                this->timeStamp = new unsigned int[this->weightDim];
+                this->timeStamp = new size_t[this->weightDim];
                 this->s = new float[this->weightDim];
                 this->u_t = new float[this->weightDim];
 
@@ -78,11 +78,11 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float Ada_RDA<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
-            int featDim = x.indexes.size();
-            int index_i = 0;
+            size_t featDim = x.indexes.size();
+            IndexType index_i = 0;
 
             //obtain w_t
-            for (int i = 0; i < featDim; i++) {
+            for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
                 //lazy update
                 //update s[i]
@@ -98,7 +98,7 @@ namespace SOL {
 
             float gt_i = 0;
             //update
-            for (int i = 0; i < featDim; i++) {
+            for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
                 gt_i = gt * x.features[i];
 
@@ -115,18 +115,17 @@ namespace SOL {
 
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
-        void Ada_RDA<FeatType, LabelType>::BeginTrain()
-        {
+        void Ada_RDA<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
             //reset time stamp
-            memset(this->timeStamp,0,sizeof(unsigned int) * this->weightDim);
+            memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
             memset(this->s,0,sizeof(float) * this->weightDim);
             memset(this->u_t, 0 ,sizeof(float) * this->weightDim);
         }
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void Ada_RDA<FeatType, LabelType>::EndTrain() {
-            for (int i = 1; i < this->weightDim; i++) {
+            for (IndexType i = 1; i < this->weightDim; i++) {
                 //lazy update
                 //update s[i]
                 float Htii = this->delta + s[i];
@@ -187,20 +186,20 @@ namespace SOL {
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void Ada_RDA<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void Ada_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
                 newDim++;
-                unsigned int* newT = new unsigned int[newDim];
+                size_t *newT = new size_t[newDim];
                 float* newS = new float[newDim + 1];
                 float* newUt = new float[newDim + 1];
                 //copy info
-                memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim);
+                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
                 memcpy(newS,this->s,sizeof(float) * this->weightDim);
                 memcpy(newUt,this->u_t,sizeof(float) * this->weightDim);
                 //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim));
+                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
                 memset(newS + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
                 memset(newUt + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
 

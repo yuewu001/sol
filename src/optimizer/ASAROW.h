@@ -24,10 +24,10 @@ namespace SOL {
             float r;
             float* sigma_w;
 
-            int* forward_map; //record the sorted position of each weight
-            int* backward_map; //record the index of weight for each sorted position
+            IndexType *forward_map; //record the sorted position of each weight
+            IndexType *backward_map; //record the index of weight for each sorted position
 
-            int K; //keep top K elemetns
+            IndexType K; //keep top K elemetns
 
         public:
             ASAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -35,7 +35,7 @@ namespace SOL {
             virtual ~ASAROW();
 
         public:
-            void SetParameterEx(int k, float lambda = -1,float r = -1);
+            void SetParameterEx(IndexType k, float lambda = -1,float r = -1);
         protected:
             //this is the core of different updating algorithms
             virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -45,7 +45,7 @@ namespace SOL {
             virtual void EndTrain();
 
             //Change the dimension of weights
-            virtual void UpdateWeightSize(int newDim);
+            virtual void UpdateWeightSize(IndexType newDim);
 
             //try and get the best parameter
             virtual void BestParameter(){}
@@ -60,7 +60,7 @@ namespace SOL {
         this->r = init_r;
         this->K = 0;
         this->backward_map = NULL;
-        this->forward_map = new int[this->weightDim];
+        this->forward_map = new IndexType[this->weightDim];
         this->sigma_w = new float[this->weightDim];
         this->sparse_soft_thresh = 0;
     }
@@ -84,25 +84,25 @@ namespace SOL {
             //y /= this->curIterNum;
             float alpha_t = 1 - x.label * y;
             if(alpha_t > 0){
-                int featDim = x.indexes.size();
+                size_t featDim = x.indexes.size();
                 //calculate beta_t
                 float beta_t = this->r;
-                for (int i = 0; i < featDim; i++){
+                for (size_t i = 0; i < featDim; i++){
                     beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
                 }
                 beta_t = 1.0 / beta_t;
                 alpha_t *= beta_t; 
 
-                for (int i = 0; i < featDim; i++){
-                    int index_i = x.indexes[i];
+                for (size_t i = 0; i < featDim; i++){
+                    IndexType index_i = x.indexes[i];
                     //update u_t
                     this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
                     //update sigma_w
                     this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
                     //obtain the current position
-                    int curPos = this->forward_map[index_i];
+                    IndexType curPos = this->forward_map[index_i];
                     if (curPos >= this->K){
-                        int index_pos = this->backward_map[this->K - 1];
+                        IndexType index_pos = this->backward_map[this->K - 1];
                         if (this->sigma_w[index_i] < 
                                 this->sigma_w[index_pos]){
                             this->weightVec[index_pos] = 0;
@@ -117,7 +117,7 @@ namespace SOL {
                         }
                     }
                     while(--curPos > 1){
-                        int index_pos =  this->backward_map[curPos];
+                        IndexType index_pos =  this->backward_map[curPos];
                         if (this->sigma_w[index_i] < 
                                 this->sigma_w[index_pos]){
                             this->forward_map[index_pos] = curPos + 1;
@@ -146,11 +146,11 @@ namespace SOL {
             }
             Optimizer<FeatType, LabelType>::BeginTrain();
 
-            for (int i = 0; i < this->weightDim; i++){
+            for (IndexType i = 0; i < this->weightDim; i++){
                 this->sigma_w[i] = 1;
                 this->forward_map[i] = i;
             }
-            for(int i = 0; i < this->K; i++)
+            for(IndexType i = 0; i < this->K; i++)
                 this->backward_map[i] = i;
         }
 
@@ -161,19 +161,19 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float lambda,float r) {
+        void ASAROW<FeatType, LabelType>::SetParameterEx(IndexType k, float lambda,float r) {
             this->K = k > 0 ? k + 1 : this->K; //one another term for bias(k + 1)
             if (this->K > 0){
                 if (this->backward_map != NULL)
                     delete []this->backward_map;
-                this->backward_map = new int[this->K];             }
+                this->backward_map = new IndexType[this->K];             }
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->r = r > 0 ? r : this->r;
         }
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void ASAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void ASAROW<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
@@ -182,17 +182,17 @@ namespace SOL {
                 //copy info
                 memcpy(newS,this->sigma_w,sizeof(float) * this->weightDim); 
                 //set the rest to zero
-                for (int i = this->weightDim; i < newDim; i++)
+                for (IndexType i = this->weightDim; i < newDim; i++)
                     newS[i] = 1;
 
                 delete []this->sigma_w;
                 this->sigma_w= newS;
 
-                int* newFM = new int[newDim];
+                IndexType *newFM = new IndexType[newDim];
                 //copy info
-                memcpy(newFM, this->forward_map, sizeof(int)* this->weightDim);
+                memcpy(newFM, this->forward_map, sizeof(IndexType)* this->weightDim);
                 //set the rest
-                for (int i = this->weightDim; i < newDim; i++)
+                for (IndexType i = this->weightDim; i < newDim; i++)
                     newFM[i] = i;
                 delete []this->forward_map;
                 this->forward_map = newFM;

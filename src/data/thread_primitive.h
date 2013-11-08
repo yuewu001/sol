@@ -87,6 +87,7 @@ namespace SOL
         pthread_cond_broadcast(pcv);
 #endif
     }
+    /*
 #ifdef _WIN32
     void WaitThread(HANDLE &thread){
         WaitForSingleObject(thread,INFINITE);
@@ -96,4 +97,5 @@ namespace SOL
         pthread_join(thread, NULL);
     }
 #endif
+*/
 }

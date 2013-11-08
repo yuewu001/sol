@@ -98,11 +98,10 @@ namespace SOL{
                 exp_acc = exp_acc * 10 + *p++ - '0';
         }
         if (*p == ':') {//easy case succeeded.
-            exp_acc -= num_dec;
-            if (exp_acc < 0)
+            if (exp_acc < num_dec)
                 return 0;
             else
-                acc *= (unsigned int)(powf(10.f,exp_acc));
+                acc *= (unsigned int)(powf(10.f,exp_acc - num_dec));
             *end = ++p;
             return acc;
         }

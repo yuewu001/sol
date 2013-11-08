@@ -38,8 +38,7 @@ inline T ABS(T x) {
 }
 
 template <typename T>
-int MSB2LSB(T x)
-{
+int MSB2LSB(T x) {
 	int y = x;
 	int byteNum = sizeof(x);
 	char *buf = new char[byteNum];
@@ -55,14 +54,12 @@ int MSB2LSB(T x)
 }
 
 template <typename T>
-inline float Average(const T* data, int dim)
-{
+inline float Average(const T* data, int dim) {
 	return std::accumulate(data,data + dim, 0.f) / (float)dim;
 }
 
 template <typename T>
-float Variance(const T* data, int dim)
-{
+float Variance(const T* data, int dim) {
 	if (dim <= 1)
 		return 0;
 	float ave = std::accumulate(data, data + dim,0.f) / (double)dim;

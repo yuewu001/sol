@@ -35,7 +35,7 @@ namespace SOL
     //skip value in SVM2SGD
     static const int init_skip = 16;
     //t0 to avoid large parameter updates in the few updates
-    static const int init_t0 = 10e4;
+    static const size_t init_t0 = 10e4;
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
 	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
@@ -50,12 +50,10 @@ namespace SOL
 	static const float init_delta_step = 10;
 
 	////////////////////Data Set Reader Parameters///////////////////////////
-	static const int init_chunk_size = 256;
-	static const int init_buf_size = 2;
-
-	static const std::string init_tmp_file = "tmp~";
+	static const size_t init_chunk_size = 256;
+	static const size_t init_buf_size = 2;
 
     //////////////////////Zlib Parameters/////////////////////////////
     static const int zlib_deflate_level = -1; // use default deflate level
-    static const int zlib_buf_size = 16348; //default buffer size of zlib
+    static const size_t zlib_buf_size = 16348; //default buffer size of zlib
 }

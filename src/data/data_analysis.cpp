@@ -23,8 +23,8 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
 
     size_t dataNum = 0;
     size_t featNum = 0;
-    int max_index = 0;
-    set<int> index_set;
+    IndexType max_index = 0;
+    set<IndexType> index_set;
     DataPoint<FeatType, LabelType> data;
     if (reader->OpenReading() == true) {
         reader->Rewind();
@@ -35,8 +35,8 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 for (size_t i = 0; i < data.indexes.size(); i++){
                     index_set.insert(data.indexes[i]);
                 }
-                if (max_index < data.max_index){
-                    max_index = data.max_index;
+                if (max_index < data.dim()){
+                    max_index = data.dim();
                 }
 
                 dataNum++;

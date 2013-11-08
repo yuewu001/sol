@@ -21,8 +21,6 @@ void Cache(const string &input_file, const string &output_file);
 void De_Cache(const string &input_file, const string &output_file);
 
 int main(int argc, char** args){
-    De_Cache("cache_file","");
-    /*
     if (argc < 3){
         Usage();
         return 0;
@@ -51,7 +49,6 @@ int main(int argc, char** args){
     }
     else
         De_Cache(filename, outFileName);
-        */
 
     return 0;
 }
@@ -115,7 +112,7 @@ void De_Cache(const string &input_file, const string &output_file){
         featNum += data.indexes.size();
         if (is_write){
             writer<<data.label;
-            for (int i = 0; i < data.dim(); i++){
+            for (IndexType i = 0; i < data.dim(); i++){
                 writer<<" "<<data.indexes[i]<<":"<<data.features[i];
             }
             writer<<"\n";

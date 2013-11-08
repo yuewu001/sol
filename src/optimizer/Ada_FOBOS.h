@@ -37,7 +37,7 @@ namespace SOL {
             virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 
             //Change the dimension of weights
-            virtual void UpdateWeightSize(int newDim);
+            virtual void UpdateWeightSize(IndexType newDim);
 
             //reset
             virtual void BeginTrain();
@@ -46,7 +46,7 @@ namespace SOL {
 
         protected:
             float delta;
-            unsigned int *timeStamp;
+            size_t *timeStamp;
             float *s;
             float *u_t;
     };
@@ -57,7 +57,7 @@ namespace SOL {
             Optimizer<FeatType, LabelType>(dataset, lossFunc), timeStamp(NULL),
             s(NULL), u_t(NULL) {
                 this->delta = init_delta;;
-                this->timeStamp = new unsigned int[this->weightDim];
+                this->timeStamp = new size_t[this->weightDim];
                 this->s = new float[this->weightDim];
                 this->u_t = new float[this->weightDim];
 
@@ -77,10 +77,10 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float Ada_FOBOS<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
-            int featDim = x.indexes.size();
-            int index_i = 0;
+            size_t featDim = x.indexes.size();
+            IndexType index_i = 0;
             float alpha = this->eta0 * this->lambda;
-            for (int i = 0; i < featDim; i++) {
+            for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
                 //update s[i]
                 float Ht0i = this->delta + s[index_i];
@@ -98,7 +98,7 @@ namespace SOL {
             float gt_i = 0;
 
             //update s[i]
-            for (int i = 0; i < featDim; i++) {
+            for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
                 gt_i = gt * x.features[i];
 
@@ -121,7 +121,7 @@ namespace SOL {
         void Ada_FOBOS<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
             //reset time stamp
-            memset(this->timeStamp,0,sizeof(unsigned int) * this->weightDim);
+            memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
             memset(this->s,0,sizeof(float) * this->weightDim);
             memset(this->u_t, 0 ,sizeof(float) * this->weightDim);
         }
@@ -130,7 +130,7 @@ namespace SOL {
         void Ada_FOBOS<FeatType, LabelType>::EndTrain() {
             size_t iterNum = this->curIterNum + 1;
             float alpha = 0;
-            for (int index_i = 1; index_i < this->weightDim; index_i++) {
+            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
                 //update s[i]
                 float Ht0i = this->delta + s[index_i];
                 alpha = this->lambda * this->eta0 * (iterNum - this->timeStamp[index_i]) / Ht0i;
@@ -190,20 +190,20 @@ namespace SOL {
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void Ada_FOBOS<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void Ada_FOBOS<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
                 newDim++;
-                unsigned int* newT = new unsigned int[newDim];
+                size_t* newT = new size_t[newDim];
                 float* newS = new float[newDim + 1];
                 float* newUt = new float[newDim + 1];
                 //copy info
-                memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim);
+                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
                 memcpy(newS,this->s,sizeof(float) * this->weightDim);
                 memcpy(newUt,this->u_t,sizeof(float) * this->weightDim);
                 //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim));
+                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
                 memset(newS + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
                 memset(newUt + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
 
@@ -218,7 +218,5 @@ namespace SOL {
                 Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
             }
         }
-
-
 }
 

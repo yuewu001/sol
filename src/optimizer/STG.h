@@ -18,42 +18,42 @@ gradient[J]. The Journal of Machine Learning Research, 2009, 10:
 #include <limits>
 
 namespace SOL {
-	template <typename FeatType, typename LabelType>
-	class STG: public Optimizer<FeatType, LabelType> {
-        protected:
-            int K;
+    template <typename FeatType, typename LabelType>
+        class STG: public Optimizer<FeatType, LabelType> {
+            protected:
+                int K;
 
-        protected:
-            unsigned int *timeStamp;
+            protected:
+                size_t *timeStamp;
 
-        public:
-            STG(DataSet<FeatType, LabelType> &dataset, 
-                    LossFunction<FeatType, LabelType> &lossFunc);
-            virtual ~STG();
+            public:
+                STG(DataSet<FeatType, LabelType> &dataset, 
+                        LossFunction<FeatType, LabelType> &lossFunc);
+                virtual ~STG();
 
-        public:
-            void SetParameterEx(float lambda = -1,int K = -1, 
-                    float eta = -1);
-        protected:
-            //this is the core of different updating algorithms
-            virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-            //reset the optimizer to this initialization
-            virtual void BeginTrain();
-			 //called when a train ends
-            virtual void EndTrain();
+            public:
+                void SetParameterEx(float lambda = -1,int K = -1, 
+                        float eta = -1);
+            protected:
+                //this is the core of different updating algorithms
+                virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
+                //reset the optimizer to this initialization
+                virtual void BeginTrain();
+                //called when a train ends
+                virtual void EndTrain();
 
-            //Change the dimension of weights
-            virtual void UpdateWeightSize(int newDim);
-    };
+                //Change the dimension of weights
+                virtual void UpdateWeightSize(IndexType newDim);
+        };
 
     template <typename FeatType, typename LabelType>
         STG<FeatType, LabelType>::STG(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , timeStamp(NULL) {
-        this->id_str = "STG";
-        this->K = init_k;
-        this->timeStamp = new unsigned int[this->weightDim];
-    }
+                this->id_str = "STG";
+                this->K = init_k;
+                this->timeStamp = new size_t[this->weightDim];
+            }
 
     template <typename FeatType, typename LabelType>
         STG<FeatType, LabelType>::~STG() {
@@ -66,17 +66,17 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float STG<FeatType,LabelType>::UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) {
             float y = this->Predict(x);
-            int featDim = x.indexes.size();
+            size_t featDim = x.indexes.size();
             float gt_i = this->lossFunc->GetGradient(x.label,y) * this->eta;
 
             float alpha = this->eta * this->lambda;
-            unsigned int stepK = 0;
+            size_t stepK = 0;
 
-            for (int i = 0; i < featDim; i++) {
-                const int &index_i = x.indexes[i];
+            for (size_t i = 0; i < featDim; i++) {
+                IndexType index_i = x.indexes[i];
                 //update the weight
                 float& p_weight = this->weightVec[index_i];
-                unsigned int & p_stamp = this->timeStamp[index_i];
+                size_t & p_stamp = this->timeStamp[index_i];
                 p_weight -= gt_i * x.features[i];
 
                 //lazy update
@@ -96,33 +96,32 @@ namespace SOL {
 
             //bias term
             this->weightVec[0] -= gt_i;
-
             return y;
         }
 
-    
+
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
         void STG<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
             //reset time stamp
-            memset(this->timeStamp,0,sizeof(unsigned int) * this->weightDim);
+            memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
         }
 
-		//called when a train ends
+    //called when a train ends
     template <typename FeatType, typename LabelType>
         void STG<FeatType, LabelType>::EndTrain() {
-			for (int index_i = 1; index_i < this->weightDim; index_i++) {
-				//truncated gradient
-				int stepK = this->curIterNum - this->timeStamp[index_i];
+            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
+                //truncated gradient
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
                 stepK -= stepK % this->K;
 
-				if (stepK == 0)
-					continue;
+                if (stepK == 0)
+                    continue;
 
                 this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
                         stepK * this->eta * this->lambda);
-			}
+            }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
 
@@ -135,16 +134,16 @@ namespace SOL {
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void STG<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void STG<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
                 newDim++; //reserve the 0-th
-                unsigned int* newT = new unsigned int[newDim];
+                size_t* newT = new size_t[newDim];
                 //copy info
-                memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim); 
+                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim); 
                 //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim)); 
+                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim)); 
 
                 delete []this->timeStamp;
                 this->timeStamp = newT;

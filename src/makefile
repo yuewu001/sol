@@ -1,4 +1,4 @@
-DEBUG_FLAG=1
+#DEBUG_FLAG=1
 
 DEBUG=-g -Wall
 RELEASE=-O2 -s
@@ -7,7 +7,7 @@ INCLUDE=-I . -I ./data -I ./loss -I./optimizer
 VPATH=.:./data:./loss:./optimizer
 
 CFLAGS=-c $(INCLUDE) -Wno-write-strings
-LDFLAGS=-lpthread
+LDFLAGS=-lpthread -lz
 
 ifeq ($(DEBUG_FLAG),1)
 	CFLAGS += $(DEBUG)
@@ -15,16 +15,13 @@ else
 	CFLAGS += $(RELEASE)
 endif
 
-OBJS=main.o Params.o
+OBJS=Params.o basic_io.o
 TARGET=SOL
 
-all:$(TARGET) analysis
+all:$(TARGET)
 
-$(TARGET):$(OBJS)
+$(TARGET):main.o $(OBJS)
 	g++ $^ -o $@ $(LDFLAGS)
-
-analysis:data_analysis.o
-	g++ $< -o $@
 
 %.o:%.cpp
 	g++ $< -o $@ $(CFLAGS)

@@ -36,7 +36,7 @@ namespace SOL {
                 //called when a train ends
                 virtual void EndTrain();
                 //Change the dimension of weights
-                virtual void UpdateWeightSize(int newDim);
+                virtual void UpdateWeightSize(IndexType newDim);
 
             protected:
                 float rou;
@@ -72,7 +72,7 @@ namespace SOL {
         float RDA_L1<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
-            int index_i = 0;
+            size_t index_i = 0;
             //obtain w_t
             float coeff1 = std::sqrt(this->curIterNum - 1);
             float coeff = -this->eta0 / coeff1;
@@ -122,7 +122,7 @@ namespace SOL {
             if (this->rou > 0){
                 lambda_t += this->gamma_rou * coeff1;
             }
-            for (int index_i = 1; index_i < this->weightDim; index_i++) {
+            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
                 this->weightVec[index_i] = coeff * trunc_weight(this->gtVec[index_i],
                         lambda_t);
             }
@@ -138,7 +138,7 @@ namespace SOL {
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void RDA_L1<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void RDA_L1<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {

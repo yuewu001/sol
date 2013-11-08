@@ -1,15 +1,15 @@
-FLAGS = -g -Wall
-#FLAGS = -O2 -s
+#FLAGS = -g -Wall
+FLAGS = -O2 -s
 
 LIBS=basic_io.o zlib_io.o gzip_io.o
-TARGETS=analysis test
+TARGETS=analysis Cacher
 
 all: $(TARGETS)
 analysis:data_analysis.o $(LIBS)
-	g++ $^ -lpthread -lz -o analysis
+	g++ $^ -lz -o $@
 
-test:test.o $(LIBS)
-	g++ $^ -lpthread -lz -o test
+Cacher:Cacher.o $(LIBS)
+	g++ $^ -lz -o $@
 
 %.o:%.cpp
 	g++ -c $^ -o $@ $(FLAGS)

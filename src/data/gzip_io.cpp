@@ -81,7 +81,7 @@ namespace SOL{
      * @Return: true if succeed
      */
     bool gzip_io::read_data(char* dst, size_t length){
-        return gzread(file, dst, length) == length;
+        return size_t(gzread(file, dst, length)) == length;
     }
 
     /**
@@ -106,7 +106,7 @@ namespace SOL{
      * @Return: true if succeed
      */
     bool gzip_io::write_data(char* src, size_t length){
-        return gzwrite(file, src, length) == length;
+        return size_t(gzwrite(file, src, length)) == length;
     }
 }
 

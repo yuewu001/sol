@@ -6,7 +6,7 @@
 > Reference: 
 Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization 
 of weight vectors." Machine Learning (2009): 1-33.
-************************************************************************/
+ ************************************************************************/
 
 #pragma once
 
@@ -17,46 +17,46 @@ of weight vectors." Machine Learning (2009): 1-33.
 #include <limits>
 
 namespace SOL {
-	template <typename FeatType, typename LabelType>
-	class SSAROW: public Optimizer<FeatType, LabelType> {
-        protected:
-            float r;
-            float* sigma_w;
-            unsigned int* timeStamp;
+    template <typename FeatType, typename LabelType>
+        class SSAROW: public Optimizer<FeatType, LabelType> {
+            protected:
+                float r;
+                float* sigma_w;
+                size_t *timeStamp;
 
-        public:
-            SSAROW(DataSet<FeatType, LabelType> &dataset, 
-                    LossFunction<FeatType, LabelType> &lossFunc);
-            virtual ~SSAROW();
+            public:
+                SSAROW(DataSet<FeatType, LabelType> &dataset, 
+                        LossFunction<FeatType, LabelType> &lossFunc);
+                virtual ~SSAROW();
 
-        public:
-            void SetParameterEx(float lambda = -1,float r = -1);
-        protected:
-            //this is the core of different updating algorithms
-            virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-            //reset the optimizer to this initialization
-            virtual void BeginTrain();
-			 //called when a train ends
-            virtual void EndTrain();
+            public:
+                void SetParameterEx(float lambda = -1,float r = -1);
+            protected:
+                //this is the core of different updating algorithms
+                virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
+                //reset the optimizer to this initialization
+                virtual void BeginTrain();
+                //called when a train ends
+                virtual void EndTrain();
 
-            //Change the dimension of weights
-            virtual void UpdateWeightSize(int newDim);
+                //Change the dimension of weights
+                virtual void UpdateWeightSize(IndexType newDim);
 
-            //try and get the best parameter
-            virtual void BestParameter(){}
+                //try and get the best parameter
+                virtual void BestParameter(){}
 
-    };
+        };
 
     template <typename FeatType, typename LabelType>
         SSAROW<FeatType, LabelType>::SSAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
             Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
-        this->id_str = "SSAROW";
-        this->r = init_r;
-        this->sigma_w = new float[this->weightDim];
-        this->timeStamp = new unsigned int[this->weightDim];
-        this->sparse_soft_thresh = 0;
-    }
+                this->id_str = "SSAROW";
+                this->r = init_r;
+                this->sigma_w = new float[this->weightDim];
+                this->timeStamp = new size_t[this->weightDim];
+                this->sparse_soft_thresh = 0;
+            }
 
     template <typename FeatType, typename LabelType>
         SSAROW<FeatType, LabelType>::~SSAROW() {
@@ -75,28 +75,32 @@ namespace SOL {
             //y /= this->curIterNum;
             float alpha_t = 1 - x.label * y;
             if(alpha_t > 0){
-                int featDim = x.indexes.size();
+                size_t featDim = x.indexes.size();
                 //calculate beta_t
                 float beta_t = this->r;
-                for (int i = 0; i < featDim; i++){
+                for (size_t i = 0; i < featDim; i++){
                     beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
                 }
                 beta_t = 1.0 / beta_t;
                 alpha_t *= beta_t; 
 
-                for (int i = 0; i < featDim; i++){
-                    int index_i = x.indexes[i];
+                for (size_t i = 0; i < featDim; i++){
+                    IndexType index_i = x.indexes[i];
                     //update u_t
-                    this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
+                    this->weightVec[index_i] += alpha_t * 
+                        this->sigma_w[index_i] * x.label * x.features[i];
                     //update sigma_w
-                    this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
+                    this->sigma_w[index_i] -= beta_t * 
+                        this->sigma_w[index_i] * this->sigma_w[index_i] * 
+                        x.features[i] * x.features[i];
 
                     //L1 lazy update
-                    int stepK = this->curIterNum - this->timeStamp[index_i];
+                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
                     this->timeStamp[index_i] = this->curIterNum;
 
                     this->weightVec[index_i]= 
-                        trunc_weight(this->weightVec[index_i],stepK * this->lambda * this->sigma_w[index_i]);
+                        trunc_weight(this->weightVec[index_i],
+                                stepK * this->lambda * this->sigma_w[index_i]);
                 }
 
                 //bias term
@@ -110,23 +114,23 @@ namespace SOL {
         void SSAROW<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
-            memset(this->timeStamp,0 ,sizeof(unsigned int) * this->weightDim);
-            for (int i = 0; i < this->weightDim; i++)
+            memset(this->timeStamp,0 ,sizeof(size_t) * this->weightDim);
+            for (IndexType i = 0; i < this->weightDim; i++)
                 this->sigma_w[i] = 1;
         }
 
-		//called when a train ends
+    //called when a train ends
     template <typename FeatType, typename LabelType>
         void SSAROW<FeatType, LabelType>::EndTrain() {
-            for (int index_i = 1; index_i < this->weightDim; index_i++) {
-                    //L1 lazy update
-                    int stepK = this->curIterNum - this->timeStamp[index_i];
-                    if (stepK == 0)
-                        continue;
-                    this->timeStamp[index_i] = this->curIterNum;
+            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
+                //L1 lazy update
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                if (stepK == 0)
+                    continue;
+                this->timeStamp[index_i] = this->curIterNum;
 
-                    this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                            stepK * this->lambda);
+                this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+                        stepK * this->lambda);
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
@@ -139,7 +143,7 @@ namespace SOL {
 
     //Change the dimension of weights
     template <typename FeatType, typename LabelType>
-        void SSAROW<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+        void SSAROW<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
             if (newDim < this->weightDim)
                 return;
             else {
@@ -148,17 +152,17 @@ namespace SOL {
                 //copy info
                 memcpy(newS,this->sigma_w,sizeof(float) * this->weightDim); 
                 //set the rest to zero
-                for (int i = this->weightDim; i < newDim; i++)
+                for (IndexType i = this->weightDim; i < newDim; i++)
                     newS[i] = 1;
 
                 delete []this->sigma_w;
                 this->sigma_w= newS;
 
-                unsigned int* newT = new unsigned int[newDim];
+                size_t *newT = new size_t[newDim];
                 //copy info
-                memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim);
+                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
                 //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim));
+                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
                 delete []this->timeStamp;
                 this->timeStamp = newT;
 

@@ -37,7 +37,7 @@ namespace SOL{
                 do {
                     DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
                     chunk.erase();
-                    for (int i = 0; i < init_chunk_size; i++) {
+                    for (size_t i = 0; i < init_chunk_size; i++) {
                         DataPoint<T1,T2> &data = chunk.data[i];
                         not_file_end = reader->GetNextData(data);
                         if (not_file_end == true){
@@ -97,7 +97,7 @@ namespace SOL{
                     do {
                         DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
                         chunk.erase();
-                        for (int i = 0; i < init_chunk_size; i++) {
+                        for (size_t i = 0; i < init_chunk_size; i++) {
                             DataPoint<T1,T2> &data = chunk.data[i];
                             not_file_end = reader->GetNextData(data);
                             if (not_file_end == true)

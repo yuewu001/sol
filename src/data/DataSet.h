@@ -31,7 +31,6 @@ using namespace std;
  *  namespace: Sparse Online Learning
  */
 namespace SOL {
-    
     //data set, can work in both read-and-write mode and read-once mode
     template <typename FeatType, typename LabelType> class DataSet {		
         private:
@@ -240,7 +239,7 @@ namespace SOL {
                 mutex_unlock(&this->data_lock);
 
 #if WIN32
-				HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType,LabelType>), this, NULL, NULL);
+                HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType,LabelType>), this, NULL, NULL);
 #else
                 pthread_t thread;
                 pthread_create(&thread,NULL,thread_LoadData<FeatType,LabelType>,this);

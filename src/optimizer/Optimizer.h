@@ -22,8 +22,8 @@ namespace SOL {
 		//Iteration 
 	protected:
 		//iteration number
-		unsigned int curIterNum;
-        unsigned int initial_t;
+		size_t curIterNum;
+        size_t initial_t;
 		//parameters
 		float lambda;
 		float eta0; //learning rate
@@ -36,7 +36,7 @@ namespace SOL {
 		//the first element is zero
 		float *weightVec;
 		//weight dimenstion: can be the same to feature, or with an extra bias
-		int weightDim;
+		IndexType weightDim;
 
 		//For sparse
 	protected:
@@ -97,11 +97,11 @@ namespace SOL {
 		//test the performance on the given set
 		float Test(DataSet<FeatType, LabelType> &testSet);
 
-		float GetSparseRate(int total_len = 0);
+		float GetSparseRate(IndexType total_len = 0);
 
 	protected:
 		//Change the dimension of weights
-		virtual void UpdateWeightSize(int newDim);
+		virtual void UpdateWeightSize(IndexType newDim);
 	};
 
 	template <typename FeatType, typename LabelType>
@@ -161,14 +161,14 @@ namespace SOL {
 				this->curIterNum++;
 
 				const DataPoint<FeatType, LabelType> &data = chunk.data[i];
-				this->UpdateWeightSize(data.max_index);
+				this->UpdateWeightSize(data.dim());
 				float y = this->UpdateWeightVec(data); 
 				//loss
 				if (this->lossFunc->IsCorrect(data.label,y) == false)
 					errorNum++;
                 show_count--;
                 if (show_count == 0){
-                    printf("%u\t\t\t%.6f\t\t\n",this->curIterNum, 
+                    printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
                             errorNum / (float)(this->curIterNum));
                     show_step *= 2;
                     show_count = show_step;
@@ -248,8 +248,8 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
 		float predict = 0;
-		int dim = data.indexes.size();
-		for (int i = 0; i < dim; i++)
+		size_t dim = data.indexes.size();
+		for (size_t i = 0; i < dim; i++)
 			predict += this->weightVec[data.indexes[i]] * data.features[i];
 		predict += this->weightVec[0];
 		return predict;
@@ -257,12 +257,12 @@ namespace SOL {
 
 
 	template <typename FeatType, typename LabelType>
-	float Optimizer<FeatType, LabelType>::GetSparseRate(int total_len) {
+	float Optimizer<FeatType, LabelType>::GetSparseRate(IndexType total_len) {
 		float zeroNum(0);
 		if (this->weightDim == 1)
 			return 1;
 
-		for (int i = 1; i < this->weightDim; i++) {
+		for (IndexType i = 1; i < this->weightDim; i++) {
 			if (this->weightVec[i] == 0)
 				zeroNum++;
 		}
@@ -309,7 +309,7 @@ namespace SOL {
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::UpdateWeightSize(int newDim) {
+	void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
 		if (newDim < this->weightDim) 
 			return;
 		else {

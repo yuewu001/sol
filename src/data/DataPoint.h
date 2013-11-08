@@ -12,101 +12,92 @@
 
 #include <cstring>
 
-namespace SOL
-{
+namespace SOL {
     /**
      *  Definitions of DataPoint: one lable, and DataPoints
      *
      * @tparam DataType
      */
-    template <typename FeatType, typename LabelType> class DataPoint
-    {
-        public:
-            //////////////Member Variables
-            s_array<int> indexes;
-            s_array<FeatType> features;
-            s_array<float> weights;
-            LabelType label;
+    template <typename FeatType, typename LabelType> 
+        class DataPoint {
+            public:
+                //////////////Member Variables
+                s_array<IndexType> indexes;
+                s_array<FeatType> features;
+                LabelType label;
 
-            int max_index;
-            //for copy and release control
-            int *count;
+                //for copy and release control
+                int *count;
 
-        public:
-            DataPoint()
-            {
-                this->count = new int;
-                *count = 1;
-            }
+                IndexType max_index; //max index, also the dimension
+            public:
+                DataPoint() {
+                    this->count = new int;
+                    *count = 1;
+                }
 
-            //copy constructor
-            DataPoint(const DataPoint &point)
-            {
-                this->indexes = point.indexes;
-                this->features = point.features;
-                this->weights = point.weights;
-                this->label = point.label;
-                this->count = point.count;
-                ++(*count);
-            }
+                //copy constructor
+                DataPoint(const DataPoint &point) {
+                    this->indexes = point.indexes;
+                    this->features = point.features;
+                    this->label = point.label;
+                    this->count = point.count;
+                    this->max_index = 0;
+                    ++(*count);
+                }
 
-            ~DataPoint(){this->release();} 
+                ~DataPoint(){this->release();} 
 
-            //assignment
-            DataPoint<FeatType, LabelType>& operator= (const DataPoint<FeatType, LabelType> &data)
-            {
-                if (data.count == this->count)
+                //assignment
+                DataPoint<FeatType, LabelType>& operator= 
+                    (const DataPoint<FeatType, LabelType> &data) {
+                    if (data.count == this->count)
+                        return *this;
+                    this->release();
+
+                    this->indexes = data.indexes;
+                    this->features = data.features;
+                    this->label = data.label;
+                    this->max_index = data.max_index;
+                    this->count = data.count;
+                    ++(*count);
                     return *this;
-                this->release();
+                }
+                //set new index-value pair
+                void AddNewFeat(const IndexType &index, 
+                        const FeatType &feat) {
+                    this->indexes.push_back(index);
+                    this->features.push_back(feat);
+                    if(this->max_index <= index){
+                        this->max_index = index;
+                    }
+                }
 
-                this->indexes = data.indexes;
-                this->features = data.features;
-                this->weights = data.weights;
-                this->label = data.label;
-                this->max_index = 0;
-                this->count = data.count;
-                ++(*count);
-                return *this;
-            }
-            //set new index-value pair
-            void AddNewFeat(const int &index, const FeatType &feat, const float weight = 0)
-            {
-                this->indexes.push_back(index);
-                this->features.push_back(feat);
+                void erase() {
+                    this->indexes.erase();
+                    this->features.erase();
+                    this->max_index = 0;
+                }
 
-                if (index > this->max_index)
-                    this->max_index = index;
-            }
+                IndexType dim() const {return this->max_index;}
 
-            void erase()
-            {
-                this->indexes.erase();
-                this->features.erase();
-                this->weights.erase();
-                this->max_index = 0;
-            }
+            private:
+                void release() {
+                    --(*count); 
+                    if (*count == 0)
+                        delete count;
+                    this->count = NULL;
+                }
 
-            int dim() const {return this->max_index;}
-
-        private:
-            void release()
-            {
-                --(*count); 
-                if (*count == 0)
-                    delete count;
-                this->count = NULL;
-            }
-
-    };
-    template <typename FeatType, typename LabelType> struct DataChunk
-    {
+        };
+    template <typename FeatType, typename LabelType> 
+        struct DataChunk{
         DataPoint<FeatType, LabelType> data[init_chunk_size];
         size_t dataNum;
         DataChunk *next;
 
         DataChunk():dataNum(0),next(NULL){}
-        void erase()
-        {
+        void erase() {
             for (size_t i = 0; i < dataNum; i++)
                 data[i].erase();
             dataNum = 0;

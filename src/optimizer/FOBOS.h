@@ -36,20 +36,20 @@ namespace SOL {
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 
         //Change the dimension of weights
-		virtual void UpdateWeightSize(int newDim);
+		virtual void UpdateWeightSize(IndexType newDim);
 
 		//reset
 		virtual void BeginTrain();
 
 	protected:
-		unsigned int* timeStamp;
+		size_t *timeStamp;
 	};
 
 	template <typename FeatType, typename LabelType>
 	FOBOS<FeatType, LabelType>::FOBOS(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc), timeStamp(NULL) {
-		this->timeStamp = new unsigned int[this->weightDim];
+		this->timeStamp = new size_t[this->weightDim];
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -72,12 +72,12 @@ namespace SOL {
 	float FOBOS<FeatType,LabelType>::UpdateWeightVec (
             const DataPoint<FeatType, LabelType> &x) {
 		float y = this->Predict(x);
-		int featDim = x.indexes.size();
+		size_t featDim = x.indexes.size();
 		float gt_i = this->eta * this->lossFunc->GetGradient(x.label,y);
 
-        int index_i = 0;
+        IndexType index_i = 0;
         float alpha = this->eta * this->lambda;
-        for (int i = 0; i < featDim; i++) {
+        for (size_t i = 0; i < featDim; i++) {
             index_i = x.indexes[i];
             //update the weight
             this->weightVec[index_i] -= gt_i * x.features[i];
@@ -135,22 +135,21 @@ namespace SOL {
 	void FOBOS<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
-		memset(this->timeStamp,0,sizeof(unsigned int) * this->weightDim);
+		memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
 	}
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType, LabelType>::UpdateWeightSize(int newDim)
-	{
+	void FOBOS<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
 		if (newDim < this->weightDim)
 			return;
 		else {
             newDim++;
-			unsigned int* newT = new unsigned int[newDim];
+			size_t* newT = new size_t[newDim];
             //copy info
-			memcpy(newT,this->timeStamp,sizeof(unsigned int) * this->weightDim);
+			memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
             //set the rest to zero
-			memset(newT + this->weightDim,0,sizeof(unsigned int) * (newDim - this->weightDim));
+			memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
 			delete []this->timeStamp;
 			this->timeStamp = newT;
 
