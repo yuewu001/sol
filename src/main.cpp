@@ -49,21 +49,22 @@ template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
 
 int main(int argc, char** args) {
-    /*
+/*    
     int new_argc = 6;
     char** argv = new char*[argc + new_argc];
     for(int i = 0; i < argc; i++)
         argv[i] = args[i];
     argv[argc + 0] = "-opt";
-    argv[argc + 1] = "AROW";
-    argv[argc + 2] = "-c";
-    argv[argc + 3] = "./cache_file";
+    argv[argc + 1] = "ASAROW";
+    argv[argc + 2] = "-k";
+    argv[argc + 3] = "6";
     argv[argc + 4] = "-i";
-    argv[argc + 5] = "./train.data";
+    argv[argc + 5] = "/home/matthew/work/Data/uci/a6a";
     argc += new_argc;
     Params param(argc, argv);
     delete []argv;
-    */
+ */  
+   
     Params param(argc, args);
 
     DataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size);
