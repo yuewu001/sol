@@ -131,7 +131,7 @@ namespace SOL {
 //called when a train ends
     template <typename FeatType, typename LabelType>
 	void Optimizer<FeatType, LabelType>::EndTrain() {
-        for (int i = 1; i < this->weightDim; i++){
+        for (IndexType i = 1; i < this->weightDim; i++){
             if (this->weightVec[i] < this->sparse_soft_thresh && 
                     this->weightVec[i] > -this->sparse_soft_thresh ){
                 this->weightVec[i] = 0;
@@ -249,8 +249,9 @@ namespace SOL {
 	float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
 		float predict = 0;
 		size_t dim = data.indexes.size();
-		for (size_t i = 0; i < dim; i++)
+		for (size_t i = 0; i < dim; i++){
 			predict += this->weightVec[data.indexes[i]] * data.features[i];
+        }
 		predict += this->weightVec[0];
 		return predict;
 	}
@@ -258,73 +259,73 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	float Optimizer<FeatType, LabelType>::GetSparseRate(IndexType total_len) {
-		float zeroNum(0);
-		if (this->weightDim == 1)
-			return 1;
+        float zeroNum(0);
+        if (this->weightDim == 1)
+            return 1;
 
-		for (IndexType i = 1; i < this->weightDim; i++) {
-			if (this->weightVec[i] == 0)
-				zeroNum++;
-		}
-		if (total_len > 0)
-			return zeroNum / total_len;
-		else
-			return zeroNum / (this->weightDim - 1);
-	}
+        for (IndexType i = 1; i < this->weightDim; i++) {
+            if (this->weightVec[i] == 0)
+                zeroNum++;
+        }
+        if (total_len > 0)
+            return zeroNum / total_len;
+        else
+            return zeroNum / (this->weightDim - 1);
+    }
 
-	//try and get the best parameter
-	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::BestParameter() {
-        if (this->eta0 != init_tbd)
-            return;
-        float prev_lambda = this->lambda;
-        this->lambda = 0;
-		//1. Select the best eta0
+    //try and get the best parameter
+    template <typename FeatType, typename LabelType>
+        void Optimizer<FeatType, LabelType>::BestParameter() {
+            if (this->eta0 != init_tbd)
+                return;
+            float prev_lambda = this->lambda;
+            this->lambda = 0;
+            //1. Select the best eta0
 
-		float min_errorRate = 1;
-		float bestEta = 1;
+            float min_errorRate = 1;
+            float bestEta = 1;
 
-		for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
-			cout<<"eta0 = "<<eta_c<<"\n";
-			float errorRate(0);
-			this->eta0 = eta_c;
-            errorRate += this->Train();
+            for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
+                cout<<"eta0 = "<<eta_c<<"\n";
+                float errorRate(0);
+                this->eta0 = eta_c;
+                errorRate += this->Train();
 
-			if (errorRate < min_errorRate) {
-				bestEta = eta_c;
-				min_errorRate = errorRate;
-			}
-			cout<<"mistake rate: "<<errorRate * 100<<" %\n";
-		}
-		this->eta0 = bestEta;
-        this->lambda = prev_lambda;
-		cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
-	}
+                if (errorRate < min_errorRate) {
+                    bestEta = eta_c;
+                    min_errorRate = errorRate;
+                }
+                cout<<"mistake rate: "<<errorRate * 100<<" %\n";
+            }
+            this->eta0 = bestEta;
+            this->lambda = prev_lambda;
+            cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
+        }
 
-	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0) {
-		this->lambda  = lambda >= 0 ? lambda : this->lambda;
-		this->eta0 = eta0 > 0 ? eta0 : this->eta0;
-	}
+    template <typename FeatType, typename LabelType>
+        void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0) {
+            this->lambda  = lambda >= 0 ? lambda : this->lambda;
+            this->eta0 = eta0 > 0 ? eta0 : this->eta0;
+        }
 
-	//Change the dimension of weights
-	template <typename FeatType, typename LabelType>
-	void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-		if (newDim < this->weightDim) 
-			return;
-		else {
-			newDim++; //reserve the 0-th
-			float* newW = new float[newDim];
-			memset(newW,0,sizeof(float) * newDim); 
+    //Change the dimension of weights
+    template <typename FeatType, typename LabelType>
+        void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+            if (newDim < this->weightDim) 
+                return;
+            else {
+                newDim++; //reserve the 0-th
+                float* newW = new float[newDim];
+                memset(newW,0,sizeof(float) * newDim); 
 
-			//copy info
-			memcpy(newW,this->weightVec,sizeof(float) * this->weightDim); 
-			//set the rest to zero
-			memset(newW + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
+                //copy info
+                memcpy(newW,this->weightVec,sizeof(float) * this->weightDim); 
+                //set the rest to zero
+                memset(newW + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
 
-			delete []this->weightVec;
-			this->weightVec = newW;
-			this->weightDim = newDim;
-		}
-	}
+                delete []this->weightVec;
+                this->weightVec = newW;
+                this->weightDim = newDim;
+            }
+        }
 }

@@ -135,7 +135,6 @@ namespace SOL{
             condition_variable_signal_all(&dataset->data_available);
             mutex_unlock(&dataset->data_lock);
 
-            cout<<"data number: "<<dataset->dataNum<<endl;
             return NULL;
         }
 }

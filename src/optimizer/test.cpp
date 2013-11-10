@@ -1,56 +1,34 @@
-count = skip;
-bool updateB = false;
-for (int i=imin; i<=imax; i++)
-{
-    const SVector &x = xp.at(i);
-    double y = yp.at(i);
-    double z = y * dot(w, x);
-    double eta = 1.0 / t ;
+#include "HeapList.h"
 
-    if(updateB==true)
-    {
-#if LOSS < LOGLOSS
-        if (z < 1)
-#endif
-        {
-            FVector w_1=w;
-            double loss_1 = dloss(z);   
-            w.add(x, eta*loss_1*y, Bc);
+#include <iostream>
+#include <time.h>
+#include <cstdlib>
 
-            double z2 = y * dot(w,x);
-            double diffloss = dloss(z2) - loss_1;  
-            if (diffloss)
-            {
-                B.compute_ratio(x, lambda, w_1, w, y*diffloss);
-                if(t>skip)
-                    Bc.combine_and_clip((t-skip)/(t+skip),B,2*skip/(t+skip),
-                            1/(100*lambda),100/lambda);
-                else
-                    Bc.combine_and_clip(t/(t+skip),B,skip/(t+skip),
-                            1/(100*lambda),100/lambda);
-                B.clear();
-                B.resize(w.size());
-            }
-        }
-        updateB=false;    
+using namespace std;
+using namespace SOL;
+
+int main(int argc, char** args){
+    int len = 20;
+    float* val_list = new float[len];
+    for(int i = 0; i < len; i++){
+        val_list[i] = (rand() %100)/ 100.0;
     }
-    else
-    {
-        if(--count <= 0)
-        {
-            w.add(w,-skip*lambda*eta,Bc);   
-            count = skip;
-            updateB=true;
-        }      
-#if LOSS < LOGLOSS
-        if (z < 1)
-#endif
-        {
-            w.add(x, eta*dloss(z)*y, Bc);
-        }
+    HeapList<float> heap;
+    heap.Init(len, len / 2, val_list);
+    heap.Output();
+//    heap.HeapSort();
+    heap.Output();
+
+    for (int i = 8; i < 20; i++){
+        cout<<"\n";
+        heap.Output();
+        val_list[i] = (rand() %100)/ 10.0;
+        cout<<i<<"\t";
+        cout<<val_list[i]<<endl;
+        heap.UpdateHeap(i);
+        heap.Output();
     }
-    t += 1;
+    //heap.Output();
+
+    return 0;
 }
-
-if (verb)
-    cout << prefix << setprecision(6) << "Norm2: " << dot(w,w) << endl;
