@@ -1,0 +1,91 @@
+\documentclass{article}
+\usepackage{bm}
+\usepackage{amsmath}
+\begin{document}
+\title{Confidence-Weighted Sparse Online Learning}
+\author{Yue Wu}
+
+\section{Confidence-Weighted Learning}
+The main idea of Confidence-Weighted algorithms is to assume a Guassian distribution 
+of the linear classifier $\omega\sim N(\bm{\mu},\Sigma)$. Each update
+tries to stay close to the previous distrbution and ensure the
+probability of the current precition for $\bm{x}_i$ is larger than
+$\eta$.
+\begin{equation}
+  \begin{aligned}
+    Pr[y_i(\bm{\omega}\cdot \bm{x}_i) \geq 0] & \geq \eta \quad or \\
+    y_i(\bm{\mu}\cdot \bm{x}_i & \geq  \phi\sqrt{\bm{x}_i^T\Sigma\bm{x}_i}
+  \end{aligned}
+  \label{equ:01}
+\end{equation}
+
+This constraint can be formulated with a loss function  so that:
+\begin{equation}
+  l(N(\bm{\mu},\Sigma);(\bm{x}_t,y_t)) = max (0,
+  \phi\sqrt{\bm{x}_t^T\Sigma\bm{x}_t}) = 0
+  \label{equ:02}
+\end{equation}
+
+Typical Confidence-Weighted learning algorithms (CW, AROW, SCW) take
+different approaches to the above constraint. CW release the above
+non-convex constraint (in $\Sigma$) to be $$y_i(\bm{\mu}\cdot\bm{x}_i)
+\geq \phi\sqrt{\bm{x}_i^T\Sigma\bm{x}_i}$$. Exact solves this problem
+directly by replacing $\Sigma$ with $\Sigma=\Upsilon^2$, as $\Sigma$
+is positive definite. The problem of these two approaches is that it
+is sensitive to label noise. To tackle such limitation, AROW relaxes 
+the above constraint by setting a regularizer with the form 
+$$\lambda_1 l_h^2(y_t, \bm{\mu}\cdot\bm{x}) + \lambda_2\bm{x}_t^T\Sigma\bm{x}_t$$. 
+SCW relaxes Equation \ref{equ:02} with the same way to PA-I and PA-II.
+Anyway, they follow the same loss function. 
+
+Despite the different approaches to tackle the constraint, these algorithms 
+share the same updating rule and only differ in the calculation of $\alpha_t$ 
+and $\beta_t$ as follows:
+
+\begin{equation}
+  \begin{aligned}
+    \bm{\mu}_t = \bm{\mu}_{t-1} + \alpha_t\Sigma_{t-1}y_t\bm{x}_t  \\
+    \Sigma_t = \Sigma_{t-1} - \beta_t\Sigma_{t-1}\bm{x}_t\bm{x}_t^T\Sigma_{t-1}
+  \end{aligned}
+  \label{equ:03}
+\end{equation}
+
+In the classical optimization problem $$\min_{\omega}f(\omega)$$, the
+search direction $p_k$ is obtained by:
+\begin{itemize}
+  \item Gradient Descent: $$p_k = -\nabla_k$$
+  \item Quasi-Newton Methods: $p_k = -B_k^{-1}\nabla_k$
+\end{itemize}
+
+In online setting, the gradient descent algorithm takes the same form.
+The difference is that, the step size is replaced by learning rate.
+First order online learning algorithms treat all the coordinates the
+same with constant or decaying learning rates. On the contrary, second
+order online learning algorithms yield a dedicated step size for each
+coordinate. Confidence-Weighted learning algorithms approach this by
+the Confidence matrix $\Sigma$ (we only consider the diagonal
+confidence matrix), as we see in Equation \ref{equ:03}.
+
+For sparse online, previous learning algorithms treat all the
+coordinates the same by adding an regularization term
+$\lambda|\omega|$. In this work, we extend the regularization term to
+be \textbf{coordinate dependent}. We take the form of FOBOS.
+
+\begin{equation}
+  \begin{aligned}
+    \bm{u}_{t+\frac{1}{2}} = \bm{u}_t - \bm{\eta}_t\cdot\bm{g}_t^f \\
+    \bm{u}_{t+1} = \arg\min_w{\frac{1}{2}\|\bm{u} -
+    \bm{u}_{t+\frac{1}{2}}\|^2 + \bm{\eta}_{t}\cdot\lambda\bm{u}} \\
+    \bm{eta}_t = \eta_t\cdot\Sigma_t
+  \end{aligned}
+  \label{equ:04}
+\end{equation}
+
+The final updating rule goes to:
+\begin{equation}
+  u_{t+1,j} = sign(u_{t,j} - \eta_t\Sigma_{jj}g_{t,j}^f)
+  [|u_{t,j} - \eta_t\Sigma_{jj}g_{t,j}^f)| - \eta_t\lambda\Sigma_{jj}]
+  \label{equ:05}
+\end{equation}
+
+\end{document}
