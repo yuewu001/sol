@@ -5,7 +5,5 @@
 cscope.*
 tags
 test
-tmp*
+*tmp*
 exp/result
-exp/tmp
-
