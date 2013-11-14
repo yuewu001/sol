@@ -2,9 +2,13 @@
 FLAGS = -O2 -s
 
 LIBS=basic_io.o zlib_io.o gzip_io.o
-TARGETS=analysis Cacher
+TARGETS=MNISTConvert
 
 all: $(TARGETS)
+
+MNISTConvert:MNISTConvert.cpp
+	g++ $^ $(FLAGS) -o $@
+
 analysis:data_analysis.o $(LIBS)
 	g++ $^ -lz -o $@
 

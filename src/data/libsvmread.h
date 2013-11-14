@@ -89,15 +89,15 @@ namespace SOL {
                         index = (IndexType)(parseUint(p,&endptr));
                         if (endptr == p) { //parse index failed
                             fprintf(stderr,"parse index value failed!\n%s", p);
-                            exit(0);
+                            return false;
                         }
 
                         p = endptr;
                         feat = parseFloat(p,&endptr);
                         //feat =(float)(strtod(val,&endptr));
                         if (endptr == p) {
-                            printf("parse feature value failed!\n");
-                            exit(0);
+                            fprintf(stderr,"parse feature value failed!\n");
+                            return false;
                         }
 
                         data.AddNewFeat(index,feat);

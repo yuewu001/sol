@@ -38,22 +38,6 @@ inline T ABS(T x) {
 }
 
 template <typename T>
-int MSB2LSB(T x) {
-	int y = x;
-	int byteNum = sizeof(x);
-	char *buf = new char[byteNum];
-	char *buf1 = new char[byteNum];
-	memcpy(buf, &x, byteNum);
-	for (int i = 0; i < byteNum; i++)
-		buf1[i] = buf[byteNum - 1 - i];
-	memcpy(&y,buf1, byteNum);
-
-	delete []buf;
-	delete []buf1;
-	return y;
-}
-
-template <typename T>
 inline float Average(const T* data, int dim) {
 	return std::accumulate(data,data + dim, 0.f) / (float)dim;
 }

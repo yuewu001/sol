@@ -23,7 +23,7 @@ namespace SOL {
                 ~RDA_L1();
 
             public:
-                void SetParameterEx(float lambda, float rou = -1);
+                void SetParameterEx(float lambda, float gamma_rou = -1);
                 //try and get the best parameter
                 virtual void BestParameter(); 
 
@@ -39,7 +39,6 @@ namespace SOL {
                 virtual void UpdateWeightSize(IndexType newDim);
 
             protected:
-                float rou;
                 float gamma_rou;
                 float * gtVec; //average gradient vector
 
@@ -50,11 +49,11 @@ namespace SOL {
             Optimizer<FeatType, LabelType>(dataset, lossFunc) {
                 if(enchance == true){
                     this->id_str = "enhanced RDA";
-                    this->rou = init_rou;
+                    this->gamma_rou = init_gammarou;
                 }
                 else{
                     this->id_str = "RDA";
-                    this->rou = 0;
+                    this->gamma_rou = 0;
                 }
                 this->gtVec = new float[this->weightDim];
                 //initail_t should be no less than 1,for the safety of update at the first step
@@ -77,7 +76,7 @@ namespace SOL {
             float coeff1 = std::sqrt(this->curIterNum - 1);
             float coeff = -this->eta0 / coeff1;
             float lambda_t = this->lambda * (this->curIterNum - 1);
-            if (this->rou > 0){
+            if (this->gamma_rou > 0){
                 lambda_t += this->gamma_rou * coeff1;
             }
 
@@ -108,7 +107,6 @@ namespace SOL {
         void RDA_L1<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
             memset(this->gtVec, 0, sizeof(float) * this->weightDim);
-            this->gamma_rou = this->rou / this->eta0;
         }
 
     //called when a train ends
@@ -119,7 +117,7 @@ namespace SOL {
             float coeff1 = std::sqrt(this->curIterNum);
             float coeff = -this->eta0 / coeff1;
             float lambda_t = this->lambda * (this->curIterNum);
-            if (this->rou > 0){
+            if (this->gamma_rou > 0){
                 lambda_t += this->gamma_rou * coeff1;
             }
             for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
@@ -131,8 +129,8 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void RDA_L1<FeatType,LabelType>::SetParameterEx(float lambda, float rou) {
-            this->rou = rou >= 0 ? rou : this->rou;
+        void RDA_L1<FeatType,LabelType>::SetParameterEx(float lambda, float gammarou) {
+            this->gamma_rou = gammarou >= 0 ? gammarou : this->gamma_rou;
             this->lambda = lambda >= 0 ? lambda : this->lambda;
         }
 

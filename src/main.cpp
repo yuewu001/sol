@@ -79,10 +79,12 @@ int main(int argc, char** args) {
 	if (opti == NULL)
 		return -1;
 
-	opti->SetParameter(param.lambda,param.eta);
+	opti->SetParameter(param.lambda,param.eta, param.power_t, param.initial_t);
 
 	//learn the best parameters
-    opti->BestParameter();
+    if (param.is_learn_best_param == true){
+        opti->BestParameter();
+    }
 
     opti->PrintOptInfo();
 
@@ -96,6 +98,7 @@ int main(int argc, char** args) {
 
     double time2 = get_current_time();
 
+    printf("data number: %lu\n",dataset.size());
     printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
 	double time3 = 0;
@@ -160,14 +163,14 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
         case Opti_RDA: 
             {
                 RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,false);
-                opti->SetParameterEx(param.lambda,param.rou);
+                opti->SetParameterEx(param.lambda);
                 return opti;
                 break;
             }
         case Opti_RDA_E: 
             {
                 RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,true);
-                opti->SetParameterEx(param.lambda,param.rou);
+                opti->SetParameterEx(param.lambda,param.gamma_rou);
                 return opti;
                 break;
             }

@@ -36,14 +36,18 @@ namespace SOL
 		int passNum;
 
 		//optimzation parameters
-		double eta; //learning rate
-		double lambda; //for l1 regularization
+		float eta; //learning rate
+		float lambda; //for l1 regularization
 		int K; //for STG method
-		double rou; //for RDA
-		double delta; //for Ada-
-        double r; //for AROW
+		float gamma_rou; //for RDA
+		float delta; //for Ada-
+        float r; //for AROW
 
 		int buf_size; //number of chunks in dataset 
+
+        size_t initial_t;
+        float power_t; 
+        bool is_learn_best_param; //whether learn best parameter
 
 	public:
 		Params(){}

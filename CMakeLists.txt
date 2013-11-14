@@ -43,6 +43,7 @@ ENDIF(UNIX)
 
 add_executable(analysis src/data/data_analysis.cpp ${data_files})
 add_executable(Cacher src/data/Cacher.cpp ${data_files})
+add_executable(MNISTConvert src/data/MNISTConvert.cpp)
 
-install(TARGETS SOL analysis
+install(TARGETS SOL analysis Cacher MNISTConvert
     DESTINATION .)

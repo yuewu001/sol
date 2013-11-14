@@ -55,7 +55,6 @@ namespace SOL {
                 this->r = init_r;
                 this->sigma_w = new float[this->weightDim];
                 this->timeStamp = new size_t[this->weightDim];
-                this->sparse_soft_thresh = 0;
             }
 
     template <typename FeatType, typename LabelType>

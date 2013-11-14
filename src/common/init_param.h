@@ -14,20 +14,24 @@ namespace SOL
 //
 	/////////////////////Optimizer Initalization parameters//////////////////
 	//
+    //whether to learn the best parameter
+    static const bool init_is_learn_best_param = false;
     //value to be determined
     static const float init_tbd = 1e10;
 	//learning rate
 	static const float init_eta = 10;
+    //pow decaying learing rate
+    static const float init_power_t = 0.5;
+    //initial t
+    static const size_t init_initial_t = 0;
 	//l1 regularization
 	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
 	static const float init_sparse_soft_thresh = 1e-6;
 	//truncate gradients every K steps
 	static const int init_k = 10;
-	//gamma in enchanced RDA
-	static const float init_gamma = 5000;
-	//rou in enchanced RDA
-	static const float init_rou = 0.005;
+	//gammarou in enchanced RDA
+	static const float init_gammarou = 25;
 	//delta in adaptive algorithms
 	static const float init_delta = 10;
     //trade-off parameter in AROW

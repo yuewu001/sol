@@ -54,15 +54,21 @@ namespace SOL {
             else if (strcmp(args[i],"-passes") == 0 && i + 1 < argc)
                 this->passNum = atoi(args[i+1]);
             else if (strcmp(args[i],"-l1") == 0 && i + 1 < argc)
-                this->lambda = strtod(args[i + 1],NULL);
+                this->lambda = atof(args[i + 1]);
             else if (strcmp(args[i],"-k") == 0 && i + 1 < argc)
                 this->K = atoi(args[i + 1]);
+            else if (strcmp(args[i],"-lbp") == 0)
+                this->is_learn_best_param = true;
             else if (strcmp(args[i],"-eta") == 0 && i + 1 < argc)
-                this->eta = strtod(args[i+1],NULL);
+                this->eta = atof(args[i+1]);
+            else if (strcmp(args[i], "-t0") == 0 && i + 1 < argc)
+                this->initial_t = atoi(args[i+1]);
+            else if (strcmp(args[i], "-power_t") == 0 && i + 1 < argc)
+                this->power_t = atof(args[i+1]);
             else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
-                this->r = strtod(args[i+1], NULL);
+                this->r = atof(args[i+1]);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
-                this->delta = strtod(args[i + 1],NULL);
+                this->delta = atof(args[i + 1]);
             else if (strcmp(args[i],"-opt") == 0 && i + 1 < argc) //opti method
                 this->ParseOptiMethod(args[i+1]);
             else if (strcmp(args[i],"-dt") == 0 && i + 1 < argc) //data type
@@ -71,8 +77,8 @@ namespace SOL {
                 this->buf_size = atoi(args[i+1]);
             else if(strcmp(args[i],"-loss") == 0 && i + 1 < argc)
                 this->loss_type = this->GetLossType(args[i+1]);
-            else if (strcmp(args[i],"-rou") == 0 && i + 1 < argc)
-                this->rou = strtod(args[i + 1],NULL);
+            else if (strcmp(args[i],"-grou") == 0 && i + 1 < argc)
+                this->gamma_rou = atof(args[i + 1]);
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else
@@ -95,8 +101,11 @@ namespace SOL {
         this->delta = -1;
         this->K = -1;
         this->buf_size = -1;
-        this->rou = -1;
+        this->gamma_rou = init_gammarou;
         this->r = init_r;
+        this->is_learn_best_param = init_is_learn_best_param;
+        this->power_t = init_power_t;
+        this->initial_t = init_initial_t;
     }
 
     void Params::ParseOptiMethod(char *str_method) {
@@ -176,12 +185,15 @@ namespace SOL {
 
         cout<<"Algorithms and Parameters: \n";
         cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW\n";
+        cout<<"-lbp      :\t learn best parameter\n";
         cout<<"\t-eta arg:\t learning rate\n";
+        cout<<"\t-power_t arg:\tpower t of decaying learing rate\n";
+        cout<<"\t-t0 arg:\t initial iteration number\n";
         cout<<"\t-l1 arg:\t value of l1 regularization\n";
         cout<<"\t-passes arg:\t number of passes\n\n";
 
         cout<<"\t-k arg:\t\t number of K in truncated gradient(STG)\n";
-        cout<<"\t-rou arg:\t rou(RDA_E)\n";
+        cout<<"\t-grou arg:\t gamma times rou(RDA_E)\n";
         cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-FOBOS, Ada-RDA)\n";
 
         cout<<"\n";

@@ -22,8 +22,10 @@ namespace SOL{
             DataReader<T1,T2>* reader = dataset->reader;
             libsvm_binary_<T1,T2>* writer = NULL;
 
+            string tmpFileName= dataset->cache_fileName + ".writing";
+
             if (dataset->is_cache == true){
-                writer = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
+                writer = new libsvm_binary_<T1,T2>(tmpFileName);
                 if (writer->OpenWriting() == false){
                     cerr<<"Open cache file failed!"<<endl;
                     exit(0);
@@ -79,6 +81,20 @@ namespace SOL{
                 writer->Close();
                 delete writer;
 
+                //rename
+#if WIN32
+                string cmd = "REN \"";
+                cmd = cmd + tmpFileName + "\" \"";
+                cmd = cmd + dataset->cache_fileName + "\"";
+#else
+                string cmd = "mv \"";
+                cmd = cmd + tmpFileName + "\" \"";
+                cmd = cmd + dataset->cache_fileName + "\"";
+#endif
+                if(system(cmd.c_str()) != 0){
+                    cerr<<"rename cahe file name failed!"<<endl;
+                    exit(0);
+                }
                 //load cache file
                 dataset->reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
                 if (dataset->reader->OpenReading() == false){
