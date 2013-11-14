@@ -6,4 +6,5 @@ cscope.*
 tags
 test
 *tmp*
+*.log
 exp/result

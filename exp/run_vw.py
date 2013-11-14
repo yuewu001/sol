@@ -53,7 +53,7 @@ if len(sys.argv) < 4:
 
 dst_folder = sys.argv[1]
 
-extra_cmd = ' --passes 5 --sgd --binary --loss_function=logistic --readable_model %s' %rd_model_file + ' -f %s' %model_file
+extra_cmd = ' --sgd --binary --loss_function=logistic --readable_model %s' %rd_model_file + ' -f %s' %model_file
 trainfile = sys.argv[2]
 cache_train = sys.argv[3]
 

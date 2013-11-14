@@ -77,7 +77,7 @@ figure(3) %learning time
 title('training time vs sparsity', 'fontsize',14)
 ylabel('training time (s)', 'fontsize',14)
 xlabel('sparsity (%)', 'fontsize',14)
-%axis([0 100 0 10])
+axis([0 100 0 2])
 legend(legend_content,'location','northeast')
 print(strcat(folder_name,'time_sparse.svg'),'-dsvg')
 %close all

@@ -2,9 +2,9 @@ import os
 import sys
 
 opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW', 'vw']
-#opt_list = ['SSAROW', 'ASAROW']
-dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
-#dataset_list = ['news']
+#opt_list = ['ASAROW']
+#dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
+dataset_list = ['rcv1']
 
 rootDir = '/home/matthew/work/Data/'
 
@@ -102,7 +102,6 @@ for dataset in dataset_list:
                     cmd += ' -eta 100'
                 else:
                     cmd += ' -eta 1'
-            cmd += ' -passes 5'
     
             cmd += cmd_data
             os.system(cmd)
