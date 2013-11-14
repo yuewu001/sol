@@ -23,6 +23,7 @@ all:$(TARGET)
 $(TARGET):main.o $(OBJS)
 	g++ $^ -o $@ $(LDFLAGS)
 
+main.o: main.cpp optimizer/STG.h optimizer/Optimizer.h
 %.o:%.cpp
 	g++ $< -o $@ $(CFLAGS)
 

@@ -160,6 +160,8 @@ namespace SOL {
 			for (size_t i = 0; i < chunk.dataNum; i++) {
 				this->curIterNum++;
 
+                this->eta = this->eta0 / std::sqrt(this->curIterNum);
+
 				const DataPoint<FeatType, LabelType> &data = chunk.data[i];
 				this->UpdateWeightSize(data.dim());
 				float y = this->UpdateWeightVec(data); 

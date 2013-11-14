@@ -39,13 +39,16 @@ for k = 1:1:opt_num
     color_shape = strcat(color_shape, shape_list{1,cur_shape_index});
     figure(1)
     hold on
-    plot(sparse_vec, l_err_vec, color_shape, 'LineWidth',1,'markersize',3);
+    plot(sparse_vec, l_err_vec, color_shape,
+    'LineWidth',2,'markersize',5);
     figure(2)
     hold on
-    plot(sparse_vec, t_err_vec, color_shape, 'LineWidth',1,'markersize',3);
+    plot(sparse_vec, t_err_vec, color_shape,
+    'LineWidth',2,'markersize',5);
     figure(3)
     hold on
-    plot(sparse_vec, l_time_vec, color_shape, 'LineWidth',1,'markersize',3);
+    plot(sparse_vec, l_time_vec, color_shape,
+    'LineWidth',2,'markersize',5);
 
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -63,14 +66,14 @@ figure(1) %learning error rate
 title('learing error rate vs sparsity', 'fontsize',14)
 ylabel('learning error rate (%)', 'fontsize',14)
 xlabel('sparsity (%)', 'fontsize',14)
-axis([0 100 ymin ymax])
+axis([60 100 ymin ymax])
 legend(legend_content,0)
 print(strcat(folder_name,'learn_sparse.svg'),'-dsvg')
 figure(2) %test error rate
 title('test error rate vs sparsity', 'fontsize',14)
 ylabel('test error rate (%)', 'fontsize',14)
 xlabel('sparsity (%)', 'fontsize',14)
-axis([0 100 ymin ymax])
+axis([20 100 ymin ymax])
 legend(legend_content,0)
 print(strcat(folder_name,'test_sparse.svg'),'-dsvg')
 figure(3) %learning time

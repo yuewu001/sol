@@ -17,7 +17,7 @@ namespace SOL
     //value to be determined
     static const float init_tbd = 1e10;
 	//learning rate
-	static const float init_eta = 0.01;
+	static const float init_eta = 10;
 	//l1 regularization
 	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
