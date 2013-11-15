@@ -8,8 +8,8 @@
 \section{Confidence-Weighted Learning}
 The main idea of Confidence-Weighted algorithms is to assume a Guassian distribution 
 of the linear classifier $\omega\sim N(\bm{\mu},\Sigma)$. Each update
-tries to stay close to the previous distrbution and ensure the
-probability of the current precition for $\bm{x}_i$ is larger than
+tries to stay close to the previous distribution and ensure the
+probability of the current precision for $\bm{x}_i$ is larger than
 $\eta$.
 \begin{equation}
   \begin{aligned}
@@ -19,12 +19,25 @@ $\eta$.
   \label{equ:01}
 \end{equation}
 
+\section{Problem Formulation}
+$$\min_\omega{f(\omega) + r(\omega)}$$
+$f(\omega)$: instead of ensure the probability is larger than .., we
+are maximizing the probability
+
+$r(\omega)$: confidence-weighted regularization
+
+
 This constraint can be formulated with a loss function  so that:
 \begin{equation}
   l(N(\bm{\mu},\Sigma);(\bm{x}_t,y_t)) = max (0,
   \phi\sqrt{\bm{x}_t^T\Sigma\bm{x}_t}) = 0
   \label{equ:02}
 \end{equation}
+
+\section{Solution}
+Search for non-deferential points. 
+
+FOBOS
 
 Typical Confidence-Weighted learning algorithms (CW, AROW, SCW) take
 different approaches to the above constraint. CW release the above
@@ -87,5 +100,10 @@ The final updating rule goes to:
   [|u_{t,j} - \eta_t\Sigma_{jj}g_{t,j}^f)| - \eta_t\lambda\Sigma_{jj}]
   \label{equ:05}
 \end{equation}
+
+\section{Experimental results}
+\subsection{test error rate vs sparsity}
+\subsection{convergence rate vs sparsity}
+\subsection{training time comparison}
 
 \end{document}
