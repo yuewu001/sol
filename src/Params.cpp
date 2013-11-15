@@ -52,33 +52,33 @@ namespace SOL {
             else if (strcmp(args[i],"-tc") == 0 && i + 1 < argc)
                 this->test_cache_fileName = args[i + 1];
             else if (strcmp(args[i],"-passes") == 0 && i + 1 < argc)
-                this->passNum = atoi(args[i+1]);
+                this->passNum = strtol(args[i+1], NULL, 10);
             else if (strcmp(args[i],"-l1") == 0 && i + 1 < argc)
-                this->lambda = atof(args[i + 1]);
+                this->lambda = strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-k") == 0 && i + 1 < argc)
-                this->K = atoi(args[i + 1]);
+                this->K = strtol(args[i + 1], NULL, 10);
             else if (strcmp(args[i],"-lbp") == 0)
                 this->is_learn_best_param = true;
             else if (strcmp(args[i],"-eta") == 0 && i + 1 < argc)
-                this->eta = atof(args[i+1]);
+                this->eta = strtod(args[i+1], NULL);
             else if (strcmp(args[i], "-t0") == 0 && i + 1 < argc)
-                this->initial_t = atoi(args[i+1]);
+                this->initial_t = strtol(args[i+1], NULL, 10);
             else if (strcmp(args[i], "-power_t") == 0 && i + 1 < argc)
-                this->power_t = atof(args[i+1]);
+                this->power_t = strtod(args[i+1], NULL);
             else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
-                this->r = atof(args[i+1]);
+                this->r = strtod(args[i+1], NULL);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
-                this->delta = atof(args[i + 1]);
+                this->delta = strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-opt") == 0 && i + 1 < argc) //opti method
                 this->ParseOptiMethod(args[i+1]);
             else if (strcmp(args[i],"-dt") == 0 && i + 1 < argc) //data type
                 this->ParseDataType(args[i + 1]);
             else if (strcmp(args[i],"-bs") == 0 && i + 1 < argc)
-                this->buf_size = atoi(args[i+1]);
+                this->buf_size = strtol(args[i+1], NULL, 10);
             else if(strcmp(args[i],"-loss") == 0 && i + 1 < argc)
                 this->loss_type = this->GetLossType(args[i+1]);
             else if (strcmp(args[i],"-grou") == 0 && i + 1 < argc)
-                this->gamma_rou = atof(args[i + 1]);
+                this->gamma_rou = strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else

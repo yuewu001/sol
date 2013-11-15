@@ -40,6 +40,7 @@ namespace SOL {
 
 		//reset
 		virtual void BeginTrain();
+        virtual void EndTrain();
 
 	protected:
 		size_t *timeStamp;
@@ -71,23 +72,26 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	float FOBOS<FeatType,LabelType>::UpdateWeightVec (
             const DataPoint<FeatType, LabelType> &x) {
-		float y = this->Predict(x);
 		size_t featDim = x.indexes.size();
+        float y = this->Predict(x);
 		float gt_i = this->eta * this->lossFunc->GetGradient(x.label,y);
 
         IndexType index_i = 0;
         float alpha = this->eta * this->lambda;
+        size_t stepK = 0;
         for (size_t i = 0; i < featDim; i++) {
             index_i = x.indexes[i];
             //update the weight
             this->weightVec[index_i] -= gt_i * x.features[i];
+
 			//lazy update
-            int stepK = this->curIterNum - this->timeStamp[index_i];
+            stepK = this->curIterNum - this->timeStamp[index_i];
             this->timeStamp[index_i] = this->curIterNum;
 
             this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
                     stepK * alpha);
         }
+
 		//update bias term
 		this->weightVec[0] -= gt_i;
 
@@ -137,6 +141,18 @@ namespace SOL {
 		//reset time stamp
 		memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
 	}
+
+    //called when a train ends
+    template <typename FeatType, typename LabelType>
+        void FOBOS<FeatType, LabelType>::EndTrain() {
+            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
+                //truncated gradient
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+                        stepK * this->eta * this->lambda);
+            }
+            Optimizer<FeatType, LabelType>::EndTrain();
+        }
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>

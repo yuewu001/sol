@@ -71,20 +71,20 @@ namespace SOL {
         float RDA_L1<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
-            size_t index_i = 0;
+            IndexType index_i = 0;
             //obtain w_t
-            float coeff1 = std::sqrt(this->curIterNum - 1);
-            float coeff = -this->eta0 / coeff1;
-            float lambda_t = this->lambda * (this->curIterNum - 1);
+            float lambda_t = this->lambda * this->curIterNum;
             if (this->gamma_rou > 0){
-                lambda_t += this->gamma_rou * coeff1;
+                lambda_t += this->gamma_rou * this->eta_coeff_time;
             }
 
             for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
-                this->weightVec[index_i] = coeff * 
+                this->weightVec[index_i] = -this->eta * 
                     trunc_weight(this->gtVec[index_i],lambda_t);
             }
+            //bias
+            this->weightVec[0] = -this->eta * this->gtVec[0];
 
             //predict
             float y = this->Predict(x);
@@ -93,10 +93,8 @@ namespace SOL {
             //update the coeffs
             for (size_t i = 0; i < featDim; i++)
                 this->gtVec[x.indexes[i]] += gt_i * x.features[i];
-
             //bias term
             this->gtVec[0] += gt_i;
-            this->weightVec[0] = -this->eta0  * this->gtVec[0] / std::sqrt((float)this->curIterNum);
 
             return y;
         }
@@ -106,13 +104,19 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         void RDA_L1<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
+
             memset(this->gtVec, 0, sizeof(float) * this->weightDim);
+
+            if (this->power_t != 0.5){
+                cerr<<"RDA only support a power t of 0.5!"<<endl;
+                exit(1);
+            }
         }
 
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void RDA_L1<FeatType, LabelType>::EndTrain() {
-            if (this->curIterNum == 0)
+            if (this->curIterNum == 1)
                 return;
             float coeff1 = std::sqrt(this->curIterNum);
             float coeff = -this->eta0 / coeff1;
@@ -124,6 +128,8 @@ namespace SOL {
                 this->weightVec[index_i] = coeff * trunc_weight(this->gtVec[index_i],
                         lambda_t);
             }
+            //bias
+            this->weightVec[0] = coeff * this->gtVec[0];
 
             Optimizer<FeatType, LabelType>::EndTrain();
         }

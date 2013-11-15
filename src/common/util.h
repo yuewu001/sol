@@ -6,6 +6,8 @@
  ************************************************************************/
 #pragma once
 
+#include "init_param.h"
+
 #include <cstring>
 #include <numeric>
 #include <math.h>

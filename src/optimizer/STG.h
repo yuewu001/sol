@@ -64,36 +64,34 @@ namespace SOL {
     //this is the core of different updating algorithms
     //return the predict
     template <typename FeatType, typename LabelType>
-        float STG<FeatType,LabelType>::UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) {
-            float y = this->Predict(x);
+        float STG<FeatType,LabelType>::UpdateWeightVec(
+                const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
+            float alpha = this->eta * this->lambda;
+            float y = this->Predict(x); 
             float gt_i = this->lossFunc->GetGradient(x.label,y) * this->eta;
 
-            float alpha = this->eta * this->lambda;
             size_t stepK = 0;
-
             for (size_t i = 0; i < featDim; i++) {
                 IndexType index_i = x.indexes[i];
                 //update the weight
-                float& p_weight = this->weightVec[index_i];
-                size_t & p_stamp = this->timeStamp[index_i];
-                p_weight -= gt_i * x.features[i];
+                this->weightVec[index_i] -= gt_i * x.features[i];
 
-                //lazy update
+                //lazy update the weight
                 //truncated gradient
-                if (p_stamp == 0) {
-                    p_stamp = this->curIterNum;
+                if (this->timeStamp[index_i] == 0) {
+                    this->timeStamp[index_i] = this->curIterNum;
                     continue;
                 }
                 else{
-                    stepK = this->curIterNum - p_stamp;
+                    stepK = this->curIterNum - this->timeStamp[index_i];
                     stepK -= stepK % this->K;
-                    p_stamp += stepK;
+                    this->timeStamp[index_i] += stepK;
                 }
 
-                p_weight = trunc_weight(p_weight,stepK * alpha);
+                this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+                        stepK * alpha);
             }
-
             //bias term
             this->weightVec[0] -= gt_i;
             return y;

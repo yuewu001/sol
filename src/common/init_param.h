@@ -23,11 +23,11 @@ namespace SOL
     //pow decaying learing rate
     static const float init_power_t = 0.5;
     //initial t
-    static const size_t init_initial_t = 0;
+    static const size_t init_initial_t = 1;
 	//l1 regularization
 	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
-	static const float init_sparse_soft_thresh = 1e-6;
+	static const float init_sparse_soft_thresh = 1e-5;
 	//truncate gradients every K steps
 	static const int init_k = 10;
 	//gammarou in enchanced RDA

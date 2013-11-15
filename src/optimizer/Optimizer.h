@@ -29,6 +29,7 @@ namespace SOL {
 		float lambda;
 		float eta0; //learning rate
         float eta;
+        float eta_coeff_time; //coeff of eta with time (1/sqrt(t) for instance)
 
 		DataSet<FeatType, LabelType> &dataSet;
 
@@ -109,21 +110,21 @@ namespace SOL {
 		virtual void UpdateWeightSize(IndexType newDim);
 
     protected:
-        float (*pEta)(float eff, size_t t, float pt);
+        float (*pEta_time)(size_t t, float pt);
     };
     
     //calculate learning rate
-    inline float pEta_general(float eff, size_t t, float pt){
-        return eff * std::pow(t,pt);
+    inline float pEta_general(size_t t, float pt){
+        return std::pow(t,pt);
     }
-    inline float pEta_sqrt(float eff, size_t t, float pt){
-        return eff / std::sqrt(t);
+    inline float pEta_sqrt(size_t t, float pt){
+        return std::sqrt(t);
     }
-    inline float pEta_linear(float eff, size_t t, float pt){
-        return eff / t;
+    inline float pEta_linear(size_t t, float pt){
+        return t;
     }
-    inline float pEta_const(float eff, size_t, float pt){
-        return eff;
+    inline float pEta_const(size_t t, float pt){
+        return 1;
     }
 
     template <typename FeatType, typename LabelType>
@@ -137,7 +138,7 @@ namespace SOL {
             this->eta0 = init_eta;;
             this->lambda = init_lambda;
             this->curIterNum = 0;
-            this->initial_t = 0;
+            this->initial_t = init_initial_t;
             this->power_t = init_power_t;
 
             this->sparse_soft_thresh = init_sparse_soft_thresh;
@@ -149,16 +150,15 @@ namespace SOL {
             //reset weight vector
             memset(this->weightVec,0,sizeof(float ) * this->weightDim);
             this->curIterNum = this->initial_t;
-            this->eta = this->eta0;
 
             if (this->power_t == 0.5)
-                this->pEta = pEta_sqrt;
+                this->pEta_time = pEta_sqrt;
             else if(this->power_t == 0)
-                this->pEta = pEta_const;
+                this->pEta_time = pEta_const;
             else if (this->power_t == 1)
-                this->pEta = pEta_linear;
+                this->pEta_time = pEta_linear;
             else
-                this->pEta = pEta_general;
+                this->pEta_time = pEta_general;
         }
 
     //called when a train ends
@@ -190,9 +190,9 @@ namespace SOL {
                     break;
 
                 for (size_t i = 0; i < chunk.dataNum; i++) {
-                    this->curIterNum++;
 
-                    this->eta = this->pEta(this->eta0, this->curIterNum, this->power_t);
+                    this->eta_coeff_time = this->pEta_time(this->curIterNum, this->power_t);
+                    this->eta = this->eta0 / this->eta_coeff_time;
 
                     const DataPoint<FeatType, LabelType> &data = chunk.data[i];
                     this->UpdateWeightSize(data.dim());
@@ -207,6 +207,7 @@ namespace SOL {
                         show_step *= 2;
                         show_count = show_step;
                     }
+                    this->curIterNum++;
                 }
                 dataSet.FinishRead();
             }
@@ -341,7 +342,7 @@ namespace SOL {
                 float power_t,  size_t t0 ){
             this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->eta0 = eta0 > 0 ? eta0 : this->eta0;
-            this->power_t = power_t > 0 ? power_t : this->power_t;
+            this->power_t = power_t >= 0 ? power_t : this->power_t;
             this->initial_t = t0 > 0 ? t0: this->initial_t;
         }
 

@@ -66,7 +66,7 @@ figure(1) %learning error rate
 title('learing error rate vs sparsity', 'fontsize',14)
 ylabel('learning error rate (%)', 'fontsize',14)
 xlabel('sparsity (%)', 'fontsize',14)
-axis([60 100 ymin ymax])
+axis([20 100 ymin ymax])
 legend(legend_content,0)
 print(strcat(folder_name,'learn_sparse.svg'),'-dsvg')
 figure(2) %test error rate

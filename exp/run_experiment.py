@@ -39,9 +39,9 @@ cmd_prefix = exe_name + extra_cmd + ' -opt %s' %opt_name
 cmd_postfix = ' >> %s' %result_file
 
 #learn the best parameter
-if is_best_param == True:
-    best_eta = best_param(extra_cmd, opt_name) 
-    cmd_prefix += ' -eta %e' %best_eta
+#if is_best_param == True:
+#    best_eta = best_param(extra_cmd, opt_name) 
+#    cmd_prefix += ' -eta %e' %best_eta
 
 if opt_name == 'ASAROW':
     temp_list = extra_cmd.split()

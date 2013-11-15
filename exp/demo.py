@@ -1,8 +1,8 @@
 import os
 import sys
 
-#opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW', 'vw']
-opt_list = ['STG','vw']
+opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW', 'vw']
+#opt_list = ['STG','vw']
 #dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
 dataset_list = ['rcv1']
 
@@ -97,12 +97,6 @@ for dataset in dataset_list:
     
         else:
             cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder
-            if dataset == 'rcv1':
-                if opt == 'RDA': 
-                    cmd += ' -eta 100'
-                else:
-                    cmd += ' -eta 10'
-    
             cmd += cmd_data
             os.system(cmd)
     
