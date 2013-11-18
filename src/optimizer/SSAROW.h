@@ -99,7 +99,7 @@ namespace SOL {
 
                     this->weightVec[index_i]= 
                         trunc_weight(this->weightVec[index_i],
-                                stepK * this->lambda * this->sigma_w[index_i]);
+                                stepK * alpha_t * this->lambda * this->sigma_w[index_i]);
                 }
 
                 //bias term

@@ -185,7 +185,7 @@ namespace SOL {
 
         cout<<"Algorithms and Parameters: \n";
         cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW\n";
-        cout<<"-lbp      :\t learn best parameter\n";
+        cout<<"\t-lbp    :\t learn best parameter\n";
         cout<<"\t-eta arg:\t learning rate\n";
         cout<<"\t-power_t arg:\tpower t of decaying learing rate\n";
         cout<<"\t-t0 arg:\t initial iteration number\n";
