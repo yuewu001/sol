@@ -25,7 +25,7 @@ namespace SOL {
                 s_array<IndexType> indexes;
                 s_array<FeatType> features;
                 LabelType label;
-                FeatType sum_sq; //sum of square
+                //FeatType sum_sq; //sum of square
 
                 //for copy and release control
                 int *count;
@@ -44,7 +44,7 @@ namespace SOL {
                     this->label = point.label;
                     this->count = point.count;
                     this->max_index = 0;
-                    this->sum_sq = 0;
+                    //this->sum_sq = 0;
                     ++(*count);
                 }
 
@@ -73,14 +73,14 @@ namespace SOL {
                     if(this->max_index <= index){
                         this->max_index = index;
                     }
-                    this->sum_sq += feat * feat;
+                    //this->sum_sq += feat * feat;
                 }
 
                 void erase() {
                     this->indexes.erase();
                     this->features.erase();
                     this->max_index = 0;
-                    this->sum_sq = 0;
+                    //this->sum_sq = 0;
                 }
 
                 IndexType dim() const {return this->max_index;}
