@@ -180,7 +180,7 @@ namespace SOL {
             this->BeginTrain();
             float errorNum(0);
             size_t show_step = 1; //show information every show_step
-            size_t show_count = 3;
+            size_t show_count = 2;
 
             printf("Iterate No.\t\tError Rate\t\t\n");
             while(1) {
@@ -200,12 +200,11 @@ namespace SOL {
                     //loss
                     if (this->lossFunc->IsCorrect(data.label,y) == false)
                         errorNum++;
-                    show_count--;
-                    if (show_count == 0){
+
+                    if (show_count == this->curIterNum){
                         printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
                                 errorNum / (float)(this->curIterNum));
-                        show_step *= 2;
-                        show_count = show_step;
+                        show_count = (1 << ++show_step);
                     }
                     this->curIterNum++;
                 }
