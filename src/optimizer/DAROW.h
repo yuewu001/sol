@@ -83,20 +83,23 @@ namespace SOL {
 
             IndexType index_i = 0;
             //y /= this->curIterNum;
+            //calculate beta_t
+            
             float alpha_t = 1 - x.label * y;
             if(alpha_t > 0){
                 alpha_t *= beta_t; 
-
                 for (size_t i = 0; i < featDim; i++){
                     index_i = x.indexes[i];
                     //update u_t
-                    this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
+                    this->weightVec[index_i] += alpha_t * 
+                        this->sigma_w[index_i] * x.label * x.features[i];
                 }
 
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
             }
+            //update sigma_w
             for(size_t i = 0; i < featDim; i++){
                 index_i = x.indexes[i];
                 //L1 lazy update
@@ -110,6 +113,7 @@ namespace SOL {
                     this->sigma_w[index_i] * this->sigma_w[index_i] * 
                     x.features[i] * x.features[i];
             }
+
             return y;
         }
     //reset the optimizer to this initialization
@@ -125,6 +129,7 @@ namespace SOL {
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void DAROW<FeatType, LabelType>::EndTrain() {
+            float temp_beta = this->eta * this->lambda;
             for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
                 //L1 lazy update
                 size_t stepK = this->curIterNum - this->timeStamp[index_i];
