@@ -127,7 +127,7 @@ namespace SOL{
             s = -1; p++;
         }
 
-        unsigned int acc = 0;
+        int acc = 0;
         while (*p >= '0' && *p <= '9')
             acc = acc * 10 + *p++ - '0';
 
@@ -155,7 +155,7 @@ namespace SOL{
         if (is_space(p) == true){//easy case succeeded.
             exp_acc -= num_dec;
             *end = p;
-            return s * acc* powf(10.f,(float)exp_acc);
+            return s * acc * powf(10.f,exp_acc);
         }
         else
             return 0;

@@ -73,41 +73,51 @@ namespace SOL {
             float y = this->Predict(x);
             //y /= this->curIterNum;
             float alpha_t = 1 - x.label * y;
-            if(alpha_t > 0){
-                size_t featDim = x.indexes.size();
-                //calculate beta_t
-                float beta_t = this->r;
-                for (size_t i = 0; i < featDim; i++){
-                    beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
-                }
-                beta_t = 1.0 / beta_t;
-                alpha_t *= beta_t; 
+            size_t featDim = x.indexes.size();
+            //calculate beta_t
+            float beta_t = this->r;
+            for (size_t i = 0; i < featDim; i++){
+                beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+            }
+            beta_t = 1.0 / beta_t;
 
+            IndexType index_i = 0;
+            //update w_t
+            if(alpha_t > 0){
+                alpha_t *= beta_t; 
                 for (size_t i = 0; i < featDim; i++){
-                    IndexType index_i = x.indexes[i];
+                    index_i = x.indexes[i];
                     //update u_t
                     this->weightVec[index_i] += alpha_t * 
                         this->sigma_w[index_i] * x.label * x.features[i];
-                    //update sigma_w
-                    this->sigma_w[index_i] -= beta_t * 
-                        this->sigma_w[index_i] * this->sigma_w[index_i] * 
-                        x.features[i] * x.features[i];
-
-                    //L1 lazy update
-                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                    this->timeStamp[index_i] = this->curIterNum;
-
-                    this->weightVec[index_i]= 
-                        trunc_weight(this->weightVec[index_i],
-                                stepK * this->lambda * this->sigma_w[index_i]);
                 }
-
-                //bias term
-                this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
-                this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
             }
+
+            //update sigma_w
+            float temp_beta = beta_t * this->lambda / 2.f;
+            for(size_t i = 0; i < featDim; i++){
+                index_i = x.indexes[i];
+                //L1 lazy update
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                this->timeStamp[index_i] = this->curIterNum;
+
+                //a trick here: actually we should save all the beta_t for those not-occuring
+                //features
+                this->weightVec[index_i]= 
+                    trunc_weight(this->weightVec[index_i],
+                            stepK * temp_beta * this->sigma_w[index_i]);
+
+                this->sigma_w[index_i] -= beta_t * 
+                    this->sigma_w[index_i] * this->sigma_w[index_i] * 
+                    x.features[i] * x.features[i];
+            }
+
+            //bias term
+            this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
+            this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
             return y;
         }
+
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
         void SSAROW<FeatType, LabelType>::BeginTrain() {

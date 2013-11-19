@@ -26,6 +26,7 @@ namespace SOL {
                 float* sigma_w;
 
                 HeapList<float> heap;
+                vector<IndexType> kickout_list;
 
                 IndexType K; //keep top K elemetns
 
@@ -76,36 +77,46 @@ namespace SOL {
             float y = this->Predict(x);
             //y /= this->curIterNum;
             float alpha_t = 1 - x.label * y;
+            size_t featDim = x.indexes.size();
+            //calculate beta_t
+            float beta_t = this->r;
+            for (size_t i = 0; i < featDim; i++){
+                beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+            }
+            beta_t = 1.0 / beta_t;
+
+            this->kickout_list.clear();
+            IndexType index_i = 0;
             if(alpha_t > 0){
-                size_t featDim = x.indexes.size();
-                //calculate beta_t
-                float beta_t = this->r;
-                for (size_t i = 0; i < featDim; i++){
-                    beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
-                }
-                beta_t = 1.0 / beta_t;
                 alpha_t *= beta_t; 
-
                 for (size_t i = 0; i < featDim; i++){
-                    IndexType index_i = x.indexes[i];
-                    //update u_t
-                    this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
-                    //update sigma_w
-                    this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
-
-                    IndexType ret_id;
-                    if(this->heap.UpdateHeap(index_i - 1, ret_id) == true){
-                        assert(ret_id + 1 < this->weightDim);
-                        this->weightVec[ret_id + 1] = 0; 
+                    index_i = x.indexes[i];
+                    if (this->heap.is_topK(index_i - 1)){
+                        //update u_t
+                        this->weightVec[index_i] += alpha_t * 
+                            this->sigma_w[index_i] * x.label * x.features[i];
                     }
-                    //heap.Output(); 
+                    else{
+                        this->weightVec[index_i] = 0;
+                    }
                 }
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
             }
+            for (size_t i = 0; i < featDim; i++){
+                index_i = x.indexes[i];
+                //update sigma_w
+                this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
+
+                IndexType ret_id;
+                if (this->heap.UpdateHeap(index_i - 1, ret_id) == true){
+                }
+                //heap.Output(); 
+            }
             return y;
         }
+
     //reset the optimizer to this initialization
     template <typename FeatType, typename LabelType>
         void ASAROW<FeatType, LabelType>::BeginTrain() {

@@ -311,8 +311,6 @@ namespace SOL {
     //try and get the best parameter
     template <typename FeatType, typename LabelType>
         void Optimizer<FeatType, LabelType>::BestParameter() {
-            if (this->eta0 != init_tbd)
-                return;
             float prev_lambda = this->lambda;
             this->lambda = 0;
             //1. Select the best eta0

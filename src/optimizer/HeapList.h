@@ -17,7 +17,7 @@
 using namespace std;
 namespace SOL{
     template <typename T> class HeapList{
-        public:
+        private:
             IndexType *id2pos_map; //record the sorted position of each data
             IndexType *pos2id_map; //record the index of weight for each sorted position
 
@@ -29,6 +29,14 @@ namespace SOL{
         public:
             HeapList():id2pos_map(NULL), pos2id_map(NULL)
                        , K(0), data_num(0), value_list(NULL){}
+
+        public:
+            inline IndexType get_pos(IndexType id) const {
+                return this->id2pos_map[id];
+            }
+            inline bool is_topK(IndexType id) const {
+                return this->id2pos_map[id] < this->K; 
+            }
 
         private:
             /**
@@ -57,7 +65,7 @@ namespace SOL{
              * @Param init_value: initial values
              */
             bool Init(IndexType dataNum, IndexType topK, const T* init_value){
-                assert(topK > 0 && init_value != NULL);
+                //assert(topK > 0 && init_value != NULL);
                 this->release();
 
                 try{
@@ -93,7 +101,7 @@ namespace SOL{
              */
             bool Init(IndexType dataNum, IndexType topK, 
                     const IndexType* init_id, const T* init_value){
-                assert(topK > 0 && init_id != NULL && init_value != NULL);
+                //assert(topK > 0 && init_id != NULL && init_value != NULL);
                 this->release();
                 try{
                     this->pos2id_map = new IndexType[topK];
@@ -227,10 +235,7 @@ namespace SOL{
              * @Param m
              */
             void HeapAdjust(IndexType s, IndexType m){
-                if (s >= this->K){
-                    cout<<s<<endl;
-                }
-                assert(s >= 0 && s < this->K);
+                //assert(s >= 0 && s < this->K);
                 IndexType cur_id = this->pos2id_map[s];
                 T cur_val = this->value_list[cur_id];
 
