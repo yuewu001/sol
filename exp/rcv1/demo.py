@@ -1,8 +1,8 @@
 import os
 import sys
 
-opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-#opt_list = ['STG','vw']
+#opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
+opt_list = ['ASAROW']
 #dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
 dataset_list = ['rcv1']
 
@@ -100,6 +100,7 @@ for dataset in dataset_list:
             cmd += cmd_data
             os.system(cmd)
     
+    sys.exit()
     opt_list_file = './%s' %dst_folder + '/opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()

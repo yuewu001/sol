@@ -68,8 +68,10 @@ namespace SOL {
                 const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
             float alpha = this->eta * this->lambda;
+
             float y = this->Predict(x); 
             float gt_i = this->lossFunc->GetGradient(x.label,y) * this->eta;
+
 
             size_t stepK = 0;
             for (size_t i = 0; i < featDim; i++) {
@@ -114,11 +116,8 @@ namespace SOL {
                 size_t stepK = this->curIterNum - this->timeStamp[index_i];
                 stepK -= stepK % this->K;
 
-                if (stepK == 0)
-                    continue;
-
                 this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                        stepK * this->eta * this->lambda);
+                        stepK * this->lambda * this->eta);
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }

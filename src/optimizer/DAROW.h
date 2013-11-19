@@ -104,13 +104,11 @@ namespace SOL {
                 this->timeStamp[index_i] = this->curIterNum;
 
                 this->weightVec[index_i]= 
-                    trunc_weight(this->weightVec[index_i],stepK * this->lambda);
+                    trunc_weight(this->weightVec[index_i],stepK * temp_beta);
                 //update sigma_w
                 this->sigma_w[index_i] -= beta_t * 
                     this->sigma_w[index_i] * this->sigma_w[index_i] * 
                     x.features[i] * x.features[i];
-
-
             }
             return y;
         }

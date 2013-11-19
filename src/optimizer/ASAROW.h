@@ -110,8 +110,7 @@ namespace SOL {
                 this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
 
                 IndexType ret_id;
-                if (this->heap.UpdateHeap(index_i - 1, ret_id) == true){
-                }
+                this->heap.UpdateHeap(index_i - 1, ret_id); 
                 //heap.Output(); 
             }
             return y;

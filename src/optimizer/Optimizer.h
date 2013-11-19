@@ -166,7 +166,7 @@ namespace SOL {
         void Optimizer<FeatType, LabelType>::EndTrain() {
             for (IndexType i = 1; i < this->weightDim; i++){
                 if (this->weightVec[i] < this->sparse_soft_thresh && 
-                        this->weightVec[i] > -this->sparse_soft_thresh ){
+                        this->weightVec[i] > - this->sparse_soft_thresh ){
                     this->weightVec[i] = 0;
                 }
             }
