@@ -80,6 +80,8 @@ namespace SOL {
                 beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
             }
             beta_t = 1.0 / beta_t;
+            this->eta = beta_t / 2.f;
+            float temp_beta = beta_t * this->lambda / 2.f;
 
             IndexType index_i = 0;
             //update w_t
@@ -91,10 +93,11 @@ namespace SOL {
                     this->weightVec[index_i] += alpha_t * 
                         this->sigma_w[index_i] * x.label * x.features[i];
                 }
-            }
+                //bias term
+                this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
+                this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
 
-            //update sigma_w
-            float temp_beta = beta_t * this->lambda / 2.f;
+            }
             for(size_t i = 0; i < featDim; i++){
                 index_i = x.indexes[i];
                 //L1 lazy update
@@ -107,14 +110,12 @@ namespace SOL {
                     trunc_weight(this->weightVec[index_i],
                             stepK * temp_beta * this->sigma_w[index_i]);
 
+                //update sigma_w
                 this->sigma_w[index_i] -= beta_t * 
                     this->sigma_w[index_i] * this->sigma_w[index_i] * 
                     x.features[i] * x.features[i];
-            }
 
-            //bias term
-            this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
-            this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
+            }
             return y;
         }
 

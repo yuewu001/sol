@@ -70,37 +70,47 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float DAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
+            size_t featDim = x.indexes.size();
             float y = this->Predict(x);
+            //calculate beta_t
+            float beta_t = this->r;
+            for (size_t i = 0; i < featDim; i++){
+                beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+            }
+            beta_t = 1.0 / beta_t;
+            this->eta = beta_t / 2.f;
+            float temp_beta = beta_t * this->lambda / 2.f;
+
+            IndexType index_i = 0;
             //y /= this->curIterNum;
             float alpha_t = 1 - x.label * y;
             if(alpha_t > 0){
-                size_t featDim = x.indexes.size();
-                //calculate beta_t
-                float beta_t = this->r;
-                for (size_t i = 0; i < featDim; i++){
-                    beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
-                }
-                beta_t = 1.0 / beta_t;
                 alpha_t *= beta_t; 
 
                 for (size_t i = 0; i < featDim; i++){
-                    IndexType index_i = x.indexes[i];
+                    index_i = x.indexes[i];
                     //update u_t
                     this->weightVec[index_i] += alpha_t * this->sigma_w[index_i] * x.label * x.features[i];
-                    //update sigma_w
-                    this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
-
-                    //L1 lazy update
-                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                    this->timeStamp[index_i] = this->curIterNum;
-
-                    this->weightVec[index_i]= 
-                        trunc_weight(this->weightVec[index_i],stepK * this->lambda);
                 }
 
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
+            }
+            for(size_t i = 0; i < featDim; i++){
+                index_i = x.indexes[i];
+                //L1 lazy update
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                this->timeStamp[index_i] = this->curIterNum;
+
+                this->weightVec[index_i]= 
+                    trunc_weight(this->weightVec[index_i],stepK * this->lambda);
+                //update sigma_w
+                this->sigma_w[index_i] -= beta_t * 
+                    this->sigma_w[index_i] * this->sigma_w[index_i] * 
+                    x.features[i] * x.features[i];
+
+
             }
             return y;
         }
@@ -114,18 +124,18 @@ namespace SOL {
                 this->sigma_w[i] = 1;
         }
 
-		//called when a train ends
+    //called when a train ends
     template <typename FeatType, typename LabelType>
         void DAROW<FeatType, LabelType>::EndTrain() {
             for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
-                    //L1 lazy update
-                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                    if (stepK == 0)
-                        continue;
-                    this->timeStamp[index_i] = this->curIterNum;
+                //L1 lazy update
+                size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                if (stepK == 0)
+                    continue;
+                this->timeStamp[index_i] = this->curIterNum;
 
-                    this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                            stepK * this->lambda);
+                this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+                        stepK * this->lambda);
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
