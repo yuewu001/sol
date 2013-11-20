@@ -238,7 +238,6 @@ namespace SOL {
 				}
 				else{ //no available data 
 					if (this->load_finished == true){
-						cout<<"load finished!"<<endl;
 						this->rd_ptr->is_parsed = false;
 						this->rd_ptr->erase();
 						mutex_unlock(&this->data_lock);
