@@ -75,7 +75,7 @@ namespace SOL {
                     labelVal = (LabelType)parseInt(p,&endptr);
                     if (endptr == p) {
                         fprintf(stderr, "parse label failed.\n");
-                        exit(0);
+						return false;
                     }
 
                     data.erase();

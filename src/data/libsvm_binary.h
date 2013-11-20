@@ -40,6 +40,9 @@ namespace SOL {
                 ~libsvm_binary_() {
                     this->Close();
                 }
+				const std::string& get_filename() const {
+					return this->fileName;
+				}
 
                 //////////////////online mode//////////////////
             public:

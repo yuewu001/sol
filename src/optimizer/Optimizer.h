@@ -173,7 +173,7 @@ namespace SOL {
     template <typename FeatType, typename LabelType> 
         float Optimizer<FeatType, LabelType>::Train() {
             if(dataSet.Rewind() == false)
-                exit(0);
+				return 1.f;
             //reset
             this->BeginTrain();
             float errorNum(0);
@@ -184,8 +184,10 @@ namespace SOL {
             while(1) {
                 const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
                 //all the data has been processed!
-                if(chunk.dataNum  == 0) 
+                if(chunk.dataNum  == 0) {
+					cout<<"train: chunk size is zero!"<<endl;
                     break;
+				}
 
                 for (size_t i = 0; i < chunk.dataNum; i++) {
 
@@ -246,7 +248,7 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
             if(testSet.Rewind() == false)
-                exit(0);
+				return 1.f;
             float errorRate(0);
             //test
             while(1) {

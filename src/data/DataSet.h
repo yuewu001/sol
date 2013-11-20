@@ -92,8 +92,8 @@ namespace SOL {
 
         private:
             bool CreateBuffer(int buf_size = 0) {
-                this->bufSize = buf_size > 0 ? buf_size : init_buf_size;
                 this->ReleaseBuffer();
+                this->bufSize = buf_size > 0 ? buf_size : init_buf_size;
                 if (this->bufSize <= 0)
                     return true;
 
@@ -145,6 +145,7 @@ namespace SOL {
             } 
 
         public:
+			template <typename T1, typename T2> friend bool CacheLoad(DataSet<T1, T2> *dataset);
 #if WIN32
             template <typename T1, typename T2> friend DWORD WINAPI thread_LoadData(LPVOID param);
 #else
@@ -189,62 +190,115 @@ namespace SOL {
 
             /////////////Data Access/////////////////////
         public:
-            //get the data to read
-            inline const DataChunk<FeatType, LabelType>& GetChunk() {
-                mutex_lock(&this->data_lock);
 
-                //check if there is available data
-                if (this->curChunkNum <= 0) {//no available data 
-                    //suspend the current thread
-                    if (this->load_finished == false) {
-                        condition_variable_wait(&this->data_available,&this->data_lock);
-                        mutex_unlock(&this->data_lock);
-                        return this->GetChunk();
-                    }
-                    else {
-                        this->rd_ptr->erase();
-                        mutex_unlock(&this->data_lock);
-                        return *this->rd_ptr; //return an invalid data
-                    }
-                }
-                DataChunk<FeatType,LabelType> &chunk = *(this->rd_ptr);
-                //notice to conitnue to read
-                mutex_unlock(&this->data_lock);
+			//get the next write chunk
+			inline DataChunk<FeatType, LabelType> &GetWriteChunk(){
+				mutex_lock(&this->data_lock); 
+				if (this->wt_ptr->is_inuse == false){
+					if(this->wt_ptr->is_parsed == true){
+						cout<<"error occured, chunk is already parsed.."<<endl;
+						cerr<<"parsed = "<<this->wt_ptr->is_parsed
+							<<"\tin_use = "<<this->wt_ptr->is_inuse<<endl;
+						system("pause");
+					}
+					this->wt_ptr->is_inuse = true;
+					this->wt_ptr->is_loading = true;
+					DataChunk<FeatType, LabelType>* p = this->wt_ptr;
+					mutex_unlock(&this->data_lock);
+					return *p;
+				}
+				else{
+					condition_variable_wait(&this->buffer_full,&this->data_lock);
+					mutex_unlock(&this->data_lock);
+				}
+			}
 
-                return chunk;
-            }
+			inline void EndWriteChunk(){
+				mutex_lock(&this->data_lock);
+				this->wt_ptr->is_parsed = true;
+				this->wt_ptr->is_loading = false;
+				this->dataNum += this->wt_ptr->dataNum;
+				if (this->wt_ptr->dataNum == 0){
+					cout<<"chunk size is zero!"<<endl;
+					exit(0);
+				}
+				this->wt_ptr = this->wt_ptr->next;
+				condition_variable_signal_all(&this->data_available);
+				mutex_unlock(&this->data_lock);
+			}
 
-            void FinishRead() {
-                mutex_lock(&this->data_lock);
-                this->rd_ptr = this->rd_ptr->next;
-                this->curChunkNum--;
-                //notice that the last data have been processed
-                condition_variable_signal_all(&this->buffer_full);
-                mutex_unlock(&this->data_lock);
-            }
+			inline void FinishParse(){
+				//notice that the all the data has been loaded
+				mutex_lock(&this->data_lock);
+				this->load_finished = true;
+				this->is_on_loading = false;
+				mutex_unlock(&this->data_lock);
+				cout<<"finish parsing.."<<endl;
+			}
 
-            //the number of features
-            inline size_t size() const {return this->dataNum; }
-            bool Rewind() {
-                mutex_lock(&this->data_lock);
-                if (this->is_on_loading == true) {
-                    cout<<"data is on loading"<<endl;
-                    mutex_unlock(&this->data_lock);
-                    return false;
-                }
-                reader->Rewind();
-                this->ClearBuffer();
-                this->load_finished = false;
-                this->is_on_loading = true;
-                mutex_unlock(&this->data_lock);
+			//get the data to read
+			inline const DataChunk<FeatType, LabelType>& GetChunk() {
+				mutex_lock(&this->data_lock);
+				//check if there is available data
+				if (this->rd_ptr->is_parsed == true){
+					if(this->rd_ptr->is_loading == true){
+						cerr<<"error occured, chunk is on loading..."<<endl;
+						cerr<<"parsed = "<<this->rd_ptr->is_parsed
+							<<"\tin_use = "<<this->rd_ptr->is_inuse<<endl;
+						//exit(0);
+						system("pause");
+					}
+					this->rd_ptr->is_parsed = false;
+
+					mutex_unlock(&this->data_lock);
+					return *(this->rd_ptr);
+				}
+				else{ //no available data 
+					if (this->load_finished == true){
+						this->rd_ptr->is_parsed = false;
+						this->rd_ptr->erase();
+						mutex_unlock(&this->data_lock);
+						return *(this->rd_ptr); //return an invalid data
+					}
+					else{ //suspend the current thread
+						condition_variable_wait(&this->data_available,&this->data_lock);
+						mutex_unlock(&this->data_lock);
+						return this->GetChunk();
+					}
+				}
+			}
+
+			void FinishRead() {
+				mutex_lock(&this->data_lock);
+				this->rd_ptr->is_inuse = false;
+				//notice that the last data have been processed
+				this->rd_ptr = this->rd_ptr->next;
+				condition_variable_signal_all(&this->buffer_full);
+				mutex_unlock(&this->data_lock);
+			}
+
+			//the number of features
+			inline size_t size() const {return this->dataNum; }
+			bool Rewind() {
+				mutex_lock(&this->data_lock);
+				if (this->is_on_loading == true) {
+					cout<<"data is on loading"<<endl;
+					mutex_unlock(&this->data_lock);
+					return false;
+				}
+				reader->Rewind();
+				this->ClearBuffer();
+				this->load_finished = false;
+				this->is_on_loading = true;
+				mutex_unlock(&this->data_lock);
 
 #if WIN32
-                HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType,LabelType>), this, NULL, NULL);
+				HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType,LabelType>), this, NULL, NULL);
 #else
-                pthread_t thread;
-                pthread_create(&thread,NULL,thread_LoadData<FeatType,LabelType>,this);
+				pthread_t thread;
+				pthread_create(&thread,NULL,thread_LoadData<FeatType,LabelType>,this);
 #endif
-                return true;
-            }
-    };
+				return true;
+			}
+	};
 }
