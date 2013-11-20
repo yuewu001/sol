@@ -40,7 +40,7 @@ namespace SOL {
 
             protected:
                 float gamma_rou;
-                float * gtVec; //average gradient vector
+                s_array<float> gtVec; //average gradient vector
 
         };
 
@@ -55,7 +55,7 @@ namespace SOL {
                     this->id_str = "RDA";
                     this->gamma_rou = 0;
                 }
-                this->gtVec = new float[this->weightDim];
+				this->gtVec.resize(this->weightDim);
                 //initail_t should be no less than 1,for the safety of update at the first step
                 this->initial_t = this->initial_t < 1 ? 1 : this->initial_t;
             }
@@ -63,8 +63,6 @@ namespace SOL {
 
     template <typename FeatType, typename LabelType>
         RDA_L1<FeatType,LabelType>::~RDA_L1() {
-            if (this->gtVec != NULL)
-                delete []this->gtVec;
         }
 
     template <typename FeatType, typename LabelType>
@@ -105,8 +103,7 @@ namespace SOL {
         void RDA_L1<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
-            memset(this->gtVec, 0, sizeof(float) * this->weightDim);
-
+			this->gtVec.zeros();
             if (this->power_t != 0.5){
                 cerr<<"RDA only support a power t of 0.5!"<<endl;
                 exit(1);
@@ -118,7 +115,7 @@ namespace SOL {
         void RDA_L1<FeatType, LabelType>::EndTrain() {
             if (this->curIterNum == 1)
                 return;
-            float coeff1 = std::sqrt(this->curIterNum);
+            float coeff1 = sqrtf((float)(this->curIterNum));
             float coeff = -this->eta0 / coeff1;
             float lambda_t = this->lambda * (this->curIterNum);
             if (this->gamma_rou > 0){
@@ -146,16 +143,12 @@ namespace SOL {
             if (newDim < this->weightDim)
                 return;
             else {
-                newDim++;
-                float* newT = new float[newDim];
-                //copy info
-                memcpy(newT,this->gtVec,sizeof(float) * this->weightDim);
-                //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
-                delete []this->gtVec;
-                this->gtVec = newT;
+				this->gtVec.reserve(newDim + 1);
+				this->gtVec.resize(newDim + 1);
+				this->gtVec.zeros(this->gtVec.begin + this->weightDim, 
+					this->gtVec.end);
 
-                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
+                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
             }
         }
 

@@ -21,8 +21,8 @@ namespace SOL {
 	class DAROW: public Optimizer<FeatType, LabelType> {
         protected:
             float r;
-            float* sigma_w;
-            size_t* timeStamp;
+            s_array<float> sigma_w;
+            s_array<size_t> timeStamp;
 
         public:
             DAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -50,19 +50,15 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         DAROW<FeatType, LabelType>::DAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
-            Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
+            Optimizer<FeatType, LabelType>(dataset, lossFunc){
         this->id_str = "DAROW";
         this->r = init_r;
-        this->sigma_w = new float[this->weightDim];
-        this->timeStamp = new size_t[this->weightDim];
+		this->sigma_w.resize(this->weightDim);
+		this->timeStamp.resize(this->weightDim);
     }
 
     template <typename FeatType, typename LabelType>
         DAROW<FeatType, LabelType>::~DAROW() {
-            if(this->sigma_w != NULL)
-                delete []this->sigma_w;
-            if (this->timeStamp != NULL)
-                delete []this->timeStamp;
         }
 
     //this is the core of different updating algorithms
@@ -77,7 +73,7 @@ namespace SOL {
             for (size_t i = 0; i < featDim; i++){
                 beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
             }
-            beta_t = 1.0 / beta_t;
+            beta_t = 1.f / beta_t;
             this->eta = beta_t / 2.f;
             float temp_beta = beta_t * this->lambda / 2.f;
 
@@ -121,9 +117,8 @@ namespace SOL {
         void DAROW<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
 
-            memset(this->timeStamp,0 ,sizeof(size_t) * this->weightDim);
-            for (IndexType i = 0; i < this->weightDim; i++)
-                this->sigma_w[i] = 1;
+			this->timeStamp.zeros();
+			this->sigma_w.set_value(1);
         }
 
     //called when a train ends
@@ -155,26 +150,18 @@ namespace SOL {
             if (newDim < this->weightDim)
                 return;
             else {
-                newDim++; //reserve the 0-th
-                float * newS = new float[newDim];
-                //copy info
-                memcpy(newS,this->sigma_w,sizeof(float) * this->weightDim); 
-                //set the rest to zero
-                for (IndexType i = this->weightDim; i < newDim; i++)
-                    newS[i] = 1;
+				this->timeStamp.reserve(newDim + 1);
+				this->timeStamp.resize(newDim + 1);
+				//set the rest to zero
+				this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
+					this->timeStamp.end);
 
-                delete []this->sigma_w;
-                this->sigma_w= newS;
-
-                size_t* newT = new size_t[newDim];
-                //copy info
-                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
-                //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
-                delete []this->timeStamp;
-                this->timeStamp = newT;
-
-                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
-            }
-        }
+				this->sigma_w.reserve(newDim + 1);
+				this->sigma_w.resize(newDim + 1);  //reserve the 0-th
+				//set the rest to 1
+				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
+					this->sigma_w.end, 1);
+				Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			}
+		}
 }

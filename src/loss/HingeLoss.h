@@ -18,7 +18,7 @@ namespace SOL {
 
             virtual  float GetGradient(LabelType label, float predict) {
                 if (this->GetLoss(label,predict) > 0)
-                    return -label;
+                    return (float)(-label);
                 else
 					return 0;
 			}

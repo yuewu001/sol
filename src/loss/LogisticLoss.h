@@ -26,7 +26,7 @@ namespace SOL {
 				if (tmp > 100.f) //to reject numeric problems
 					return 0.f;
 				else if (tmp  < -100.f)
-					return -label; 
+					return (float)(-label); 
 				else
 					return -label / (1.f + std::exp(tmp)); 
 			}

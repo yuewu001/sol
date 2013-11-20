@@ -48,11 +48,11 @@ template <typename T>
 float Variance(const T* data, int dim) {
 	if (dim <= 1)
 		return 0;
-	float ave = std::accumulate(data, data + dim,0.f) / (double)dim;
+	float ave = std::accumulate(data, data + dim,0.f) / (float)dim;
 	double var(0);
 	for (int i = 0; i < dim; i++)
 		var += (data[i] - ave) * (data[i] - ave);
-	return sqrt(var / (dim - 1));
+	return (float)(sqrt(var / (dim - 1)));
 }
 
 inline float trunc_weight(float w, float gravity){
