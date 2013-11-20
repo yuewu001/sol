@@ -102,11 +102,9 @@ namespace SOL {
         size_t dataNum;
 		bool is_inuse;
 		bool is_parsed;
-		bool is_loading;
         DataChunk *next;
 
         DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
-			is_loading = false;
 		}
         void erase() {
 			for (size_t i = 0; i < dataNum; i++)

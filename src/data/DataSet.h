@@ -195,14 +195,7 @@ namespace SOL {
 			inline DataChunk<FeatType, LabelType> &GetWriteChunk(){
 				mutex_lock(&this->data_lock); 
 				if (this->wt_ptr->is_inuse == false){
-					if(this->wt_ptr->is_parsed == true){
-						cout<<"error occured, chunk is already parsed.."<<endl;
-						cerr<<"parsed = "<<this->wt_ptr->is_parsed
-							<<"\tin_use = "<<this->wt_ptr->is_inuse<<endl;
-						system("pause");
-					}
 					this->wt_ptr->is_inuse = true;
-					this->wt_ptr->is_loading = true;
 					DataChunk<FeatType, LabelType>* p = this->wt_ptr;
 					mutex_unlock(&this->data_lock);
 					return *p;
@@ -210,18 +203,17 @@ namespace SOL {
 				else{
 					condition_variable_wait(&this->buffer_full,&this->data_lock);
 					mutex_unlock(&this->data_lock);
+					return this->GetWriteChunk();
 				}
 			}
 
 			inline void EndWriteChunk(){
 				mutex_lock(&this->data_lock);
 				this->wt_ptr->is_parsed = true;
-				this->wt_ptr->is_loading = false;
 				this->dataNum += this->wt_ptr->dataNum;
-				if (this->wt_ptr->dataNum == 0){
-					cout<<"chunk size is zero!"<<endl;
-					exit(0);
-				}
+				//if (this->wt_ptr->dataNum == 0){
+				//	cout<<"chunk size is zero!"<<endl;
+				//}
 				this->wt_ptr = this->wt_ptr->next;
 				condition_variable_signal_all(&this->data_available);
 				mutex_unlock(&this->data_lock);
@@ -233,7 +225,6 @@ namespace SOL {
 				this->load_finished = true;
 				this->is_on_loading = false;
 				mutex_unlock(&this->data_lock);
-				cout<<"finish parsing.."<<endl;
 			}
 
 			//get the data to read
@@ -241,20 +232,13 @@ namespace SOL {
 				mutex_lock(&this->data_lock);
 				//check if there is available data
 				if (this->rd_ptr->is_parsed == true){
-					if(this->rd_ptr->is_loading == true){
-						cerr<<"error occured, chunk is on loading..."<<endl;
-						cerr<<"parsed = "<<this->rd_ptr->is_parsed
-							<<"\tin_use = "<<this->rd_ptr->is_inuse<<endl;
-						//exit(0);
-						system("pause");
-					}
 					this->rd_ptr->is_parsed = false;
-
 					mutex_unlock(&this->data_lock);
 					return *(this->rd_ptr);
 				}
 				else{ //no available data 
 					if (this->load_finished == true){
+						cout<<"load finished!"<<endl;
 						this->rd_ptr->is_parsed = false;
 						this->rd_ptr->erase();
 						mutex_unlock(&this->data_lock);
