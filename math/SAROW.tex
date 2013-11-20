@@ -29,7 +29,7 @@ $\eta$.
 In Sparse online learning, we set the weight vector equal to the average
 $\bm{\omega} = \bm{\mu}$. Each iteration step is a minimization problem as follows:
 \begin{equation}
-    \bm{\mu}_{t} = \arg\min_{\bm{\mu}}{f(\bm{\mu}) + \lambda r(\bm{\mu})}
+    \bm{\mu}_{t} = \arg\min_{\bm{\mu}}{f(\bm{\mu}) + \tilde{\lambda} r(\bm{\mu})}
     \label{equ:02}
 \end{equation}
 where $f(\bm{\mu})$ is often the loss function. In this paper, we follow the
@@ -105,8 +105,12 @@ coordinates.
 
 The second step is a projection step with the smooth regularization penalty.
 \begin{equation}
-    \bm{\mu}_{t} = \arg\min_{\mu}{\frac{1}{2}\|\bm{\mu} - \mu_{t-\frac{1}{2}}\|
-    + \frac{\beta_t}{2}\lambda|\Sigma_{t-1}\mu|}
+    \begin{aligned}
+        \tilde{\lambda} &= \frac{\beta_t}{2} \lambda \\
+        \bm{\mu}_{t} &= \arg\min_{\mu}{\frac{1}{2}\|\bm{\mu} -
+        \mu_{t-\frac{1}{2}}\|^2
+        + \frac{\beta_t}{2}\lambda|\Sigma_{t-1}\mu|}
+    \end{aligned}
     \label{equ:08}
 \end{equation}
 
