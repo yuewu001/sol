@@ -16,7 +16,8 @@ namespace SOL{
     bool basic_io::open_file(const char* filename, const char* mode){
         this->close_file();
 #if _WIN32
-        if (fopen_s(&file,filename, mode) != 0){
+		errno_t ret = fopen_s(&file,filename, mode);
+        if ( ret != 0){
             printf("error %d: can't open input file %s\n",ret,filename);
             return false;
         }
