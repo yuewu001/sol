@@ -70,6 +70,9 @@ void Cache(const string &input_file, const string &output_file){
     while(reader.GetNextData(data) == true){
         dataNum++;
         featNum += data.indexes.size();
+        if(!(data.label == 1 || data.label == -1)){
+            cout<<"data index "<<dataNum<<" label = "<<(int)(data.label)<<endl;
+        }
         writer.WriteData(data);
     }
     reader.Close();

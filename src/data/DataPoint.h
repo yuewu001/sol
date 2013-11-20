@@ -35,6 +35,8 @@ namespace SOL {
                 DataPoint() {
                     this->count = new int;
                     *count = 1;
+                    this->max_index = 0;
+                    this->label = 0;
                 }
 
                 //copy constructor
@@ -43,7 +45,7 @@ namespace SOL {
                     this->features = point.features;
                     this->label = point.label;
                     this->count = point.count;
-                    this->max_index = 0;
+                    this->max_index = point.max_index;
                     //this->sum_sq = 0;
                     ++(*count);
                 }
