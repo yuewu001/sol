@@ -54,21 +54,21 @@ namespace SOL {
             else if (strcmp(args[i],"-passes") == 0 && i + 1 < argc)
                 this->passNum = strtol(args[i+1], NULL, 10);
             else if (strcmp(args[i],"-l1") == 0 && i + 1 < argc)
-                this->lambda = strtod(args[i + 1], NULL);
+                this->lambda = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-k") == 0 && i + 1 < argc)
                 this->K = strtol(args[i + 1], NULL, 10);
             else if (strcmp(args[i],"-lbp") == 0)
                 this->is_learn_best_param = true;
             else if (strcmp(args[i],"-eta") == 0 && i + 1 < argc)
-                this->eta = strtod(args[i+1], NULL);
+                this->eta = (float)strtod(args[i+1], NULL);
             else if (strcmp(args[i], "-t0") == 0 && i + 1 < argc)
                 this->initial_t = strtol(args[i+1], NULL, 10);
             else if (strcmp(args[i], "-power_t") == 0 && i + 1 < argc)
-                this->power_t = strtod(args[i+1], NULL);
+                this->power_t = (float)strtod(args[i+1], NULL);
             else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
-                this->r = strtod(args[i+1], NULL);
+                this->r = (float)strtod(args[i+1], NULL);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
-                this->delta = strtod(args[i + 1], NULL);
+                this->delta = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-opt") == 0 && i + 1 < argc) //opti method
                 this->ParseOptiMethod(args[i+1]);
             else if (strcmp(args[i],"-dt") == 0 && i + 1 < argc) //data type
@@ -78,7 +78,7 @@ namespace SOL {
             else if(strcmp(args[i],"-loss") == 0 && i + 1 < argc)
                 this->loss_type = this->GetLossType(args[i+1]);
             else if (strcmp(args[i],"-grou") == 0 && i + 1 < argc)
-                this->gamma_rou = strtod(args[i + 1], NULL);
+                this->gamma_rou = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else

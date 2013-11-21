@@ -100,11 +100,14 @@ namespace SOL {
         struct DataChunk{
         DataPoint<FeatType, LabelType> data[init_chunk_size];
         size_t dataNum;
+		bool is_inuse;
+		bool is_parsed;
         DataChunk *next;
 
-        DataChunk():dataNum(0),next(NULL){}
+        DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
+		}
         void erase() {
-            for (size_t i = 0; i < dataNum; i++)
+			for (size_t i = 0; i < dataNum; i++)
                 data[i].erase();
             dataNum = 0;
         }

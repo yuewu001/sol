@@ -24,7 +24,7 @@ namespace SOL {
                 int K;
 
             protected:
-                size_t *timeStamp;
+                s_array<size_t> timeStamp;
 
             public:
                 STG(DataSet<FeatType, LabelType> &dataset, 
@@ -49,16 +49,14 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         STG<FeatType, LabelType>::STG(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
-            Optimizer<FeatType, LabelType>(dataset, lossFunc) , timeStamp(NULL) {
+            Optimizer<FeatType, LabelType>(dataset, lossFunc){
                 this->id_str = "STG";
                 this->K = init_k;
-                this->timeStamp = new size_t[this->weightDim];
+				this->timeStamp.resize(this->weightDim);
             }
 
     template <typename FeatType, typename LabelType>
         STG<FeatType, LabelType>::~STG() {
-            if(this->timeStamp != NULL)
-                delete []this->timeStamp;
         }
 
     //this is the core of different updating algorithms
@@ -105,7 +103,7 @@ namespace SOL {
         void STG<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
             //reset time stamp
-            memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
+			this->timeStamp.zeros();
         }
 
     //called when a train ends
@@ -135,17 +133,13 @@ namespace SOL {
             if (newDim < this->weightDim)
                 return;
             else {
-                newDim++; //reserve the 0-th
-                size_t* newT = new size_t[newDim];
-                //copy info
-                memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim); 
+				this->timeStamp.reserve(newDim + 1);
+				this->timeStamp.resize(newDim + 1);
                 //set the rest to zero
-                memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim)); 
+				this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
+					this->timeStamp.end);
 
-                delete []this->timeStamp;
-                this->timeStamp = newT;
-
-                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
+                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
             }
         }
 }

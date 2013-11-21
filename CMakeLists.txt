@@ -13,7 +13,7 @@ FILE(GLOB loss_files src/loss/*.h)
 FILE(GLOB opti_files src/optimizer/*.h)
 FILE(GLOB comm_files src/common/*.h)
 
-set (data_files ${datafiles} 
+set (data_files ${data_files} 
     src/data/basic_io.cpp 
     )
 

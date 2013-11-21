@@ -60,7 +60,7 @@ namespace SOL{
             if (exp_acc < 0)
                 return 0;
             else
-                acc *= (int)(powf(10.f,exp_acc));
+                acc *= (int)(powf(10.f,(float)exp_acc));
 
             *end = p;
             return s * acc;
@@ -101,7 +101,7 @@ namespace SOL{
             if (exp_acc < num_dec)
                 return 0;
             else
-                acc *= (unsigned int)(powf(10.f,exp_acc - num_dec));
+                acc *= (unsigned int)(powf(10.f,(float)(exp_acc - num_dec)));
             *end = ++p;
             return acc;
         }
@@ -155,7 +155,7 @@ namespace SOL{
         if (is_space(p) == true){//easy case succeeded.
             exp_acc -= num_dec;
             *end = p;
-            return s * acc * powf(10.f,exp_acc);
+            return s * acc * powf(10.f,(float)(exp_acc));
         }
         else
             return 0;

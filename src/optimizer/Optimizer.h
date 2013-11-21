@@ -36,7 +36,7 @@ namespace SOL {
 		//weight vector
 	protected:
 		//the first element is zero
-		float *weightVec;
+		s_array<float> weightVec;
 		//weight dimenstion: can be the same to feature, or with an extra bias
 		IndexType weightDim;
 
@@ -67,8 +67,6 @@ namespace SOL {
 		Optimizer(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
 
 		virtual ~Optimizer() {
-			if (weightVec != NULL)
-				delete []this->weightVec;
 		}
         const string& Id_Str() const {return this->id_str;}
 
@@ -115,13 +113,13 @@ namespace SOL {
     
     //calculate learning rate
     inline float pEta_general(size_t t, float pt){
-        return std::pow(t,pt);
+        return powf((float)t,pt);
     }
     inline float pEta_sqrt(size_t t, float pt){
-        return std::sqrt(t);
+        return sqrtf((float)t);
     }
     inline float pEta_linear(size_t t, float pt){
-        return t;
+        return (float)t;
     }
     inline float pEta_const(size_t t, float pt){
         return 1;
@@ -133,7 +131,7 @@ namespace SOL {
             this->lossFunc = &lossFunc;
             this->weightDim = 1;
             //weight vector
-            this->weightVec = new float[this->weightDim];
+			this->weightVec.resize(this->weightDim);
 
             this->eta0 = init_eta;;
             this->lambda = init_lambda;
@@ -148,7 +146,7 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         void Optimizer<FeatType, LabelType>::BeginTrain() {
             //reset weight vector
-            memset(this->weightVec,0,sizeof(float ) * this->weightDim);
+			this->weightVec.set_value(0);
             this->curIterNum = this->initial_t;
 
             if (this->power_t == 0.5)
@@ -175,7 +173,7 @@ namespace SOL {
     template <typename FeatType, typename LabelType> 
         float Optimizer<FeatType, LabelType>::Train() {
             if(dataSet.Rewind() == false)
-                exit(0);
+				return 1.f;
             //reset
             this->BeginTrain();
             float errorNum(0);
@@ -186,8 +184,9 @@ namespace SOL {
             while(1) {
                 const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
                 //all the data has been processed!
-                if(chunk.dataNum  == 0) 
+                if(chunk.dataNum  == 0) {
                     break;
+				}
 
                 for (size_t i = 0; i < chunk.dataNum; i++) {
 
@@ -248,7 +247,7 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
             if(testSet.Rewind() == false)
-                exit(0);
+				return 1.f;
             float errorRate(0);
             //test
             while(1) {
@@ -349,17 +348,12 @@ namespace SOL {
             if (newDim < this->weightDim) 
                 return;
             else {
-                newDim++; //reserve the 0-th
-                float* newW = new float[newDim];
-                memset(newW,0,sizeof(float) * newDim); 
-
-                //copy info
-                memcpy(newW,this->weightVec,sizeof(float) * this->weightDim); 
-                //set the rest to zero
-                memset(newW + this->weightDim,0,sizeof(float) * (newDim - this->weightDim));
-
-                delete []this->weightVec;
-                this->weightVec = newW;
+				newDim++; //reserve the 0-th
+				this->weightVec.reserve(newDim);
+				this->weightVec.resize(newDim); 
+                //set the new value to zero
+				this->weightVec.zeros(this->weightVec.begin + this->weightDim, 
+					this->weightVec.end);
                 this->weightDim = newDim;
             }
         }

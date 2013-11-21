@@ -23,7 +23,7 @@ namespace SOL {
         class ASAROW: public Optimizer<FeatType, LabelType> {
             protected:
                 float r;
-                float* sigma_w;
+                s_array<float> sigma_w;
 
                 HeapList<float> heap;
                 vector<IndexType> kickout_list;
@@ -56,17 +56,15 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         ASAROW<FeatType, LabelType>::ASAROW(DataSet<FeatType, LabelType> &dataset, 
                 LossFunction<FeatType, LabelType> &lossFunc):
-            Optimizer<FeatType, LabelType>(dataset, lossFunc) , sigma_w(NULL) {
+            Optimizer<FeatType, LabelType>(dataset, lossFunc){
                 this->id_str = "ASAROW";
                 this->r = init_r;
                 this->K = 0;
-                this->sigma_w = new float[this->weightDim];
+				this->sigma_w.resize(this->weightDim);
             }
 
     template <typename FeatType, typename LabelType>
         ASAROW<FeatType, LabelType>::~ASAROW() {
-            if(this->sigma_w != NULL)
-                delete []this->sigma_w;
         }
 
     //this is the core of different updating algorithms
@@ -83,7 +81,7 @@ namespace SOL {
             for (size_t i = 0; i < featDim; i++){
                 beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
             }
-            beta_t = 1.0 / beta_t;
+            beta_t = 1.f / beta_t;
 
             this->kickout_list.clear();
             IndexType index_i = 0;
@@ -125,11 +123,8 @@ namespace SOL {
             if (this->weightDim < this->K + 1){
                 this->UpdateWeightSize(this->K); //remove the bais term
             }
-
-            for (IndexType i = 0; i < this->weightDim; i++){
-                this->sigma_w[i] = 1;
-            }
-            heap.Init(this->weightDim - 1, this->K, this->sigma_w + 1);
+			this->sigma_w.set_value(1);
+			heap.Init(this->weightDim - 1, this->K, this->sigma_w.begin + 1);
         }
 
     //called when a train ends
@@ -151,19 +146,14 @@ namespace SOL {
             if (newDim < this->weightDim)
                 return;
             else {
-                newDim++; //reserve the 0-th
-                float * newS = new float[newDim];
-                //copy info
-                memcpy(newS,this->sigma_w,sizeof(float) * this->weightDim); 
-                //set the rest to zero
-                for (IndexType i = this->weightDim; i < newDim; i++)
-                    newS[i] = 1;
+				this->sigma_w.reserve(newDim + 1);
+				this->sigma_w.resize(newDim + 1);  //reserve the 0-th
+                //set the rest to 1
+				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
+					this->sigma_w.end, 1);
 
-                delete []this->sigma_w;
-                this->sigma_w= newS;
-
-                heap.UpdateDataNum(newDim - 1, this->sigma_w + 1);
-                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
+				heap.UpdateDataNum(newDim, this->sigma_w.begin + 1);
+                Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
             }
         }
 }

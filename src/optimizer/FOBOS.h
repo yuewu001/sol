@@ -43,20 +43,18 @@ namespace SOL {
         virtual void EndTrain();
 
 	protected:
-		size_t *timeStamp;
+		s_array<size_t> timeStamp;
 	};
 
 	template <typename FeatType, typename LabelType>
 	FOBOS<FeatType, LabelType>::FOBOS(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
-	Optimizer<FeatType, LabelType>(dataset, lossFunc), timeStamp(NULL) {
-		this->timeStamp = new size_t[this->weightDim];
+	Optimizer<FeatType, LabelType>(dataset, lossFunc) {
+		this->timeStamp.resize(this->weightDim);
 	}
 
 	template <typename FeatType, typename LabelType>
 	FOBOS<FeatType, LabelType>::~FOBOS() {
-		if(this->timeStamp != NULL)
-			delete []this->timeStamp;
 	}
 
     /**
@@ -139,7 +137,7 @@ namespace SOL {
 	void FOBOS<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
-		memset(this->timeStamp,0,sizeof(size_t) * this->weightDim);
+		this->timeStamp.zeros();
 	}
 
     //called when a train ends
@@ -160,16 +158,13 @@ namespace SOL {
 		if (newDim < this->weightDim)
 			return;
 		else {
-            newDim++;
-			size_t* newT = new size_t[newDim];
-            //copy info
-			memcpy(newT,this->timeStamp,sizeof(size_t) * this->weightDim);
-            //set the rest to zero
-			memset(newT + this->weightDim,0,sizeof(size_t) * (newDim - this->weightDim));
-			delete []this->timeStamp;
-			this->timeStamp = newT;
+			this->timeStamp.reserve(newDim + 1);
+			this->timeStamp.resize(newDim + 1);
+			//set the rest to zero
+			this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
+				this->timeStamp.end);
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim - 1);
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
 	}
 }

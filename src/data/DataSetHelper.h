@@ -1,156 +1,154 @@
 /*************************************************************************
-  > File Name: DataSetHelper.h
-  > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-  > Created Time: Thu 24 Oct 2013 03:33:10 PM
-  > Descriptions: thread function definitions
- ************************************************************************/
+> File Name: DataSetHelper.h
+> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
+> Created Time: Thu 24 Oct 2013 03:33:10 PM
+> Descriptions: thread function definitions
+************************************************************************/
 #pragma once
 
 #include "libsvm_binary.h"
 #include "thread_primitive.h"
 
 namespace SOL{
-    template <typename T1, typename T2> class DataSet;
-    template <typename T1, typename T2> 
+	template <typename T1, typename T2> class DataSet;
+
+	//load a chunk of data, return if file ended
+	template <typename T1, typename T2>
+	bool load_chunk(DataReader<T1, T2>* reader, DataChunk<T1,T2>&chunk){
+		bool not_file_end = true;
+		chunk.erase();
+		while(chunk.dataNum < init_chunk_size && not_file_end == true){
+			DataPoint<T1,T2> &data = chunk.data[chunk.dataNum];
+			not_file_end = reader->GetNextData(data);
+			if (not_file_end == true)
+				chunk.dataNum++;
+			else
+				break;
+		}
+		return not_file_end;
+	}
+
+	//save chunk to disk
+	template <typename T1, typename T2>
+	bool save_chunk(libsvm_binary_<T1, T2> *writer, DataChunk<T1, T2>&chunk){
+		size_t w_num = 0;
+		while(w_num < chunk.dataNum){
+			if (writer->WriteData(chunk.data[w_num]) == true)
+				w_num++;
+			else
+				return false;
+		}
+		return false;
+	}
+
+	template <typename T1, typename T2>
+	libsvm_binary_<T1, T2>* get_cacher(const std::string &cache_filename){
+		string tmpFileName = cache_filename + ".writing";
+		libsvm_binary_<T1, T2>* cacher = new libsvm_binary_<T1,T2>(tmpFileName);
+		if (cacher->OpenWriting() == false){
+			cerr<<"Open cache file failed!"<<endl;
+			delete cacher;
+			return NULL;
+		}
+		return cacher;
+	}
+
+	template <typename T1, typename T2>
+	bool end_cache(libsvm_binary_<T1, T2>**cacher, const std::string& cache_fileName){
+		const string &tmpFileName = (*cacher)->get_filename();
+		(*cacher)->Close();
+		delete *cacher;
+		*cacher = NULL;
+
+		//rename
 #if WIN32
-        DWORD WINAPI thread_LoadData(LPVOID param)
+		string cmd = "REN \"";
+		cmd = cmd + tmpFileName + "\" \"";
+		cmd = cmd + cache_fileName + "\"";
 #else
-        void* thread_LoadData(void* param)
+		string cmd = "mv \"";
+		cmd = cmd + tmpFileName + "\" \"";
+		cmd = cmd + cache_fileName + "\"";
 #endif
-        {
-            DataSet<T1,T2>* dataset = static_cast<DataSet<T1,T2>*>(param);
-            DataReader<T1,T2>* reader = dataset->reader;
-            libsvm_binary_<T1,T2>* writer = NULL;
+		if(system(cmd.c_str()) != 0){
+			cerr<<"rename cahe file name failed!"<<endl;
+			return false;
+		}
+		return true;
+	}
 
-            string tmpFileName= dataset->cache_fileName + ".writing";
+	template <typename T1, typename T2>
+	bool CacheLoad(DataSet<T1, T2> *dataset){
+		DataReader<T1,T2>* reader = dataset->reader;
+		reader->Rewind();
+		if (reader->Good() == false) {
+			cerr<<"reader is incorrect!"<<endl;
+			return false;
+		}
 
-            if (dataset->is_cache == true){
-                writer = new libsvm_binary_<T1,T2>(tmpFileName);
-                if (writer->OpenWriting() == false){
-                    cerr<<"Open cache file failed!"<<endl;
-                    exit(0);
-                }
-            }
+		libsvm_binary_<T1,T2>* writer = get_cacher<T1,T2>(dataset->cache_fileName);
+		if (writer == NULL)
+			return false;
 
-            //load data
-            reader->Rewind();
-            if (reader->Good()) {
-                bool not_file_end = false;
-                do {
-                    DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
-                    chunk.erase();
-                    for (size_t i = 0; i < init_chunk_size; i++) {
-                        DataPoint<T1,T2> &data = chunk.data[i];
-                        not_file_end = reader->GetNextData(data);
-                        if (not_file_end == true){
-                            chunk.dataNum++;
-                            if (writer != NULL){
-                                writer->WriteData(data);
-                            }
-                        }
-                        else{
-                            break;
-                        }
-                    }
+		//load data
+		bool not_file_end = false;
+		do {
+			DataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
+			not_file_end = load_chunk(reader, chunk);
+			save_chunk(writer, chunk);
+			dataset->EndWriteChunk();
+		}while(not_file_end == true);
 
-					if(chunk.dataNum > 0){
-						mutex_lock(&dataset->data_lock); 
-						//notice that there is data available
-						dataset->wt_ptr = dataset->wt_ptr->next;
-						dataset->curChunkNum++; 
-						dataset->dataNum += chunk.dataNum;
-						condition_variable_signal_all(&dataset->data_available);
+		return end_cache(&writer, dataset->cache_fileName);
+	}
 
-						if (dataset->curChunkNum == dataset->bufSize){ //buffer full
-							condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-						}
-						mutex_unlock(&dataset->data_lock);
-					}
-
-                }while(not_file_end == true);
-            }
-            else{
-                cerr<<"load data failed!"<<endl;
-                exit(0);
-            }
-
-            if (dataset->is_cache == true){
-                dataset->reader->Close();
-                delete dataset->reader;
-
-                writer->Close();
-                delete writer;
-
-                //rename
+	template <typename T1, typename T2> 
 #if WIN32
-                string cmd = "REN \"";
-                cmd = cmd + tmpFileName + "\" \"";
-                cmd = cmd + dataset->cache_fileName + "\"";
+	DWORD WINAPI thread_LoadData(LPVOID param)
 #else
-                string cmd = "mv \"";
-                cmd = cmd + tmpFileName + "\" \"";
-                cmd = cmd + dataset->cache_fileName + "\"";
+	void* thread_LoadData(void* param)
 #endif
-                if(system(cmd.c_str()) != 0){
-                    cerr<<"rename cahe file name failed!"<<endl;
-                    exit(0);
-                }
-                //load cache file
-                dataset->reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
-                if (dataset->reader->OpenReading() == false){
-                    cerr<<"load cache data failed!"<<endl;
-                    exit(0);
-                }
-                reader = dataset->reader;
-                dataset->is_cache = false;
-            }
+	{
+		DataSet<T1,T2>* dataset = static_cast<DataSet<T1,T2>*>(param);
+		DataReader<T1,T2>* reader = dataset->reader;
 
-            //load cache
-            for (size_t pass= 1; pass < dataset->passNum; pass++) {
-                reader->Rewind();
-                if (reader->Good()) {
-                    bool not_file_end = false;
-                    do {
-                        DataChunk<T1,T2> &chunk = *dataset->wt_ptr;
-                        chunk.erase();
-                        for (size_t i = 0; i < init_chunk_size; i++) {
-                            DataPoint<T1,T2> &data = chunk.data[i];
-                            not_file_end = reader->GetNextData(data);
-                            if (not_file_end == true)
-                                chunk.dataNum++;
-                            else
-                                break;
-                        }
-
-						if (chunk.dataNum > 0){
-							mutex_lock(&dataset->data_lock); 
-							//notice that there is data available
-							dataset->wt_ptr = dataset->wt_ptr->next;
-							dataset->curChunkNum++; 
-							dataset->dataNum += chunk.dataNum;
-							condition_variable_signal_all(&dataset->data_available);
-
-							if (dataset->curChunkNum == dataset->bufSize){ //buffer full
-								condition_variable_wait(&dataset->buffer_full,&dataset->data_lock);
-							}
-							mutex_unlock(&dataset->data_lock);
-						}
-
-                    }while(not_file_end == true);
-                }
-                else {
-                    cerr<<"reader is incorrect!"<<endl;
-                    exit(0);
-                }
-            }
-
-            //notice that the all the data has been loaded
-            mutex_lock(&dataset->data_lock);
-            dataset->load_finished = true;
-            dataset->is_on_loading = false;
-            condition_variable_signal_all(&dataset->data_available);
-            mutex_unlock(&dataset->data_lock);
-
-            return NULL;
-        }
+		size_t pass = 0;
+		if (dataset->is_cache == true){
+			if(CacheLoad(dataset) == false){
+				cerr<<"caching data failed!"<<endl;
+				dataset->FinishParse();
+				return NULL;
+			}
+			dataset->reader->Close();
+			delete dataset->reader;
+			//load cache file
+			dataset->reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
+			if (dataset->reader->OpenReading() == false){
+				cerr<<"load cache data failed!"<<endl;
+				dataset->FinishParse();
+				return NULL;
+			}
+			reader = dataset->reader;
+			dataset->is_cache = false;
+			pass++;
+		}
+		//load cache
+		for (;pass < dataset->passNum; pass++) {
+			reader->Rewind();
+			if (reader->Good()) {
+				bool not_file_end = false;
+				do {
+					DataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
+					not_file_end = load_chunk(reader, chunk);
+					dataset->EndWriteChunk();
+				}while(not_file_end == true);
+			}
+			else {
+				cerr<<"reader is incorrect!"<<endl;
+				break;
+			}
+		}
+		dataset->FinishParse();
+		return NULL;
+	}
 }
