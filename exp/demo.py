@@ -1,12 +1,12 @@
 import os
 import sys
 
-opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW', 'vw']
-#opt_list = ['STG','vw']
+opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
+#opt_list = ['SSAROW']
 #dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
 dataset_list = ['rcv1']
 
-rootDir = '/home/matthew/work/Data/'
+rootDir = 'D:/Data/Sparse/'
 
 if len(sys.argv) == 2:
     dataset = sys.argv[1]
@@ -17,7 +17,7 @@ for dataset in dataset_list:
     test_file = ''
     if dataset == 'a6a':
         train_file = rootDir + 'uci/a6a'
-        test_file = rootDir + '/uci/a6a.t'
+        test_file = rootDir + 'uci/a6a.t'
     
     elif dataset == 'a9a':
         train_file = rootDir + 'uci/a9a'
@@ -25,7 +25,7 @@ for dataset in dataset_list:
     
     elif dataset == 'rcv1':
         train_file = rootDir + 'rcv1/rcv1.train' 
-        test_file = rootDir + '/rcv1/rcv1.test'
+        test_file = rootDir + 'rcv1/rcv1.test'
     
     elif dataset == 'real-sim':
         train_file = rootDir + 'real-sim/real_sim_train'
@@ -62,7 +62,10 @@ for dataset in dataset_list:
         print 'unrecoginized dataset'
         sys.exit()
     
-    
+    if os.sep != '/':
+        train_file = train_file.replace('/', os.sep)
+        test_file = test_file.replace('/', os.sep)
+
     cmd_data = ' -i %s' %train_file 
     cache_train_file = train_file + '_cache'
     cmd_data += ' -c %s' %cache_train_file
@@ -73,14 +76,14 @@ for dataset in dataset_list:
     else:
         cache_test_file = ''
     
-    dst_folder = './result/%s' %dataset 
-    os.system("mkdir -p %s" %dst_folder)
+    dst_folder = dataset
+    os.system("mkdir %s" %dst_folder)
     
     #analyze dataset
     dataset_info_file = train_file + '_info.txt'
     if os.path.exists(dataset_info_file) == False:
         print 'analyze dataset'
-        cmd = '../analysis %s' %train_file +' >> %s' %dataset_info_file
+        cmd = '..' + os.sep + 'analysis %s' %train_file +' >> %s' %dataset_info_file
         print cmd
         os.system(cmd)
     
@@ -100,10 +103,10 @@ for dataset in dataset_list:
             cmd += cmd_data
             os.system(cmd)
     
-    opt_list_file = './%s' %dst_folder + '/opt_list.txt' 
+    #sys.exit()
+    opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()
-    
     
     try:
         file_handle = open(opt_list_file,'w')

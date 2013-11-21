@@ -7,7 +7,7 @@ import re
 
 from l1_def import *
 
-exe_name = '../SOL'
+exe_name = '..' + os.sep + 'SOL'
 
 def best_param(cmd_params, opt_name):
     output_file = 'tmp.txt'

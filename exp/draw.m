@@ -45,10 +45,10 @@ for k = 1:1:opt_num
     hold on
     plot(sparse_vec, t_err_vec, color_shape,
     'LineWidth',2,'markersize',5);
-    figure(3)
-    hold on
-    plot(sparse_vec, l_time_vec, color_shape,
-    'LineWidth',2,'markersize',5);
+    %figure(3)
+    %hold on
+    %plot(sparse_vec, l_time_vec, color_shape,
+    %'LineWidth',2,'markersize',5);
 
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -76,11 +76,11 @@ xlabel('sparsity (%)', 'fontsize',14)
 axis([20 100 ymin ymax])
 legend(legend_content,0)
 print(strcat(folder_name,'test_sparse.svg'),'-dsvg')
-figure(3) %learning time
-title('training time vs sparsity', 'fontsize',14)
-ylabel('training time (s)', 'fontsize',14)
-xlabel('sparsity (%)', 'fontsize',14)
-axis([0 100 0 2])
-legend(legend_content,'location','northeast')
-print(strcat(folder_name,'time_sparse.svg'),'-dsvg')
+%figure(3) %learning time
+%title('training time vs sparsity', 'fontsize',14)
+%ylabel('training time (s)', 'fontsize',14)
+%xlabel('sparsity (%)', 'fontsize',14)
+%axis([0 100 0 2])
+%legend(legend_content,'location','northeast')
+%print(strcat(folder_name,'time_sparse.svg'),'-dsvg')
 %close all
