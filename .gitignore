@@ -7,4 +7,5 @@ tags
 test
 *tmp*
 *.log
+*.pyc
 exp/result

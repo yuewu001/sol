@@ -224,6 +224,7 @@ namespace SOL {
 				mutex_lock(&this->data_lock);
 				this->load_finished = true;
 				this->is_on_loading = false;
+				condition_variable_signal_all(&this->data_available);
 				mutex_unlock(&this->data_lock);
 			}
 

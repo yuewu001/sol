@@ -55,21 +55,23 @@ namespace SOL{
 
 	template <typename T1, typename T2>
 	bool end_cache(libsvm_binary_<T1, T2>**cacher, const std::string& cache_fileName){
-		const string &tmpFileName = (*cacher)->get_filename();
+		string tmpFileName = (*cacher)->get_filename();
 		(*cacher)->Close();
 		delete *cacher;
-		*cacher = NULL;
+		*cacher = NULL;	
 
 		//rename
 #if WIN32
-		string cmd = "REN \"";
+		string cmd = "ren \"";
 		cmd = cmd + tmpFileName + "\" \"";
-		cmd = cmd + cache_fileName + "\"";
+		//in windows, the second parameter of ren should not include path
+		cmd = cmd + cache_fileName.substr(cache_fileName.find_last_of("/\\") + 1) + "\"";
 #else
 		string cmd = "mv \"";
 		cmd = cmd + tmpFileName + "\" \"";
 		cmd = cmd + cache_fileName + "\"";
 #endif
+		
 		if(system(cmd.c_str()) != 0){
 			cerr<<"rename cahe file name failed!"<<endl;
 			return false;
