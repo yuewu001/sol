@@ -2,7 +2,7 @@ import os
 import sys
 
 #opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-opt_list = ['ASAROW']
+opt_list = ['SSAROW']
 #dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
 dataset_list = ['rcv1']
 
