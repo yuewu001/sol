@@ -3,8 +3,8 @@ import sys
 
 opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
 #opt_list = ['SSAROW']
-#dataset_list = ['rcv1','real-sim','text','aut','pcmac','physic']
-dataset_list = ['rcv1']
+#dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
+dataset_list = ['epsilon']
 
 rootDir = 'D:/Data/Sparse/'
 
@@ -50,13 +50,13 @@ for dataset in dataset_list:
         train_file = rootDir + 'physic/physic_train'
         test_file  = rootDir + 'physic/physic_test' 
     
-    elif dataset == 'kdda':
-        train_file = rootDir + 'kdda/algebra/kdda'
-        test_file = rootDir + 'kdda/algebra/kdda.t'
+    elif dataset == 'kdd':
+        train_file = rootDir + 'kdd/algebra/kdda'
+        test_file = rootDir + 'kdd/algebra/kdda.t'
     
     elif dataset == 'epsilon':
-        train_file = rootDir + 'epsilon/epsion_normalized'
-        test_file = rootDir + 'epsilon/epsion_normalized.t'
+        train_file = rootDir + 'epsilon/epsilon_normalized'
+        test_file = rootDir + 'epsilon/epsilon_normalized.t'
     
     else:
         print 'unrecoginized dataset'
@@ -69,6 +69,8 @@ for dataset in dataset_list:
     cmd_data = ' -i %s' %train_file 
     cache_train_file = train_file + '_cache'
     cmd_data += ' -c %s' %cache_train_file
+
+    cmd_data += ' -loss Hinge'
     
     if len(test_file) > 0:
         cache_test_file = test_file + '_cache'
