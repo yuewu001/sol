@@ -93,27 +93,23 @@ namespace SOL {
                     //update u_t
                     this->weightVec[index_i] += alpha_t * 
                         this->sigma_w[index_i] * x.label * x.features[i];
+
+                    //L1 lazy update
+                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                    this->timeStamp[index_i] = this->curIterNum;
+
+                    this->weightVec[index_i]= 
+                        trunc_weight(this->weightVec[index_i],stepK * temp_beta);
+                    //update sigma_w
+                    this->sigma_w[index_i] -= beta_t * 
+                        this->sigma_w[index_i] * this->sigma_w[index_i] * 
+                        x.features[i] * x.features[i];
                 }
 
                 //bias term
                 this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
                 this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
             }
-            //update sigma_w
-            for(size_t i = 0; i < featDim; i++){
-                index_i = x.indexes[i];
-                //L1 lazy update
-                size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                this->timeStamp[index_i] = this->curIterNum;
-
-                this->weightVec[index_i]= 
-                    trunc_weight(this->weightVec[index_i],stepK * temp_beta);
-                //update sigma_w
-                this->sigma_w[index_i] -= beta_t * 
-                    this->sigma_w[index_i] * this->sigma_w[index_i] * 
-                    x.features[i] * x.features[i];
-            }
-
             return y;
         }
     //reset the optimizer to this initialization
@@ -129,7 +125,9 @@ namespace SOL {
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void DAROW<FeatType, LabelType>::EndTrain() {
-            float temp_beta = this->eta * this->lambda;
+            float beta_t = 1.f / this->r;
+            float temp_beta = beta_t * this->lambda /2.f;
+
             for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
                 //L1 lazy update
                 size_t stepK = this->curIterNum - this->timeStamp[index_i];
@@ -138,7 +136,7 @@ namespace SOL {
                 this->timeStamp[index_i] = this->curIterNum;
 
                 this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                        stepK * this->lambda);
+                        stepK * temp_beta);
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }
