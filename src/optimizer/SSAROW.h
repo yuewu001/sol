@@ -75,8 +75,7 @@ namespace SOL {
             for (size_t i = 0; i < featDim; i++){
                 beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
             }
-            beta_t = 1.0 / beta_t;
-            this->eta = beta_t / 2.f;
+            beta_t = 1.f / beta_t;
             float temp_beta = beta_t * this->lambda / 2.f;
 
             IndexType index_i = 0;
