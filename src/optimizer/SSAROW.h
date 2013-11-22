@@ -23,6 +23,7 @@ namespace SOL {
                 float r;
                 s_array<float> sigma_w;
                 s_array<size_t> timeStamp;
+				s_array<float> sum_rate;
 
             public:
                 SSAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -76,7 +77,8 @@ namespace SOL {
                 beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
             }
             beta_t = 1.f / beta_t;
-            float temp_beta = beta_t * this->lambda / 2.f;
+            float temp_beta = 3.f * beta_t * this->lambda / 2.f; 
+			this->sum_rate.push_back(this->sum_rate.last() + temp_beta);
 
             IndexType index_i = 0;
             //update w_t
@@ -90,14 +92,15 @@ namespace SOL {
                         this->sigma_w[index_i] * x.label * x.features[i];
 
                     //L1 lazy update
-                    size_t stepK = this->curIterNum - this->timeStamp[index_i];
+                    //size_t stepK = this->curIterNum - this->timeStamp[index_i];
+					float gravity = this->sum_rate.last() - 
+						this->sum_rate[this->timeStamp[index_i]];
                     this->timeStamp[index_i] = this->curIterNum;
-
                     //a trick here: actually we should save all the beta_t for those not-occuring
                     //features
                     this->weightVec[index_i]= 
                         trunc_weight(this->weightVec[index_i],
-                                stepK * temp_beta * this->sigma_w[index_i]);
+                                gravity *(this->sigma_w[index_i]));
 
                     //update sigma_w
                     this->sigma_w[index_i] -= beta_t * 
@@ -119,23 +122,24 @@ namespace SOL {
 
 			this->timeStamp.zeros();
 			this->sigma_w.set_value(1);
+			this->sum_rate.push_back(0);
+			this->curIterNum = 1; //force to begin from 1, as sum_rate depends on this value
         }
 
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void SSAROW<FeatType, LabelType>::EndTrain() {
             float beta_t = 1.f / this->r;
-            float temp_beta = beta_t * this->lambda /2.f;
+            float temp_beta = 3.f * beta_t * this->lambda /2.f;
+			this->sum_rate.push_back(this->sum_rate.last() + temp_beta);
 
+			float gravity = 0;
             for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
                 //L1 lazy update
-                size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                if (stepK == 0)
-                    continue;
+				gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
                 this->timeStamp[index_i] = this->curIterNum;
-
                 this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-                        stepK * temp_beta);
+					gravity *(this->sigma_w[index_i]));
             }
             Optimizer<FeatType, LabelType>::EndTrain();
         }

@@ -73,6 +73,12 @@ int main(int argc, char** args){
         cout<<"Usage: data_analysis data_file"<<endl;
         return 0;
     }
+//check memory leak in VC++
+#if defined(_MSC_VER) && defined(_DEBUG)
+	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+	_CrtSetDbgFlag( tmpFlag );
+#endif
     string filename = args[1];
     //string filename = "/home/matthew/work/Data/aut/aut_train";
     LibSVMReader reader(filename);

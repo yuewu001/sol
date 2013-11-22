@@ -1,10 +1,13 @@
-#FLAGS = -g -Wall
-FLAGS = -O2 -s
+FLAGS = -g -Wall
+#FLAGS = -O2 -s
 
 LIBS=basic_io.o zlib_io.o gzip_io.o
-TARGETS=MNISTConvert
+TARGETS=test
 
 all: $(TARGETS)
+
+test:test.o
+	g++ test.o -o test
 
 MNISTConvert:MNISTConvert.cpp
 	g++ $^ $(FLAGS) -o $@

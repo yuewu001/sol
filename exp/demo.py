@@ -2,9 +2,9 @@ import os
 import sys
 
 opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-#opt_list = ['SSAROW']
+opt_list = ['SSAROW']
 #dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
-dataset_list = ['epsilon']
+dataset_list = ['rcv1']
 
 rootDir = 'D:/Data/Sparse/'
 
@@ -105,7 +105,7 @@ for dataset in dataset_list:
             cmd += cmd_data
             os.system(cmd)
     
-    #sys.exit()
+    sys.exit()
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()

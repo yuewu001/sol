@@ -29,7 +29,6 @@ namespace SOL {
         class LibSVMReader_: public DataReader<FeatType, LabelType> { 
             private:
                 string fileName;
-
                 basic_io reader;
 
                 char *line;

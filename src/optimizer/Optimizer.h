@@ -185,6 +185,7 @@ namespace SOL {
                 const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
                 //all the data has been processed!
                 if(chunk.dataNum  == 0) {
+					dataSet.FinishRead();
                     break;
 				}
 

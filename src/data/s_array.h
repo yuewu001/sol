@@ -133,11 +133,11 @@ namespace SOL {
 				this->begin = NULL;
 				this->end = NULL;
 				this->capacity = 0;
-				this->count = 0;
+				this->count = NULL;
 			}
 
 			s_array() {
-				begin = NULL; end = NULL; capacity = 0;
+				begin = NULL; end = NULL; count = NULL; capacity = 0;
 				count = new int;
 				*count = 1;
 			}

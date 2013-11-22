@@ -8,6 +8,7 @@
 #ifndef HEADER_LIBSVM_BINARY
 #define HEADER_LIBSVM_BINARY
 
+
 #include "DataReader.h"
 #include "basic_io.h"
 //#include "zlib_io.h"
@@ -28,7 +29,6 @@ namespace SOL {
                 //gzip_io io_handler.
                 //zlib_io io_handler.
                 
-            private:
                 //compressed codes of indexes
                 s_array<char> comp_codes;
 

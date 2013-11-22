@@ -7,6 +7,7 @@
 
 #pragma once
 
+
 #if WIN32
 #include <windows.h>
 #endif
@@ -88,6 +89,8 @@ namespace SOL {
                 delete_mutex(&data_lock);
                 if (this->reader != NULL)
                     delete this->reader;
+				this->reader = NULL;
+				this->ReleaseBuffer();
             }
 
         private:

@@ -50,7 +50,9 @@ namespace SOL {
                     ++(*count);
                 }
 
-                ~DataPoint(){this->release();} 
+                ~DataPoint(){
+                    this->release();
+                } 
 
                 //assignment
                 DataPoint<FeatType, LabelType>& operator= 
@@ -85,6 +87,18 @@ namespace SOL {
                     //this->sum_sq = 0;
                 }
 
+
+                DataPoint<FeatType, LabelType>& clone() const{
+                    DataPoint<FeatType, LabelType> *newPt = new DataPoint<FeatType, LabelType>();
+                    newPt->label = this->label;
+                    newPt->max_index = this->max_index;
+                    newPt->indexes.resize(this->indexes.size());
+                    memcpy(newPt->indexes.begin,this->indexes.begin, sizeof(this->indexes.size()) * sizeof(int));
+                    newPt->features.resize(this->features.size());
+                    memcpy(newPt->features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
+                    return *newPt;				
+                }
+
                 IndexType dim() const {return this->max_index;}
 
             private:
@@ -98,19 +112,19 @@ namespace SOL {
         };
     template <typename FeatType, typename LabelType> 
         struct DataChunk{
-        DataPoint<FeatType, LabelType> data[init_chunk_size];
-        size_t dataNum;
-		bool is_inuse;
-		bool is_parsed;
-        DataChunk *next;
+            DataPoint<FeatType, LabelType> data[init_chunk_size];
+            size_t dataNum;
+            bool is_inuse;
+            bool is_parsed;
+            DataChunk *next;
 
-        DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
-		}
-        void erase() {
-			for (size_t i = 0; i < dataNum; i++)
-                data[i].erase();
-            dataNum = 0;
-        }
-    };
+            DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
+            }
+            void erase() {
+                for (size_t i = 0; i < dataNum; i++)
+                    data[i].erase();
+                dataNum = 0;
+            }
+        };
 
 }
