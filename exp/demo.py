@@ -70,7 +70,7 @@ for dataset in dataset_list:
     cache_train_file = train_file + '_cache'
     cmd_data += ' -c %s' %cache_train_file
 
-    cmd_data += ' -loss Hinge'
+    cmd_data += ' -loss Hinge -eta 1'
     
     if len(test_file) > 0:
         cache_test_file = test_file + '_cache'

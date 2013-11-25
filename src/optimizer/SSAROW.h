@@ -24,7 +24,8 @@ namespace SOL {
                 s_array<float> sigma_w;
                 s_array<size_t> timeStamp;
 				s_array<float> sum_rate;
-
+				
+				float beta_t;
 
             public:
                 SSAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -69,26 +70,23 @@ namespace SOL {
         float SSAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
-			float norm = 0;
 			IndexType index_i = 0;
-            //y /= this->curIterNum;
 
-			//calculate beta_t
-			float beta_t = this->r;
+			//calculate this->beta_t
+			this->beta_t = this->r;
 			for (size_t i = 0; i < featDim; i++){
-				beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+				this->beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
 			}
-			beta_t += this->r;
-			beta_t = 1.f / beta_t;
+			this->beta_t += this->r;
+			this->beta_t = 1.f / this->beta_t;
 			this->sum_rate.push_back(this->sum_rate.last() + 
-				beta_t  / 2.f);
+				this->beta_t  / 2.f * this->lambda);
 
 			float y = this->Predict(x); 
 			float alpha_t = 1 - x.label * y;
-			float gamma = 0;
 			//update w_t
 			if(alpha_t > 0){
-				alpha_t *= beta_t; 
+				alpha_t *= this->beta_t; 
 				for (size_t i = 0; i < featDim; i++){
 					index_i = x.indexes[i];
 					//update u_t
@@ -96,22 +94,26 @@ namespace SOL {
 						this->sigma_w[index_i] * x.label * x.features[i];
 
 					//L1 lazy update
-					//size_t stepK = this->curIterNum - this->timeStamp[index_i];
-					float gravity = this->sum_rate.last() - 
-						this->sum_rate[this->timeStamp[index_i]];
+					size_t stepK = this->curIterNum - this->timeStamp[index_i];
+					//float gravity = this->sum_rate.last() - 
+					//	this->sum_rate[this->timeStamp[index_i]];
+					float gravity = stepK * this->lambda * this->beta_t / 2.f;
+					this->timeStamp[index_i] = this->curIterNum;
+
 					this->weightVec[index_i]= 
 						trunc_weight(this->weightVec[index_i],
-						gravity * this->lambda * (this->sigma_w[index_i])); 
+						gravity * (this->sigma_w[index_i])); 
 					//update sigma_w
-					this->sigma_w[index_i] -= beta_t * 
+					this->sigma_w[index_i] -= this->beta_t * 
 						this->sigma_w[index_i] * this->sigma_w[index_i] * 
 						x.features[i] * x.features[i];
-
-					this->timeStamp[index_i] = this->curIterNum;
 				}
+
 				//bias term
 				this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
-				this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
+				this->sigma_w[0] -= this->beta_t * this->sigma_w[0] * this->sigma_w[0];
+
+				this->timeStamp[0] = this->curIterNum;
 			}
 			return y;
 		}
@@ -130,19 +132,23 @@ namespace SOL {
 		//called when a train ends
 		template <typename FeatType, typename LabelType>
 		void SSAROW<FeatType, LabelType>::EndTrain() {
-			float beta_t = 1.f / this->r;
-			this->sum_rate.push_back(this->sum_rate.last() + 
-				beta_t * this->lambda / 2.f);
-
 			float gravity = 0;
+			this->beta_t = 1.f / this->r;
 			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 				//L1 lazy update
-				gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
+				//gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
+				size_t stepK = this->curIterNum - this->timeStamp[index_i];
+				gravity = stepK * this->lambda * this->beta_t / 2.f;
 				this->timeStamp[index_i] = this->curIterNum;
-				this->weightVec[index_i] = 
-					trunc_weight(this->weightVec[index_i], 
-					gravity * this->lambda * (this->sigma_w[index_i]));
+				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
+					gravity * this->sigma_w[index_i]);
 			}
+			float c = 0.447;//this makes exp(-0.1) \sigma probability density
+			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
+				if (fabsf(this->weightVec[index_i]) < c * sqrtf(this->sigma_w[index_i]))
+					this->weightVec[index_i] = 0;
+			}
+
 			Optimizer<FeatType, LabelType>::EndTrain();
 		}
 
