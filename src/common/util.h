@@ -61,6 +61,15 @@ inline float trunc_weight(float w, float gravity){
     else
         return (gravity < -w) ? w + gravity : 0.f;
 }
+inline float trunc_weight2(float w, float gravity){
+    if (w > 0)
+        return (gravity < w) ?  -gravity : -w;
+    else
+        return (gravity < -w) ? gravity : -w;
+}
+
+
+
 
 inline double get_current_time(){
 #if _WIN32

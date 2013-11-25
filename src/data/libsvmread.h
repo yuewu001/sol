@@ -102,6 +102,7 @@ namespace SOL {
                         data.AddNewFeat(index,feat);
                     }
                     data.label = labelVal;
+					
                     return true;
                 }
         };
