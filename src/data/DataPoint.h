@@ -89,14 +89,14 @@ namespace SOL {
 
 
                 DataPoint<FeatType, LabelType>& clone() const{
-                    DataPoint<FeatType, LabelType> *newPt = new DataPoint<FeatType, LabelType>();
-                    newPt->label = this->label;
-                    newPt->max_index = this->max_index;
-                    newPt->indexes.resize(this->indexes.size());
-                    memcpy(newPt->indexes.begin,this->indexes.begin, sizeof(this->indexes.size()) * sizeof(int));
-                    newPt->features.resize(this->features.size());
-                    memcpy(newPt->features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
-                    return *newPt;				
+                    DataPoint<FeatType, LabelType> newPt; 
+                    newPt.label = this->label;
+                    newPt.max_index = this->max_index;
+                    newPt.indexes.resize(this->indexes.size());
+                    memcpy(newPt.indexes.begin,this->indexes.begin, this->indexes.size() * sizeof(IndexType) );
+                    newPt.features.resize(this->features.size());
+                    memcpy(newPt.features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
+                    return newPt;				
                 }
 
                 IndexType dim() const {return this->max_index;}

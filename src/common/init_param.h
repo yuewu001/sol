@@ -35,7 +35,7 @@ namespace SOL
 	//delta in adaptive algorithms
 	static const float init_delta = 10;
     //trade-off parameter in AROW
-    static const int init_r = 1;
+    static const int init_r = 2;
     //skip value in SVM2SGD
     static const int init_skip = 16;
 
