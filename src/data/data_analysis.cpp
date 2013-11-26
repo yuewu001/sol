@@ -20,7 +20,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         return false;
     }
 
-	size_t max_show_count = 10000;
+	size_t max_show_count = 100000;
 	size_t show_count = 1000;
     size_t dataNum = 0;
     size_t featNum = 0;
@@ -81,7 +81,7 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
 	cerr<<"\n";
 	reader->Close();
 	size_t valid_dim = 0;
-	for (int i = 0; i < index_set.size(); i++) {
+	for (size_t i = 0; i < index_set.size(); i++) {
 		if (index_set[i] == 1)
 			valid_dim++;
 	}

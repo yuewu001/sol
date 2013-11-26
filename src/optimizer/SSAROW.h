@@ -144,7 +144,7 @@ namespace SOL {
 				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
 					gravity * this->sigma_w[index_i]);
 			}
-			float c = 0.142;//this makes 0.99 probability density
+			float c = 0.142f;//this makes 0.99 probability density
 			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 				if (fabsf(this->weightVec[index_i]) < c * sqrtf(this->sigma_w[index_i]))
 					this->weightVec[index_i] = 0;
