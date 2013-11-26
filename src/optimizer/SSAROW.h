@@ -133,13 +133,14 @@ namespace SOL {
 		template <typename FeatType, typename LabelType>
 		void SSAROW<FeatType, LabelType>::EndTrain() {
 			float gravity = 0;
-			this->beta_t = 1.f / this->r;
+			//this->beta_t = 1.f / this->r;
 			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 				//L1 lazy update
 				gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
 				//size_t stepK = this->curIterNum - this->timeStamp[index_i];
 				//gravity = stepK * this->lambda * this->beta_t / 2.f;
-				this->timeStamp[index_i] = this->curIterNum;
+
+				//this->timeStamp[index_i] = this->curIterNum;
 				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
 					gravity * this->sigma_w[index_i]);
 			}

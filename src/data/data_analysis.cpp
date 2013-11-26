@@ -10,7 +10,6 @@
 #include "MNISTReader.h"
 
 #include <string>
-#include <set>
 using namespace std;
 using namespace SOL;
 
@@ -21,10 +20,12 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         return false;
     }
 
+	size_t max_show_count = 10000;
+	size_t show_count = 1000;
     size_t dataNum = 0;
     size_t featNum = 0;
     IndexType max_index = 0;
-    set<IndexType> index_set;
+    s_array<char> index_set;
     DataPoint<FeatType, LabelType> data;
     if (reader->OpenReading() == true) {
         reader->Rewind();
@@ -32,57 +33,73 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
             if (reader->GetNextData(data) == true) {
                 if (data.indexes.size() == 0)
                     continue;
-                for (size_t i = 0; i < data.indexes.size(); i++){
-                    index_set.insert(data.indexes[i]);
-                }
                 if (max_index < data.dim()){
                     max_index = data.dim();
+                }
+                size_t prev_size = index_set.size();
+                if (max_index > prev_size){
+                    index_set.reserve(max_index);
+                    index_set.resize(max_index);
+                    //set the new value to zero
+                    index_set.zeros(index_set.begin + prev_size, 
+                            index_set.end);
+                }
+                for (size_t i = 0; i < data.indexes.size(); i++){
+                    index_set[data.indexes[i] - 1] = 1;
                 }
 
                 dataNum++;
                 featNum += data.indexes.size();
-                /*
-                if (dataNum % 1000 == 0){
-                    cout<<"data number  : "<<dataNum<<"    ";
-                    cout<<"valid dim    : "<<max_index<<"\r";
-                }
-                */
-            }
-            else
-                break;
-        }
-    }
-    else {
-        cerr<<"Can not open file to read!"<<endl;
-        return false;
-    }
-    reader->Close();
-    cout<<"data number  : "<<dataNum<<"\n";
-    cout<<"feat number  : "<<featNum<<"\n";
-    cout<<"valid dim    : "<<max_index<<"\n";
-    cout<<"nonzero feat : "<<index_set.size()<<"\n";
-    if (max_index > 0){
-        printf("data sparsity: %.2lf%%\n",100 - index_set.size() * 100.0 / max_index);
-    }
+                
+				if (dataNum % show_count == 0){
+					cerr<<"data number  : "<<dataNum<<"    ";
+					cerr<<"valid dim    : "<<max_index<<"\r";
+					show_count *= 2;
+					show_count = show_count > max_show_count ? 
+						max_show_count : show_count;
+				}
+			}
+			else
+				break;
+		}
+	}
+	else {
+		cerr<<"Can not open file to read!"<<endl;
+		return false;
+	}
+	cerr<<"\n";
+	reader->Close();
+	size_t valid_dim = 0;
+	for (int i = 0; i < index_set.size(); i++) {
+		if (index_set[i] == 1)
+			valid_dim++;
+	}
+	cout<<"data number  : "<<dataNum<<"\n";
+	cout<<"feat number  : "<<featNum<<"\n";
+	cout<<"valid dim    : "<<max_index<<"\n";
+	cout<<"nonzero feat : "<<valid_dim<<"\n";
+	if (max_index > 0){
+		printf("data sparsity: %.2lf%%\n",100 - valid_dim * 100.0 / max_index);
+	}
 
-    return true;
+	return true;
 }
 
 int main(int argc, char** args){ 
-    if (argc != 2){
-        cout<<"Usage: data_analysis data_file"<<endl;
-        return 0;
-    }
-//check memory leak in VC++
+	if (argc != 2){
+		cout<<"Usage: data_analysis data_file"<<endl;
+		return 0;
+	}
+	//check memory leak in VC++
 #if defined(_MSC_VER) && defined(_DEBUG)
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
 #endif
-    string filename = args[1];
-    //string filename = "/home/matthew/work/Data/aut/aut_train";
-    LibSVMReader reader(filename);
-    if (Analyze(&reader) == false)
-        cerr<<"analyze dataset failed!"<<endl;
-    return 0;
+	string filename = args[1];
+	//string filename = "/home/matthew/work/Data/aut/aut_train";
+	LibSVMReader reader(filename);
+	if (Analyze(&reader) == false)
+		cerr<<"analyze dataset failed!"<<endl;
+	return 0;
 }
