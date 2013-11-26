@@ -95,9 +95,9 @@ namespace SOL {
 
 					//L1 lazy update
 					size_t stepK = this->curIterNum - this->timeStamp[index_i];
-					//float gravity = this->sum_rate.last() - 
-					//	this->sum_rate[this->timeStamp[index_i]];
-					float gravity = stepK * this->lambda * this->beta_t / 2.f;
+					float gravity = this->sum_rate.last() - 
+						this->sum_rate[this->timeStamp[index_i]];
+					//float gravity = stepK * this->lambda * this->beta_t / 2.f;
 					this->timeStamp[index_i] = this->curIterNum;
 
 					this->weightVec[index_i]= 
@@ -136,14 +136,14 @@ namespace SOL {
 			this->beta_t = 1.f / this->r;
 			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 				//L1 lazy update
-				//gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
-				size_t stepK = this->curIterNum - this->timeStamp[index_i];
-				gravity = stepK * this->lambda * this->beta_t / 2.f;
+				gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
+				//size_t stepK = this->curIterNum - this->timeStamp[index_i];
+				//gravity = stepK * this->lambda * this->beta_t / 2.f;
 				this->timeStamp[index_i] = this->curIterNum;
 				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
 					gravity * this->sigma_w[index_i]);
 			}
-			float c = 0.447;//this makes exp(-0.1) \sigma probability density
+			float c = 0.142;//this makes 0.99 probability density
 			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 				if (fabsf(this->weightVec[index_i]) < c * sqrtf(this->sigma_w[index_i]))
 					this->weightVec[index_i] = 0;
