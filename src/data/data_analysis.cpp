@@ -24,6 +24,8 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
 	size_t show_count = 1000;
     size_t dataNum = 0;
     size_t featNum = 0;
+	size_t pos_num = 0;
+	size_t neg_num = 0;
     IndexType max_index = 0;
     s_array<char> index_set;
     DataPoint<FeatType, LabelType> data;
@@ -49,6 +51,15 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
+				if (data.label == 1)
+					pos_num++;
+				else if (data.label == -1)
+					neg_num++;
+				else{
+					cerr<<"\nunrecognized label!"<<endl;
+					break;
+				}
+
                 featNum += data.indexes.size();
                 
 				if (dataNum % show_count == 0){
@@ -78,6 +89,8 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
 	cout<<"feat number  : "<<featNum<<"\n";
 	cout<<"valid dim    : "<<max_index<<"\n";
 	cout<<"nonzero feat : "<<valid_dim<<"\n";
+	cout<<"positive num	: "<<pos_num<<"\n";
+	cout<<"negtive num	: "<<neg_num<<"\n";
 	if (max_index > 0){
 		printf("data sparsity: %.2lf%%\n",100 - valid_dim * 100.0 / max_index);
 	}

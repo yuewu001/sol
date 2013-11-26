@@ -5,7 +5,7 @@ import sys
 opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'ASAROW']
 #opt_list = ['SSAROW']
 #dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
-dataset_list = ['epsilon']
+dataset_list = ['url','epsilon']
 
 rootDir = 'D:/Data/Sparse/'
 
@@ -58,6 +58,9 @@ for dataset in dataset_list:
     elif dataset == 'epsilon':
         train_file = rootDir + 'epsilon/epsilon_normalized'
         test_file = rootDir + 'epsilon/epsilon_normalized.t'
+    elif dataset =='url':
+        train_file = rootDir + 'url_combined/url_train'
+        test_file  = rootDir + 'url_combined/url_test'
     
     else:
         print 'unrecoginized dataset'
