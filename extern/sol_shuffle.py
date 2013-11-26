@@ -2,7 +2,7 @@ import random
 import sys
 
 if len(sys.argv) != 3:
-    print 'usage: shuffle.py input output_num'
+    print 'usage: sol_shuffle.py input output_num'
     sys.ext()
 
 filename = sys.argv[1]

@@ -2,12 +2,13 @@ import os
 import sys
 
 #opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-#opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'ASAROW']
-opt_list = ['SSAROW']
+opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'AROW']
+#opt_list = ['AROW']
 #dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
-dataset_list = ['rcv1']
+#dataset_list = ['kdda', 'kddb', 'url']
+dataset_list = ['url']
 
-rootDir = 'D:/Data/Sparse/'
+rootDir = 'D:/Coding/SOL/data/'
 
 if len(sys.argv) == 2:
     dataset = sys.argv[1]
@@ -51,10 +52,12 @@ for dataset in dataset_list:
         train_file = rootDir + 'physic/physic_train'
         test_file  = rootDir + 'physic/physic_test' 
     
-    elif dataset == 'kdd':
-        train_file = rootDir + 'kdd/algebra/kdda'
-        test_file = rootDir + 'kdd/algebra/kdda.t'
-    
+    elif dataset == 'kdda':
+        train_file = rootDir + 'kdda/kdda_train'
+        test_file = rootDir + 'kdda/kdda.t'
+    elif dataset == 'kddb':
+        train_file = rootDir + 'kddb/kddb_train'
+        test_file = rootDir + 'kddb/kddb_test'
     elif dataset == 'epsilon':
         train_file = rootDir + 'epsilon/epsilon_normalized'
         test_file = rootDir + 'epsilon/epsilon_normalized.t'
@@ -109,7 +112,7 @@ for dataset in dataset_list:
             cmd += cmd_data
             os.system(cmd)
     
-    sys.exit()
+    #sys.exit()
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()
