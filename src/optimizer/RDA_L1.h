@@ -102,7 +102,6 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         void RDA_L1<FeatType, LabelType>::BeginTrain() {
             Optimizer<FeatType, LabelType>::BeginTrain();
-
 			this->gtVec.zeros();
             if (this->power_t != 0.5){
                 cerr<<"RDA only support a power t of 0.5!"<<endl;
@@ -113,21 +112,6 @@ namespace SOL {
     //called when a train ends
     template <typename FeatType, typename LabelType>
         void RDA_L1<FeatType, LabelType>::EndTrain() {
-            if (this->curIterNum == 1)
-                return;
-            float coeff1 = sqrtf((float)(this->curIterNum));
-            float coeff = -this->eta0 / coeff1;
-            float lambda_t = this->lambda * (this->curIterNum);
-            if (this->gamma_rou > 0){
-                lambda_t += this->gamma_rou * coeff1;
-            }
-            for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
-                this->weightVec[index_i] = coeff * trunc_weight(this->gtVec[index_i],
-                        lambda_t);
-            }
-            //bias
-            this->weightVec[0] = coeff * this->gtVec[0];
-
             Optimizer<FeatType, LabelType>::EndTrain();
         }
 

@@ -14,7 +14,6 @@
 namespace SOL {
     template <typename FeatType, typename LabelType>
         class CW_RDA: public Optimizer<FeatType, LabelType> {
-
             protected:
                 float r;
                 s_array<float> sigma_w;
@@ -77,7 +76,6 @@ namespace SOL {
             for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
                 //lazy update
-                //update s[i]
                 this->weightVec[index_i] = -this->sigma_w[index_i] *
 					trunc_weight(u_t[index_i], this->gravity_t[index_i] * (this->curIterNum - 1));
             }
@@ -119,7 +117,6 @@ namespace SOL {
 		template <typename FeatType, typename LabelType>
 		void CW_RDA<FeatType, LabelType>::BeginTrain() {
 			Optimizer<FeatType, LabelType>::BeginTrain();
-			//reset time stamp
 			this->u_t.zeros();
 			this->gravity_t.zeros();
 			this->sigma_w.set_value(1);
@@ -128,12 +125,6 @@ namespace SOL {
 		//called when a train ends
 		template <typename FeatType, typename LabelType>
 		void CW_RDA<FeatType, LabelType>::EndTrain() {
-			for (IndexType i = 1; i < this->weightDim; i++) {
-				//lazy update
-				this->gravity_t[i] = 0.5f / this->r * this->lambda;
-				this->weightVec[i] = -this->sigma_w[i] * 
-					trunc_weight(u_t[i], this->curIterNum * this->gravity_t[i]);
-			}
 			Optimizer<FeatType,LabelType>::EndTrain();
 		}
 
@@ -155,7 +146,6 @@ namespace SOL {
 				//set the rest to one
 				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim, 
 					this->sigma_w.end,1);
-
 
 				this->u_t.reserve(newDim + 1);
 				this->u_t.resize(newDim + 1);

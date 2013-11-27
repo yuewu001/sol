@@ -34,10 +34,12 @@ namespace SOL
 	static const float init_gammarou = 25;
 	//delta in adaptive algorithms
 	static const float init_delta = 10;
-    //trade-off parameter in AROW
-    static const int init_r = 1;
+	//r in AROW
+	static const float init_r = 1;
     //skip value in SVM2SGD
     static const int init_skip = 16;
+	//intial value of norminv in Confidence weighted algorithms
+	static const float init_phi =  1.f;
 
 	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
 	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;

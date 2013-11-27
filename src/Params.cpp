@@ -65,10 +65,10 @@ namespace SOL {
                 this->initial_t = strtol(args[i+1], NULL, 10);
             else if (strcmp(args[i], "-power_t") == 0 && i + 1 < argc)
                 this->power_t = (float)strtod(args[i+1], NULL);
-            else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
-                this->r = (float)strtod(args[i+1], NULL);
             else if (strcmp(args[i],"-delta") == 0 && i + 1 < argc)
                 this->delta = (float)strtod(args[i + 1], NULL);
+            else if (strcmp(args[i],"-r") == 0 && i + 1 < argc)
+                this->r = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-opt") == 0 && i + 1 < argc) //opti method
                 this->ParseOptiMethod(args[i+1]);
             else if (strcmp(args[i],"-dt") == 0 && i + 1 < argc) //data type
@@ -100,9 +100,9 @@ namespace SOL {
         this->lambda = -1;
         this->delta = -1;
         this->K = -1;
+		this->r = init_r;
         this->buf_size = -1;
         this->gamma_rou = init_gammarou;
-        this->r = init_r;
         this->is_learn_best_param = init_is_learn_best_param;
         this->power_t = init_power_t;
         this->initial_t = init_initial_t;
@@ -132,8 +132,10 @@ namespace SOL {
             this->opti_method = Opti_SSAROW;
         else if (strcmp(c_str, "ASAROW") == 0)
             this->opti_method = Opti_ASAROW;
-		else if (strcmp(c_str, "CW_RDA") == 0)
+		else if (strcmp(c_str, "CW-RDA") == 0)
 			this->opti_method = Opti_CW_RDA;
+		else if (strcmp(c_str, "SCW-RDA") == 0)
+			this->opti_method = Opti_SCW_RDA;
         else {
             cerr<<"Unrecognized Optimization method!"<<endl;
             exit(0);
@@ -188,7 +190,7 @@ namespace SOL {
         cout<<"\t-loss arg:\t loss function type\n\t\t\t\tHinge|Logit|Square|SquareHinge\n";
 
         cout<<"Algorithms and Parameters: \n";
-        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW|CW_RDA\n";
+        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW|CW-RDA|SCW-RDA\n";
         cout<<"\t-lbp    :\t learn best parameter\n";
         cout<<"\t-eta arg:\t learning rate\n";
         cout<<"\t-power_t arg:\tpower t of decaying learing rate\n";
@@ -198,7 +200,7 @@ namespace SOL {
 
         cout<<"\t-k arg:\t\t number of K in truncated gradient(STG)\n";
         cout<<"\t-grou arg:\t gamma times rou(RDA_E)\n";
-        cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-FOBOS, Ada-RDA)\n";
+        cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-FOBOS, Ada-RDA, AROW, SCW)\n";
 
         cout<<"\n";
         exit(0);

@@ -117,13 +117,6 @@ namespace SOL {
 		//called when a train ends
 		template <typename FeatType, typename LabelType>
 		void Ada_RDA<FeatType, LabelType>::EndTrain() {
-			for (IndexType i = 1; i < this->weightDim; i++) {
-				//lazy update
-				//update s[i]
-				float Htii = this->delta + s[i];
-				this->weightVec[i] = - this->eta0 / Htii * 
-					trunc_weight(u_t[i], this->lambda * this->curIterNum);
-			}
 			Optimizer<FeatType,LabelType>::EndTrain();
 		}
 

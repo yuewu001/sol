@@ -22,6 +22,7 @@
 #include "optimizer/SSAROW.h"
 #include "optimizer/ASAROW.h"
 #include "optimizer/CW_RDA.h"
+#include "optimizer/SCW_RDA.h"
 
 #include "loss/LogisticLoss.h"
 #include "loss/HingeLoss.h"
@@ -231,7 +232,13 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 			return opti;
 			break;
 		}
-
+	case Opti_SCW_RDA:
+		{
+			SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
+			opti->SetParameterEx(param.lambda, param.r);
+			return opti;
+			break;
+		}
 
 	default:
 		break;

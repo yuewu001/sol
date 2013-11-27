@@ -53,6 +53,7 @@ namespace SOL {
         Opti_SSAROW     = 8,
         Opti_ASAROW     = 9,
 		Opti_CW_RDA		= 10,
+		Opti_SCW_RDA	= 11,
     };
 
     enum NormType {
