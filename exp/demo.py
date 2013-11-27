@@ -1,12 +1,15 @@
+#!/usr/bin/env python
 import os
 import sys
 
 #opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'AROW']
-#opt_list = ['AROW']
+#opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'AROW']
+#opt_list = ['RDA','Ada-RDA','CW_RDA']
+opt_list = ['CW_RDA']
+
 #dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
 #dataset_list = ['kdda', 'kddb', 'url']
-dataset_list = ['url']
+dataset_list = ['rcv1']
 
 rootDir = 'D:/Coding/SOL/data/'
 
@@ -112,7 +115,7 @@ for dataset in dataset_list:
             cmd += cmd_data
             os.system(cmd)
     
-    #sys.exit()
+    sys.exit()
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()

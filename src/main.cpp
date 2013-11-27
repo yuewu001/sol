@@ -21,10 +21,12 @@
 #include "optimizer/DAROW.h"
 #include "optimizer/SSAROW.h"
 #include "optimizer/ASAROW.h"
+#include "optimizer/CW_RDA.h"
 
 #include "loss/LogisticLoss.h"
 #include "loss/HingeLoss.h"
 #include "loss/SquareLoss.h"
+#include "loss/SquaredHingeLoss.h"
 
 #include "common/util.h"
 
@@ -141,6 +143,8 @@ LossFunction<T1,T2>* GetLossFunc(const Params &param) {
 		return new LogisticLoss<T1,T2>();
 	case Loss_Type_Square:
 		return new SquareLoss<T1,T2>();
+	case Loss_Type_SquareHinge:
+		return new SquaredHingeLoss<T1, T2>();
 	default:
 		cout<<"Unrecognized Loss function!"<<endl;
 		return NULL;
@@ -217,6 +221,13 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		{
 			ASAROW<T1,T2> *opti = new ASAROW<T1, T2>(dataset,lossFunc);
 			opti->SetParameterEx(param.K, param.lambda, param.r);
+			return opti;
+			break;
+		}
+	case Opti_CW_RDA:
+		{
+			CW_RDA<T1,T2> *opti = new CW_RDA<T1, T2>(dataset,lossFunc);
+			opti->SetParameterEx(param.lambda, param.r);
 			return opti;
 			break;
 		}

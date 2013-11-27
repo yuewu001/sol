@@ -132,6 +132,8 @@ namespace SOL {
             this->opti_method = Opti_SSAROW;
         else if (strcmp(c_str, "ASAROW") == 0)
             this->opti_method = Opti_ASAROW;
+		else if (strcmp(c_str, "CW_RDA") == 0)
+			this->opti_method = Opti_CW_RDA;
         else {
             cerr<<"Unrecognized Optimization method!"<<endl;
             exit(0);
@@ -162,6 +164,8 @@ namespace SOL {
             this->loss_type = Loss_Type_Logit;
         else if (strcmp(c_str,"square") == 0)
             this->loss_type = Loss_Type_Square;
+		else if (strcmp(c_str,"squarehinge") == 0)
+			this->loss_type = Loss_Type_SquareHinge;
         else {
             cout<<"Unrecognized Loss Function Type!"<<endl;
             exit(0);
@@ -181,10 +185,10 @@ namespace SOL {
         cout<<"\t-bs arg :\t number of chunks for buffering\n";
 
         cout<<"Loss Functions: \n";
-        cout<<"\t-loss arg:\t loss function type\n\t\t\t\tHinge|Logit|Square\n";
+        cout<<"\t-loss arg:\t loss function type\n\t\t\t\tHinge|Logit|Square|SquareHinge\n";
 
         cout<<"Algorithms and Parameters: \n";
-        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW\n";
+        cout<<"\t-opt arg:\t optimization method:\n\t\t\t\tSGD|STG|RDA|RDA_E|FOBOS|Ada-RDA|Ada-FOBOS|AROW|SAROW|CW_RDA\n";
         cout<<"\t-lbp    :\t learn best parameter\n";
         cout<<"\t-eta arg:\t learning rate\n";
         cout<<"\t-power_t arg:\tpower t of decaying learing rate\n";

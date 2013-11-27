@@ -21,6 +21,7 @@ namespace SOL {
         Loss_Type_Hinge = 0,
         Loss_Type_Logit = 1,
         Loss_Type_Square = 2,
+        Loss_Type_SquareHinge = 3,
     };
 
     enum enum_DataSet_Type {
@@ -48,9 +49,10 @@ namespace SOL {
         Opti_FOBOS      = 4,
         Opti_Ada_RDA    = 5,
         Opti_Ada_FOBOS  = 6,
-        Opti_DAROW       = 7,
-        Opti_SSAROW       = 8,
-        Opti_ASAROW       = 9,
+        Opti_DAROW      = 7,
+        Opti_SSAROW     = 8,
+        Opti_ASAROW     = 9,
+		Opti_CW_RDA		= 10,
     };
 
     enum NormType {

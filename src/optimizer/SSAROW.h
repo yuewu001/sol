@@ -13,6 +13,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 
 #include "../common/util.h"
 #include "Optimizer.h"
+#include "../loss/SquaredHingeLoss.h"
 #include <cmath>
 #include <limits>
 
@@ -25,8 +26,6 @@ namespace SOL {
                 s_array<size_t> timeStamp;
 				s_array<float> sum_rate;
 				
-				float beta_t;
-
             public:
                 SSAROW(DataSet<FeatType, LabelType> &dataset, 
                         LossFunction<FeatType, LabelType> &lossFunc);
@@ -58,10 +57,15 @@ namespace SOL {
                 this->r = init_r;
 				this->sigma_w.resize(this->weightDim);
 				this->timeStamp.resize(this->weightDim);
+				this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
             }
 
     template <typename FeatType, typename LabelType>
         SSAROW<FeatType, LabelType>::~SSAROW() {
+			if (this->lossFunc != NULL){
+				delete this->lossFunc;
+				this->lossFunc = NULL;
+			}
         }
 
     //this is the core of different updating algorithms
@@ -72,26 +76,25 @@ namespace SOL {
             size_t featDim = x.indexes.size();
 			IndexType index_i = 0;
 
-			//calculate this->beta_t
-			this->beta_t = this->r;
+			//calculate learning rate
+			this->eta = this->r;
 			for (size_t i = 0; i < featDim; i++){
-				this->beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+				this->eta += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
 			}
-			this->beta_t += this->r;
-			this->beta_t = 1.f / this->beta_t;
+			this->eta = 0.5f / this->eta;
 			this->sum_rate.push_back(this->sum_rate.last() + 
-				this->beta_t  / 2.f * this->lambda);
+				this->eta * this->lambda);
 
 			float y = this->Predict(x); 
-			float alpha_t = 1 - x.label * y;
+			float gt_i = this->lossFunc->GetGradient(x.label,y);
 			//update w_t
-			if(alpha_t > 0){
-				alpha_t *= this->beta_t; 
+			if(gt_i != 0){
+				gt_i *= this->eta;
 				for (size_t i = 0; i < featDim; i++){
 					index_i = x.indexes[i];
 					//update u_t
-					this->weightVec[index_i] += alpha_t * 
-						this->sigma_w[index_i] * x.label * x.features[i];
+					this->weightVec[index_i] -= gt_i *
+						x.features[i] * this->sigma_w[index_i];  
 
 					//L1 lazy update
 					size_t stepK = this->curIterNum - this->timeStamp[index_i];
@@ -104,15 +107,12 @@ namespace SOL {
 						trunc_weight(this->weightVec[index_i],
 						gravity * (this->sigma_w[index_i])); 
 					//update sigma_w
-					this->sigma_w[index_i] -= this->beta_t * 
-						this->sigma_w[index_i] * this->sigma_w[index_i] * 
-						x.features[i] * x.features[i];
+					this->sigma_w[index_i] *= this->r / (this->r + this->sigma_w[index_i] * x.features[i] * x.features[i]);
 				}
 
 				//bias term
-				this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
-				this->sigma_w[0] -= this->beta_t * this->sigma_w[0] * this->sigma_w[0];
-
+				this->weightVec[0] -= gt_i * this->sigma_w[0];
+				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 				this->timeStamp[0] = this->curIterNum;
 			}
 			return y;
@@ -144,12 +144,6 @@ namespace SOL {
 				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
 					gravity * this->sigma_w[index_i]);
 			}
-			float c = 0.142f;//this makes 0.99 probability density
-			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
-				if (fabsf(this->weightVec[index_i]) < c * sqrtf(this->sigma_w[index_i]))
-					this->weightVec[index_i] = 0;
-			}
-
 			Optimizer<FeatType, LabelType>::EndTrain();
 		}
 

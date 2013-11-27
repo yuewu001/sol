@@ -11,10 +11,11 @@ Machine Learning Research, 2011, 999999: 2121-2159.
 This file implements the L1 regularization
  ************************************************************************/
 
-#pragma once
+#ifndef HEADER_ADA_RDA
+#define HEADER_ADA_RDA
+
 #include "Optimizer.h"
 #include <cmath>
-#include <limits>
 #include <stdexcept>
 
 namespace SOL {
@@ -23,7 +24,6 @@ namespace SOL {
 
 		protected:
 			float delta;
-			s_array<size_t> timeStamp;
 			s_array<float> s;
 			s_array<float> u_t;
 		public:
@@ -59,7 +59,6 @@ namespace SOL {
 			LossFunction<FeatType, LabelType> &lossFunc):
 		Optimizer<FeatType, LabelType>(dataset, lossFunc){
 				this->delta = init_delta;;
-				this->timeStamp.resize(this->weightDim);
 				this->s.resize(this->weightDim);
 				this->u_t.resize(this->weightDim);
 
@@ -112,8 +111,6 @@ namespace SOL {
 		template <typename FeatType, typename LabelType>
 		void Ada_RDA<FeatType, LabelType>::BeginTrain() {
 			Optimizer<FeatType, LabelType>::BeginTrain();
-			//reset time stamp
-			this->timeStamp.zeros();
 			this->s.zeros();
 			this->u_t.zeros();
 		}
@@ -185,12 +182,6 @@ namespace SOL {
 			if (newDim < this->weightDim)
 				return;
 			else {
-				this->timeStamp.reserve(newDim + 1);
-				this->timeStamp.resize(newDim + 1);
-				//set the rest to zero
-				this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
-					this->timeStamp.end);
-
 				this->s.reserve(newDim + 1);
 				this->s.resize(newDim + 1);
 				//set the rest to zero
@@ -209,3 +200,4 @@ namespace SOL {
 
 
 }
+#endif

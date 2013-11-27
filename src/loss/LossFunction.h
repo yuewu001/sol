@@ -26,5 +26,8 @@ namespace SOL {
 
         virtual float GetLoss(LabelType label, float predict) = 0;
         virtual float GetGradient(LabelType label, float predict) = 0;
+
+	public:
+		virtual ~LossFunction(){}
     };
 }

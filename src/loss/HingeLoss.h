@@ -5,7 +5,9 @@
 	> Functions: Hinge Loss function, for SVM
  ************************************************************************/
 
-#pragma once
+#ifndef HEADER_HINGE_LOSS
+#define HEADER_HINGE_LOSS
+
 #include "LossFunction.h"
 
 namespace SOL {
@@ -24,3 +26,5 @@ namespace SOL {
 			}
 	};
 }
+
+#endif
