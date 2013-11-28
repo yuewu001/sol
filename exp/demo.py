@@ -7,12 +7,10 @@ opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA']
 #opt_list = ['SSAROW']
 
 #dataset_list = ['news', 'rcv1', 'url']
-dataset_list = ['url']
+dataset_list = ['news', 'rcv1','url','webspam', 'webspam_trigram']
 
 rootDir = 'D:/Coding/SOL/data/'
 #rootDir = 'D:/Data/Sparse/'
-
-cmd_data = ' -loss Hinge '
 
 for dataset in dataset_list:
     cmd_data = ' -loss Hinge -norm '
@@ -23,6 +21,9 @@ for dataset in dataset_list:
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 
+    elif dataset == 'real-sim':
+        train_file = 'real-sim/real-sim_train'
+        test_file = 'real-sim/real-sim_test' 
     elif dataset == 'epsilon':
         train_file = 'epsilon/epsilon_normalized'
         test_file = 'epsilon/epsilon_normalized.t'
@@ -121,6 +122,38 @@ for dataset in dataset_list:
                 cmd += ' -eta 32 '
             elif opt == 'RDA':
                 cmd += ' -eta 64'
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+        elif dataset == 'real-sim':
+            if opt == 'SSAROW':
+                cmd += ' -r 4 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 4'
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'STG':
+                cmd += ' -eta 1 '
+            elif opt == 'RDA':
+                cmd += ' -eta 1'
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+        elif dataset == 'webspam' or dataset == 'webspam_trigram':
+            if opt == 'SSAROW':
+                cmd += ' -r 0.125 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 0.125 '
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 8 -delta 0.125 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 8 -delta 0.5 '
+            elif opt == 'STG':
+                cmd += ' -eta 64 '
+            elif opt == 'RDA':
+                cmd += ' -eta 32 '
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
