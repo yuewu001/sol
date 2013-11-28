@@ -75,17 +75,20 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float SSAROW<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
-            size_t featDim = x.indexes.size();
-			IndexType index_i = 0;
+			IndexType* p_index = x.indexes.begin;
+			float* p_feat = x.features.begin;
 
+			//obtain w_t
 			float y = this->Predict(x); 
 			float gt_i = this->lossFunc->GetGradient(x.label,y);
 			//update w_t
 			if(gt_i != 0){
 				//calculate learning rate
 				this->eta = this->r;
-				for (size_t i = 0; i < featDim; i++)
-					this->eta += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+				while(p_index != x.indexes.end){
+					this->eta += (*p_feat) * (*p_feat) * this->sigma_w[*p_index];
+					p_index++;p_feat++;
+				}
 
 				this->eta = 0.5f / this->eta;
 				this->sum_rate.push_back(this->sum_rate.last() + 
@@ -93,26 +96,28 @@ namespace SOL {
 				gt_i *= this->eta;
 
 				float last_g_sum = this->sum_rate.last();
-
-				for (size_t i = 0; i < featDim; i++){
-					index_i = x.indexes[i];
+				p_index = x.indexes.begin;
+				p_feat = x.features.begin;
+				while(p_index != x.indexes.end){
 					//update u_t
-					this->weightVec[index_i] -= gt_i *
-						x.features[i] * this->sigma_w[index_i];  
+					this->weightVec[*p_index] -= gt_i *
+						(*p_feat) * this->sigma_w[*p_index];  
 
 					//L1 lazy update
-					size_t stepK = this->iter_num - this->timeStamp[index_i];
+					size_t stepK = this->iter_num - this->timeStamp[*p_index];
 					float gravity = last_g_sum - 
-						this->sum_rate[this->timeStamp[index_i]];
+						this->sum_rate[this->timeStamp[*p_index]];
 					//float gravity = stepK * this->lambda * this->beta_t / 2.f;
-					this->timeStamp[index_i] = this->iter_num;
+					this->timeStamp[*p_index] = this->iter_num;
 
-					this->weightVec[index_i]= 
-						trunc_weight(this->weightVec[index_i],
-						gravity * (this->sigma_w[index_i])); 
+					this->weightVec[*p_index]= 
+						trunc_weight(this->weightVec[*p_index],
+						gravity * this->sigma_w[*p_index]); 
 
 					//update sigma_w
-					this->sigma_w[index_i] *= this->r / (this->r + this->sigma_w[index_i] * x.features[i] * x.features[i]);
+					this->sigma_w[*p_index] *= this->r / (this->r + 
+						this->sigma_w[*p_index] * (*p_feat) * (*p_feat));
+					p_index++;p_feat++;
 				}
 
 				//bias term
