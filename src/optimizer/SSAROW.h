@@ -25,6 +25,8 @@ namespace SOL {
                 s_array<float> sigma_w;
                 s_array<size_t> timeStamp;
 				s_array<float> sum_rate;
+
+				size_t iter_num;
 				
             public:
                 SSAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -76,20 +78,22 @@ namespace SOL {
             size_t featDim = x.indexes.size();
 			IndexType index_i = 0;
 
-			//calculate learning rate
-			this->eta = this->r;
-			for (size_t i = 0; i < featDim; i++){
-				this->eta += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
-			}
-			this->eta = 0.5f / this->eta;
-			this->sum_rate.push_back(this->sum_rate.last() + 
-				this->eta * this->lambda);
-
 			float y = this->Predict(x); 
 			float gt_i = this->lossFunc->GetGradient(x.label,y);
 			//update w_t
 			if(gt_i != 0){
+				//calculate learning rate
+				this->eta = this->r;
+				for (size_t i = 0; i < featDim; i++)
+					this->eta += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+
+				this->eta = 0.5f / this->eta;
+				this->sum_rate.push_back(this->sum_rate.last() + 
+					this->eta * this->lambda);
 				gt_i *= this->eta;
+
+				float last_g_sum = this->sum_rate.last();
+
 				for (size_t i = 0; i < featDim; i++){
 					index_i = x.indexes[i];
 					//update u_t
@@ -97,15 +101,16 @@ namespace SOL {
 						x.features[i] * this->sigma_w[index_i];  
 
 					//L1 lazy update
-					size_t stepK = this->curIterNum - this->timeStamp[index_i];
-					float gravity = this->sum_rate.last() - 
+					size_t stepK = this->iter_num - this->timeStamp[index_i];
+					float gravity = last_g_sum - 
 						this->sum_rate[this->timeStamp[index_i]];
 					//float gravity = stepK * this->lambda * this->beta_t / 2.f;
-					this->timeStamp[index_i] = this->curIterNum;
+					this->timeStamp[index_i] = this->iter_num;
 
 					this->weightVec[index_i]= 
 						trunc_weight(this->weightVec[index_i],
 						gravity * (this->sigma_w[index_i])); 
+
 					//update sigma_w
 					this->sigma_w[index_i] *= this->r / (this->r + this->sigma_w[index_i] * x.features[i] * x.features[i]);
 				}
@@ -113,7 +118,9 @@ namespace SOL {
 				//bias term
 				this->weightVec[0] -= gt_i * this->sigma_w[0];
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
-				this->timeStamp[0] = this->curIterNum;
+				this->timeStamp[0] = this->iter_num;
+
+				this->iter_num++;
 			}
 			return y;
 		}
@@ -126,7 +133,7 @@ namespace SOL {
 			this->timeStamp.zeros();
 			this->sigma_w.set_value(1);
 			this->sum_rate.push_back(0);
-			this->curIterNum = 1; //force to begin from 1, as sum_rate depends on this value
+			this->iter_num = 1; //force to begin from 1, as sum_rate depends on this value
 		}
 
 		//called when a train ends

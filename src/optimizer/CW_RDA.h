@@ -18,7 +18,7 @@ namespace SOL {
                 float r;
                 s_array<float> sigma_w;
                 s_array<float> u_t;
-				s_array<float> gravity_t;
+				float gravity;
 
             public:
                 CW_RDA(DataSet<FeatType, LabelType> &dataset, 
@@ -54,7 +54,6 @@ namespace SOL {
                 this->r = init_r;
                 this->u_t.resize(this->weightDim);
                 this->sigma_w.resize(this->weightDim);
-				this->gravity_t.resize(this->weightDim);
                 this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
             }
 
@@ -77,7 +76,7 @@ namespace SOL {
                 index_i = x.indexes[i];
                 //lazy update
                 this->weightVec[index_i] = -this->sigma_w[index_i] *
-					trunc_weight(u_t[index_i], this->gravity_t[index_i] * (this->curIterNum - 1));
+					trunc_weight(u_t[index_i], gravity * (this->curIterNum - 1));
             }
 
             //predict 
@@ -87,24 +86,22 @@ namespace SOL {
             if (gt != 0){
 				//calculate learning rate
 				this->eta = this->r;
+				float temp_sum = 0;
 				for (size_t i = 0; i < featDim; i++){
-					this->eta += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+					index_i = x.indexes[i];
+					temp_sum = x.features[i] * x.features[i] * this->sigma_w[index_i];
+					this->eta += temp_sum;
+					//update sigma_w
+					this->sigma_w[index_i] *= this->r / (this->r + temp_sum);
 				}
 				this->eta = 0.5f / this->eta;
 				gt *= this->eta;
-				float gravity = this->lambda * this->eta;
+				gravity = this->lambda * this->eta;
 
-				float gt_i = 0;
 				//update
-				for (size_t i = 0; i < featDim; i++) {
-					index_i = x.indexes[i];
-					gt_i = gt * x.features[i];
-					this->u_t[index_i] += gt_i;
-					this->gravity_t[index_i] = gravity;
+				for (size_t i = 0; i < featDim; i++) 
+					this->u_t[x.features[i]] += gt * x.features[i];
 
-					//update sigma_w
-					this->sigma_w[index_i] *= this->r / (this->r + this->sigma_w[index_i] * x.features[i] * x.features[i]);
-				}
 				//bias term
 				this->u_t[0] += gt;
 				this->weightVec[0] = -u_t[0] * this->sigma_w[0]; 
@@ -118,7 +115,6 @@ namespace SOL {
 		void CW_RDA<FeatType, LabelType>::BeginTrain() {
 			Optimizer<FeatType, LabelType>::BeginTrain();
 			this->u_t.zeros();
-			this->gravity_t.zeros();
 			this->sigma_w.set_value(1);
 		}
 
@@ -151,13 +147,6 @@ namespace SOL {
 				//set the rest to zero
 				this->u_t.zeros(this->u_t.begin + this->weightDim,
 					this->u_t.end);
-
-				this->gravity_t.reserve(newDim + 1);
-				this->gravity_t.resize(newDim + 1);
-				//set the rest to zero
-				this->gravity_t.zeros(this->gravity_t.begin + this->weightDim,
-					this->gravity_t.end);
-
 				Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 			}
 		}
