@@ -1,9 +1,9 @@
 /*************************************************************************
-  > File Name: CW_RDA.h
-  > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-  > Created Time: 2013/11/27 14:04:06
-  > Functions: Confidence weighted regularized dual averaging
- ************************************************************************/
+> File Name: CW_RDA.h
+> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
+> Created Time: 2013/11/27 14:04:06
+> Functions: Confidence weighted regularized dual averaging
+************************************************************************/
 #ifndef HEADER_CW_RDA
 #define HEADER_CW_RDA
 
@@ -12,65 +12,79 @@
 #include <stdexcept>
 
 namespace SOL {
-    template <typename FeatType, typename LabelType>
-        class CW_RDA: public Optimizer<FeatType, LabelType> {
-            protected:
-                float r;
-                s_array<float> sigma_w;
-                s_array<float> u_t;
-				float gravity;
+	template <typename FeatType, typename LabelType>
+	class CW_RDA: public Optimizer<FeatType, LabelType> {
+	protected:
+		float r;
+		s_array<float> sigma_w;
+		s_array<float> u_t;
+		float gravity;
+		bool is_normalize;
 
-            public:
-                CW_RDA(DataSet<FeatType, LabelType> &dataset, 
-                        LossFunction<FeatType, LabelType> &lossFunc);
-                ~CW_RDA();
+	public:
+		CW_RDA(DataSet<FeatType, LabelType> &dataset, 
+			LossFunction<FeatType, LabelType> &lossFunc);
+		~CW_RDA();
 
-            public:
-                //set parameters for specific optimizers
-                void SetParameterEx(float r = -1);
+	public:
+		//set parameters for specific optimizers
+		void SetParameterEx(float r = -1);
 
-            protected:
-                //this is the core of different updating algorithms
-                virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
+	protected:
+		//this is the core of different updating algorithms
+		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 
-                //Change the dimension of weights
-                virtual void UpdateWeightSize(IndexType newDim);
+		//Change the dimension of weights
+		virtual void UpdateWeightSize(IndexType newDim);
 
-                //reset
-                virtual void BeginTrain();
-                //called when a train ends
-                virtual void EndTrain();
+		//reset
+		virtual void BeginTrain();
+		//called when a train ends
+		virtual void EndTrain();
 
-                //try and get the best parameter
-                virtual void BestParameter(){}
+		//try and get the best parameter
+		virtual void BestParameter(){}
 
-        };
+	};
 
-    template <typename FeatType, typename LabelType>
-        CW_RDA<FeatType, LabelType>::CW_RDA(DataSet<FeatType, LabelType> &dataset, 
-                LossFunction<FeatType, LabelType> &lossFunc):
-            Optimizer<FeatType, LabelType>(dataset, lossFunc){
-                this->id_str = "Confidence Weighted RDA";
-                this->r = init_r;
-                this->u_t.resize(this->weightDim);
-                this->sigma_w.resize(this->weightDim);
-                this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-            }
+	template <typename FeatType, typename LabelType>
+	CW_RDA<FeatType, LabelType>::CW_RDA(DataSet<FeatType, LabelType> &dataset, 
+		LossFunction<FeatType, LabelType> &lossFunc):
+	Optimizer<FeatType, LabelType>(dataset, lossFunc){
+		this->id_str = "Confidence Weighted RDA";
+		this->r = init_r;
+		this->u_t.resize(this->weightDim);
+		this->sigma_w.resize(this->weightDim);
+		this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
+		this->is_normalize = true;
+	}
 
-    template <typename FeatType, typename LabelType>
+	template <typename FeatType, typename LabelType>
 	CW_RDA<FeatType, LabelType>::~CW_RDA() {
 		if (this->lossFunc != NULL){
 			delete this->lossFunc;
 			this->lossFunc = NULL;
 		}
 	}
-    //this is the core of different updating algorithms
-    template <typename FeatType, typename LabelType>
-        float CW_RDA<FeatType,LabelType>::UpdateWeightVec(
-                const DataPoint<FeatType, LabelType> &x) {
-            size_t featDim = x.indexes.size();
+	//this is the core of different updating algorithms
+	template <typename FeatType, typename LabelType>
+	float CW_RDA<FeatType,LabelType>::UpdateWeightVec(
+		const DataPoint<FeatType, LabelType> &x) {
 			IndexType* p_index = x.indexes.begin;
 			float* p_feat = x.features.begin;
+
+			if (is_normalize){
+				if (x.sum_sq != 1){
+					float norm = sqrtf(x.sum_sq);
+					while(p_index != x.indexes.end){
+						*p_feat /= norm;
+						p_index++; p_feat++;
+					}
+				}
+			}
+
+			p_index = x.indexes.begin;
+			p_feat = x.features.begin;
 			//obtain w_t
 			while(p_index != x.indexes.end){
 				//lazy update
@@ -113,49 +127,49 @@ namespace SOL {
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 			}
 			return y;
-		}
+	}
 
-		//reset the optimizer to this initialization
-		template <typename FeatType, typename LabelType>
-		void CW_RDA<FeatType, LabelType>::BeginTrain() {
-			Optimizer<FeatType, LabelType>::BeginTrain();
-			this->u_t.zeros();
-			this->sigma_w.set_value(1);
-			this->gravity = 0;
-		}
+	//reset the optimizer to this initialization
+	template <typename FeatType, typename LabelType>
+	void CW_RDA<FeatType, LabelType>::BeginTrain() {
+		Optimizer<FeatType, LabelType>::BeginTrain();
+		this->u_t.zeros();
+		this->sigma_w.set_value(1);
+		this->gravity = 0;
+	}
 
-		//called when a train ends
-		template <typename FeatType, typename LabelType>
-		void CW_RDA<FeatType, LabelType>::EndTrain() {
-			Optimizer<FeatType,LabelType>::EndTrain();
-		}
+	//called when a train ends
+	template <typename FeatType, typename LabelType>
+	void CW_RDA<FeatType, LabelType>::EndTrain() {
+		Optimizer<FeatType,LabelType>::EndTrain();
+	}
 
-		//set parameters for specific optimizers
-		template <typename FeatType, typename LabelType>
-		void CW_RDA<FeatType, LabelType>::SetParameterEx(float r) {
-			this->r = r > 0 ? r : this->r;
-		}
+	//set parameters for specific optimizers
+	template <typename FeatType, typename LabelType>
+	void CW_RDA<FeatType, LabelType>::SetParameterEx(float r) {
+		this->r = r > 0 ? r : this->r;
+	}
 
-		//Change the dimension of weights
-		template <typename FeatType, typename LabelType>
-		void CW_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-			if (newDim < this->weightDim)
-				return;
-			else {
-				this->sigma_w.reserve(newDim + 1);
-				this->sigma_w.resize(newDim + 1);
-				//set the rest to one
-				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim, 
-					this->sigma_w.end,1);
+	//Change the dimension of weights
+	template <typename FeatType, typename LabelType>
+	void CW_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+		if (newDim < this->weightDim)
+			return;
+		else {
+			this->sigma_w.reserve(newDim + 1);
+			this->sigma_w.resize(newDim + 1);
+			//set the rest to one
+			this->sigma_w.set_value(this->sigma_w.begin + this->weightDim, 
+				this->sigma_w.end,1);
 
-				this->u_t.reserve(newDim + 1);
-				this->u_t.resize(newDim + 1);
-				//set the rest to zero
-				this->u_t.zeros(this->u_t.begin + this->weightDim,
-					this->u_t.end);
-				Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
-			}
+			this->u_t.reserve(newDim + 1);
+			this->u_t.resize(newDim + 1);
+			//set the rest to zero
+			this->u_t.zeros(this->u_t.begin + this->weightDim,
+				this->u_t.end);
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
+	}
 }
 
 #endif
