@@ -79,6 +79,8 @@ namespace SOL {
                 this->loss_type = this->GetLossType(args[i+1]);
             else if (strcmp(args[i],"-grou") == 0 && i + 1 < argc)
                 this->gamma_rou = (float)strtod(args[i + 1], NULL);
+            else if (strcmp(args[i],"-phi") == 0 && i + 1 < argc)
+                this->phi = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else
@@ -106,6 +108,7 @@ namespace SOL {
         this->is_learn_best_param = init_is_learn_best_param;
         this->power_t = init_power_t;
         this->initial_t = init_initial_t;
+		this->phi = init_phi;
     }
 
     void Params::ParseOptiMethod(char *str_method) {
@@ -200,8 +203,9 @@ namespace SOL {
 
         cout<<"\t-k arg:\t\t number of K in truncated gradient(STG)\n";
         cout<<"\t-grou arg:\t gamma times rou(RDA_E)\n";
-        cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-FOBOS, Ada-RDA, AROW, SCW)\n";
-
+        cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-)\n";
+		cout<<"\t-r	arg:\t r in AROW\n";
+		cout<<"\t-phi arg:\t phi in SCW\n";
         cout<<"\n";
         exit(0);
     }

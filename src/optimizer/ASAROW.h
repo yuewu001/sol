@@ -36,7 +36,7 @@ namespace SOL {
                 virtual ~ASAROW();
 
             public:
-                void SetParameterEx(int k = -1, float lambda = -1,float r = -1);
+                void SetParameterEx(int k = -1, float r = -1);
             protected:
                 //this is the core of different updating algorithms
                 virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -134,9 +134,8 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float lambda,float r) {
+        void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float r) {
             this->K = k > 0 ? k : this->K; 
-            this->lambda  = lambda >= 0 ? lambda : this->lambda;
             this->r = r > 0 ? r : this->r;
         }
 

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "common/global.h"
+#include "data/parser.h"
 
 #include <string>
 #include <map>
@@ -42,12 +43,13 @@ namespace SOL
 		float gamma_rou; //for RDA
 		float delta; //for Ada-
 		float r; //for AROW
+		float phi; //for SCW
 
 		int buf_size; //number of chunks in dataset 
 
-        size_t initial_t;
-        float power_t; 
-        bool is_learn_best_param; //whether learn best parameter
+		size_t initial_t;
+		float power_t; 
+		bool is_learn_best_param; //whether learn best parameter
 
 	public:
 		Params(){}

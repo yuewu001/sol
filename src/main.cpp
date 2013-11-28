@@ -157,85 +157,68 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 	switch(param.opti_method) {
 	case Opti_SGD: 
 		{
-			SGD<T1,T2> *opti = new SGD<T1,T2>(dataset,lossFunc);
-			opti->SetParameter(param.lambda,param.eta);
-			return opti;
-			break;
+			return new SGD<T1,T2>(dataset,lossFunc);
 		}
 	case Opti_STG: 
 		{
 			STG<T1,T2> *opti = new STG<T1,T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda,param.K, param.eta);
+			opti->SetParameterEx(param.K);
 			return opti;
-			break;
 		}
 	case Opti_RDA: 
 		{
-			RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,false);
-			opti->SetParameterEx(param.lambda);
-			return opti;
-			break;
+			return new RDA_L1<T1,T2>(dataset,lossFunc,false);
 		}
 	case Opti_RDA_E: 
 		{
 			RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,true);
-			opti->SetParameterEx(param.lambda,param.gamma_rou);
+			opti->SetParameterEx(param.gamma_rou);
 			return opti;
-			break;
 		}
 	case Opti_FOBOS: 
 		{
-			FOBOS<T1,T2> *opti = new FOBOS<T1,T2>(dataset,lossFunc);
-			opti->SetParameter(param.lambda,param.eta);
-			return opti;
-			break;
+			return new FOBOS<T1,T2>(dataset,lossFunc);
 		}
 	case Opti_Ada_RDA: 
 		{
 			Ada_RDA<T1,T2> *opti = new Ada_RDA<T1,T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda,param.delta,param.eta);
+			opti->SetParameterEx(param.delta);
 			return opti;
-			break;
 		}
 	case Opti_Ada_FOBOS: 
 		{
 			Ada_FOBOS<T1,T2> *opti = new Ada_FOBOS<T1,T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda,param.delta,param.eta);
+			opti->SetParameterEx(param.delta);
 			return opti;
-			break;
 		}
 	case Opti_DAROW: 
 		{
 			DAROW<T1,T2> *opti = new DAROW<T1, T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda, param.r);
+			opti->SetParameterEx(param.r);
 			return opti;
-			break;
 		}
 	case Opti_SSAROW: 
 		{
 			SSAROW<T1,T2> *opti = new SSAROW<T1, T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda, param.r);
+			opti->SetParameterEx(param.r);
 			return opti;
-			break;
 		}
 	case Opti_ASAROW: 
 		{
 			ASAROW<T1,T2> *opti = new ASAROW<T1, T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.K, param.lambda, param.r);
+			opti->SetParameterEx(param.K, param.r);
 			return opti;
-			break;
 		}
 	case Opti_CW_RDA:
 		{
 			CW_RDA<T1,T2> *opti = new CW_RDA<T1, T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda, param.r);
+			opti->SetParameterEx(param.r);
 			return opti;
-			break;
 		}
 	case Opti_SCW_RDA:
 		{
 			SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
-			opti->SetParameterEx(param.lambda, param.r);
+			opti->SetParameterEx(param.phi, param.r);
 			return opti;
 			break;
 		}

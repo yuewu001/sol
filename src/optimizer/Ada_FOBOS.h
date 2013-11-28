@@ -32,7 +32,7 @@ namespace SOL {
 
 		public:
 			//set parameters for specific optimizers
-			void SetParameterEx(float lambda = -1, float delta = -1, float eta0 = -1);
+			void SetParameterEx(float delta = -1);
 
 			//select the best parameters for the model
 			//		virtual void BestParameter();
@@ -176,10 +176,8 @@ namespace SOL {
 
 		//set parameters for specific optimizers
 		template <typename FeatType, typename LabelType>
-		void Ada_FOBOS<FeatType, LabelType>::SetParameterEx(float lambda , float delta , float eta0 ) {
-			this->lambda = lambda >= 0 ? lambda : this->lambda;
+		void Ada_FOBOS<FeatType, LabelType>::SetParameterEx(float delta) {
 			this->delta = delta >= 0 ? delta : this->delta;
-			this->eta0 = eta0 > 0 ? eta0 : this->eta0;
 		}
 
 		//Change the dimension of weights

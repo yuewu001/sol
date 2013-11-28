@@ -23,7 +23,7 @@ namespace SOL {
                 ~RDA_L1();
 
             public:
-                void SetParameterEx(float lambda, float gamma_rou = -1);
+                void SetParameterEx( float gamma_rou = -1);
                 //try and get the best parameter
                 virtual void BestParameter(); 
 
@@ -116,8 +116,7 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void RDA_L1<FeatType,LabelType>::SetParameterEx(float lambda, float gammarou) {
-            this->gamma_rou = gammarou >= 0 ? gammarou : this->gamma_rou;
+        void RDA_L1<FeatType,LabelType>::SetParameterEx( float gammarou) {
             this->lambda = lambda >= 0 ? lambda : this->lambda;
         }
 

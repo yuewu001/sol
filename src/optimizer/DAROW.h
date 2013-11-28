@@ -30,7 +30,7 @@ namespace SOL {
             virtual ~DAROW();
 
         public:
-            void SetParameterEx(float lambda = -1,float r = -1);
+            void SetParameterEx(float r = -1);
         protected:
             //this is the core of different updating algorithms
             virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -136,8 +136,7 @@ namespace SOL {
         }
 
     template <typename FeatType, typename LabelType>
-        void DAROW<FeatType, LabelType>::SetParameterEx(float lambda,float r) {
-            this->lambda  = lambda >= 0 ? lambda : this->lambda;
+        void DAROW<FeatType, LabelType>::SetParameterEx(float r) {
             this->r = r > 0 ? r : this->r;
         }
 

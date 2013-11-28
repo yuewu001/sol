@@ -32,8 +32,7 @@ namespace SOL {
 		virtual ~STG();
 
 	public:
-		void SetParameterEx(float lambda = -1,int K = -1, 
-			float eta = -1);
+		void SetParameterEx(int K = -1);
 	protected:
 		//this is the core of different updating algorithms
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -84,12 +83,14 @@ namespace SOL {
 				}
 				else{
 					stepK = this->curIterNum - this->timeStamp[index_i];
+					if (stepK < this->K)
+						continue;
+
 					stepK -= stepK % this->K;
 					this->timeStamp[index_i] += stepK;
-				}
-
-				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+					this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
 					stepK * alpha);
+				}
 			}
 			//bias term
 			this->weightVec[0] -= gt_i;
@@ -120,10 +121,8 @@ namespace SOL {
 	}
 
 	template <typename FeatType, typename LabelType>
-	void STG<FeatType, LabelType>::SetParameterEx(float lambda , int k, float Eta) {
-		this->lambda  = lambda >= 0 ? lambda : this->lambda;
+	void STG<FeatType, LabelType>::SetParameterEx(int k) {
 		this->K = k > 0 ? k : this->K;
-		this->eta = Eta > 0 ? Eta : this->eta;
 	}
 
 	//Change the dimension of weights
