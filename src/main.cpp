@@ -94,42 +94,43 @@ int main(int argc, char** args) {
 	if (param.is_learn_best_param == true){
 		opti->BestParameter();
 	}
+	else{
+		opti->PrintOptInfo();
 
-	opti->PrintOptInfo();
+		float l_errRate(0), l_varErr(0);	//learning error rate
+		float sparseRate(0);
 
-	float l_errRate(0), l_varErr(0);	//learning error rate
-	float sparseRate(0);
+		//learning the model
+		double time1 = get_current_time();
 
-	//learning the model
-	double time1 = get_current_time();
+		opti->Learn(l_errRate,l_varErr,sparseRate);
 
-	opti->Learn(l_errRate,l_varErr,sparseRate);
+		double time2 = get_current_time();
 
-	double time2 = get_current_time();
+		printf("data number: %lu\n",dataset.size());
+		printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
-	printf("data number: %lu\n",dataset.size());
-	printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
+		double time3 = 0;
+		//test the model
+		bool is_test = param.test_cache_fileName.length() > 0 || param.test_fileName.length() > 0;
+		if ( is_test) {
+			DataSet<FeatType, LabelType> testset(1,param.buf_size);
+			if (testset.Load(param.test_fileName, param.test_cache_fileName) == true) {
+				float t_errRate(0);	//test error rate
+				t_errRate = opti->Test(testset);
+				time3 = get_current_time();
 
-	double time3 = 0;
-	//test the model
-	bool is_test = param.test_cache_fileName.length() > 0 || param.test_fileName.length() > 0;
-	if ( is_test) {
-		DataSet<FeatType, LabelType> testset(1,param.buf_size);
-		if (testset.Load(param.test_fileName, param.test_cache_fileName) == true) {
-			float t_errRate(0);	//test error rate
-			t_errRate = opti->Test(testset);
-			time3 = get_current_time();
-
-			printf("Test error rate: %.2f %%\n",t_errRate * 100); 
+				printf("Test error rate: %.2f %%\n",t_errRate * 100); 
+			}
+			else
+				cout<<"load test set failed!"<<endl;
 		}
-		else
-			cout<<"load test set failed!"<<endl;
-	}
 
-	printf("Sparsification Rate: %.2f %%\n", sparseRate * 100);
-	printf("Learning time: %.3f s\n", (float)(time2 - time1));
-	if (is_test)
-		printf("Test time: %.3f s\n", (float)(time3 - time2));
+		printf("Sparsification Rate: %.2f %%\n", sparseRate * 100);
+		printf("Learning time: %.3f s\n", (float)(time2 - time1));
+		if (is_test)
+			printf("Test time: %.3f s\n", (float)(time3 - time2));
+	}
 
 	delete lossFunc;
 	delete opti;

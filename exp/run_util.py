@@ -5,39 +5,17 @@ import sys
 import os
 import re
 
-from l1_def import *
-
 exe_name = '..' + os.sep + 'SOL'
 
-def best_param(cmd_params, opt_name):
-    output_file = 'tmp.txt'
+def best_param(cmd_params, opt_name, output_file):
     #select the best learning rate
     cmd = exe_name + ' -opt %s' %opt_name
     cmd += cmd_params
+    cmd += ' -lbp '
     cmd += ' > %s' %output_file 
     print 'learn best parameter...'
     print cmd
     os.system(cmd)
-    
-    #parse the file to find out the best learning rate
-    eta_list = re.findall(r'Best Parameter:\s*eta\s*=\s*.*\n',open(output_file,'r').read())
-    if len(eta_list) > 1:
-        print 'incorrect result file'
-        print eta_list
-        sys.exit()
-    elif len(eta_list) == 1:
-        try:
-            best_eta = eta_list[0].split('=')[1].strip()
-            best_eta = float(best_eta)
-        except ValueError as e:
-            print 'convert %s' %best_eta + ' to float value failed!'
-            sys.exit()
-        print 'best eta = {0}'.format(best_eta)  
-    else:
-        best_eta = 0
-
-    os.system('rm -f %s' %output_file)
-    return best_eta
     
 #parse the result to a format for matlab to recognize
 def parse_result(input_file, output_file):

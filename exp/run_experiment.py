@@ -3,7 +3,7 @@
 import sys
 import os
 
-from run_util import *
+import run_util
 import l1_def
 
 def Usage():
@@ -18,15 +18,15 @@ opt_name = sys.argv[1]
 dst_folder = sys.argv[2]
 dataset = sys.argv[3]
 
-is_best_param = True
+is_best_param = False
 is_l1 = True
 extra_cmd = ' '
 for k in range(4,len(sys.argv)):
     if sys.argv[k] == 'no_l1':
         is_l1 = False
         continue
-    if sys.argv[k] == '-eta':
-        is_best_param = False
+    if sys.argv[k] == '-lbp':
+        is_best_param = True
 
     extra_cmd = extra_cmd + sys.argv[k] + ' '
 
@@ -35,13 +35,14 @@ result_file = dst_folder + '/%s' %opt_name + '_result.txt'
 open(result_file,'w').close()
 
 #evaluate the result
-cmd_prefix = exe_name + extra_cmd + ' -opt %s' %opt_name 
+cmd_prefix = run_util.exe_name + extra_cmd + ' -opt %s' %opt_name 
 cmd_postfix = ' >> %s' %result_file
 
 #learn the best parameter
-#if is_best_param == True:
-#    best_eta = best_param(extra_cmd, opt_name) 
-#    cmd_prefix += ' -eta %e' %best_eta
+if is_best_param == True:
+    output_file = dst_folder + '/%s_best.txt' %opt_name
+    run_util.best_param(extra_cmd, opt_name, output_file) 
+    sys.exit()
 
 if opt_name == 'ASAROW':
     temp_list = extra_cmd.split()
@@ -53,7 +54,7 @@ if opt_name == 'ASAROW':
     if train_file == '':
         print 'no input file is specified!'
         sys.exit()
-    data_valid_dim = get_valid_dim(train_file)
+    data_valid_dim = run_util.get_valid_dim(train_file)
 
 if is_l1 == True:
     lambda_list = l1_def.get_lambda_list(dataset, opt_name)
@@ -73,4 +74,4 @@ else:
 print '\nparsing result...'
 #write the result to file
 parse_file = dst_folder +'/%s' %opt_name + '.txt'
-parse_result(result_file, parse_file);
+run_util.parse_result(result_file, parse_file);
