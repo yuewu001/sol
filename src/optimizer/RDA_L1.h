@@ -117,7 +117,7 @@ namespace SOL {
 
     template <typename FeatType, typename LabelType>
         void RDA_L1<FeatType,LabelType>::SetParameterEx( float gammarou) {
-            this->lambda = lambda >= 0 ? lambda : this->lambda;
+			this->gamma_rou = gammarou >= 0 ? gammarou : this->gamma_rou;
         }
 
     //Change the dimension of weights
