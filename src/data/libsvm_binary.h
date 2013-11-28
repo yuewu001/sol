@@ -79,7 +79,7 @@ namespace SOL {
                             return false;
                         }
                     }
-                    assert(data.label == 1 || data.label == -1);
+                    //assert(data.label == 1 || data.label == -1);
                     
                     size_t featNum = 0;
                     if(io_handler.read_data((char*)&featNum,sizeof(size_t)) == false){
@@ -114,6 +114,10 @@ namespace SOL {
                             cerr<<"load features failed!"<<endl;
                             return false;
                         }
+						if (io_handler.read_data((char*)&(data.sum_sq),sizeof(float)) == false){
+                            cerr<<"load sum of square failed!"<<endl;
+                            return false;
+						}
                     }
                     return true;
                 }
@@ -153,12 +157,16 @@ namespace SOL {
                             cerr<<"write features failed!"<<endl;
                             return false;
                         }
-                    }
-                    return true;
-                }
-        };
+						if (io_handler.write_data((char*)&(data.sum_sq),sizeof(float)) == false){
+							cerr<<"write sum of square failed!"<<endl;
+							return false;
+						}
+					}
+					return true;
+				}
+		};
 
-    //for special definition
-    typedef libsvm_binary_<float, char> libsvm_binary;
+		//for special definition
+		typedef libsvm_binary_<float, char> libsvm_binary;
 }
 #endif

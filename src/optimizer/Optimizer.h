@@ -282,9 +282,10 @@ namespace SOL {
     template <typename FeatType, typename LabelType>
         float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
             float predict = 0;
-            size_t dim = data.indexes.size();
-            for (size_t i = 0; i < dim; i++){
-                predict += this->weightVec[data.indexes[i]] * data.features[i];
+			IndexType* p_index = data.indexes.begin;
+			float* p_feat = data.features.begin;
+			while(p_index != data.indexes.end){
+                predict += this->weightVec[*p_index++] * (*p_feat++);
             }
             predict += this->weightVec[0];
             return predict;
