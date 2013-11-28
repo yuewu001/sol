@@ -3,18 +3,19 @@ import os
 import sys
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-opt_list = ['STG','Ada-FOBOS', 'RDA','Ada-RDA', 'CW-RDA']
+opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA']
 #opt_list = ['SSAROW']
 
+#dataset_list = ['news', 'rcv1', 'url']
 dataset_list = ['url']
 
 rootDir = 'D:/Coding/SOL/data/'
 #rootDir = 'D:/Data/Sparse/'
 
-#cmd_data = ' -loss Hinge -passes 5 '
-cmd_data = ' -loss Hinge -norm '
+cmd_data = ' -loss Hinge '
 
 for dataset in dataset_list:
+    cmd_data = ' -loss Hinge -norm '
     test_file = ''
     if dataset == 'rcv1':
         train_file = 'rcv1/rcv1.train' 
@@ -77,13 +78,60 @@ for dataset in dataset_list:
         print '-----------------------------------'
         cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder + ' %s' %dataset
         cmd += cmd_data
+
+        if dataset == 'news':
+            cmd += ' -r 0.125 '
+            if opt == 'Ada-FOBOS':
+                cmd += ' -eta 16 -delta 1 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 16 -delta 2 '
+            elif opt == 'STG':
+                cmd += ' -eta 32 '
+            elif opt == 'RDA':
+                cmd += ' -eta 32'
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+        elif dataset == 'rcv1':
+            if opt == 'SSAROW':
+                cmd += ' -r 1 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 2'
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'STG':
+                cmd += ' -eta 32 '
+            elif opt == 'RDA':
+                cmd += ' -eta 64'
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+        elif dataset == 'url':
+            if opt == 'SSAROW':
+                cmd += ' -r 1 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 2'
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'STG':
+                cmd += ' -eta 32 '
+            elif opt == 'RDA':
+                cmd += ' -eta 64'
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+
         os.system(cmd)
-    
+
     #sys.exit()
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()
-    
+
     try:
         file_handle = open(opt_list_file,'w')
         for opt in opt_list:

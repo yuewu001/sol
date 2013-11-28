@@ -38,12 +38,6 @@ def get_lambda_list(dataset, opt_name):
 
     if dataset == 'MNIST':
         return get_MNIST(opt_name)
-    elif dataset == 'rcv1':
-        return get_rcv1(opt_name)
-    elif dataset == 'news':
-        return get_rcv1(opt_name)
-    elif dataset == 'url':
-        return get_rcv1(opt_name)
     else:
-        return []
+        return get_rcv1(opt_name)
 

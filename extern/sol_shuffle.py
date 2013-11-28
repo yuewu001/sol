@@ -3,7 +3,7 @@ import sys
 
 if len(sys.argv) != 3:
     print 'usage: sol_shuffle.py input output_num'
-    sys.ext()
+    sys.exit()
 
 filename = sys.argv[1]
 num = int(sys.argv[2])
