@@ -81,6 +81,8 @@ namespace SOL {
                 this->gamma_rou = (float)strtod(args[i + 1], NULL);
             else if (strcmp(args[i],"-phi") == 0 && i + 1 < argc)
                 this->phi = (float)strtod(args[i + 1], NULL);
+			else if (strcmp(args[i],"-norm") == 0)
+				this->is_normalize = true;
             else if (strcmp(args[i],"--help") == 0)
                 this->Help();
             else
@@ -109,6 +111,7 @@ namespace SOL {
         this->power_t = init_power_t;
         this->initial_t = init_initial_t;
 		this->phi = init_phi;
+		this->is_normalize = init_normalize;
     }
 
     void Params::ParseOptiMethod(char *str_method) {
@@ -206,6 +209,7 @@ namespace SOL {
         cout<<"\t-delta arg:\t value of delta for Adaptive algorithms(Ada-)\n";
 		cout<<"\t-r	arg:\t r in AROW\n";
 		cout<<"\t-phi arg:\t phi in SCW\n";
+		cout<<"\t-norm :\t	normalize the data\n";
         cout<<"\n";
         exit(0);
     }

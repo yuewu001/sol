@@ -3,13 +3,12 @@ import os
 import sys
 
 #opt_list = ['SGD','STG','RDA','Ada-FOBOS','Ada-RDA', 'AROW', 'SSAROW', 'ASAROW']
-#opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'AROW']
-#opt_list = ['SSAROW','RDA','Ada-RDA','CW-RDA']
-opt_list = ['CW-RDA']
+opt_list = ['STG','RDA','Ada-FOBOS','Ada-RDA', 'SSAROW', 'AROW','CW-RDA']
+#opt_list = ['RDA','Ada-RDA','CW-RDA']
 
 #dataset_list = ['real-sim','text','pcmac','physic','news', 'kdd','epsilon']
 #dataset_list = ['kdda', 'kddb', 'url']
-dataset_list = ['url']
+dataset_list = ['rcv1']
 
 rootDir = 'D:/Coding/SOL/data/'
 #rootDir = 'D:/Data/Sparse/'
@@ -18,6 +17,9 @@ if len(sys.argv) == 2:
     dataset = sys.argv[1]
 else:
     dataset = 'rcv1'
+
+#cmd_data = ' -loss Hinge -passes 5 '
+cmd_data = ' -loss Hinge '
 
 for dataset in dataset_list:
     test_file = ''
@@ -68,7 +70,10 @@ for dataset in dataset_list:
     elif dataset =='url':
         train_file = rootDir + 'url_combined/url_train'
         test_file  = rootDir + 'url_combined/url_test'
-    
+    elif dataset =='MNIST':
+        train_file = rootDir + 'MNIST/train67'
+        test_file  = rootDir + 'MNIST/test67'
+        cmd_data += ' -norm -r 2 '
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -77,11 +82,10 @@ for dataset in dataset_list:
         train_file = train_file.replace('/', os.sep)
         test_file = test_file.replace('/', os.sep)
 
-    cmd_data = ' -i %s' %train_file 
+    cmd_data += ' -i %s' %train_file 
     cache_train_file = train_file + '_cache'
     cmd_data += ' -c %s' %cache_train_file
 
-    cmd_data += ' -loss Hinge '
     
     if len(test_file) > 0:
         cache_test_file = test_file + '_cache'
@@ -112,7 +116,7 @@ for dataset in dataset_list:
             os.system(cmd)
     
         else:
-            cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder
+            cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder + ' %s' %dataset
             cmd += cmd_data
             os.system(cmd)
     

@@ -51,6 +51,8 @@ namespace SOL
 		float power_t; 
 		bool is_learn_best_param; //whether learn best parameter
 
+		bool is_normalize;
+
 	public:
 		Params(){}
 		Params(int argc, char** args);

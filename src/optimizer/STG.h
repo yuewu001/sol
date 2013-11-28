@@ -25,6 +25,8 @@ namespace SOL {
 
 	protected:
 		s_array<size_t> timeStamp;
+	protected:
+		float (*pEta_time)(size_t t, float pt);
 
 	public:
 		STG(DataSet<FeatType, LabelType> &dataset, 
@@ -63,6 +65,8 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	float STG<FeatType,LabelType>::UpdateWeightVec(
 		const DataPoint<FeatType, LabelType> &x) {
+			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
+
 			size_t featDim = x.indexes.size();
 			float alpha = this->eta * this->lambda;
 
@@ -89,7 +93,7 @@ namespace SOL {
 					stepK -= stepK % this->K;
 					this->timeStamp[index_i] += stepK;
 					this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-					stepK * alpha);
+						stepK * alpha);
 				}
 			}
 			//bias term
@@ -104,6 +108,15 @@ namespace SOL {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
 		this->timeStamp.zeros();
+
+		if (this->power_t == 0.5)
+			this->pEta_time = pEta_sqrt;
+		else if(this->power_t == 0)
+			this->pEta_time = pEta_const;
+		else if (this->power_t == 1)
+			this->pEta_time = pEta_linear;
+		else
+			this->pEta_time = pEta_general;
 	}
 
 	//called when a train ends

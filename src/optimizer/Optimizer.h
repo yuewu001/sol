@@ -29,9 +29,10 @@ namespace SOL {
 		float lambda;
 		float eta0; //learning rate
         float eta;
-        float eta_coeff_time; //coeff of eta with time (1/sqrt(t) for instance)
 
 		DataSet<FeatType, LabelType> &dataSet;
+
+		bool is_normalize;
 
 		//weight vector
 	protected:
@@ -51,16 +52,16 @@ namespace SOL {
         string id_str;
 
     public:
-        /* by yuewuTue 15 Oct 2013 09:46:02 AM PDT*/
         /**
          * PrintOptInfo print the info of optimization algorithm
          */
-        void PrintOptInfo()const {
+        virtual void PrintOptInfo() const {
             printf("--------------------------------------------------\n");
-            printf("Algorithm: %s\n",this->Id_Str().c_str());
-            printf("Learning Rate: %.2e\n", this->eta0);
+            printf("Algorithm: %s\n\n",this->Id_Str().c_str());
+            printf("Learning Rate: %.2f\n", this->eta0);
             printf("Initial t  : %lu\n",this->initial_t);
             printf("Power t : %.2f\n",this->power_t); 
+			printf("lambda	: %.2f\n\n",this->lambda);
         }
 
 	public:
@@ -88,6 +89,10 @@ namespace SOL {
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) = 0;
 
 	public:
+		void SetNormalize(bool is_norm){
+			this->is_normalize = is_norm;
+		}
+
         void SetParameter(float lambda = -1, float eta0 = -1, 
                 float power_t = -1, size_t t0 = 0);
 		//try and get the best parameter
@@ -106,9 +111,6 @@ namespace SOL {
 	protected:
 		//Change the dimension of weights
 		virtual void UpdateWeightSize(IndexType newDim);
-
-    protected:
-        float (*pEta_time)(size_t t, float pt);
     };
     
     //calculate learning rate
@@ -140,6 +142,7 @@ namespace SOL {
             this->power_t = init_power_t;
 
             this->sparse_soft_thresh = init_sparse_soft_thresh;
+			this->is_normalize = false;
         }
 
     //reset the optimizer to this initialization
@@ -148,15 +151,6 @@ namespace SOL {
             //reset weight vector
 			this->weightVec.set_value(0);
             this->curIterNum = this->initial_t;
-
-            if (this->power_t == 0.5)
-                this->pEta_time = pEta_sqrt;
-            else if(this->power_t == 0)
-                this->pEta_time = pEta_const;
-            else if (this->power_t == 1)
-                this->pEta_time = pEta_linear;
-            else
-                this->pEta_time = pEta_general;
         }
 
     //called when a train ends
@@ -190,173 +184,193 @@ namespace SOL {
 				}
 
                 for (size_t i = 0; i < chunk.dataNum; i++) {
-
-                    this->eta_coeff_time = this->pEta_time(this->curIterNum, this->power_t);
-                    this->eta = this->eta0 / this->eta_coeff_time;
-
                     const DataPoint<FeatType, LabelType> &data = chunk.data[i];
-                    this->UpdateWeightSize(data.dim());
-                    float y = this->UpdateWeightVec(data); 
-                    //loss
-                    if (this->lossFunc->IsCorrect(data.label,y) == false)
-                        errorNum++;
 
-                    if (show_count == this->curIterNum){
-                        printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
-                                errorNum / (float)(this->curIterNum));
-                        show_count = (1 << ++show_step);
-                    }
-                    this->curIterNum++;
-                }
-                dataSet.FinishRead();
-            }
-            this->EndTrain();
+					IndexType* p_index = data.indexes.begin;
+					float* p_feat = data.features.begin;
+					if (is_normalize){
+						if (data.sum_sq != 1){
+							float norm = sqrtf(data.sum_sq);
+							while(p_index != data.indexes.end){
+								*p_feat /= norm;
+								p_index++; p_feat++;
+							}
+						}
+					}
 
-            return errorNum / dataSet.size();
-        }
+					this->UpdateWeightSize(data.dim());
+					float y = this->UpdateWeightVec(data); 
+					//loss
+					if (this->lossFunc->IsCorrect(data.label,y) == false)
+						errorNum++;
 
-    //learn a model and return the mistake rate and its variance
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::Learn(float &aveErrRate, float &varErrRate, 
-                float &sparseRate, int numOfTimes) {
-            float * errorRateVec = new float[numOfTimes];
-            float * sparseRateVec = new float[numOfTimes];
+					if (show_count == this->curIterNum){
+						printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
+							errorNum / (float)(this->curIterNum));
+						show_count = (1 << ++show_step);
+					}
+					this->curIterNum++;
+				}
+				dataSet.FinishRead();
+			}
+			this->EndTrain();
 
-            for (int i = 0; i < numOfTimes; i++) {
-                //random order
-                errorRateVec[i] = this->Train();
-                sparseRateVec[i] = this->GetSparseRate();
-            }
-            aveErrRate = Average(errorRateVec, numOfTimes);
-            varErrRate = Variance(errorRateVec, numOfTimes);
-            sparseRate = Average(sparseRateVec, numOfTimes);
+			return errorNum / dataSet.size();
+		}
 
-            delete []errorRateVec;
-            delete []sparseRateVec;
+		//learn a model and return the mistake rate and its variance
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::Learn(float &aveErrRate, float &varErrRate, 
+			float &sparseRate, int numOfTimes) {
+				float * errorRateVec = new float[numOfTimes];
+				float * sparseRateVec = new float[numOfTimes];
 
-            return aveErrRate;
-        }
+				for (int i = 0; i < numOfTimes; i++) {
+					//random order
+					errorRateVec[i] = this->Train();
+					sparseRateVec[i] = this->GetSparseRate();
+				}
+				aveErrRate = Average(errorRateVec, numOfTimes);
+				varErrRate = Variance(errorRateVec, numOfTimes);
+				sparseRate = Average(sparseRateVec, numOfTimes);
 
-    //learn a model
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::Learn(int numOfTimes) {
-            float aveErrRate, varErrRate, sparseRate;
-            return this->Learn(aveErrRate, varErrRate,sparseRate, numOfTimes);
-        }
+				delete []errorRateVec;
+				delete []sparseRateVec;
 
-    //test the performance on the given set
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
-            if(testSet.Rewind() == false)
+				return aveErrRate;
+		}
+
+		//learn a model
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::Learn(int numOfTimes) {
+			float aveErrRate, varErrRate, sparseRate;
+			return this->Learn(aveErrRate, varErrRate,sparseRate, numOfTimes);
+		}
+
+		//test the performance on the given set
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
+			if(testSet.Rewind() == false)
 				return 1.f;
-            float errorRate(0);
-            //test
-            while(1) {
-                const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk();
-                if(chunk.dataNum  == 0) //"all the data has been processed!"
-                    break;
-                for (size_t i = 0; i < chunk.dataNum; i++) {
-                    const DataPoint<FeatType , LabelType> &data = chunk.data[i];
-                    //predict
-                    float predict = this->Test_Predict(data);
-                    if (this->lossFunc->IsCorrect(data.label,predict) == false)
-                        errorRate++;
-                }
-                testSet.FinishRead();
-            }
-            errorRate /= testSet.size();
-            return errorRate;
-        }
+			float errorRate(0);
+			//test
+			while(1) {
+				const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk();
+				if(chunk.dataNum  == 0) //"all the data has been processed!"
+					break;
+				for (size_t i = 0; i < chunk.dataNum; i++) {
+					const DataPoint<FeatType , LabelType> &data = chunk.data[i];
+					IndexType* p_index = data.indexes.begin;
+					float* p_feat = data.features.begin;
+					if (is_normalize){
+						if (data.sum_sq != 1){
+							float norm = sqrtf(data.sum_sq);
+							while(p_index != data.indexes.end){
+								*p_feat /= norm;
+								p_index++; p_feat++;
+							}
+						}
+					}
+					//predict
+					float predict = this->Test_Predict(data);
+					if (this->lossFunc->IsCorrect(data.label,predict) == false)
+						errorRate++;
+				}
+				testSet.FinishRead();
+			}
+			errorRate /= testSet.size();
+			return errorRate;
+		}
 
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::Test_Predict(const DataPoint<FeatType, LabelType> &data) {
-            float predict = 0;
-            int dim = data.indexes.size();
-            for (int i = 0; i < dim; i++){
-                if (data.indexes[i] < this->weightDim)
-                    predict += this->weightVec[data.indexes[i]] * data.features[i];
-            }
-            predict += this->weightVec[0];
-            return predict;
-        }
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
-            float predict = 0;
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::Test_Predict(const DataPoint<FeatType, LabelType> &data) {
+			float predict = 0;
+			int dim = data.indexes.size();
+			for (int i = 0; i < dim; i++){
+				if (data.indexes[i] < this->weightDim)
+					predict += this->weightVec[data.indexes[i]] * data.features[i];
+			}
+			predict += this->weightVec[0];
+			return predict;
+		}
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::Predict(const DataPoint<FeatType, LabelType> &data) {
+			float predict = 0;
 			IndexType* p_index = data.indexes.begin;
 			float* p_feat = data.features.begin;
 			while(p_index != data.indexes.end){
-                predict += this->weightVec[*p_index++] * (*p_feat++);
-            }
-            predict += this->weightVec[0];
-            return predict;
-        }
+				predict += this->weightVec[*p_index++] * (*p_feat++);
+			}
+			predict += this->weightVec[0];
+			return predict;
+		}
 
 
-    template <typename FeatType, typename LabelType>
-        float Optimizer<FeatType, LabelType>::GetSparseRate(IndexType total_len) {
-            float zeroNum(0);
-            if (this->weightDim == 1)
-                return 1;
+		template <typename FeatType, typename LabelType>
+		float Optimizer<FeatType, LabelType>::GetSparseRate(IndexType total_len) {
+			float zeroNum(0);
+			if (this->weightDim == 1)
+				return 1;
 
-            for (IndexType i = 1; i < this->weightDim; i++) {
-                if (this->weightVec[i] == 0)
-                    zeroNum++;
-            }
-            if (total_len > 0)
-                return zeroNum / total_len;
-            else
-                return zeroNum / (this->weightDim - 1);
-        }
+			for (IndexType i = 1; i < this->weightDim; i++) {
+				if (this->weightVec[i] == 0)
+					zeroNum++;
+			}
+			if (total_len > 0)
+				return zeroNum / total_len;
+			else
+				return zeroNum / (this->weightDim - 1);
+		}
 
-    //try and get the best parameter
-    template <typename FeatType, typename LabelType>
-        void Optimizer<FeatType, LabelType>::BestParameter() {
-            float prev_lambda = this->lambda;
-            this->lambda = 0;
-            //1. Select the best eta0
+		//try and get the best parameter
+		template <typename FeatType, typename LabelType>
+		void Optimizer<FeatType, LabelType>::BestParameter() {
+			float prev_lambda = this->lambda;
+			this->lambda = 0;
+			//1. Select the best eta0
 
-            float min_errorRate = 1;
-            float bestEta = 1;
+			float min_errorRate = 1;
+			float bestEta = 1;
 
-            for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
-                cout<<"eta0 = "<<eta_c<<"\n";
-                float errorRate(0);
-                this->eta0 = eta_c;
-                errorRate += this->Train();
+			for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
+				cout<<"eta0 = "<<eta_c<<"\n";
+				float errorRate(0);
+				this->eta0 = eta_c;
+				errorRate += this->Train();
 
-                if (errorRate < min_errorRate) {
-                    bestEta = eta_c;
-                    min_errorRate = errorRate;
-                }
-                cout<<"mistake rate: "<<errorRate * 100<<" %\n";
-            }
-            this->eta0 = bestEta;
-            this->lambda = prev_lambda;
-            cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
-        }
+				if (errorRate < min_errorRate) {
+					bestEta = eta_c;
+					min_errorRate = errorRate;
+				}
+				cout<<"mistake rate: "<<errorRate * 100<<" %\n";
+			}
+			this->eta0 = bestEta;
+			this->lambda = prev_lambda;
+			cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
+		}
 
-    template <typename FeatType, typename LabelType>
-        void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0, 
-                float power_t,  size_t t0 ){
-            this->lambda  = lambda >= 0 ? lambda : this->lambda;
-            this->eta0 = eta0 > 0 ? eta0 : this->eta0;
-            this->power_t = power_t >= 0 ? power_t : this->power_t;
-            this->initial_t = t0 > 0 ? t0: this->initial_t;
-        }
+		template <typename FeatType, typename LabelType>
+		void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0, 
+			float power_t,  size_t t0 ){
+				this->lambda  = lambda >= 0 ? lambda : this->lambda;
+				this->eta0 = eta0 > 0 ? eta0 : this->eta0;
+				this->power_t = power_t >= 0 ? power_t : this->power_t;
+				this->initial_t = t0 > 0 ? t0: this->initial_t;
+		}
 
-    //Change the dimension of weights
-    template <typename FeatType, typename LabelType>
-        void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-            if (newDim < this->weightDim) 
-                return;
-            else {
+		//Change the dimension of weights
+		template <typename FeatType, typename LabelType>
+		void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+			if (newDim < this->weightDim) 
+				return;
+			else {
 				newDim++; //reserve the 0-th
 				this->weightVec.reserve(newDim);
 				this->weightVec.resize(newDim); 
-                //set the new value to zero
+				//set the new value to zero
 				this->weightVec.zeros(this->weightVec.begin + this->weightDim, 
 					this->weightVec.end);
-                this->weightDim = newDim;
-            }
-        }
+				this->weightDim = newDim;
+			}
+		}
 }

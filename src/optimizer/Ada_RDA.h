@@ -9,7 +9,7 @@ online learning and stochastic optimization[J]. The Journal of
 Machine Learning Research, 2011, 999999: 2121-2159.
 
 This file implements the L1 regularization
- ************************************************************************/
+************************************************************************/
 
 #ifndef HEADER_ADA_RDA
 #define HEADER_ADA_RDA
@@ -19,175 +19,169 @@ This file implements the L1 regularization
 #include <stdexcept>
 
 namespace SOL {
-    template <typename FeatType, typename LabelType>
-        class Ada_RDA: public Optimizer<FeatType, LabelType> {
+	template <typename FeatType, typename LabelType>
+	class Ada_RDA: public Optimizer<FeatType, LabelType> {
 
-		protected:
-			float delta;
-			s_array<float> s;
-			s_array<float> u_t;
-		public:
-			Ada_RDA(DataSet<FeatType, LabelType> &dataset, 
-				LossFunction<FeatType, LabelType> &lossFunc);
-			~Ada_RDA();
+	protected:
+		float delta;
+		s_array<float> s;
+		s_array<float> u_t;
+	public:
+		Ada_RDA(DataSet<FeatType, LabelType> &dataset, 
+			LossFunction<FeatType, LabelType> &lossFunc);
+		~Ada_RDA();
 
-		public:
-			//set parameters for specific optimizers
-			void SetParameterEx(float delta = -1);
+	public:
+		//set parameters for specific optimizers
+		void SetParameterEx(float delta = -1);
 
-			//select the best parameters for the model
-			//		virtual void BestParameter();
-
-
-		protected:
-			//this is the core of different updating algorithms
-			virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-
-			//Change the dimension of weights
-			virtual void UpdateWeightSize(IndexType newDim);
-
-			//reset
-			virtual void BeginTrain();
-			//called when a train ends
-			virtual void EndTrain();
-
-
-		};
-
-		template <typename FeatType, typename LabelType>
-		Ada_RDA<FeatType, LabelType>::Ada_RDA(DataSet<FeatType, LabelType> &dataset, 
-			LossFunction<FeatType, LabelType> &lossFunc):
-		Optimizer<FeatType, LabelType>(dataset, lossFunc){
-				this->delta = init_delta;;
-				this->s.resize(this->weightDim);
-				this->u_t.resize(this->weightDim);
-
-				this->id_str = "Adaptive RDA";
+		//select the best parameters for the model
+		virtual void BestParameter();
+		/**
+		* PrintOptInfo print the info of optimization algorithm
+		*/
+		virtual void PrintOptInfo() const {
+			Optimizer<FeatType,LabelType>::PrintOptInfo();
+			printf("delta : %.2f\n\n", this->delta);
 		}
 
-		template <typename FeatType, typename LabelType>
-		Ada_RDA<FeatType, LabelType>::~Ada_RDA() {
-		}
+	protected:
 		//this is the core of different updating algorithms
-		template <typename FeatType, typename LabelType>
-		float Ada_RDA<FeatType,LabelType>::UpdateWeightVec(
-			const DataPoint<FeatType, LabelType> &x) {
-				size_t featDim = x.indexes.size();
-				IndexType index_i = 0;
+		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
 
-				//obtain w_t
-				for (size_t i = 0; i < featDim; i++) {
-					index_i = x.indexes[i];
-					//lazy update
-					//update s[i]
-					float Htii = this->delta + s[index_i];
-					this->weightVec[index_i] = -this->eta0 / Htii *
-						trunc_weight(u_t[index_i], this->lambda * (this->curIterNum - 1));
-				}
+		//Change the dimension of weights
+		virtual void UpdateWeightSize(IndexType newDim);
 
-				//predict 
-				float y = this->Predict(x);
-				//get gradient
-				float gt = this->lossFunc->GetGradient(x.label,y);
-
-				float gt_i = 0;
-				//update
-				for (size_t i = 0; i < featDim; i++) {
-					index_i = x.indexes[i];
-					gt_i = gt * x.features[i];
-
-					this->s[index_i] = sqrt(this->s[index_i] * this->s[index_i] + gt_i * gt_i);
-					this->u_t[index_i] += gt_i;
-				}
-				//bias term
-				this->s[0] = sqrt(s[0] * s[0] + gt * gt);
-				this->u_t[0] += gt;
-				float Htii = this->delta + s[0];
-				this->weightVec[0] = -u_t[0] * this->eta0 / Htii; 
-				return y;
-		}
-
-		//reset the optimizer to this initialization
-		template <typename FeatType, typename LabelType>
-		void Ada_RDA<FeatType, LabelType>::BeginTrain() {
-			Optimizer<FeatType, LabelType>::BeginTrain();
-			this->s.zeros();
-			this->u_t.zeros();
-		}
+		//reset
+		virtual void BeginTrain();
 		//called when a train ends
-		template <typename FeatType, typename LabelType>
-		void Ada_RDA<FeatType, LabelType>::EndTrain() {
-			Optimizer<FeatType,LabelType>::EndTrain();
-		}
+		virtual void EndTrain();
 
-		/*
-		//get the best model parameter
-		template <typename FeatType, typename LabelType>
-		void Ada_RDA<FeatType, LabelType>::BestParameter()
-		{
+
+	};
+
+	template <typename FeatType, typename LabelType>
+	Ada_RDA<FeatType, LabelType>::Ada_RDA(DataSet<FeatType, LabelType> &dataset, 
+		LossFunction<FeatType, LabelType> &lossFunc):
+	Optimizer<FeatType, LabelType>(dataset, lossFunc){
+		this->delta = init_delta;;
+		this->s.resize(this->weightDim);
+		this->u_t.resize(this->weightDim);
+
+		this->id_str = "Adaptive RDA";
+	}
+
+	template <typename FeatType, typename LabelType>
+	Ada_RDA<FeatType, LabelType>::~Ada_RDA() {
+	}
+	//this is the core of different updating algorithms
+	template <typename FeatType, typename LabelType>
+	float Ada_RDA<FeatType,LabelType>::UpdateWeightVec(
+		const DataPoint<FeatType, LabelType> &x) {
+			size_t featDim = x.indexes.size();
+			IndexType index_i = 0;
+
+			//obtain w_t
+			for (size_t i = 0; i < featDim; i++) {
+				index_i = x.indexes[i];
+				//lazy update
+				//update s[i]
+				float Htii = this->delta + s[index_i];
+				this->weightVec[index_i] = -this->eta0 / Htii *
+					trunc_weight(u_t[index_i], this->lambda * (this->curIterNum - 1));
+			}
+
+			//predict 
+			float y = this->Predict(x);
+			//get gradient
+			float gt = this->lossFunc->GetGradient(x.label,y);
+
+			float gt_i = 0;
+			//update
+			for (size_t i = 0; i < featDim; i++) {
+				index_i = x.indexes[i];
+				gt_i = gt * x.features[i];
+
+				this->s[index_i] = sqrt(this->s[index_i] * this->s[index_i] + gt_i * gt_i);
+				this->u_t[index_i] += gt_i;
+			}
+			//bias term
+			this->s[0] = sqrt(s[0] * s[0] + gt * gt);
+			this->u_t[0] += gt;
+			float Htii = this->delta + s[0];
+			this->weightVec[0] = -u_t[0] * this->eta0 / Htii; 
+			return y;
+	}
+
+	//reset the optimizer to this initialization
+	template <typename FeatType, typename LabelType>
+	void Ada_RDA<FeatType, LabelType>::BeginTrain() {
+		Optimizer<FeatType, LabelType>::BeginTrain();
+		this->s.zeros();
+		this->u_t.zeros();
+	}
+	//called when a train ends
+	template <typename FeatType, typename LabelType>
+	void Ada_RDA<FeatType, LabelType>::EndTrain() {
+		Optimizer<FeatType,LabelType>::EndTrain();
+	}
+
+	//get the best model parameter
+	template <typename FeatType, typename LabelType>
+	void Ada_RDA<FeatType, LabelType>::BestParameter() {
+		//first learn the best learning rate
+		Optimizer<FeatType,LabelType>::BestParameter();
 		float prevLambda = this->lambda;
 		this->lambda = 0;
 
 		//Select the best eta0
 		float min_errorRate = 1;
-		float bestEta = 1;
 		float bestDelta = 1;
 
-		for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step)
-		{
-		this->eta0 = eta_c;
-		for (float delt = init_delta_min; delt <= init_delta_max; delt *= init_delta_step)
-		{
-		cout<<"eta0 = "<<eta_c<<" delta= "<<delt;
-		this->delta = delt;
-		float errorRate(0);
-		errorRate = this->Train();
+		for (float delt = init_delta_min; delt <= init_delta_max; delt *= init_delta_step) {
+			cout<<"delta= "<<delt<<"\n";
+			this->delta = delt;
+			float errorRate(0);
+			errorRate = this->Train();
 
-		if (errorRate < min_errorRate)
-		{
-		bestEta = eta_c;
-		bestDelta = delt;
-		min_errorRate = errorRate;
-		}
-		cout<<" mistake rate: "<<errorRate * 100<<" %\n";
-		}
+			if (errorRate < min_errorRate) {
+				bestDelta = delt;
+				min_errorRate = errorRate;
+			}
+			cout<<" mistake rate: "<<errorRate * 100<<" %\n";
 		}
 
-		this->eta0 = bestEta;
 		this->delta = bestDelta;
 		this->lambda = prevLambda;
-		cout<<"Best Parameter:\teta = "<<this->eta0<<"\tdelta = "<<this->delta<<"\n\n";
+		cout<<"Best Parameter:\tdelta = "<<this->delta<<"\n\n";
+	}
+
+	//set parameters for specific optimizers
+	template <typename FeatType, typename LabelType>
+	void Ada_RDA<FeatType, LabelType>::SetParameterEx(float delta) {
+		this->delta = delta >= 0 ? delta : this->delta;
+	}
+
+	//Change the dimension of weights
+	template <typename FeatType, typename LabelType>
+	void Ada_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+		if (newDim < this->weightDim)
+			return;
+		else {
+			this->s.reserve(newDim + 1);
+			this->s.resize(newDim + 1);
+			//set the rest to zero
+			this->s.zeros(this->s.begin + this->weightDim,
+				this->s.end);
+
+			this->u_t.reserve(newDim + 1);
+			this->u_t.resize(newDim + 1);
+			//set the rest to zero
+			this->u_t.zeros(this->u_t.begin + this->weightDim,
+				this->u_t.end);
+
+			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
-		*/
-
-		//set parameters for specific optimizers
-		template <typename FeatType, typename LabelType>
-		void Ada_RDA<FeatType, LabelType>::SetParameterEx(float delta) {
-			this->delta = delta >= 0 ? delta : this->delta;
-		}
-
-		//Change the dimension of weights
-		template <typename FeatType, typename LabelType>
-		void Ada_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-			if (newDim < this->weightDim)
-				return;
-			else {
-				this->s.reserve(newDim + 1);
-				this->s.resize(newDim + 1);
-				//set the rest to zero
-				this->s.zeros(this->s.begin + this->weightDim,
-					this->s.end);
-
-				this->u_t.reserve(newDim + 1);
-				this->u_t.resize(newDim + 1);
-				//set the rest to zero
-				this->u_t.zeros(this->u_t.begin + this->weightDim,
-					this->u_t.end);
-
-				Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
-			}
-		}
-
-
+	}
 }
 #endif

@@ -19,7 +19,6 @@ namespace SOL {
 		s_array<float> sigma_w;
 		s_array<float> u_t;
 		float gravity;
-		bool is_normalize;
 
 	public:
 		CW_RDA(DataSet<FeatType, LabelType> &dataset, 
@@ -29,7 +28,16 @@ namespace SOL {
 	public:
 		//set parameters for specific optimizers
 		void SetParameterEx(float r = -1);
-
+		//select the best parameters for the model
+		virtual void BestParameter();
+		/**
+		* PrintOptInfo print the info of optimization algorithm
+		*/
+		virtual void PrintOptInfo() const {
+			printf("--------------------------------------------------\n");
+			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
+			printf("r: %.2f\n\n", this->r);
+		}
 	protected:
 		//this is the core of different updating algorithms
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -41,10 +49,6 @@ namespace SOL {
 		virtual void BeginTrain();
 		//called when a train ends
 		virtual void EndTrain();
-
-		//try and get the best parameter
-		virtual void BestParameter(){}
-
 	};
 
 	template <typename FeatType, typename LabelType>
@@ -56,7 +60,6 @@ namespace SOL {
 		this->u_t.resize(this->weightDim);
 		this->sigma_w.resize(this->weightDim);
 		this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-		this->is_normalize = true;
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -73,22 +76,10 @@ namespace SOL {
 			IndexType* p_index = x.indexes.begin;
 			float* p_feat = x.features.begin;
 
-			if (is_normalize){
-				if (x.sum_sq != 1){
-					float norm = sqrtf(x.sum_sq);
-					while(p_index != x.indexes.end){
-						*p_feat /= norm;
-						p_index++; p_feat++;
-					}
-				}
-			}
-
-			p_index = x.indexes.begin;
-			p_feat = x.features.begin;
 			//obtain w_t
 			while(p_index != x.indexes.end){
 				//lazy update
-				this->weightVec[*p_index] = -this->sigma_w[*p_index] *
+				this->weightVec[*p_index] = -sqrtf(this->sigma_w[*p_index]) *
 					trunc_weight(u_t[*p_index], gravity * (this->curIterNum - 1));
 				p_index++;
 			}
@@ -123,7 +114,7 @@ namespace SOL {
 
 				//bias term
 				this->u_t[0] += gt;
-				this->weightVec[0] = -u_t[0] * this->sigma_w[0]; 
+				this->weightVec[0] = -u_t[0] * sqrtf(this->sigma_w[0]); 
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 			}
 			return y;
@@ -136,6 +127,7 @@ namespace SOL {
 		this->u_t.zeros();
 		this->sigma_w.set_value(1);
 		this->gravity = 0;
+		this->is_normalize = true; //CW_RDA requires normalization
 	}
 
 	//called when a train ends
@@ -169,6 +161,34 @@ namespace SOL {
 				this->u_t.end);
 			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
+	}
+	//get the best model parameter
+	template <typename FeatType, typename LabelType>
+	void CW_RDA<FeatType, LabelType>::BestParameter() {
+		//first learn the best learning rate
+		float prevLambda = this->lambda;
+		this->lambda = 0;
+
+		//Select the best eta0
+		float min_errorRate = 1;
+		float bestr = 1;
+
+		for (float r_temp = init_r_min;  r_temp <= init_r_max; r_temp *= init_r_step) {
+			cout<<"r = "<<r_temp<<"\n";
+			this->r = r_temp;
+			float errorRate(0);
+			errorRate = this->Train();
+
+			if (errorRate < min_errorRate) {
+				bestr = r_temp;
+				min_errorRate = errorRate;
+			}
+			cout<<" mistake rate: "<<errorRate * 100<<" %\n";
+		}
+
+		this->r = bestr;
+		this->lambda = prevLambda;
+		cout<<"Best Parameter:\tr = "<<this->r<<"\n\n";
 	}
 }
 

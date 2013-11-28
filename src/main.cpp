@@ -87,6 +87,8 @@ int main(int argc, char** args) {
 		return -1;
 
 	opti->SetParameter(param.lambda,param.eta, param.power_t, param.initial_t);
+	if (param.is_normalize == true)
+		opti->SetNormalize(param.is_normalize);
 
 	//learn the best parameters
 	if (param.is_learn_best_param == true){

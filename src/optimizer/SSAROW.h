@@ -28,7 +28,6 @@ namespace SOL {
 
 		size_t iter_num;
 
-		bool is_normalize;
 
 	public:
 		SSAROW(DataSet<FeatType, LabelType> &dataset, 
@@ -37,6 +36,17 @@ namespace SOL {
 
 	public:
 		void SetParameterEx(float r = -1);
+		//select the best parameters for the model
+		virtual void BestParameter();
+		/**
+		* PrintOptInfo print the info of optimization algorithm
+		*/
+		virtual void PrintOptInfo() const {
+			printf("--------------------------------------------------\n");
+			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
+			printf("r: %.2f\n\n", this->r);
+		}
+
 	protected:
 		//this is the core of different updating algorithms
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
@@ -47,10 +57,6 @@ namespace SOL {
 
 		//Change the dimension of weights
 		virtual void UpdateWeightSize(IndexType newDim);
-
-		//try and get the best parameter
-		virtual void BestParameter(){}
-
 	};
 
 	template <typename FeatType, typename LabelType>
@@ -62,7 +68,6 @@ namespace SOL {
 		this->sigma_w.resize(this->weightDim);
 		this->timeStamp.resize(this->weightDim);
 		this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-		this->is_normalize = true;
 	}
 
 	template <typename FeatType, typename LabelType>
@@ -81,18 +86,6 @@ namespace SOL {
 			IndexType* p_index = x.indexes.begin;
 			float* p_feat = x.features.begin;
 
-			if (is_normalize){
-				if (x.sum_sq != 1){
-					float norm = sqrtf(x.sum_sq);
-					while(p_index != x.indexes.end){
-						*p_feat /= norm;
-						p_index++; p_feat++;
-					}
-				}
-			}
-
-			p_index = x.indexes.begin;
-			p_feat = x.features.begin;
 			//obtain w_t
 			float y = this->Predict(x); 
 			float gt_i = this->lossFunc->GetGradient(x.label,y);
@@ -127,7 +120,7 @@ namespace SOL {
 
 					this->weightVec[*p_index]= 
 						trunc_weight(this->weightVec[*p_index],
-						gravity * this->sigma_w[*p_index]); 
+						gravity *(this->sigma_w[*p_index])); 
 
 					//update sigma_w
 					this->sigma_w[*p_index] *= this->r / (this->r + 
@@ -154,6 +147,7 @@ namespace SOL {
 		this->sigma_w.set_value(1);
 		this->sum_rate.push_back(0);
 		this->iter_num = 1; //force to begin from 1, as sum_rate depends on this value
+		this->is_normalize = true; //AROW requires normalization
 	}
 
 	//called when a train ends
@@ -169,7 +163,7 @@ namespace SOL {
 
 			//this->timeStamp[index_i] = this->curIterNum;
 			this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
-				gravity * this->sigma_w[index_i]);
+				gravity *(this->sigma_w[index_i]));
 		}
 		Optimizer<FeatType, LabelType>::EndTrain();
 	}
@@ -199,5 +193,33 @@ namespace SOL {
 
 			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
+	}
+	//get the best model parameter
+	template <typename FeatType, typename LabelType>
+	void SSAROW<FeatType, LabelType>::BestParameter() {
+		//first learn the best learning rate
+		float prevLambda = this->lambda;
+		this->lambda = 0;
+
+		//Select the best eta0
+		float min_errorRate = 1;
+		float bestr = 1;
+
+		for (float r_temp = init_r_min;  r_temp <= init_r_max; r_temp *= init_r_step) {
+			cout<<"r = "<<r_temp<<"\n";
+			this->r = r_temp;
+			float errorRate(0);
+			errorRate = this->Train();
+
+			if (errorRate < min_errorRate) {
+				bestr = r_temp;
+				min_errorRate = errorRate;
+			}
+			cout<<" mistake rate: "<<errorRate * 100<<" %\n";
+		}
+
+		this->r = bestr;
+		this->lambda = prevLambda;
+		cout<<"Best Parameter:\tr = "<<this->r<<"\n\n";
 	}
 }

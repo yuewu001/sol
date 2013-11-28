@@ -2,13 +2,12 @@
 
 import sys
 import os
-import re
 
 from run_util import *
 import l1_def
 
 def Usage():
-    print 'Usage: run_experiment.py opt_name dst_folder [parameters]'
+    print 'Usage: run_experiment.py opt_name dst_folder dataset [parameters]'
 
 if len(sys.argv) < 3:
     Usage()
@@ -17,11 +16,12 @@ if len(sys.argv) < 3:
 #parse the arguments
 opt_name = sys.argv[1]
 dst_folder = sys.argv[2]
+dataset = sys.argv[3]
 
 is_best_param = True
 is_l1 = True
 extra_cmd = ' '
-for k in range(3,len(sys.argv)):
+for k in range(4,len(sys.argv)):
     if sys.argv[k] == 'no_l1':
         is_l1 = False
         continue
@@ -56,7 +56,7 @@ if opt_name == 'ASAROW':
     data_valid_dim = get_valid_dim(train_file)
 
 if is_l1 == True:
-    lambda_list = l1_def.get_lambda_list(opt_name)
+    lambda_list = l1_def.get_lambda_list(dataset, opt_name)
     for l1 in lambda_list:
         if opt_name == 'ASAROW':
             l1 = (int)(l1 * data_valid_dim)
