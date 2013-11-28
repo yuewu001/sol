@@ -69,38 +69,43 @@ namespace SOL {
         float CW_RDA<FeatType,LabelType>::UpdateWeightVec(
                 const DataPoint<FeatType, LabelType> &x) {
             size_t featDim = x.indexes.size();
-            IndexType index_i = 0;
+			IndexType* p_index = x.indexes.begin;
+			float* p_feat = x.features.begin;
+			//obtain w_t
+			while(p_index != x.indexes.end){
+				//lazy update
+				this->weightVec[*p_index] = -this->sigma_w[*p_index] *
+					trunc_weight(u_t[*p_index], gravity * (this->curIterNum - 1));
+				p_index++;
+			}
 
-            //obtain w_t
-            for (size_t i = 0; i < featDim; i++) {
-                index_i = x.indexes[i];
-                //lazy update
-                this->weightVec[index_i] = -this->sigma_w[index_i] *
-					trunc_weight(u_t[index_i], gravity * (this->curIterNum - 1));
-            }
-
-            //predict 
-            float y = this->Predict(x);
-            //get gradient
-            float gt = this->lossFunc->GetGradient(x.label,y);
-            if (gt != 0){
+			//predict 
+			float y = this->Predict(x);
+			//get gradient
+			float gt = this->lossFunc->GetGradient(x.label,y);
+			if (gt != 0){
 				//calculate learning rate
 				this->eta = this->r;
 				float temp_sum = 0;
-				for (size_t i = 0; i < featDim; i++){
-					index_i = x.indexes[i];
-					temp_sum = x.features[i] * x.features[i] * this->sigma_w[index_i];
+				p_index = x.indexes.begin;
+				p_feat = x.features.begin;
+				while(p_index != x.indexes.end){
+					temp_sum = (*p_feat) * (*p_feat) * this->sigma_w[*p_index];
 					this->eta += temp_sum;
 					//update sigma_w
-					this->sigma_w[index_i] *= this->r / (this->r + temp_sum);
+					this->sigma_w[*p_index] *= this->r / (this->r + temp_sum);
+					p_index++;p_feat++;
 				}
-				this->eta = 0.5f / this->eta;
-				gt *= this->eta;
-				gravity = this->lambda * this->eta;
 
+				this->eta = 0.5f / this->eta;
+				gravity = this->lambda * this->eta;
+				gt *= this->eta;
 				//update
-				for (size_t i = 0; i < featDim; i++) 
-					this->u_t[x.features[i]] += gt * x.features[i];
+				p_index = x.indexes.begin;
+				p_feat = x.features.begin;
+				while(p_index != x.indexes.end){
+					this->u_t[*p_index++] += gt * (*p_feat++);
+				}
 
 				//bias term
 				this->u_t[0] += gt;
@@ -116,6 +121,7 @@ namespace SOL {
 			Optimizer<FeatType, LabelType>::BeginTrain();
 			this->u_t.zeros();
 			this->sigma_w.set_value(1);
+			this->gravity = 0;
 		}
 
 		//called when a train ends
