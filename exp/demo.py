@@ -3,14 +3,15 @@ import os
 import sys
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['SSAROW']
+opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
+#opt_list = ['ASAROW']
 
 #dataset_list = ['news', 'rcv1', 'url']
-dataset_list = ['news', 'rcv1','url','webspam', 'webspam_trigram']
+dataset_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
+#dataset_list = ['webspam_trigram']
 
-rootDir = 'D:/Coding/SOL/data/'
-#rootDir = 'D:/Data/Sparse/'
+#rootDir = 'D:/Coding/SOL/data/'
+rootDir = '/home/matthew/work/Data/'
 
 for dataset in dataset_list:
     cmd_data = ' -loss Hinge -norm '
@@ -34,12 +35,11 @@ for dataset in dataset_list:
         train_file = 'webspam/webspam_unigram_train'
         test_file  = 'webspam/webspam_unigram_test'
     elif dataset == 'webspam_trigram':
-        train_file = 'webspam/webspam_trigram_train'
-        test_file  = 'webspam/webspam_trigram_test'
+        train_file = 'webspam_trigram/webspam_trigram_train'
+        test_file  = 'webspam_trigram/webspam_trigram_test'
     elif dataset =='MNIST':
-        train_file = rootDir + 'MNIST/train67'
-        test_file  = rootDir + 'MNIST/test67'
-        cmd_data += ' -norm -r 2 '
+        train_file = 'MNIST/train67'
+        test_file  = 'MNIST/test67'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -81,7 +81,6 @@ for dataset in dataset_list:
         cmd += cmd_data
 
         if dataset == 'news':
-            cmd += ' -r 0.125 '
             if opt == 'Ada-FOBOS':
                 cmd += ' -eta 16 -delta 1 '
             elif opt == 'Ada-RDA':
@@ -90,11 +89,30 @@ for dataset in dataset_list:
                 cmd += ' -eta 32 '
             elif opt == 'RDA':
                 cmd += ' -eta 32'
+	    elif opt == 'SSAROW' or opt == 'CW-RDA' or opt == 'ASAROW':
+            	cmd += ' -r 0.125 '
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
+	elif dataset == 'MNIST':
+            if opt == 'SSAROW' or opt == 'ASAROW':
+                cmd += ' -r 1 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 2'
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 8 -delta 8 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 4 -delta 8 '
+            elif opt == 'STG':
+                cmd += ' -eta 4 '
+            elif opt == 'RDA':
+                cmd += ' -eta 8 '
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+
         elif dataset == 'rcv1':
-            if opt == 'SSAROW':
+            if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 1 '
             elif opt == 'CW-RDA':
                 cmd += '-r 2'
@@ -110,7 +128,7 @@ for dataset in dataset_list:
                 print 'unrecognized %s' %opt
                 sys.exit()
         elif dataset == 'url':
-            if opt == 'SSAROW':
+            if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 1 '
             elif opt == 'CW-RDA':
                 cmd += '-r 2'
@@ -126,7 +144,7 @@ for dataset in dataset_list:
                 print 'unrecognized %s' %opt
                 sys.exit()
         elif dataset == 'real-sim':
-            if opt == 'SSAROW':
+            if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 4 '
             elif opt == 'CW-RDA':
                 cmd += '-r 4'
@@ -141,8 +159,8 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-        elif dataset == 'webspam' or dataset == 'webspam_trigram':
-            if opt == 'SSAROW':
+        elif dataset == 'webspam': 
+            if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 0.125 '
             elif opt == 'CW-RDA':
                 cmd += '-r 0.125 '
@@ -154,6 +172,22 @@ for dataset in dataset_list:
                 cmd += ' -eta 64 '
             elif opt == 'RDA':
                 cmd += ' -eta 32 '
+            else:
+                print 'unrecognized %s' %opt
+                sys.exit()
+	elif dataset == 'webspam_trigram': 
+            if opt == 'SSAROW' or opt == 'ASAROW':
+                cmd += ' -r 0.125 '
+            elif opt == 'CW-RDA':
+                cmd += '-r 0.125 '
+            elif opt == 'Ada-FOBOS':
+                cmd += ' -eta 16 -delta 0.125 '
+            elif opt == 'Ada-RDA':
+                cmd += ' -eta 16 -delta 0.125 '
+            elif opt == 'STG':
+                cmd += ' -eta 128 '
+            elif opt == 'RDA':
+                cmd += ' -eta 128 '
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
