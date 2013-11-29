@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.11.18)  29 NOV 2013 13:34
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.11.18)  29 NOV 2013 14:25
 entering extended mode
 **SAROW.tex
 (D:\Coding\SOL\math\SAROW.tex
@@ -159,12 +159,12 @@ LaTeX Font Info:    ... okay on input line 10.
 ) [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
-<./figs/MNIST67_test.pdf, id=19, 597.23125pt x 845.1575pt>
+<./figs/MNIST67_test.pdf, id=19, 508.90125pt x 423.5825pt>
 File: ./figs/MNIST67_test.pdf Graphic file (type pdf)
 
 <use ./figs/MNIST67_test.pdf>
 Package pdftex.def Info: ./figs/MNIST67_test.pdf used on input line 159.
-(pdftex.def)             Requested size: 406.51599pt x 575.27983pt.
+(pdftex.def)             Requested size: 406.51599pt x 338.37524pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -179,22 +179,22 @@ Package pdftex.def Info: ./figs/news_test.pdf used on input line 167.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./figs/rcv1_test.pdf, id=21, 597.23125pt x 845.1575pt>
+<./figs/rcv1_test.pdf, id=21, 508.90125pt x 423.5825pt>
 File: ./figs/rcv1_test.pdf Graphic file (type pdf)
 
 <use ./figs/rcv1_test.pdf>
 Package pdftex.def Info: ./figs/rcv1_test.pdf used on input line 174.
-(pdftex.def)             Requested size: 429.10175pt x 607.23624pt.
+(pdftex.def)             Requested size: 429.10175pt x 357.17711pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./figs/url_test.pdf, id=22, 597.23125pt x 845.1575pt>
+<./figs/url_test.pdf, id=22, 511.9125pt x 423.5825pt>
 File: ./figs/url_test.pdf Graphic file (type pdf)
 
 <use ./figs/url_test.pdf>
 Package pdftex.def Info: ./figs/url_test.pdf used on input line 182.
-(pdftex.def)             Requested size: 429.10175pt x 607.23624pt.
+(pdftex.def)             Requested size: 429.10175pt x 355.06358pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -238,7 +238,7 @@ r5.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.p
 fb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 ><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C
 :/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on SAROW.pdf (7 pages, 203934 bytes).
+Output written on SAROW.pdf (7 pages, 205823 bytes).
 PDF statistics:
  115 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
