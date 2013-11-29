@@ -61,6 +61,8 @@ if is_l1 == True:
     for l1 in lambda_list:
         if opt_name == 'ASAROW':
             l1 = (int)(l1 * data_valid_dim)
+	    if l1 < 1:
+		continue
             cmd = cmd_prefix + ' -k %d' %l1 + cmd_postfix
         else:
             cmd = cmd_prefix + ' -l1 %e' %l1 + cmd_postfix
