@@ -19,7 +19,6 @@ def best_param(cmd_params, opt_name, output_file):
     
 #parse the result to a format for matlab to recognize
 def parse_result(input_file, output_file):
-    print input_file
     dec_pattern = "(\d+\.?\d*)"
     pattern_l = re.compile(r'Learn error rate:\s*' + dec_pattern + '.*\s*')
     pattern_t = re.compile(r'Test error rate:\s*' + dec_pattern + '.*\s*')
@@ -57,6 +56,7 @@ def parse_result(input_file, output_file):
         sys.exit()
     else:
         file_handler.close()
+    return result_list
 
 def get_valid_dim(trainfile):
     filename = trainfile + '_info.txt'

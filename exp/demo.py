@@ -1,86 +1,33 @@
 #!/usr/bin/env python
 import os
 import sys
+import dataset
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-#opt_list = ['ASAROW']
+#opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
+opt_list = ['ASAROW']
 
-#dataset_list = ['news', 'rcv1', 'url']
-dataset_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
-#dataset_list = ['webspam_trigram']
+#ds_list = ['news', 'rcv1', 'url']
+#ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
+ds_list = ['rcv1']
 
-#rootDir = 'D:/Coding/SOL/data/'
-rootDir = '/home/matthew/work/Data/'
-
-for dataset in dataset_list:
-    cmd_data = ' -loss Hinge -norm '
-    test_file = ''
-    if dataset == 'rcv1':
-        train_file = 'rcv1/rcv1.train' 
-        test_file = 'rcv1/rcv1.test'
-    elif dataset == 'news':
-        train_file = 'news/news_train'
-        test_file = 'news/news_test' 
-    elif dataset == 'real-sim':
-        train_file = 'real-sim/real-sim_train'
-        test_file = 'real-sim/real-sim_test' 
-    elif dataset == 'epsilon':
-        train_file = 'epsilon/epsilon_normalized'
-        test_file = 'epsilon/epsilon_normalized.t'
-    elif dataset == 'url':
-        train_file = 'url_combined/url_train'
-        test_file  = 'url_combined/url_test'
-    elif dataset == 'webspam':
-        train_file = 'webspam/webspam_unigram_train'
-        test_file  = 'webspam/webspam_unigram_test'
-    elif dataset == 'webspam_trigram':
-        train_file = 'webspam_trigram/webspam_trigram_train'
-        test_file  = 'webspam_trigram/webspam_trigram_test'
-    elif dataset =='MNIST':
-        train_file = 'MNIST/train67'
-        test_file  = 'MNIST/test67'
-    else:
-        print 'unrecoginized dataset'
-        sys.exit()
-    
-    train_file = rootDir + train_file
-
-    if os.sep != '/':
-        train_file = train_file.replace('/', os.sep)
-        test_file = test_file.replace('/', os.sep)
-
-    cmd_data += ' -i %s' %train_file 
-    cache_train_file = train_file + '_cache'
-    cmd_data += ' -c %s' %cache_train_file
-
-    if len(test_file) > 0:
-        test_file = rootDir+ test_file
-        cache_test_file = test_file + '_cache'
-        cmd_data += ' -t %s' %test_file + ' -tc %s' %cache_test_file
-    else:
-        cache_test_file = ''
-    
-    dst_folder = dataset
+extra_cmd = ' -loss Hinge -norm '
+for ds in ds_list:
+    cmd_data = dataset.get_cmd_data(ds)
+        
+    dst_folder = ds
     os.system("mkdir %s" %dst_folder)
-    
-    #analyze dataset
-    dataset_info_file = train_file + '_info.txt'
-    if os.path.exists(dataset_info_file) == False:
-        print 'analyze dataset'
-        cmd = '..' + os.sep + 'analysis %s' %train_file +' >> %s' %dataset_info_file
-        print cmd
-        os.system(cmd)
     
     #train model
     for opt in opt_list:
         print '-----------------------------------'
         print 'Experiment on %s' %opt
         print '-----------------------------------'
-        cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder + ' %s' %dataset
+        cmd = 'python run_experiment.py %s' %opt  + ' %s' %dst_folder + ' %s' %ds
         cmd += cmd_data
+        cmd += extra_cmd
 
-        if dataset == 'news':
+        if ds == 'news':
             if opt == 'Ada-FOBOS':
                 cmd += ' -eta 16 -delta 1 '
             elif opt == 'Ada-RDA':
@@ -94,7 +41,7 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-	elif dataset == 'MNIST':
+	elif ds == 'MNIST':
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 1 '
             elif opt == 'CW-RDA':
@@ -111,7 +58,7 @@ for dataset in dataset_list:
                 print 'unrecognized %s' %opt
                 sys.exit()
 
-        elif dataset == 'rcv1':
+        elif ds == 'rcv1':
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 1 '
             elif opt == 'CW-RDA':
@@ -127,7 +74,7 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-        elif dataset == 'url':
+        elif ds == 'url':
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 1 '
             elif opt == 'CW-RDA':
@@ -143,7 +90,7 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-        elif dataset == 'real-sim':
+        elif ds == 'real-sim':
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 4 '
             elif opt == 'CW-RDA':
@@ -159,7 +106,7 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-        elif dataset == 'webspam': 
+        elif ds == 'webspam': 
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 0.125 '
             elif opt == 'CW-RDA':
@@ -175,7 +122,7 @@ for dataset in dataset_list:
             else:
                 print 'unrecognized %s' %opt
                 sys.exit()
-	elif dataset == 'webspam_trigram': 
+	elif ds == 'webspam_trigram': 
             if opt == 'SSAROW' or opt == 'ASAROW':
                 cmd += ' -r 0.125 '
             elif opt == 'CW-RDA':
@@ -194,7 +141,7 @@ for dataset in dataset_list:
 
         os.system(cmd)
 
-    #sys.exit()
+    sys.exit()
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
     #clear the file if it already exists
     open(opt_list_file,'w').close()

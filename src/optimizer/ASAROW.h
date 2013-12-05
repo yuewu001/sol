@@ -142,7 +142,7 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float r) {
-		if (this->K < 1){
+		if (k < 1){
 			cerr<<"Please specify a valid number of weights to keep!\n";
 			cerr<<"current number: "<<this->K<<endl;
 			exit(0);
