@@ -74,7 +74,6 @@ def get_cv_data_list(dataset, fold_num):
     count_handler = os.popen(count_cmd)
     line_num = int(count_handler.read().split()[0])
     count_handler.close()
-    print 'line number: %d' %line_num
 
     #split the train_data into fold_num pieces
     split_line_num = int(line_num / fold_num)
@@ -110,3 +109,43 @@ def get_cmd_data(dataset):
     analyze(test_file)
 
     return get_cmd_data_by_file(train_file, test_file)
+
+def get_model_param(ds, opt):
+    news = {'SGD':{'-eta':10},'STG':{'-eta':10},
+            'Ada-FOBOS':{'-eta':10, '-delta':2},
+            'Ada-RDA':{'-eta':10, '-delta':2},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':1}}
+    MNIST = {'SGD':{'-eta':10},'STG':{'-eta':10},
+            'Ada-FOBOS':{'-eta':10, '-delta':2},
+            'Ada-RDA':{'-eta':10, '-delta':2},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':1}}
+    rcv1 = {'SGD':{'-eta':10},'STG':{'-eta':10},
+            'Ada-FOBOS':{'-eta':10, '-delta':2},
+            'Ada-RDA':{'-eta':10, '-delta':2},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':1}}
+    url = {'SGD':{'-eta':10},'STG':{'-eta':10},
+            'Ada-FOBOS':{'-eta':10, '-delta':2},
+            'Ada-RDA':{'-eta':10, '-delta':2},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':1}}
+    webspam_trigram = {'SGD':{'-eta':10},'STG':{'-eta':10},
+            'Ada-FOBOS':{'-eta':10, '-delta':2},
+            'Ada-RDA':{'-eta':10, '-delta':2},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':1}}
+    ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
+            'url':url,'webspam_trigram':webspam_trigram}
+
+    cmd = ''
+    if ds in ds_opt_param.keys():
+        if opt in ds_opt_param[ds].keys():
+            for key,val in ds_opt_param[ds][opt].iteritems():
+                cmd += ' {0} {1} '.format(key, val)
+        else:
+            print opt + ' not unrecognized!'
+    else:
+        print ds + ' not unrecognized!'
+    return cmd

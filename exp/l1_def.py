@@ -47,6 +47,8 @@ def get_webspam_trigram(opt_name):
 def get_lambda_list(dataset, opt_name):
     if opt_name == 'ASAROW':
         return ASAROW_list
+    if opt_name == 'SGD':
+        return SGD_list
 
     if dataset == 'MNIST':
         return get_MNIST(opt_name)

@@ -17,6 +17,21 @@ def best_param(cmd_params, opt_name, output_file):
     print cmd
     os.system(cmd)
     
+def write_parse_result(result_list, output_file):
+    open(output_file,'w').close()
+    print 'write parsed result %s\n' %output_file
+    try:
+        file_handler = open(output_file,'w')
+        for item in result_list:
+            for val in item:
+                file_handler.write(str(val) + ' ')
+            file_handler.write('\n')
+    except IOError as e:
+        print "I/O error ({0}): {1}".format(e.errno,e.strerror)
+        sys.exit()
+    else:
+        file_handler.close()
+
 #parse the result to a format for matlab to recognize
 def parse_result(input_file, output_file):
     dec_pattern = "(\d+\.?\d*)"
@@ -43,20 +58,10 @@ def parse_result(input_file, output_file):
         item.append(result_lt[i])
         result_list.append(item)
 
-    open(output_file,'w').close()
-    print 'write parsed result %s\n' %output_file
-    try:
-        file_handler = open(output_file,'w')
-        for item in result_list:
-            for val in item:
-                file_handler.write(str(val) + ' ')
-            file_handler.write('\n')
-    except IOError as e:
-        print "I/O error ({0}): {1}".format(e.errno,e.strerror)
-        sys.exit()
-    else:
-        file_handler.close()
+    write_parse_result(result_list, output_file)
+
     return result_list
+
 
 def get_valid_dim(trainfile):
     filename = trainfile + '_info.txt'

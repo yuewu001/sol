@@ -28,10 +28,9 @@ if fold_num < 2 or fold_num > 26:
     sys.exit()
 
 split_list = dataset.get_cv_data_list(dt,fold_num)
-print 'splt list %s'  %split_list
 
-dst_folder = dt
-os.system('mkdir %s' %dst_folder)
+dst_folder = dt + '/cv'
+os.system('mkdir -p %s' %dst_folder)
 
 #define the grid search item
 class grid_item:
@@ -97,10 +96,13 @@ for item in param_space:
 grid_size = reduce(lambda x, y: x * y, size_list)
 
 param_list = []
-result_file = dst_folder + '/%s' %opt_name + '_result.txt'
+
+run_count = 0
 
 #run on one split of data
 def run_one_data(exe_cmd_one):
+    global run_count
+    result_file = dst_folder + '/%s' %opt_name + '_result_%d' %run_count + '.txt'
     os.system('rm -f %s' %result_file)
     for k in range(0,grid_size):
         cmd = exe_cmd_one
@@ -119,8 +121,10 @@ def run_one_data(exe_cmd_one):
         os.system(cmd)
     
     #write the result to file
-    parse_file = dst_folder +'/%s' %opt_name + '_parse.txt'
+    parse_file = dst_folder +'/%s' %opt_name + '_parse_%d' %run_count + '.txt'
     result_list = run_util.parse_result(result_file, parse_file);
+
+    run_count += 1
     
     return result_list
 
