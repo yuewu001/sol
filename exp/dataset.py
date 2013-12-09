@@ -98,6 +98,7 @@ def get_cmd_data_by_file(train_file, test_file):
 
     cache_test_file = test_file + '_cache'
     cmd_data += ' -t %s' %test_file + ' -tc %s' %cache_test_file
+
     return cmd_data
 
 def get_cmd_data(dataset):
@@ -111,29 +112,29 @@ def get_cmd_data(dataset):
     return get_cmd_data_by_file(train_file, test_file)
 
 def get_model_param(ds, opt):
-    news = {'SGD':{'-eta':10},'STG':{'-eta':10},
-            'Ada-FOBOS':{'-eta':10, '-delta':2},
-            'Ada-RDA':{'-eta':10, '-delta':2},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':1}}
-    MNIST = {'SGD':{'-eta':10},'STG':{'-eta':10},
-            'Ada-FOBOS':{'-eta':10, '-delta':2},
-            'Ada-RDA':{'-eta':10, '-delta':2},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':1}}
-    rcv1 = {'SGD':{'-eta':10},'STG':{'-eta':10},
-            'Ada-FOBOS':{'-eta':10, '-delta':2},
-            'Ada-RDA':{'-eta':10, '-delta':2},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':1}}
-    url = {'SGD':{'-eta':10},'STG':{'-eta':10},
-            'Ada-FOBOS':{'-eta':10, '-delta':2},
-            'Ada-RDA':{'-eta':10, '-delta':2},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':1}}
+    news = {'SGD':{'-eta':64},'STG':{'-eta':64},
+            'Ada-FOBOS':{'-eta':2, '-delta':0.0625},
+            'Ada-RDA':{'-eta':2, '-delta':0.0625},
+            'SSAROW':{'-r':0.125}, 'ASAROW':{'-r':0.125},
+            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':256}}
+    MNIST = {'SGD':{'-eta':1},'STG':{'-eta':1},
+            'Ada-FOBOS':{'-eta':1, '-delta':8},
+            'Ada-RDA':{'-eta':2, '-delta':1},
+            'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
+            'CW-RDA':{'-r':0.0625}}
+    rcv1 = {'SGD':{'-eta':128},'STG':{'-eta':128},
+            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
+            'Ada-RDA':{'-eta':1, '-delta':0.0625},
+            'SSAROW':{'-r':2}, 'ASAROW':{'-r':2},
+            'CW-RDA':{'-r':2}}
+    url = {'SGD':{'-eta':16},'STG':{'-eta':16},
+            'Ada-FOBOS':{'-eta':1, '-delta':0.0625},
+            'Ada-RDA':{'-eta':1, '-delta':0.0625},
+            'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
+            'CW-RDA':{'-r':0.0625}}
     webspam_trigram = {'SGD':{'-eta':10},'STG':{'-eta':10},
-            'Ada-FOBOS':{'-eta':10, '-delta':2},
-            'Ada-RDA':{'-eta':10, '-delta':2},
+            'Ada-FOBOS':{'-eta':10, '-delta':1},
+            'Ada-RDA':{'-eta':10, '-delta':1},
             'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
             'CW-RDA':{'-r':1}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,

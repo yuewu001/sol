@@ -8,14 +8,15 @@ import sol_shuffle
 
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-opt_list = ['STG']
+opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
+#opt_list = ['STG']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
-ds_list = ['news']
+ds_list = ['MNIST','news', 'rcv1','url']
+#ds_list = ['news']
 
-rand_num = 2
+rand_num = 10 
 extra_cmd = ' -loss Hinge -norm '
 
 def add_to_dict(opt, result_all, result_once):
@@ -56,6 +57,7 @@ def train_model(path_list,dst_folder):
         sol_shuffle.sol_shuffle(train_file, rand_file)
 
         cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file)
+	dataset.analyze(rand_file);
 
         for opt in opt_list:
             print '-----------------------------------'

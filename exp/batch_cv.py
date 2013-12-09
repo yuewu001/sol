@@ -14,8 +14,8 @@ ds_list = ['MNIST','news', 'rcv1','url']
 
 fold_num = 5
 
-eta_search = '1.0:2.0:128.0'
-delta_search = '0.125:2:16'
+eta_search = '1.0:2.0:1024.0'
+delta_search = '0.0625:2:16'
 r_search = delta_search
 
 for dt in ds_list:
