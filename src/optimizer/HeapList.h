@@ -8,7 +8,6 @@
 #ifndef HEADER_HEAP_LIST
 #define HEADER_HEAP_LIST
 
-#include "../common/global.h"
 #include <assert.h>
 
 #include <new>

@@ -14,7 +14,6 @@
 		************************************************************************/
 
 #pragma once
-#include "../common/global.h"
 #include "../common/util.h"
 
 #include "Optimizer.h"

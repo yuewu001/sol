@@ -5,7 +5,8 @@
 > Functions: Data Point Definition
 ************************************************************************/
 
-#pragma once
+#ifndef HEADER_DATA_POINT
+#define HEADER_DATA_POINT
 
 #include "s_array.h"
 #include "../common/init_param.h"
@@ -90,7 +91,7 @@ namespace SOL {
 		}
 
 
-		DataPoint<FeatType, LabelType>& clone() const{
+		DataPoint<FeatType, LabelType> clone() const{
 			DataPoint<FeatType, LabelType> newPt; 
 			newPt.label = this->label;
 			newPt.max_index = this->max_index;
@@ -131,3 +132,4 @@ namespace SOL {
 	};
 
 }
+#endif
