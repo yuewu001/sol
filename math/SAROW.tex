@@ -6,6 +6,7 @@
 \usepackage{bm}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{subfigure}
 
 \begin{document}
 \title{Confidence-Weighted Sparse Online Learning}
@@ -135,61 +136,54 @@ The final updating rule goes to:
 \caption{Real Datasets}
 \label{tbl:01}
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-DataSet& Feat Dim & Train Data No. & Test Data No. & Feat No.\\
+DataSet& Feat Dim & Train Data No. & Test Data No. & Feat No. & sparsity\\
 \hline
-MNIST67 & 780 & 12183 & 1987 & 1,751,945\\
+MNIST67 & 780 & 12183 & 1987 & 1,751,945 & 0\\
 \hline
-news & 732209 & 9960 & 9994 & 5,513,533\\
+news & 732209 & 9960 & 9994 & 5,513,533 & 0\\
 \hline
-rcv1& 47,152  & 781,265 & 23,149 &59,155,144\\
+rcv1& 47,152  & 781,265 & 23,149 &59,155,144 & 0\\
 \hline
-url\_combined & 3,231,961 & 2,000,000 & 396,130 &231,259,917\\
+url\_combined & 3,231,961 & 2,000,000 & 396,130 &231,259,917 & 0\\
 \hline
-webspam& 16,609,143 &300,000 & 50,000 &1, 118,443,083\\
+webspam& 16,609,143 &300,000 & 50,000 &1, 118,443,083 & 0\\
 \hline
 \end{tabular}
 \end{table}
 
 \subsection{test error rate vs sparsity}
-\subsubsection{MNIST}
+\subsubsection{TG-based algorithms}
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.9\textwidth]{./figs/MNIST67_test.pdf}
-\caption{test error rate vs sparsity on MNIST (digit 6 and7)}
+\subfigure[MNIST]{
+    \includegraphics[width=0.33\textwidth]{./figs/MNIST67_test.pdf}}
+\subfigure[news]{
+    \includegraphics[width=0.33\textwidth]{./figs/news_test.pdf}}
+\subfigure[rcv1]{
+    \includegraphics[width=0.3\textwidth]{./figs/rcv1_test.pdf}}
+\subfigure[url]{
+    \includegraphics[width=0.3\textwidth]{./figs/url_test.pdf}}
+\subfigure[webspam]{
+    \includegraphics[width=0.33\textwidth]{./figs/webspam_trigram_test.pdf}}
 \label{fig:00}
 \end{figure}
 
-\subsubsection{news}
+\subsubsection{DA-based algorithms}
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.9\textwidth]{./figs/news_test.pdf}
-\caption{test error rate vs sparsity on news}
+\subfigure[MNIST]{
+    \includegraphics[width=0.33\textwidth]{./figs/MNIST67_test.pdf}}
+\subfigure[news]{
+    \includegraphics[width=0.33\textwidth]{./figs/news_test.pdf}}
+\subfigure[rcv1]{
+    \includegraphics[width=0.3\textwidth]{./figs/rcv1_test.pdf}}
+\subfigure[url]{
+    \includegraphics[width=0.3\textwidth]{./figs/url_test.pdf}}
+\subfigure[webspam]{
+    \includegraphics[width=0.33\textwidth]{./figs/webspam_trigram_test.pdf}}
 \label{fig:01}
-\end{figure}
-\subsubsection{rcv1}
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.95\textwidth]{./figs/rcv1_test.pdf}
-\caption{test error rate vs sparsity on rcv1}
-\label{fig:02}
-\end{figure}
-
-\subsubsection{url}
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.95\textwidth]{./figs/url_test.pdf}
-\caption{test error rate vs sparsity on url}
-\label{fig:03}
-\end{figure}
-
-\subsubsection{webspam}
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.95\textwidth]{./figs/webspam_trigram_test.pdf}
-\caption{test error rate vs sparsity on webspam}
-\label{fig:04}
 \end{figure}
 
 \section{Reference}
