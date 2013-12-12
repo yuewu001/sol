@@ -11,7 +11,7 @@ set (CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 FILE(GLOB data_files src/data/*.h)
 FILE(GLOB loss_files src/loss/*.h)
 FILE(GLOB opti_files src/optimizer/*.h)
-FILE(GLOB comm_files src/common/*.h)
+FILE(GLOB comm_files src/common/*.h src/common/*.hpp) 
 
 set (data_files ${data_files} 
     src/data/basic_io.cpp 
