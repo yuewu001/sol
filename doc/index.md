@@ -5,18 +5,6 @@ online classification tasks. The library provide an easy-to-use command-line too
 several scripts for users and developers.  We performed comprehensive experiments to 
 verify the efficiency and effectiveness of the library.
 
-1. First Level
-
-    1. Second Level
-
-        1. Third Level
-
-        2. Third Level
-
-  2. Second Level
-
-2. First Level
-
 ##Outline
 1. [Structure of folders](#struct)
 
@@ -48,11 +36,13 @@ verify the efficiency and effectiveness of the library.
    
     4.4. [Common Utilities](#common_util)
 
+<!--
 5. [Experimental Results of SOL](#exp)
 
     5.1. [Experiment on RCV1](#exp_rcv1)
 
     5.2. [Experiment on kdda](#exp_kdda)
+-->
 
 
 ## <a id='struct'>1. Structure of folders</a>
@@ -86,9 +76,6 @@ verify the efficiency and effectiveness of the library.
 
     Some tools to standardize datasets
 
-*   ---vs
-
-    Microsoft Visual Studio 2012 Projects of the library
 
 ## <a id='cmd_line'>2. Command line</a>
 
@@ -106,9 +93,10 @@ arguments are grouped according to their function.
     -loss arg:      loss function type
 
     supported loss functions:
-    *   Hinge:  hinge loss 
-    *   Logit:  logistic loss
-    *   Square: square loss
+    *   Hinge:          hinge loss 
+    *   Logit:          logistic loss
+    *   Square:         square loss
+    *   SquareHinge:    squared hinge loss
 
 ### Algorithms and parameters
     -opt arg :      optimization algorithms, options include:
@@ -149,7 +137,7 @@ arguments are grouped according to their function.
 
     *Parameter*: 
 
-        -rou arg :      decreased L1 regularization parameter.
+        -gammarou arg :      decreased L1 regularization parameter.
 
     *Reference*:
 
@@ -191,10 +179,57 @@ arguments are grouped according to their function.
 
     Adaptive Regularization of weighted vectors.
 
+    *Parameter*:
+
+        -r arg :    parameter of passive-aggressive update trade-off
+
     *Reference*:
 
         rammer K, Kulesza A, Dredze M. Adaptive regularization of weight vectors[J]. Machine Learning, 2009: 1-33.
 
+*   **ASAROW**
+
+    Adaptive Regularization of weighted vectors for feature selection.
+
+    *Parameter*:
+
+        -k arg :    number of weight dimenstions to keep
+
+*   **SSAROW**
+
+    Truncated Sparse Adaptive Regularization of weighted vectors.
+
+    *Parameter*:
+
+        -r arg :    parameter of passive-aggressive update trade-off
+
+*   **CW-RDA**
+
+    Confidence weighted dual avearaging regularization
+
+    *Parameter*:
+
+        -r arg :    parameter of passive-aggressive update trade-off
+
+*   **SCW**
+
+    Exact Soft-Confidence Weighted Learning (To be verified)
+
+    *Parameter*:
+
+        -phi arg:   probability parameter in SCW
+
+        -r arg  :    parameter of passive-aggressive update trade-off
+
+*   **SCW-RDA**
+
+    Exact Soft-Confidence Weighted Learning with regularized dual averaing (To be verified)
+
+    *Parameter*:
+
+        -phi arg:   probability parameter in SCW
+
+        -r arg  :    parameter of passive-aggressive update trade-off
 
 ## <a id='tutorial'>3. Tutorial</a>
 
@@ -376,7 +411,8 @@ Logistic Loss). The interfaces are:
     Users need to multiply the correspondent feature `x[i]` in the optimization algorithms.
 
 #### 4.2.1 Extend loss functions
-The files 'HingeLoss.h', 'LogisticLoss.h', and 'SquareLoss.h' are three examples to extend the base class.
+The files 'HingeLoss.h', 'LogisticLoss.h', 'SquareLoss.h', and
+'SquareHingeLoss.h'  are three examples to extend the base class.
 
 ### 4.3 <a id='optimizer'>Optimizers</a>
 
@@ -536,10 +572,16 @@ Check the implemented algorithms to explore more details of how to extend the op
 
 ### 4.4 <a id='common_util'>Common Utilities</a>
 
-Some utilized functions and global definitions.
+For some utilized functions and global definitions, please refer to
+*'common/init_param.h'* and *'common/util.h'*.
 
+
+<br/>
+<br/>
+<!--
 ## <a id='exp'>Experimental Results of SOL</a>
 
 ### <a id='exp_rcv1'>Experiment on RCV1 </a>
 
 ### <a id='exp_kdda'>Experiment on kdda</a>
+-->

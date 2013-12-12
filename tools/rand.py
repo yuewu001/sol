@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+"""rand a dataset"""
+
 import sys
 import random
 def Usage():

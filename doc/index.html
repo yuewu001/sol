@@ -1,25 +1,10 @@
 <h1>Documentation</h1>
 
-<p>SOL is an large scale sparse online learning library, which consists of a family of 
-efficient and scalable state-of-art online learning algorithms for large-scale sparse 
-online classification tasks. The library provide an easy-to-use command-line tool and 
-several scripts for users and developers.  We performed comprehensive experiments to 
+<p>SOL is an large scale sparse online learning library, which consists of a family of
+efficient and scalable state-of-art online learning algorithms for large-scale sparse
+online classification tasks. The library provide an easy-to-use command-line tool and
+several scripts for users and developers.  We performed comprehensive experiments to
 verify the efficiency and effectiveness of the library.</p>
-
-<ol>
-<li><p>First Level</p>
-
-<ol>
-<li><p>Second Level</p>
-
-<ol>
-<li><p>Third Level</p></li>
-<li><p>Third Level</p></li>
-</ol></li>
-<li><p>Second Level</p></li>
-</ol></li>
-<li><p>First Level</p></li>
-</ol>
 
 <h2>Outline</h2>
 
@@ -28,71 +13,75 @@ verify the efficiency and effectiveness of the library.</p>
 <li><p><a href="#cmd_line">Command line</a></p></li>
 <li><p><a href="#tutorial">Tutorial</a></p>
 
-<p>3.1. <a href="#install">Installation</a></p>
+<p> 3.1. <a href="#install">Installation</a></p>
 
-<p>3.2. <a href="#step_example">A step by step example</a></p></li>
+<p> 3.2. <a href="#step_example">A step by step example</a></p></li>
 <li><p><a href="#manual">User Manual &amp; Extend the library</a></p>
 
-<p>4.1. <a href="#io_handler">IO Handlers</a></p>
+<p> 4.1. <a href="#io_handler">IO Handlers</a></p>
 
-<ul style="list-style-type:none;">
-    <li><p><a href="#parse">4.1.1. Parsing Dataset</a></p></li>
-    <li><p><a href="#extend_datareader">4.1.2. Extend the data readers</a></p></li>
-</ul>
+<p> <ul style="list-style-type:none;">
+     <li><p><a href="#parse">4.1.1. Parsing Dataset</a></p></li>
+     <li><p><a href="#extend_datareader">4.1.2. Extend the data readers</a></p></li>
+ </ul></p>
 
-<p>4.2. <a href="#loss">Loss Functions</a></p>
+<p> 4.2. <a href="#loss">Loss Functions</a></p>
 
-<p>4.3. <a href="#optimizer">Optimizers</a></p>
+<p> 4.3. <a href="#optimizer">Optimizers</a></p>
 
-<p><ul style="list-style-type:none;">
-    <li><p><a href="#opt_detail">4.3.1. Details of Optimizer</a></p></li>
-    <li><p><a href="#opt_own">4.3.2. Implement your own algorithms</a></p></li>
-</ul></p>
+<p>  <ul style="list-style-type:none;">
+     <li><p><a href="#opt_detail">4.3.1. Details of Optimizer</a></p></li>
+     <li><p><a href="#opt_own">4.3.2. Implement your own algorithms</a></p></li>
+ </ul></p>
 
-<p>4.4. <a href="#common_util">Common Utilities</a></p></li>
-<li><p><a href="#exp">Experimental Results of SOL</a></p>
-
-<p>5.1. <a href="#exp_rcv1">Experiment on RCV1</a></p>
-
-<p>5.2. <a href="#exp_kdda">Experiment on kdda</a></p></li>
+<p> 4.4. <a href="#common_util">Common Utilities</a></p></li>
 </ol>
+
+
+<!--
+5. [Experimental Results of SOL](#exp)
+
+    5.1. [Experiment on RCV1](#exp_rcv1)
+
+    5.2. [Experiment on kdda](#exp_kdda)
+-->
+
 
 <h2><a id='struct'>1. Structure of folders</a></h2>
 
 <ul>
-<li><p>---doc</p>
+<li><p>&mdash;doc</p>
 
 <p>documentation of the library</p></li>
-<li><p>---exp</p>
+<li><p>&mdash;exp</p>
 
 <p>some scripts for experiments</p></li>
-<li><p>---src</p>
+<li><p>&mdash;src</p>
 
 <ul>
-<li><p>---common</p>
+<li><p>&mdash;common</p>
 
 <p>source code of common utilities and global definitions</p></li>
-<li><p>---data</p>
+<li><p>&mdash;data</p>
 
 <p>source code of IO handlers</p></li>
-<li><p>---loss</p>
+<li><p>&mdash;loss</p>
 
 <p>source code of loss functions</p></li>
-<li><p>---optimizer</p>
+<li><p>&mdash;optimizer</p>
 
 <p>source code of large scale sparse online learning algorithms</p></li>
-</ul></li>
-<li><p>---tools</p>
+</ul>
+</li>
+<li><p>&mdash;tools</p>
 
 <p>Some tools to standardize datasets</p></li>
-<li><p>---vs</p>
-
-<p>Microsoft Visual Studio 2012 Projects of the library</p></li>
 </ul>
+
 
 <h2><a id='cmd_line'>2. Command line</a></h2>
 
-<p>Running SOL without any arguments or with '--help' will produce a message which briefly explains each argument. Below
+<p>Running SOL without any arguments or with &lsquo;&ndash;help&rsquo; will produce a message which briefly explains each argument. Below
 arguments are grouped according to their function.</p>
 
 <h4>Input Options</h4>
@@ -110,9 +99,10 @@ arguments are grouped according to their function.</p>
 <pre><code>-loss arg:      loss function type
 
 supported loss functions:
-*   Hinge:  hinge loss 
-*   Logit:  logistic loss
-*   Square: square loss
+*   Hinge:          hinge loss 
+*   Logit:          logistic loss
+*   Square:         square loss
+*   SquareHinge:    squared hinge loss
 </code></pre>
 
 <h3>Algorithms and parameters</h3>
@@ -122,7 +112,7 @@ supported loss functions:
 -eta arg :      learning rate, if this option is not specified, algorithms will 
                 try difference parameters and select a best one automatically         
 -l1  arg :      L1 regularization parameter
--passes arg:    number of passes to go through
+-passes arg:    number of passes to go through 
 </code></pre>
 
 <h4>Algorithm list</h4>
@@ -133,16 +123,16 @@ supported loss functions:
 <p>Stochastic Gradient Descent algorithm. Note that no sparsity is induced even a L1 regularization parameter is set.</p></li>
 <li><p><strong>STG</strong></p>
 
-<p>Truncated Gradient Descent algorithm. </p>
+<p>Truncated Gradient Descent algorithm.</p>
 
 <p><em>Parameter</em>:</p>
 
 <pre><code>-k  arg :       truncate the weight vector every k steps
 </code></pre>
 
-<p><em>Reference</em>: </p>
+<p><em>Reference</em>:</p>
 
-<pre><code>Langford J, Li L, Zhang T. Sparse online learning via truncated gradient[J]. The Journal of Machine Learning Research, 2009, 10: 777-801.
+<pre><code>Langford J, Li L, Zhang T. Sparse online learning via truncated gradient[J]. The Journal of Machine Learning Research, 2009, 10: 777-801. 
 </code></pre></li>
 <li><p><strong>RDA</strong></p>
 
@@ -150,20 +140,20 @@ supported loss functions:
 
 <p><em>Reference</em>:</p>
 
-<pre><code>Xiao L. Dual averaging methods for regularized stochastic learning and online optimization[J]. The Journal of Machine Learning Research, 2010, 9999: 2543-2596.
+<pre><code>Xiao L. Dual averaging methods for regularized stochastic learning and online optimization[J]. The Journal of Machine Learning Research, 2010, 9999: 2543-2596.  
 </code></pre></li>
 <li><p><strong>RDA_E</strong></p>
 
 <p>Enhanced L1-Regularized Dual Averaging algorithm.</p>
 
-<p><em>Parameter</em>: </p>
+<p><em>Parameter</em>:</p>
 
-<pre><code>-rou arg :      decreased L1 regularization parameter.
+<pre><code>-gammarou arg :      decreased L1 regularization parameter.
 </code></pre>
 
 <p><em>Reference</em>:</p>
 
-<pre><code>Xiao L. Dual averaging methods for regularized stochastic learning and online optimization[J]. The Journal of Machine Learning Research, 2010, 9999: 2543-2596.
+<pre><code>Xiao L. Dual averaging methods for regularized stochastic learning and online optimization[J]. The Journal of Machine Learning Research, 2010, 9999: 2543-2596.  
 </code></pre></li>
 <li><p><strong>FOBOS</strong></p>
 
@@ -171,7 +161,7 @@ supported loss functions:
 
 <p><em>Reference</em>:</p>
 
-<pre><code>Duchi J, Singer Y. Efficient online and batch learning using forward backward splitting[J]. The Journal of Machine Learning Research, 2009, 10: 2899-2934.
+<pre><code>Duchi J, Singer Y. Efficient online and batch learning using forward backward splitting[J]. The Journal of Machine Learning Research, 2009, 10: 2899-2934.  
 </code></pre></li>
 <li><p><strong>Ada-RDA</strong></p>
 
@@ -203,17 +193,67 @@ supported loss functions:
 
 <p>Adaptive Regularization of weighted vectors.</p>
 
+<p><em>Parameter</em>:</p>
+
+<pre><code>-r arg :    parameter of passive-aggressive update trade-off
+</code></pre>
+
 <p><em>Reference</em>:</p>
 
 <pre><code>rammer K, Kulesza A, Dredze M. Adaptive regularization of weight vectors[J]. Machine Learning, 2009: 1-33.
 </code></pre></li>
+<li><p><strong>ASAROW</strong></p>
+
+<p>Adaptive Regularization of weighted vectors for feature selection.</p>
+
+<p><em>Parameter</em>:</p>
+
+<pre><code>-k arg :    number of weight dimenstions to keep
+</code></pre></li>
+<li><p><strong>SSAROW</strong></p>
+
+<p>Truncated Sparse Adaptive Regularization of weighted vectors.</p>
+
+<p><em>Parameter</em>:</p>
+
+<pre><code>-r arg :    parameter of passive-aggressive update trade-off
+</code></pre></li>
+<li><p><strong>CW-RDA</strong></p>
+
+<p>Confidence weighted dual avearaging regularization</p>
+
+<p><em>Parameter</em>:</p>
+
+<pre><code>-r arg :    parameter of passive-aggressive update trade-off
+</code></pre></li>
+<li><p><strong>SCW</strong></p>
+
+<p>Exact Soft-Confidence Weighted Learning (To be verified)</p>
+
+<p><em>Parameter</em>:</p>
+
+<pre><code>-phi arg:   probability parameter in SCW
+
+-r arg  :    parameter of passive-aggressive update trade-off
+</code></pre></li>
+<li><p><strong>SCW-RDA</strong></p>
+
+<p>Exact Soft-Confidence Weighted Learning with regularized dual averaing (To be verified)</p>
+
+<p><em>Parameter</em>:</p>
+
+<pre><code>-phi arg:   probability parameter in SCW
+
+-r arg  :    parameter of passive-aggressive update trade-off
+</code></pre></li>
 </ul>
+
 
 <h2><a id='tutorial'>3. Tutorial</a></h2>
 
 <h3><a id='install'>3.1 Installation</a></h3>
 
-<p>SOL features a very simple installation procedure. The project is managed by Cmake. There exists a <code>CMakeLists.txt</code> in the root dir of SOL. </p>
+<p>SOL features a very simple installation procedure. The project is managed by Cmake. There exists a <code>CMakeLists.txt</code> in the root dir of SOL.</p>
 
 <ol>
 <li><p>For linux users</p>
@@ -221,10 +261,11 @@ supported loss functions:
 <ol>
 <li><p><code>cd</code> to the directory of SOL</p></li>
 <li><p>make a folder for building the project, like  <code>mkdir build</code></p></li>
-<li><p><code>cd</code> to the folder above and call cmake </p></li>
+<li><p><code>cd</code> to the folder above and call cmake</p></li>
 <li><p><code>make</code> and you will get an executable <code>SOL</code> in the <code>bin</code> folder</p></li>
 <li><p><code>make install</code> and the executable will be copied to the root dir of SOL</p></li>
-</ol></li>
+</ol>
+</li>
 <li><p>For windows users</p>
 
 <ol>
@@ -232,13 +273,15 @@ supported loss functions:
 <li><p>call cmake. Remember to specify the visual studio. For example, if you are using Visual Studio 2012, you can
 generate the project by</p>
 
-<pre><code>cmake -G "Visual Studio 11" ..
+<pre><code> cmake -G "Visual Studio 11" ..
 </code></pre></li>
 <li><p>Open the project, Rebuild the <code>ALL_BUILD</code> project and then build the <code>INSTALL</code> project</p></li>
-</ol></li>
+</ol>
+</li>
 </ol>
 
-<p>In the <code>vs</code> directory, we provide a Visual Studio 2012 Project. </p>
+
+<p>In the <code>vs</code> directory, we provide a Visual Studio 2012 Project.</p>
 
 <h3>3.2 <a id='step_example'>A step-by-step example</a></h3>
 
@@ -252,7 +295,7 @@ The dataset we use will be <code>a6a</code>. Note that only LibSVM datasets are 
 <pre><code>./SOL -i a6a -opt SGD
 </code></pre>
 
-<p>The output will be: </p>
+<p>The output will be:</p>
 
 <pre><code>eta0 = 1e-08    mistake rate: 24.0107 %
 eta0 = 1e-07    mistake rate: 24.0107 %
@@ -326,7 +369,7 @@ correctly. The interfaces are:</p>
 <pre><code>virtual bool OpenReading() = 0;
 </code></pre>
 
-<p>Open a dataset file to load data. Note that we do not specify the source of dataset (like a file path name), as the 
+<p>Open a dataset file to load data. Note that we do not specify the source of dataset (like a file path name), as the
 source of data may be online sources (like TCP). The <code>open</code> operation can go beyond opening a local file. It can
 also open a socket listener.</p>
 
@@ -358,6 +401,7 @@ also open a socket listener.</p>
 
 <p>Test if the data reader is ok.</p></li>
 </ul>
+
 
 <h4>4.1.2 <a id='extend_datareader'>Extend the data readers</a></h4>
 
@@ -400,13 +444,15 @@ example:</p>
 
 <p><i>l&#39;(<b>w</b>) = -y <b>x</b></i></p>
 
-<p>As a result, we only calculate the shared term <code>-y</code> for the gradients of different features for efficiency concern. 
+<p>As a result, we only calculate the shared term <code>-y</code> for the gradients of different features for efficiency concern.
 Users need to multiply the correspondent feature <code>x[i]</code> in the optimization algorithms.</p></li>
 </ul>
 
+
 <h4>4.2.1 Extend loss functions</h4>
 
-<p>The files 'HingeLoss.h', 'LogisticLoss.h', and 'SquareLoss.h' are three examples to extend the base class.</p>
+<p>The files &lsquo;HingeLoss.h&rsquo;, &lsquo;LogisticLoss.h&rsquo;, &lsquo;SquareLoss.h&rsquo;, and
+&lsquo;SquareHingeLoss.h&rsquo;  are three examples to extend the base class.</p>
 
 <h3>4.3 <a id='optimizer'>Optimizers</a></h3>
 
@@ -426,21 +472,22 @@ functions).</p>
 <li><code>eta</code> :         learning rates. This variable is set to <code>eta0</code> at the when training begins. Different algorithms can
                 set the value of learning rate on the fly.</li>
 <li><code>lambda</code>:       The L1 regularization parameter.</li>
-<li><code>dataSet</code>:      The training and test data source.   </li>
+<li><code>dataSet</code>:      The training and test data source.</li>
 <li><code>weightVec</code>:    The weight vector of the linear model.</li>
 <li><code>weightDim</code>:    current dimension of the weight vector. Note that this variable is changing with training data
                 coming in.</li>
-<li><code>sparse_soft_thresh</code>: 
+<li><code>sparse_soft_thresh</code>:
                 threshold below which a weight is regarded as zero.</li>
 <li><code>lossFunc</code> :    user specified loss function</li>
 <li><code>id_str</code> :      a string to describe the algorithm, need to be assigned a value when an algorithm is constructed</li>
 </ul>
 
+
 <h5>Class Methods</h5>
 
 <p><strong>Constructor</strong></p>
 
-<pre><code>    Optimizer(DataSet&lt;FeatType, LabelType&gt; &amp;dataSet, LossFunc&lt;FeatType, LabelType&gt; &amp;lossFunc);
+<pre><code>    Optimizer(DataSet&lt;FeatType, LabelType&gt; &amp;dataSet, LossFunc&lt;FeatType, LabelType&gt; &amp;lossFunc); 
 </code></pre>
 
 <p>When initializing an optimizer, users need to assign the data set and the loss function at least.</p>
@@ -475,7 +522,8 @@ can be randomized. It is not available at the moment.</p>
 <li><code>varErrRate</code>:   variance of the average error rate, only valid when dataset can be randomized</li>
 <li><code>sparesRate</code>:   sparsification rate of the linear model</li>
 <li><code>numOfTimes</code>:   number of times to learn the model with randomized dataset, not available at the moment</li>
-</ul></li>
+</ul>
+</li>
 <li><p>BeginTrain</p>
 
 <pre><code>virtual void BeginTrain();
@@ -495,7 +543,7 @@ can be randomized. It is not available at the moment.</p>
 <pre><code>virtual void EndTrain();
 </code></pre>
 
-<p>Called when training is finished. </p></li>
+<p>Called when training is finished.</p></li>
 <li><p>Predict</p>
 
 <pre><code>float Predict(DataPoint&lt;FeatType, LabelType&gt; &amp;data);
@@ -513,6 +561,7 @@ can be randomized. It is not available at the moment.</p>
 
 <p><strong>Return</strong>: the prediction of the input data <code>x</code></p></li>
 </ol>
+
 
 <p><strong>Test</strong></p>
 
@@ -542,7 +591,7 @@ of different algorithms.</p></li>
 <pre><code>float GetSparseRate(int total_len = 0);
 </code></pre>
 
-<p>Get the sparse rate of the model. The total_len is the dimension of the input data. If not assigned by users, the 
+<p>Get the sparse rate of the model. The total_len is the dimension of the input data. If not assigned by users, the
 largest index of features will be used.</p></li>
 <li><p>UpdateWeightSize</p>
 
@@ -550,9 +599,9 @@ largest index of features will be used.</p></li>
 </code></pre>
 
 <p>Update the dimension of the weight vector. As we are learning on sparse data online, we do not know the dimension of
-the input data. So the weight vector needs to be resized on the fly. 
-Note that inherited algorithms need to override this function to resize their own dimension-related members and call 
-the base one explicitly to resize the weight vector. </p></li>
+the input data. So the weight vector needs to be resized on the fly.
+Note that inherited algorithms need to override this function to resize their own dimension-related members and call
+the base one explicitly to resize the weight vector.</p></li>
 <li><p>PrintOptInfo</p>
 
 <pre><code>void PrintOptInfo() const;
@@ -567,22 +616,30 @@ the base one explicitly to resize the weight vector. </p></li>
 <p>Get the identity string of the optimizer.</p></li>
 </ol>
 
+
 <h4>4.3.2 <a id='opt_own'>Implement your own algorithms</a></h4>
 
 <p>To implement a specific learning algorithm, you only need to inherit from the base class <code>Optimizer</code>, and implement
 the pure virtual function <code>UpdateWeightVec</code>. Whether other virtual functions need to be override depends on the
 specific algorithm. Take STG for example, it has to maintain a time stamp vector. So it override the <code>BeginTrain</code>
 and <code>UpdateWeightSize</code> functions to initialize and resize the time stamp vector. It needs to shrink weight vectors
-at the end of the training. So <code>EndTrain</code> is override. </p>
+at the end of the training. So <code>EndTrain</code> is override.</p>
 
 <p>Check the implemented algorithms to explore more details of how to extend the optimizers.</p>
 
 <h3>4.4 <a id='common_util'>Common Utilities</a></h3>
 
-<p>Some utilized functions and global definitions.</p>
+<p>For some utilized functions and global definitions, please refer to
+<em>&lsquo;common/init_param.h&rsquo;</em> and <em>&lsquo;common/util.h&rsquo;</em>.</p>
 
-<h2><a id='exp'>Experimental Results of SOL</a></h2>
+<p><br/>
+<br/></p>
 
-<h3><a id='exp_rcv1'>Experiment on RCV1 </a></h3>
+<!--
+## <a id='exp'>Experimental Results of SOL</a>
 
-<h3><a id='exp_kdda'>Experiment on kdda</a></h3>
+### <a id='exp_rcv1'>Experiment on RCV1 </a>
+
+### <a id='exp_kdda'>Experiment on kdda</a>
+-->
+

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+"""format a libsvm dataset, change label 0 to -1,""" 
 import sys
 import os
 import time
