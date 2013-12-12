@@ -113,7 +113,7 @@ namespace SOL {
 						(*p_feat) * this->sigma_w[*p_index];  
 
 					//L1 lazy update
-					size_t stepK = this->iter_num - this->timeStamp[*p_index];
+					//size_t stepK = this->iter_num - this->timeStamp[*p_index];
 					float gravity = last_g_sum - 
 						this->sum_rate[this->timeStamp[*p_index]];
 					//float gravity = stepK * this->lambda * this->beta_t / 2.f;

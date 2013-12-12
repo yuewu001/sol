@@ -119,18 +119,19 @@ namespace SOL {
 		}
 		for (map_bool_iter iter = this->flag2storage_bool.begin();
 			iter != this->flag2storage_bool.end(); iter++){
-				if (opt.isSet(iter->first.c_str()))
-					if (opt.get(iter->first.c_str())->expectArgs == 0)
-						*(iter->second) = true;
-					else{
-						string out;
-						opt.get(iter->first.c_str())->getString(out);
-						ToLowerCase(out);
-						if (out == "true")
-							*(iter->second) = true;
-						else
-							*(iter->second) = false;
-					}
+            if (opt.isSet(iter->first.c_str())){
+                if (opt.get(iter->first.c_str())->expectArgs == 0)
+                    *(iter->second) = true;
+                else{
+                    string out;
+                    opt.get(iter->first.c_str())->getString(out);
+                    ToLowerCase(out);
+                    if (out == "true")
+                        *(iter->second) = true;
+                    else
+                        *(iter->second) = false;
+                }
+            }
 		}
 		for (map_str_iter iter = this->flag2storage_str.begin();
 			iter != this->flag2storage_str.end(); iter++){

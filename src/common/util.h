@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <unistd.h>
 #define SOL_ACCESS(x) access(x,F_OK)
 #endif
 
