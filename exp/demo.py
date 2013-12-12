@@ -9,14 +9,15 @@ import sol_shuffle
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-#opt_list = ['STG']
+#opt_list = ['CW-RDA']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
-ds_list = ['MNIST','news', 'rcv1','url']
-#ds_list = ['news']
+#ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
+ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
+#ds_list = ['news20']
 
-rand_num = 10 
+rand_num = 10
 extra_cmd = ' -loss Hinge -norm '
 
 def add_to_dict(opt, result_all, result_once):
@@ -45,16 +46,20 @@ def train_model(path_list,dst_folder):
 
     result_all = {}
     #random the file
-    rand_file = train_file + '_rand'  
+    if rand_num > 1:
+        rand_file = train_file + '_rand'  
+    else:
+	rand_file = train_file
     rand_file_cache = rand_file + '_cache'
 
 
     for k in range(0,rand_num):
-        #remove previous files
-        open(rand_file,'w').close()
-        os.system('rm -f %s' %rand_file_cache)
+	if rand_num > 1:
+            #remove previous files
+            open(rand_file,'w').close()
+            os.system('rm -f %s' %rand_file_cache)
 
-        sol_shuffle.sol_shuffle(train_file, rand_file)
+            sol_shuffle.sol_shuffle(train_file, rand_file)
 
         cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file)
 	dataset.analyze(rand_file);
@@ -93,16 +98,17 @@ def train_model(path_list,dst_folder):
 for ds in ds_list:
     path_list = dataset.get_file_name(ds)
     dst_folder = ds
+    dst_folder = ds
+    os.system("mkdir %s" %dst_folder)
 
     result_all = train_model(path_list, dst_folder)
+
     for key,val in result_all.iteritems():
         #write the result to file
         parse_file = dst_folder +'/%s' %key + '.txt'
         run_util.write_parse_result(val,parse_file)
 
-    #sys.exit()
-    dst_folder = ds
-    os.system("mkdir %s" %dst_folder)
+    continue
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
 
     try:

@@ -6,16 +6,18 @@ import dataset
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['SSAROW','STG']
+#opt_list = ['CW-RDA']
 
 #ds_list = ['news', 'rcv1', 'url']
-ds_list = ['MNIST','news', 'rcv1','url']
-#ds_list = ['news']
+#ds_list = ['MNIST','news', 'rcv1','url']
+#ds_list = ['webspam_trigram']
+ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim','webspam_trigram']
+#ds_list = ['news20']
 
 fold_num = 5
 
 eta_search = '1.0:2.0:1024.0'
-delta_search = '0.0625:2:16'
+delta_search = '0.03125:2:8'
 r_search = delta_search
 
 for dt in ds_list:
