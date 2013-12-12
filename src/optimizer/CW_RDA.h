@@ -36,7 +36,8 @@ namespace SOL {
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
 			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("r: %.2f\n\n", this->r);
+			printf("lambda:\t%.2f\n", this->lambda);
+			printf("r:\t%.2f\n\n", this->r);
 		}
 	protected:
 		//this is the core of different updating algorithms

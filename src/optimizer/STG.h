@@ -87,7 +87,7 @@ namespace SOL {
 				}
 				else{
 					stepK = this->curIterNum - this->timeStamp[index_i];
-					if (stepK < this->K)
+					if (stepK < size_t(this->K))
 						continue;
 
 					stepK -= stepK % this->K;

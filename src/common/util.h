@@ -4,7 +4,8 @@
 	> Created Time: 8/19/2013 Monday 2:17:56 PM
 	> Functions: 
  ************************************************************************/
-#pragma once
+#ifndef HEADER_UTIL
+#define HEADER_UTIL
 
 #include "init_param.h"
 
@@ -68,15 +69,31 @@ inline float trunc_weight2(float w, float gravity){
         return (gravity < -w) ? gravity : -w;
 }
 
+inline void ToUpperCase(string &str) {
+	string dst_str;
+	int len = str.length();
+	for (int i = 0; i < len; i++)
+		dst_str.push_back(toupper(str[i]));
+	std::swap(str,dst_str);
+}
+
+inline void ToLowerCase(string &str) {
+	string dst_str;
+	int len = str.length();
+	for (int i = 0; i < len; i++)
+		dst_str.push_back(tolower(str[i]));
+	std::swap(str,dst_str);
+}
 
 
 
 inline double get_current_time(){
 #if _WIN32
-    return GetTickCount() / 1000.0;
+	return GetTickCount() / 1000.0;
 #else
-    struct timeval tim;
-    gettimeofday(&tim, NULL);
-    return tim.tv_sec + tim.tv_usec / 1000000.0;
+	struct timeval tim;
+	gettimeofday(&tim, NULL);
+	return tim.tv_sec + tim.tv_usec / 1000000.0;
 #endif
 }
+#endif

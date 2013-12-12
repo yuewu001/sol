@@ -18,7 +18,6 @@
 #include "libsvm_binary.h"
 #include "libsvmread.h"
 #include "../common/util.h"
-#include "../common/global.h"
 
 #include "thread_primitive.h"
 
@@ -39,7 +38,6 @@ namespace SOL {
             string cache_fileName;
             bool is_cache;
 
-            enum_DataSet_Type dataset_type;
 
             size_t bufSize; //buffer to load data
             size_t passNum; //number of passes
@@ -64,7 +62,6 @@ namespace SOL {
 
         public:
             DataSet(size_t passes = 1, int buf_size = -1) {
-                this->dataset_type = DataSet_Type_BC;
                 this->head = NULL;
                 this->wt_ptr = NULL;
                 this->rd_ptr = NULL;

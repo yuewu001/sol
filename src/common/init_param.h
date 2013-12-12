@@ -5,26 +5,33 @@
 > Functions: init parameters
 ************************************************************************/
 
-#pragma once
-#include "global.h"
-#include <string>
+#ifndef HEADER_INIT_PARAM
+#define HEADER_INIT_PARAM
 
-namespace SOL
-{
-//
+#include <stdint.h>
+#include <string>
+namespace SOL {
+#define IndexType uint32_t
+
+	//compress cache
+#define BASIC_IO 0
+#define GZIP_IO 1
+#define ZLIB_IO 2
+
+	//
 	/////////////////////Optimizer Initalization parameters//////////////////
 	//
-    //whether to learn the best parameter
-    static const bool init_is_learn_best_param = false;
+	//whether to learn the best parameter
+	static const bool init_is_learn_best_param = false;
 	//learning rate
 	static const float init_eta = 10;
 	static const float init_eta_max = 128.f;
 	static const float init_eta_min = 1.f;
 	static const float init_eta_step = 2.f;
-    //pow decaying learing rate
-    static const float init_power_t = 0.5;
-    //initial t
-    static const size_t init_initial_t = 1;
+	//pow decaying learing rate
+	static const float init_power_t = 0.5;
+	//initial t
+	static const int init_initial_t = 1;
 	//l1 regularization
 	static const float init_lambda = 0.0;
 	//sparse soft threshold when counting zero-weights
@@ -51,9 +58,9 @@ namespace SOL
 	//is normalize the data
 	static const bool init_normalize = false;
 
-	static const enum_Loss_Type init_loss_type = Loss_Type_Logit;
-	static const int init_data_type = DataSet_Type_BC | DataSet_LibSVM;
-	static const enum_Opti_Method init_opti_method = Opti_STG;
+	static const char* init_loss_type = "Hinge";
+	static const char* init_data_type = "LibSVM";
+	static const char* init_opti_method = "SGD";
 
 	//trying the optimal parameters
 
@@ -67,3 +74,4 @@ namespace SOL
 	static const int zlib_deflate_level = -1; // use default deflate level
 	static const size_t zlib_buf_size = 16348; //default buffer size of zlib
 }
+#endif

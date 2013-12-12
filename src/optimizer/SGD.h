@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../common/global.h"
 #include "Optimizer.h"
 
 namespace SOL {
@@ -16,8 +15,7 @@ namespace SOL {
 	protected:
 		float (*pEta_time)(size_t t, float pt);
 	public:
-		SGD(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc,
-			NormType type = NormType_None);
+		SGD(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
 		virtual ~SGD();
 
 	protected:
@@ -30,8 +28,7 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	SGD<FeatType, LabelType>::SGD(DataSet<FeatType, LabelType> &dataset, 
-		LossFunction<FeatType, LabelType> &lossFunc,
-		NormType type): Optimizer<FeatType, LabelType>(dataset, lossFunc) {
+		LossFunction<FeatType, LabelType> &lossFunc): Optimizer<FeatType, LabelType>(dataset, lossFunc) {
 			this->id_str = "SGD";
 	}
 

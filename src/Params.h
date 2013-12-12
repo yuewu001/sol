@@ -5,21 +5,42 @@
 > Functions: Class for Parsing parameters
 ************************************************************************/
 
-#pragma once
+#ifndef HEADER_PARSER_PARAM
+#define HEADER_PARSER_PARAM
 
-#include "common/global.h"
+#include "common/ezOptionParser.hpp"
+
 #include "data/parser.h"
 
 #include <string>
 #include <map>
 
+
 using std::string;
 using std::map;
+
+//using namespace ez;
 
 namespace SOL
 {
 	class Params
 	{
+	private:
+		ez::ezOptionParser opt;
+		ez::ezOptionValidator* vfloat; 
+		ez::ezOptionValidator* vint; 
+		ez::ezOptionValidator* vbool; 
+
+		map<std::string, float*> flag2storage_float;
+		map<std::string, int*> flag2storage_int;
+		map<std::string, bool*> flag2storage_bool;
+		map<std::string, std::string*> flag2storage_str;
+
+		typedef map<std::string, float*>::iterator map_float_iter;
+		typedef map<std::string, int*>::iterator map_int_iter;
+		typedef map<std::string, bool*>::iterator map_bool_iter;
+		typedef map<std::string, std::string*>::iterator map_str_iter;
+
 	public:
 		//input data
 		string fileName; //source file name
@@ -28,11 +49,11 @@ namespace SOL
 		string test_cache_fileName; //cached test file name
 
 		//dataset type
-		int data_type;
-		//optimization method
-		enum_Opti_Method opti_method;
+		string str_data_type;
 		//loss function type
-		enum_Loss_Type loss_type;
+		string str_loss;
+		//optimization method
+		string str_opt;
 
 		int passNum;
 
@@ -47,24 +68,30 @@ namespace SOL
 
 		int buf_size; //number of chunks in dataset 
 
-		size_t initial_t;
+		int initial_t;
 		float power_t; 
 		bool is_learn_best_param; //whether learn best parameter
 
 		bool is_normalize;
 
 	public:
-		Params(){}
-		Params(int argc, char** args);
+		Params();
+		~Params();
 
-		void Parse(int argc, char** args);
+		bool Parse(int argc, const char** args);
 		void Help();
 
 	private:
-		//default parameter settings
-		void Default();
-		void ParseOptiMethod(char *str_method);
-		void ParseDataType(char *str_data_type);
-		enum_Loss_Type GetLossType(char *str_type);
+		void Init();
+
+		void add_option(float default_val, bool is_required, int expectArgs, 
+			const char* descr, const char* flag, float *storage);
+		void add_option(int default_val, bool is_required, int expectArgs, 
+			const char* descr, const char* flag, int *storage);
+		void add_option(bool default_val, bool is_required, int expectArgs, 
+			const char* descr, const char* flag, bool *storage);
+		void add_option(const char* default_val, bool is_required, int expectArgs, 
+			const char* descr, const char* flag, string *storage);
 	};
 }
+#endif

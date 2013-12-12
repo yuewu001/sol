@@ -1,18 +1,18 @@
 /*************************************************************************
-> File Name: SCW_RDA.h
+> File Name: SCW.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 > Created Time: 2013/11/27 17:10:06
 > Functions: Exact Soft Confidence-Weighted Learning
 ************************************************************************/
-#ifndef HEADER_SCW_RDA
-#define HEADER_SCW_RDA
+#ifndef HEADER_SCW
+#define HEADER_SCW
 
 #include "Optimizer.h"
 #include <cmath>
 
 namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class SCW_RDA: public Optimizer<FeatType, LabelType> {
+	class SCW: public Optimizer<FeatType, LabelType> {
 	protected:
 		s_array<float> sigma_w;
 		float C;
@@ -24,9 +24,9 @@ namespace SOL {
 		float zeta;
 
 	public:
-		SCW_RDA(DataSet<FeatType, LabelType> &dataset, 
+		SCW(DataSet<FeatType, LabelType> &dataset, 
 			LossFunction<FeatType, LabelType> &lossFunc);
-		~SCW_RDA();
+		~SCW();
 
 	public:
 		//set parameters for specific optimizers
@@ -59,7 +59,7 @@ namespace SOL {
 	};
 
 	template <typename FeatType, typename LabelType>
-	SCW_RDA<FeatType, LabelType>::SCW_RDA(DataSet<FeatType, LabelType> &dataset, 
+	SCW<FeatType, LabelType>::SCW(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc){
 		this->id_str = "Soft Confidence Weighted";
@@ -70,12 +70,12 @@ namespace SOL {
 	}
 
 	template <typename FeatType, typename LabelType>
-	SCW_RDA<FeatType, LabelType>::~SCW_RDA() {
+	SCW<FeatType, LabelType>::~SCW() {
 	}
 
 	//this is the core of different updating algorithms
 	template <typename FeatType, typename LabelType>
-	float SCW_RDA<FeatType,LabelType>::UpdateWeightVec(
+	float SCW<FeatType,LabelType>::UpdateWeightVec(
 		const DataPoint<FeatType, LabelType> &x) {
 			size_t featDim = x.indexes.size();
 			IndexType index_i = 0;
@@ -113,7 +113,7 @@ namespace SOL {
 
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void SCW_RDA<FeatType, LabelType>::BeginTrain() {
+	void SCW<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
 		this->sigma_w.set_value(1);
@@ -121,13 +121,13 @@ namespace SOL {
 
 	//called when a train ends
 	template <typename FeatType, typename LabelType>
-	void SCW_RDA<FeatType, LabelType>::EndTrain() {
+	void SCW<FeatType, LabelType>::EndTrain() {
 		Optimizer<FeatType,LabelType>::EndTrain();
 	}
 
 	//set parameters for specific optimizers
 	template <typename FeatType, typename LabelType>
-	void SCW_RDA<FeatType, LabelType>::SetParameterEx(float phi,float r) {
+	void SCW<FeatType, LabelType>::SetParameterEx(float phi,float r) {
 		if (phi > 0)
 			this->update_phi(phi);
 		this->C = r > 0 ? 0.5f / r : this->C;
@@ -135,7 +135,7 @@ namespace SOL {
 
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
-	void SCW_RDA<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+	void SCW<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
 		if (newDim < this->weightDim)
 			return;
 		else {
