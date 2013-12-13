@@ -105,15 +105,17 @@ namespace SOL {
 						this->weightVec[index_i] = 0;
 					}
 					//update sigma_w
-					this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
-
+					//this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
+					this->sigma_w[index_i] *= this->r / (this->r + 
+						this->sigma_w[index_i] * x.features[i] * x.features[i]);
 					IndexType ret_id;
 					this->heap.UpdateHeap(index_i - 1, ret_id); 
 					//heap.Output(); 
 				}
 				//bias term
 				this->weightVec[0] += alpha_t * this->sigma_w[0] * x.label;
-				this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
+				//this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
+				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 			}
 			return y;
 	}
