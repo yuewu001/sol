@@ -140,7 +140,8 @@ namespace SOL {
 		}
 
 		if (this->cache_fileName.size() == 0 && this->fileName.length() == 0){
-			cerr<<"you must specify the training data"<<endl;
+			cerr<<"ERROR: you must specify the training data\n"<<endl;
+            this->Help();
 			return false;
 		}
 		return true;
