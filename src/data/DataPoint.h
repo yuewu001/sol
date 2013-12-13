@@ -118,9 +118,9 @@ namespace SOL {
 	struct DataChunk{
 		DataPoint<FeatType, LabelType> data[init_chunk_size];
 		size_t dataNum;
+		DataChunk *next;
 		bool is_inuse;
 		bool is_parsed;
-		DataChunk *next;
 
 		DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
 		}
