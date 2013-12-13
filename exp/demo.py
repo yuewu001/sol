@@ -14,11 +14,11 @@ opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
 #ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
-ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-#ds_list = ['news20']
+#ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
+ds_list = ['gisette']
 
 rand_num = 10
-extra_cmd = ' -loss Hinge -norm '
+extra_cmd = ' -loss Hinge -norm -passes 10'
 
 def add_to_dict(opt, result_all, result_once):
     if opt in result_all.keys(): #add to previous result

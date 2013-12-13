@@ -2095,7 +2095,7 @@ namespace ez {
 		for(size_t i=0; i < firstArgs.size(); ++i) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-			sprintf(tmp, "%d: %s\n", i+1, firstArgs[i]->c_str());
+			sprintf(tmp, "%lu: %s\n", i+1, firstArgs[i]->c_str());
 #pragma warning(pop)
 
 			out += tmp;
@@ -2174,7 +2174,7 @@ namespace ez {
 		for(size_t i=0; i < lastArgs.size(); ++i) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-			sprintf(tmp, "%d: %s\n", i+1, lastArgs[i]->c_str());
+			sprintf(tmp, "%lu: %s\n", i+1, lastArgs[i]->c_str());
 #pragma warning(pop)
 			out += tmp;
 		}
@@ -2183,7 +2183,7 @@ namespace ez {
 		for(size_t i=0; i < unknownArgs.size(); ++i) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-			sprintf(tmp, "%d: %s\n", i+1, unknownArgs[i]->c_str());
+			sprintf(tmp, "%lu: %s\n", i+1, unknownArgs[i]->c_str());
 #pragma warning(pop)
 			out += tmp;
 		}

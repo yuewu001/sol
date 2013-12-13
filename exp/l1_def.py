@@ -10,6 +10,10 @@ rcv1_SSAROW = [0, 1e-8,1e-7,1e-6,5e-6,
         1e-4, 1.25e-4,2e-4,2.5e-4,5e-4,7.5e-4, 
         1e-3, 2e-3,3e-3,4e-3,5e-3]
 
+gisette_util = [0, 1e-5,2.5e-5,5e-5,7.5e-5,
+        1e-4, 1.25e-4,2e-4,2.5e-4,5e-4,7.5e-4, 
+        1e-3,2e-3,3e-3,4e-3,5e-3]
+
 webspam_trigram_util = rcv1_util
 webspam_trigram_rda = [0, 1e-10,1e-9,2.5e-9,5e-9,7.5e-9,
 		     1e-8,1e-7,1e-6,5e-6,
@@ -53,7 +57,9 @@ def get_lambda_list(dataset, opt_name):
     if dataset == 'MNIST':
         return get_MNIST(opt_name)
     elif dataset == 'webspam_trigram':
-	return get_webspam_trigram(opt_name)
+        return get_webspam_trigram(opt_name)
+    elif dataset =='gisette':
+        return gisette_util;
     else:
         return get_rcv1(opt_name)
 

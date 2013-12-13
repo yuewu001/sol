@@ -195,19 +195,19 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
-	else if (param.str_opt == "SCW"){
-		SCW<T1, T2> *opti = new SCW<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.phi,param.r);
-		return opti;
-	}
-	else if (param.str_opt == "SCW-RDA") {
-		SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.phi, param.r);
-		return opti;
-	}
-	else{
-		cerr<<"unrecognized optimization method "<<param.str_opt<<endl;
-		return NULL;
-	}
+    else if (param.str_opt == "SCW"){
+        SCW<T1, T2> *opti = new SCW<T1, T2>(dataset,lossFunc);
+        opti->SetParameterEx(param.phi,param.r);
+        return opti;
+    }
+    else if (param.str_opt == "SCW-RDA") {
+        SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
+        opti->SetParameterEx(param.phi, param.r);
+        return opti;
+    }
+    else{
+        cerr<<"ERROR: unrecognized optimization method "<<param.str_opt<<endl;
+        return NULL;
+    }
 }
 
