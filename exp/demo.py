@@ -108,7 +108,6 @@ for ds in ds_list:
         parse_file = dst_folder +'/%s' %key + '.txt'
         run_util.write_parse_result(val,parse_file)
 
-    continue
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
 
     try:
