@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Split a dataset into two parts"""
+
 import sys
 
 if len(sys.argv) != 5:
