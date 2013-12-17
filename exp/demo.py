@@ -15,10 +15,10 @@ opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
 #ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-ds_list = ['gisette']
+ds_list = ['synthetic']
 
 rand_num = 10
-extra_cmd = ' -loss Hinge -norm -passes 10'
+extra_cmd = ' -loss Hinge -norm '
 
 def add_to_dict(opt, result_all, result_once):
     if opt in result_all.keys(): #add to previous result
@@ -49,20 +49,21 @@ def train_model(path_list,dst_folder):
     if rand_num > 1:
         rand_file = train_file + '_rand'  
     else:
-	rand_file = train_file
+	    rand_file = train_file
+
     rand_file_cache = rand_file + '_cache'
 
-
     for k in range(0,rand_num):
-	if rand_num > 1:
-            #remove previous files
+        if rand_num > 1:
+            #remove previous file
             open(rand_file,'w').close()
             os.system('rm -f %s' %rand_file_cache)
 
+            print 'shuffle datset...'
             sol_shuffle.sol_shuffle(train_file, rand_file)
 
         cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file)
-	dataset.analyze(rand_file);
+        dataset.analyze(rand_file);
 
         for opt in opt_list:
             print '-----------------------------------'
@@ -108,7 +109,6 @@ for ds in ds_list:
         parse_file = dst_folder +'/%s' %key + '.txt'
         run_util.write_parse_result(val,parse_file)
 
-    continue
     opt_list_file = '%s' %dst_folder + os.sep + 'opt_list.txt' 
 
     try:

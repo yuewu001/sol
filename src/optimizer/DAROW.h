@@ -126,7 +126,7 @@ namespace SOL {
 
 		this->timeStamp.zeros();
 		this->sigma_w.set_value(1);
-		this->is_normalize = true;
+		//this->is_normalize = true;
 	}
 
 	//called when a train ends

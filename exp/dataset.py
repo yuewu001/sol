@@ -70,6 +70,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'real-sim':
         train_file = 'real-sim/real-sim_train'
         test_file = 'real-sim/real-sim_test'
+    elif dataset == 'synthetic':
+        train_file = 'synthetic/synthetic_train'
+        test_file = 'synthetic/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -189,10 +192,16 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':8, '-delta':0.0625},
             'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
             'CW-RDA':{'-r':0.0625},'RDA':{'-eta':512}}
+    synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':8},
+            'Ada-RDA':{'-eta':0.5, '-delta':8},
+            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
+            'CW-RDA':{'-r':8.0},'RDA':{'-eta':16.0}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut, 'news20':news20,'physic':physic,
-            'pcmac':pcmac,'gisette':gisette,'real-sim':realsim}
+            'pcmac':pcmac,'gisette':gisette,'real-sim':realsim,
+            'synthetic':synthetic}
 
     cmd = ''
     if ds in ds_opt_param.keys():

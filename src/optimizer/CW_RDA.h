@@ -128,7 +128,7 @@ namespace SOL {
 		this->u_t.zeros();
 		this->sigma_w.set_value(1);
 		this->gravity = 0;
-		this->is_normalize = true; //CW_RDA requires normalization
+		//this->is_normalize = true; //CW_RDA requires normalization
 	}
 
 	//called when a train ends

@@ -18,6 +18,7 @@ if len(sys.argv) < 6 or len(sys.argv) % 2 == 1:
     sys.exit()
 
 exe_cmd = run_util.exe_name
+exe_cmd += ' -loss Hinge -norm '
 dt = sys.argv[1]
 opt_name = sys.argv[2]
 exe_cmd += ' -opt %s' %opt_name
@@ -147,6 +148,9 @@ for split_item in split_list:
     for k in range(0,grid_size):
         for m in range(0,result_item_num):
             result_list_all[k][m] += float(result_list_one[k][m])
+
+    os.system('rm -f %s' %train_file)
+    os.system('rm -f %s' %train_file + '_cache')
 
 #average the results
 for k in range(0,grid_size):

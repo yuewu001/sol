@@ -148,7 +148,7 @@ namespace SOL {
 		this->sigma_w.set_value(1);
 		this->sum_rate.push_back(0);
 		this->iter_num = 1; //force to begin from 1, as sum_rate depends on this value
-		this->is_normalize = true; //AROW requires normalization
+        //this->is_normalize = true; //AROW requires normalization
 	}
 
 	//called when a train ends
