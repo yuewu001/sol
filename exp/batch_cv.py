@@ -5,22 +5,22 @@ import sys
 import dataset
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['STG','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA']
-opt_list = ['Ada-FOBOS','Ada-RDA', 'CW-RDA']
+opt_list = ['STG','FOBOS','Ada-FOBOS','Ada-RDA', 'SSAROW','CW-RDA','RDA']
+#opt_list = ['Ada-FOBOS','Ada-RDA', 'CW-RDA']
 #opt_list = ['CW-RDA']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url']
 #ds_list = ['webspam_trigram']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim','webspam_trigram']
-ds_list = ['synthetic']
+ds_list = ['aut']
 
 fold_num = 5
 
-#eta_search = '0.5:2.0:1024.0'
-eta_search = '0.5:2.0:256'
-#delta_search = '0.03125:2:8'
-delta_search = '0.5:2:256'
+eta_search = '0.5:2.0:1024.0'
+#eta_search = '0.5:2.0:256'
+delta_search = '0.03125:2:8'
+#delta_search = '0.5:2:256'
 r_search = delta_search
 
 for dt in ds_list:
