@@ -26,7 +26,6 @@ namespace SOL {
 		s_array<float> sigma_w;
 
 		HeapList<float> heap;
-		vector<IndexType> kickout_list;
 
 		IndexType K; //keep top K elemetns
 
@@ -90,7 +89,6 @@ namespace SOL {
 			}
 			beta_t = 1.f / beta_t;
 
-			this->kickout_list.clear();
 			IndexType index_i = 0;
 			if(alpha_t > 0){
 				alpha_t *= beta_t; 
@@ -134,7 +132,7 @@ namespace SOL {
 		}
 		this->sigma_w.set_value(1);
 		heap.Init(this->weightDim - 1, this->K, this->sigma_w.begin + 1);
-		this->is_normalize = true; //AROW requires normalization
+        //this->is_normalize = true; //AROW requires normalization
 	}
 
 	//called when a train ends

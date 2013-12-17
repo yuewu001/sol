@@ -25,6 +25,7 @@
 #include "optimizer/SCW.h"
 #include "optimizer/CW_RDA.h"
 #include "optimizer/SCW_RDA.h"
+#include "optimizer/OFSGD.h"
 
 #include "loss/LogisticLoss.h"
 #include "loss/HingeLoss.h"
@@ -50,7 +51,6 @@ template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
 
 int main(int argc, const char** args) {
-
 	//check memory leak in VC++
 #if defined(_MSC_VER) && defined(_DEBUG)
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
@@ -61,7 +61,6 @@ int main(int argc, const char** args) {
 	if (param.Parse(argc, args) == false){
 		return -1;
 	}
-
 	LossFunction<FeatType, LabelType> *lossFunc = GetLossFunc<FeatType, LabelType>(param);
 	if(lossFunc == NULL)
 		return -1;
@@ -203,6 +202,11 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
     else if (param.str_opt == "SCW-RDA") {
         SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
         opti->SetParameterEx(param.phi, param.r);
+        return opti;
+    }
+    else if (param.str_opt == "OFSGD"){
+        OFSGD<T1, T2> *opti = new OFSGD<T1, T2>(dataset, lossFunc);
+        opti->SetParameterEx(param.K);
         return opti;
     }
     else{
