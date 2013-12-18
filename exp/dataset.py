@@ -137,11 +137,11 @@ def get_cmd_data(dataset):
     return get_cmd_data_by_file(train_file, test_file)
 
 def get_model_param(ds, opt):
-    news = {'SGD':{'-eta':64},'STG':{'-eta':64},
-            'Ada-FOBOS':{'-eta':2, '-delta':0.0625},
-            'Ada-RDA':{'-eta':2, '-delta':0.0625},
-            'SSAROW':{'-r':0.125}, 'ASAROW':{'-r':0.125},
-            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':256}}
+    news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':128, '-delta':0.5},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
+            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
+            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':0.5}}
     MNIST = {'SGD':{'-eta':1},'STG':{'-eta':1},
             'Ada-FOBOS':{'-eta':1, '-delta':8},
             'Ada-RDA':{'-eta':2, '-delta':1},
@@ -157,25 +157,25 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':1, '-delta':0.0625},
             'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
             'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':64}}
-    aut = {'SGD':{'-eta':64},'STG':{'-eta':64},
-                'Ada-FOBOS':{'-eta':1, '-delta':0.0625},
-                'Ada-RDA':{'-eta':1, '-delta':0.125},
+    aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
+                'Ada-FOBOS':{'-eta':1, '-delta':0.25},
+                'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
                 'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
-                'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':512}}
-    news20 = {'SGD':{'-eta':128},'STG':{'-eta':128},
-                'Ada-FOBOS':{'-eta':1, '-delta':0.0625},
-                'Ada-RDA':{'-eta':2, '-delta':0.0625},
-                'SSAROW':{'-r':0.125}, 'ASAROW':{'-r':0.125},
-                'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':256}}
-    pcmac = {'SGD':{'-eta':4},'STG':{'-eta':4},
-                'Ada-FOBOS':{'-eta':2, '-delta':1},
-                'Ada-RDA':{'-eta':1, '-delta':0.25},
-                'SSAROW':{'-r':2}, 'ASAROW':{'-r':2},
-                'CW-RDA':{'-r':2}, 'RDA':{'-eta':8}}
-    physic = {'SGD':{'-eta':256},'STG':{'-eta':256},
-                'Ada-FOBOS':{'-eta':1, '-delta':0.125},
-                'Ada-RDA':{'-eta':1, '-delta':0.0625},
-                'SSAROW':{'-r':0.125}, 'ASAROW':{'-r':0.125},
+                'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':64}}
+    news20 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
+                'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
+                'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
+                'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
+                'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':128}}
+    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
+                'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
+                'Ada-RDA':{'-eta':0.5, '-delta':0.125},
+                'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+                'CW-RDA':{'-r':2}, 'RDA':{'-eta':32}}
+    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},
+                'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
+                'Ada-RDA':{'-eta':2, '-delta':1},
+                'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
                 'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':256}}
     realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
                 'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
@@ -192,11 +192,11 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':8, '-delta':0.0625},
             'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
             'CW-RDA':{'-r':0.0625},'RDA':{'-eta':512}}
-    synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':8},
-            'Ada-RDA':{'-eta':0.5, '-delta':8},
+    synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':16},
+            'Ada-RDA':{'-eta':4, '-delta':32},
             'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
-            'CW-RDA':{'-r':8.0},'RDA':{'-eta':16.0}}
+            'CW-RDA':{'-r':32.0},'RDA':{'-eta':16.0}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut, 'news20':news20,'physic':physic,

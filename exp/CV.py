@@ -149,6 +149,7 @@ for split_item in split_list:
         for m in range(0,result_item_num):
             result_list_all[k][m] += float(result_list_one[k][m])
 
+    #delete the temp files
     os.system('rm -f %s' %train_file)
     os.system('rm -f %s' %train_file + '_cache')
 

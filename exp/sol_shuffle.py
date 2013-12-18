@@ -17,7 +17,7 @@ def sol_shuffle(filename, out_filename):
         wfile.writelines(lines)
         wfile.close()
     except IOError as e:
-        print "I/O error ({0}): {1}".format(e.errno, e.stderror)
+        print "I/O error ({0}): {1}".format(e.errno, e.strerror)
         sys.exit()
     else:
         file.close()
