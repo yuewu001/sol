@@ -13,6 +13,9 @@ input_file = sys.argv[1]
 output_file = sys.argv[2]
 file_handler = open(input_file,'r')
 content = file_handler.readlines()
+if content[-1][-1] != '\n':
+    content[-1]+='\n'
+
 file_handler.close()
 
 random.shuffle(content)
