@@ -2,14 +2,16 @@
 import os
 import sys
 import dataset
-import run_experiment
 import run_util
 import sol_shuffle
+import run_experiment
+import run_vw
+import run_liblinear
 
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 #opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-opt_list = ['vw']
+opt_list = ['liblinear','vw','SGD']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
@@ -17,7 +19,7 @@ opt_list = ['vw']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
 ds_list = ['a9a']
 
-rand_num = 1
+rand_num = 2 
 extra_cmd = ' -loss Hinge -norm '
 
 def add_to_dict(opt, result_all, result_once):
@@ -71,7 +73,11 @@ def train_model(path_list,dst_folder):
             print '-----------------------------------'
 
             if opt == 'vw':
-                result_once = run_vw.run_vw(rand_file, test_file, ds)
+                result_file = 'vw_result_%d' %k + '.txt'
+                result_once = run_vw.run_vw(rand_file, test_file, ds, result_file)
+            elif  opt == 'liblinear':
+                result_file = 'liblinear_result_%d' %k + '.txt'
+                result_once = run_liblinear.run_liblinear(rand_file, test_file, ds, result_file)
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 

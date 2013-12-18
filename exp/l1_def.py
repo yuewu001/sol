@@ -1,6 +1,7 @@
 # define the l1 normalized parameter
 
-SGD_list = [0, 1]
+SGD_list = [0]
+vw_list = [0]
 synthetic_util = [0, 1e-8,1e-7,1e-6,5e-6,
         1e-5,2.5e-5,5e-5,7.5e-5,
         1e-4, 1.25e-4,2e-4,2.5e-4,5e-4,7.5e-4,
@@ -88,6 +89,8 @@ def get_lambda_list(dataset, opt_name):
         return ASAROW_list
     if opt_name == 'SGD':
         return SGD_list
+    if opt_name == 'vw':
+        return vw_list
 
     if dataset == 'MNIST':
         return get_MNIST(opt_name)

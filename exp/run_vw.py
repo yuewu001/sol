@@ -2,7 +2,6 @@
 
 import sys
 import os
-import re
 import time
 import l1_def
 import dataset
@@ -11,47 +10,48 @@ import vw_util
 
 exe_name = 'vw'
 
-def run_vw(trainfile, testfile, dst_folder, is_cache = False):
-    tmp_folder = dst_folder + '/vw_tmp'
+def run_vw(train_file, test_file,ds,result_file, is_cache = True):
+    tmp_folder = ds + '/vw_tmp'
     os.system('mkdir -p %s' %tmp_folder)
     
     model_file = tmp_folder + '/vw_model'
     rd_model_file = tmp_folder + '/vw_model.txt'
     tmp_file = tmp_folder + '/vw_tmp.txt'
-    result_file = dst_folder + 'vw.txt'
+    result_file = tmp_folder + '/' + result_file
     
     extra_cmd = ' --sgd --binary --loss_function=hinge '
-    model_cmd = ' -readable_model %s' %rd_model_file + ' -f %s ' %model_file
+    model_cmd = ' --readable_model %s' %rd_model_file + ' -f %s ' %model_file
     
-    valid_dim = get_valid_dim(trainfile)
+    valid_dim = run_util.get_valid_dim(train_file)
     
     #transform into vw format
-    if os.path.exists('%s.vw' %trainfile) == False:
-        os.system('python ../tools/libsvm2vw.py %s' %trainfile)
-    if os.path.exists('%s.vw' %testfile) == False:
-        os.system('python ../tools/libsvm2vw.py %s' %testfile)
+    if os.path.exists('%s.vw' %train_file) == False:
+        os.system('python ../tools/libsvm2vw.py %s' %train_file)
+    if os.path.exists('%s.vw' %test_file) == False:
+        os.system('python ../tools/libsvm2vw.py %s' %test_file)
     
     if is_cache == True:
         cache_train = train_file + "_cache.vw"
-        cache_test += "_cache.vw"
+        cache_test = test_file + "_cache.vw"
     
-    trainfile += ".vw"
-    testfile += ".vw"
-    
-    print '----------------------------------------\nAlgorithm: vw'
+    train_file += ".vw"
+    test_file += ".vw"
     
     #evaluate the result
     if is_cache == True:
-        train_cmd_prefix = '%s' %exe_name + ' %s' %trainfile +' --cache_file %s ' %cache_train
-        test_cmd_prefix = '%s'  %exe_name + ' %s' %testfile + ' -t -i %s' %model_file + ' --cache_file %s ' %cache_test
+        train_cmd_prefix = '%s' %exe_name + ' %s' %train_file +' --cache_file %s ' %cache_train
+        test_cmd_prefix = '%s'  %exe_name + ' %s' %test_file + ' -t -i %s' %model_file + ' --cache_file %s ' %cache_test
+    else:
+        train_cmd_prefix = '%s' %exe_name + ' %s' %train_file 
+        test_cmd_prefix = '%s'  %exe_name + ' %s' %test_file + ' -t -i %s' %model_file 
     
     cmd_postfix = ' 2> %s' %tmp_file
     
     result_list = []
     
     
-    l1 = lambda_start
-    while l1 <= lambda_end:
+    lambda_list = l1_def.get_lambda_list(ds,'vw')
+    for l1 in lambda_list:
         result_item = [0,0,0,0]
         #train
         cmd = train_cmd_prefix + ' --l1 %e' %l1 + extra_cmd + model_cmd +  cmd_postfix
@@ -77,8 +77,6 @@ def run_vw(trainfile, testfile, dst_folder, is_cache = False):
         result_item[2] = 100 - (model_size * 100.0 / valid_dim)
     
         result_list.append(result_item)
-    
-        l1 *= lambda_step
     
     vw_util.write_parse_result(result_list,result_file)
     return result_list

@@ -4,52 +4,54 @@ import sys
 import os
 import re
 import time
+import liblinear_util
+import run_util
 
 from l1_def import *
 
-def Usage():
-    print 'Usage: run_liblinear.py dst_folder model_file train_file test_file' 
+def run_liblinear(train_file, test_file,ds, result_file):
 
-if len(sys.argv) < 5:
-    Usage()
-    sys.exit()
+    result_once = [0,0,0,0]
+    os.system('mkdir ./tmp')
 
-os.system('mkdir ./tmp')
+    dst_folder = './%s' %ds
+    tmp_folder = dst_folder + '/liblinear'
+    os.system('mkdir -p %s' %tmp_folder)
 
-dst_folder = sys.argv[1]
-model_file = sys.argv[2]
-train_file = sys.argv[3]
-test_file  = sys.argv[4]
-tmp_file   = './tmp/tmp.txt'
+    model_file = tmp_folder + '/model'
+    tmp_file   = tmp_folder + '/tmp.txt'
 
-train_exe_name = '../extern/liblinear/train'
-test_exe_name = '../extern/liblinear/predict'
+    train_exe_name = '../extern/liblinear/train'
+    test_exe_name = '../extern/liblinear/predict'
 
-#make the result dir
-cmd = 'mkdir -p ./%s' %dst_folder
-os.system(cmd)
+    #make the result dir
+    cmd = 'mkdir -p %s' %dst_folder
+    os.system(cmd)
 
-print 'Algorithm: LibLinear'
-result_file = './%s' %dst_folder + '/liblinear_result.txt'
-print 'output file %s' %result_file
-#clear the file if it already exists
-open(result_file,'w').close()
+    result_file = './%s' %tmp_folder + '/' + result_file
+    #clear the file if it already exists
+    open(result_file,'w').close()
 
    
-#evaluate the result
-train_cmd = train_exe_name + ' %s' %train_file + ' %s' %model_file 
-test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %tmp_file + '>> %s' %result_file
+    #evaluate the result
+    train_cmd = train_exe_name + ' %s' %train_file + ' %s' %model_file 
+    test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %tmp_file + '>> %s' %result_file
+    
+    print train_cmd
+    start_time =time.time()
+    os.system(train_cmd)
+    end_time = time.time()
 
-print train_cmd
-start_time =time.time()
-os.system(train_cmd)
-end_time = time.time()
-#parse learning time
-train_time = (float)(end_time - start_time) 
-train_time = ('training time: %.2f\n' %train_time) 
-file_handler = open(result_file, 'w')
-file_handler.write(train_time)
-file_handler.close()
+    #parse learning time
+    train_time = (float)(end_time - start_time) 
+    result_once[3] = train_time
+    
+    #predict
+    print test_cmd
+    os.system(test_cmd)
+    result_once[1] = liblinear_util.parse_error_rate(result_file)
+    valid_dim = run_util.get_valid_dim(train_file)
+    model_size = liblinear_util.get_model_size(model_file)
+    result_once[2] = 100 - (model_size * 100.0 / valid_dim)
 
-#predict
-os.system(test_cmd)
+    return [result_once]
