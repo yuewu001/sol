@@ -9,13 +9,13 @@ import sol_shuffle
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-#opt_list = ['CW-RDA']
+#opt_list = ['SSAROW','CW-RDA']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
 #ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-ds_list = ['news','news20']
+ds_list = ['url']
 
 rand_num = 10
 extra_cmd = ' -loss Hinge -norm '
