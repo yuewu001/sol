@@ -11,16 +11,19 @@ import run_liblinear
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 #opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-opt_list = ['liblinear','vw','SGD']
+opt_list = ['vw','SGD','liblinear']
 
 #ds_list = ['news', 'rcv1', 'url']
-#ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
+ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']
 #ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-ds_list = ['a9a']
+#ds_list = ['a9a']
 
-rand_num = 2 
+rand_num = 10
 extra_cmd = ' -loss Hinge -norm '
+
+is_cache = False
+is_default_param = True
 
 def add_to_dict(opt, result_all, result_once):
     if opt in result_all.keys(): #add to previous result
@@ -64,7 +67,7 @@ def train_model(path_list,dst_folder):
             print 'shuffle datset...'
             sol_shuffle.sol_shuffle(train_file, rand_file)
 
-        cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file)
+        cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file, is_cache)
         dataset.analyze(rand_file);
 
         for opt in opt_list:
@@ -74,7 +77,7 @@ def train_model(path_list,dst_folder):
 
             if opt == 'vw':
                 result_file = 'vw_result_%d' %k + '.txt'
-                result_once = run_vw.run_vw(rand_file, test_file, ds, result_file)
+                result_once = run_vw.run_vw(rand_file, test_file, ds, result_file, is_cache)
             elif  opt == 'liblinear':
                 result_file = 'liblinear_result_%d' %k + '.txt'
                 result_once = run_liblinear.run_liblinear(rand_file, test_file, ds, result_file)
@@ -83,7 +86,8 @@ def train_model(path_list,dst_folder):
 
                 cmd = cmd_data
                 cmd += extra_cmd
-                cmd += dataset.get_model_param(ds, opt)
+                if is_default_param == False:
+                    cmd += dataset.get_model_param(ds, opt)
 
                 run_experiment.run_experiment(opt,result_file,ds, cmd)
 
