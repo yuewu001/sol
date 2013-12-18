@@ -8,16 +8,16 @@ import sol_shuffle
 
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-#opt_list = ['CW-RDA']
+#opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
+opt_list = ['vw']
 
 #ds_list = ['news', 'rcv1', 'url']
 #ds_list = ['MNIST','news', 'rcv1','url','webspam_trigram']
 #ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
 #ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-ds_list = ['news','news20']
+ds_list = ['a9a']
 
-rand_num = 10
+rand_num = 1
 extra_cmd = ' -loss Hinge -norm '
 
 def add_to_dict(opt, result_all, result_once):
@@ -70,19 +70,22 @@ def train_model(path_list,dst_folder):
             print ' Experiment on %s' %opt + ' Random %d' %k 
             print '-----------------------------------'
 
-            result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
+            if opt == 'vw':
+                result_once = run_vw.run_vw(rand_file, test_file, ds)
+            else:
+                result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 
-            cmd = cmd_data
-            cmd += extra_cmd
-            cmd += dataset.get_model_param(ds, opt)
+                cmd = cmd_data
+                cmd += extra_cmd
+                cmd += dataset.get_model_param(ds, opt)
 
-            run_experiment.run_experiment(opt,result_file,ds, cmd)
+                run_experiment.run_experiment(opt,result_file,ds, cmd)
 
-            print '\nparsing result...'
-            #write the result to file
-            parse_file = dst_folder +'/%s' %opt + '_%d' %k + '.txt'
+                print '\nparsing result...'
+                #write the result to file
+                parse_file = dst_folder +'/%s' %opt + '_%d' %k + '.txt'
 
-            result_once = run_util.parse_result(result_file, parse_file);
+                result_once = run_util.parse_result(result_file, parse_file);
             result_all = add_to_dict(opt,result_all, result_once)
 
     #average the result
