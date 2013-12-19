@@ -81,7 +81,7 @@ namespace SOL {
 			while(p_index != x.indexes.end){
 				//lazy update
 				this->weightVec[*p_index] = -sqrtf(this->sigma_w[*p_index]) *
-					trunc_weight(u_t[*p_index], gravity * (this->curIterNum - 1));
+					trunc_weight(u_t[*p_index], gravity);
 				p_index++;
 			}
 
@@ -104,7 +104,7 @@ namespace SOL {
 				}
 
 				this->eta = 0.5f / this->eta;
-				gravity = this->lambda * this->eta;
+				gravity += this->lambda * this->eta;
 				gt *= this->eta;
 				//update
 				p_index = x.indexes.begin;
