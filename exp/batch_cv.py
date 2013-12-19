@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """bach cross validation"""
 import os
-import sys
-import dataset
 
 #opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 #opt_list = ['SGD','Ada-FOBOS','Ada-RDA', 'SSAROW','CW-RDA','RDA']
