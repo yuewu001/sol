@@ -1,17 +1,10 @@
-function draw(dataset, type, xmin, xmax, ymin, ymax)
+function draw_time(dataset, type)
 close all;
-
-if (~exist('xmin','var'))
-    xmin = 0;
-end
-if (~exist('xmax','var'))
-    xmax = 100;
-end
 if (~exist('ymin','var'))
     ymin = 0;
 end
 if (~exist('ymax','var'))
-    ymax = 50;
+    ymax = 0;
 end
 
 color_list = {'r','m','b','black'};
@@ -24,7 +17,6 @@ cur_shape_index = 1;
 
 folder_name = strcat(dataset,'/');
 mkdir figs
-
 opt_list_file = strcat(folder_name,'opt_list.txt');
 if type == 'TG'
     opt_list = {'SSAROW.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
@@ -33,7 +25,6 @@ elseif type =='DA'
 elseif type == 'FS'
     opt_list = {'ASAROW.txt';'SSAROW.txt';'CW-RDA.txt'};
 end
-
 %opt_list = textread(opt_list_file,'%s');
 
 opt_num = size(opt_list,1);
@@ -55,24 +46,19 @@ for k = 1:1:opt_num
     end
 
     result = load(strcat(folder_name, result_file));
-
-    l_err_vec = result(:,1);
-    t_err_vec = result(:,2);
-    sparse_vec = result(:,3);    
+   
+    sparse_vec = result(:,3);
+    l_time_vec = result(:,4);  
+    l_time_vec(1) = l_time_vec(2);
 
 	color_shape = strcat(color_list{1,cur_color_index}, '-');
     color_shape = strcat(color_shape, shape_list{1,cur_shape_index});
-    figure(1)
+    figure(1)    
+	hold on
     grid on
     box on
-    hold on
-    plot(sparse_vec, l_err_vec, color_shape,'LineWidth',2,'markersize',5);
-    figure(2)
-    grid on
-    box on
-    hold on
-    plot(sparse_vec, t_err_vec, color_shape,'LineWidth',2,'markersize',5);
-	
+	plot(sparse_vec, l_time_vec, color_shape,'LineWidth',2,'markersize',5);	 
+    
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
         cur_color_index = 1;
@@ -87,18 +73,12 @@ end
 
 folder_name = strcat('figs/',dataset);
 folder_name = strcat(folder_name,'-');
+	
 figure(1) %learning error rate
-%title('learing error rate vs sparsity', 'fontsize',14)
-ylabel('learning error rate (%)', 'fontsize',14)
+%title('training time vs sparsity', 'fontsize',14)
+
+ylabel('training time (s)', 'fontsize',14)
 xlabel('sparsity (%)', 'fontsize',14)
-axis([xmin xmax ymin ymax])
-legend(legend_content,'Location','NorthWest')
-print(strcat(folder_name,strcat(type,'-learn-sparse')),'-dpdf')
-figure(2) %test error rate
-%title('test error rate vs sparsity', 'fontsize',14)
-ylabel('test error rate (%)', 'fontsize',14)
-xlabel('sparsity (%)', 'fontsize',14)
-axis([xmin xmax ymin ymax])
-legend(legend_content,'Location','NorthWest')
-print(strcat(folder_name,strcat(type,'-test-sparse')),'-dpdf')
+legend(legend_content,'location','northwest')
+print(strcat(folder_name,strcat(type,'-time-sparse')),'-dpdf')
 %close all

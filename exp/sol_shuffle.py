@@ -11,7 +11,9 @@ def sol_shuffle(filename, out_filename):
             print 'empty file'
             file.close()
             sys.exit()
-    
+        if lines[-1][-1] != '\n':
+            lines[-1]+='\n'
+
         random.shuffle(lines)
         wfile = open(out_filename, 'wb')
         wfile.writelines(lines)
