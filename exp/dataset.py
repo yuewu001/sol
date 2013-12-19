@@ -120,12 +120,15 @@ def get_cv_data_list(dataset, fold_num):
 
     return split_list
 
-def get_cmd_data_by_file(train_file, test_file):
-    cache_train_file = train_file + '_cache'
-    cmd_data = ' -i %s' %train_file + ' -c %s' %cache_train_file
+def get_cmd_data_by_file(train_file, test_file, is_cache = True):
+    cmd_data = ' -i %s' %train_file 
+    cmd_data += ' -t %s' %test_file
+    if is_cache == True:
+        cache_train_file = train_file + '_cache'
+        cmd_data += ' -c %s' %cache_train_file
 
-    cache_test_file = test_file + '_cache'
-    cmd_data += ' -t %s' %test_file + ' -tc %s' %cache_test_file
+        cache_test_file = test_file + '_cache'
+        cmd_data += ' -tc %s' %cache_test_file
 
     return cmd_data
 

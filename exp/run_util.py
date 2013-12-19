@@ -110,7 +110,6 @@ def parse_result(input_file, output_file):
 
 def get_valid_dim(trainfile):
     filename = trainfile + '_info.txt'
-    print filename
     dim = 0
     pattern = re.compile(r'valid dim\s*:\s*(\d+)')
     result_list = pattern.findall(open(filename,'r').read())
