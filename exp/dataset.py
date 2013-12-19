@@ -30,6 +30,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 
+    elif dataset == 'a9a':
+        train_file = 'uci/a9a'
+        test_file = 'uci/a9a.t'
     elif dataset == 'real-sim':
         train_file = 'real-sim/real-sim_train'
         test_file = 'real-sim/real-sim_test' 
@@ -43,15 +46,15 @@ def get_file_name(dataset, task = 'train'):
         train_file = 'webspam/webspam_unigram_train'
         test_file  = 'webspam/webspam_unigram_test'
     elif dataset == 'webspam_trigram':
-	if task == 'cv':
+        if task == 'cv':
             train_file = 'webspam_trigram_15K/webspam_trigram_15K_train'
             test_file  = 'webspam_trigram_15K/webspam_trigram_15K_test'
-	else:
-	    train_file = 'webspam_trigram/webspam_trigram_train'
+        else:
+            train_file = 'webspam_trigram/webspam_trigram_train'
             test_file  = 'webspam_trigram/webspam_trigram_test'
     elif dataset =='MNIST':
-        train_file = 'MNIST/train67'
-        test_file  = 'MNIST/test67'
+        train_file = 'MNIST/train38'
+        test_file  = 'MNIST/test38'
     elif dataset == 'aut':
         train_file = 'aut/aut_train'
         test_file = 'aut/aut_test'
@@ -114,15 +117,18 @@ def get_cv_data_list(dataset, fold_num):
             .format(split_line_num,train_file, train_file) 
 
     os.system(split_cmd)
-    
+
     return split_list
 
-def get_cmd_data_by_file(train_file, test_file):
-    cache_train_file = train_file + '_cache'
-    cmd_data = ' -i %s' %train_file + ' -c %s' %cache_train_file
+def get_cmd_data_by_file(train_file, test_file, is_cache = True):
+    cmd_data = ' -i %s' %train_file 
+    cmd_data += ' -t %s' %test_file
+    if is_cache == True:
+        cache_train_file = train_file + '_cache'
+        cmd_data += ' -c %s' %cache_train_file
 
-    cache_test_file = test_file + '_cache'
-    cmd_data += ' -t %s' %test_file + ' -tc %s' %cache_test_file
+        cache_test_file = test_file + '_cache'
+        cmd_data += ' -tc %s' %cache_test_file
 
     return cmd_data
 
@@ -138,70 +144,71 @@ def get_cmd_data(dataset):
 
 def get_model_param(ds, opt):
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':128, '-delta':0.5},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
-            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':0.5}}
-    MNIST = {'SGD':{'-eta':1},'STG':{'-eta':1},
-            'Ada-FOBOS':{'-eta':1, '-delta':8},
-            'Ada-RDA':{'-eta':2, '-delta':1},
-            'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
-            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':1}}
-    rcv1 = {'SGD':{'-eta':128},'STG':{'-eta':128},
-            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
-            'Ada-RDA':{'-eta':1, '-delta':0.0625},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
+            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
+            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':64}}
+    MNIST = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
+            'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
+            'CW-RDA':{'-r':4}, 'RDA':{'-eta':8}}
+    rcv1 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.125},
             'SSAROW':{'-r':2}, 'ASAROW':{'-r':2},
-            'CW-RDA':{'-r':2}, 'RDA':{'-eta':512}}
-    url = {'SGD':{'-eta':16},'STG':{'-eta':16},
-            'Ada-FOBOS':{'-eta':1, '-delta':0.0625},
-            'Ada-RDA':{'-eta':1, '-delta':0.0625},
-            'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
-            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':64}}
-    aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-                'Ada-FOBOS':{'-eta':1, '-delta':0.25},
-                'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-                'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
-                'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':64}}
-    news20 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-                'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
-                'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-                'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
-                'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':128}}
-    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
-                'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
-                'Ada-RDA':{'-eta':0.5, '-delta':0.125},
-                'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-                'CW-RDA':{'-r':2}, 'RDA':{'-eta':32}}
-    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},
-                'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
-                'Ada-RDA':{'-eta':2, '-delta':1},
-                'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
-                'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':256}}
-    realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
-                'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
-                'Ada-RDA':{'-eta':512, '-delta':0.0625},
-                'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
-                'CW-RDA':{'-r':4}, 'RDA':{'-eta':256}}
-    gisette = {'SGD':{'-eta':1},'STG':{'-eta':1},
-                'Ada-FOBOS':{'-eta':2, '-delta':1.0},
-                'Ada-RDA':{'-eta':32, '-delta':4},
-                'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
-                'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':256}}
-    webspam_trigram = {'SGD':{'-eta':128},'STG':{'-eta':128},
+            'CW-RDA':{'-r':2}, 'RDA':{'-eta':128}}
+    url = {'SGD':{'-eta':256},'STG':{'-eta':256},'FOBOS':{'-eta':256},
             'Ada-FOBOS':{'-eta':4, '-delta':0.0625},
-            'Ada-RDA':{'-eta':8, '-delta':0.0625},
-            'SSAROW':{'-r':0.0625}, 'ASAROW':{'-r':0.0625},
-            'CW-RDA':{'-r':0.0625},'RDA':{'-eta':512}}
+            'Ada-RDA':{'-eta':4, '-delta':0.0625},
+            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
+            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':512}}
+    aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
+            'Ada-FOBOS':{'-eta':1, '-delta':0.25},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
+            'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
+            'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':64}}
+    news20 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
+            'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
+            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':128}}
+    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.125},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':2}, 'RDA':{'-eta':32}}
+    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
+            'Ada-RDA':{'-eta':2, '-delta':1},
+            'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
+            'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':256}}
+    realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
+            'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
+            'Ada-RDA':{'-eta':512, '-delta':0.0625},
+            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
+            'CW-RDA':{'-r':4}, 'RDA':{'-eta':256}}
+    webspam_trigram = {'SGD':{'-eta':64},'STG':{'-eta':64},
+            'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
+            'Ada-RDA':{'-eta':8, '-delta':0.03125},
+            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
+            'CW-RDA':{'-r':0.03125},'RDA':{'-eta':512}}
     synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
             'Ada-FOBOS':{'-eta':0.5, '-delta':16},
             'Ada-RDA':{'-eta':4, '-delta':32},
             'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
             'CW-RDA':{'-r':32.0},'RDA':{'-eta':16.0}}
+    a9a = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
+            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
+            'Ada-RDA':{'-eta':1, '-delta':0.25},
+            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
+            'CW-RDA':{'-r':8.0},'RDA':{'-eta':16.0}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut, 'news20':news20,'physic':physic,
-            'pcmac':pcmac,'gisette':gisette,'real-sim':realsim,
-            'synthetic':synthetic}
+            'pcmac':pcmac,'real-sim':realsim,
+            'synthetic':synthetic, 'a9a':a9a}
 
     cmd = ''
     if ds in ds_opt_param.keys():
