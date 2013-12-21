@@ -169,6 +169,12 @@ namespace SOL {
                     this->reader = new LibSVMReader_<FeatType, LabelType>(this->fileName);
                     if (this->cache_fileName.length() == 0 && this->passNum > 1){ 
                         this->cache_fileName = "cache_file";
+#if WIN32
+						string cmd = "del " + this->cache_fileName;
+#else
+						string cmd = "rm " + this->cache_fileName;
+#endif
+						system(cmd.c_str());
                         this->is_cache = true;
                     }
                     else if (this->cache_fileName.length() > 0)
