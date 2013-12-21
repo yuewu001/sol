@@ -55,7 +55,7 @@ namespace SOL{
                 exp_acc = exp_acc * 10 + *p++ - '0';
 
         }
-        if (is_space(p)== true) {//easy case succeeded.
+        if (is_space(p)== true || *p == '\0') {//easy case succeeded.
             exp_acc -= num_dec;
             if (exp_acc < 0)
                 return 0;
@@ -172,7 +172,7 @@ namespace SOL{
 				exp_acc = exp_acc * 10 + *p++ - '0';
 			exp_acc *= exp_s;
 		}
-		if (is_space(p) == true){//easy case succeeded.
+		if (is_space(p) == true || *p == '\0'){//easy case succeeded.
 			exp_acc -= num_dec;
 			*end = p;
 			return s * acc * powf(10.f,(float)(exp_acc));
