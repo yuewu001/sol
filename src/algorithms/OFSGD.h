@@ -8,7 +8,7 @@
 #ifndef HEADER_OPTIMISER_OFSGD
 #define HEADER_OPTIMISER_OFSGD
 
-#include "../common/util.h"
+#include "../utils/util.h"
 #include "Optimizer.h"
 #include <algorithm>
 #include <math.h>

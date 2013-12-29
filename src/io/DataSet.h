@@ -17,7 +17,7 @@
 #include "DataReader.h"
 #include "libsvm_binary.h"
 #include "libsvmread.h"
-#include "../common/util.h"
+#include "../utils/util.h"
 
 #include "thread_primitive.h"
 

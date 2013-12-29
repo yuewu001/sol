@@ -6,9 +6,9 @@
 ************************************************************************/
 
 #pragma once
-#include "../data/DataSet.h"
+#include "../io/DataSet.h"
 #include "../loss/LossFunction.h"
-#include "../common/init_param.h"
+#include "../utils/init_param.h"
 
 #include <stdio.h>
 #include <math.h>

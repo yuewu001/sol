@@ -9,7 +9,7 @@
 #define HEADER_DATA_POINT
 
 #include "s_array.h"
-#include "../common/init_param.h"
+#include "../utils/init_param.h"
 
 #include <cstring>
 

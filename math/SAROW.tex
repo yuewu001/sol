@@ -126,66 +126,6 @@ The final updating rule goes to:
     \label{equ:09}
 \end{equation}
 
-\section{Experimental results}
-\subsection{Experiment on real datasets}
-
-\begin{table}[!ht]
-% increase table row spacing, adjust to taste
-\renewcommand{\arraystretch}{1.3}
- %\extrarowheight 
-\caption{Real Datasets}
-\label{tbl:01}
-\centering
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-DataSet& Feat Dim & Train Data No. & Test Data No. & Feat No. & sparsity\\
-\hline
-MNIST67 & 780 & 12183 & 1987 & 1,751,945 & 0\\
-\hline
-news & 732209 & 9960 & 9994 & 5,513,533 & 0\\
-\hline
-rcv1& 47,152  & 781,265 & 23,149 &59,155,144 & 0\\
-\hline
-url\_combined & 3,231,961 & 2,000,000 & 396,130 &231,259,917 & 0\\
-\hline
-webspam& 16,609,143 &300,000 & 50,000 &1, 118,443,083 & 0\\
-\hline
-\end{tabular}
-\end{table}
-
-\subsection{test error rate vs sparsity}
-\subsubsection{TG-based algorithms}
-\begin{figure}[!h]
-\centering
-\subfigure[MNIST]{
-    \includegraphics[width=0.33\textwidth]{./figs/MNIST67_test.pdf}}
-\subfigure[news]{
-    \includegraphics[width=0.33\textwidth]{./figs/news_test.pdf}}
-\subfigure[rcv1]{
-    \includegraphics[width=0.3\textwidth]{./figs/rcv1_test.pdf}}
-\subfigure[url]{
-    \includegraphics[width=0.3\textwidth]{./figs/url_test.pdf}}
-\subfigure[webspam]{
-    \includegraphics[width=0.33\textwidth]{./figs/webspam_trigram_test.pdf}}
-\label{fig:00}
-\end{figure}
-
-\subsubsection{DA-based algorithms}
-\begin{figure}[!h]
-\centering
-\subfigure[MNIST]{
-    \includegraphics[width=0.33\textwidth]{./figs/MNIST67_test.pdf}}
-\subfigure[news]{
-    \includegraphics[width=0.33\textwidth]{./figs/news_test.pdf}}
-\subfigure[rcv1]{
-    \includegraphics[width=0.3\textwidth]{./figs/rcv1_test.pdf}}
-\subfigure[url]{
-    \includegraphics[width=0.3\textwidth]{./figs/url_test.pdf}}
-\subfigure[webspam]{
-    \includegraphics[width=0.33\textwidth]{./figs/webspam_trigram_test.pdf}}
-\label{fig:01}
-\end{figure}
-
 \section{Reference}
 
 \end{document}

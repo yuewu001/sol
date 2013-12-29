@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.11.18)  18 DEC 2013 15:23
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.11.18)  27 DEC 2013 09:21
 entering extended mode
 **SAROW.tex
 (D:\Coding\SOL\math\SAROW.tex
@@ -178,105 +178,34 @@ LaTeX Font Info:    ... okay on input line 11.
 \everyMPtoPDFconversion=\toks21
 ) [1
 
-{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
-<./figs/MNIST67_test.pdf, id=19, 508.90125pt x 423.5825pt>
-File: ./figs/MNIST67_test.pdf Graphic file (type pdf)
-
-<use ./figs/MNIST67_test.pdf>
-Package pdftex.def Info: ./figs/MNIST67_test.pdf used on input line 161.
-(pdftex.def)             Requested size: 149.0577pt x 124.06381pt.
-
-<./figs/news_test.pdf, id=20, 508.90125pt x 423.5825pt>
-File: ./figs/news_test.pdf Graphic file (type pdf)
-
-<use ./figs/news_test.pdf>
-Package pdftex.def Info: ./figs/news_test.pdf used on input line 163.
-(pdftex.def)             Requested size: 149.0577pt x 124.06381pt.
-
-<./figs/rcv1_test.pdf, id=21, 508.90125pt x 423.5825pt>
-File: ./figs/rcv1_test.pdf Graphic file (type pdf)
-
-<use ./figs/rcv1_test.pdf>
-Package pdftex.def Info: ./figs/rcv1_test.pdf used on input line 165.
-(pdftex.def)             Requested size: 135.50761pt x 112.78528pt.
-
-<./figs/url_test.pdf, id=22, 511.9125pt x 423.5825pt>
-File: ./figs/url_test.pdf Graphic file (type pdf)
-
-<use ./figs/url_test.pdf>
-Package pdftex.def Info: ./figs/url_test.pdf used on input line 167.
-(pdftex.def)             Requested size: 135.50761pt x 112.12602pt.
-
-<./figs/webspam_trigram_test.pdf, id=23, 511.9125pt x 423.5825pt>
-File: ./figs/webspam_trigram_test.pdf Graphic file (type pdf)
-
-<use ./figs/webspam_trigram_test.pdf>
-Package pdftex.def Info: ./figs/webspam_trigram_test.pdf used on input line 169
-.
-(pdftex.def)             Requested size: 149.0577pt x 123.33345pt.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-File: ./figs/MNIST67_test.pdf Graphic file (type pdf)
-<use ./figs/MNIST67_test.pdf>
-Package pdftex.def Info: ./figs/MNIST67_test.pdf used on input line 177.
-(pdftex.def)             Requested size: 149.0577pt x 124.06381pt.
-File: ./figs/news_test.pdf Graphic file (type pdf)
- <use ./figs/news_test.pdf>
-Package pdftex.def Info: ./figs/news_test.pdf used on input line 179.
-(pdftex.def)             Requested size: 149.0577pt x 124.06381pt.
-File: ./figs/rcv1_test.pdf Graphic file (type pdf)
-
-<use ./figs/rcv1_test.pdf>
-Package pdftex.def Info: ./figs/rcv1_test.pdf used on input line 181.
-(pdftex.def)             Requested size: 135.50761pt x 112.78528pt.
-File: ./figs/url_test.pdf Graphic file (type pdf)
- <use ./figs/url_test.pdf>
-Package pdftex.def Info: ./figs/url_test.pdf used on input line 183.
-(pdftex.def)             Requested size: 135.50761pt x 112.12602pt.
-File: ./figs/webspam_trigram_test.pdf Graphic file (type pdf)
-
-<use ./figs/webspam_trigram_test.pdf>
-Package pdftex.def Info: ./figs/webspam_trigram_test.pdf used on input line 185
-.
-(pdftex.def)             Requested size: 149.0577pt x 123.33345pt.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[2] [3 <D:/Coding/SOL/math/figs/MNIST67_test.pdf> <D:/Coding/SOL/math/figs/news
-_test.pdf> <D:/Coding/SOL/math/figs/rcv1_test.pdf> <D:/Coding/SOL/math/figs/url
-_test.pdf> <D:/Coding/SOL/math/figs/webspam_trigram_test.pdf>]
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}] [2]
 (D:\Coding\SOL\math\SAROW.aux) ) 
 Here is how much of TeX's memory you used:
- 2027 strings out of 493921
- 25689 string characters out of 3144869
- 84535 words of memory out of 3000000
- 5314 multiletter control sequences out of 15000+200000
+ 1995 strings out of 493921
+ 25003 string characters out of 3144869
+ 83503 words of memory out of 3000000
+ 5288 multiletter control sequences out of 15000+200000
  14280 words of font info for 50 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,9n,24p,239b,255s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,9n,24p,239b,194s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/
-public/amsfonts/cm/cmbx10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/pu
-blic/amsfonts/cm/cmbx12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/publ
-ic/amsfonts/cm/cmex10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public
-/amsfonts/cm/cmmi10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/a
-msfonts/cm/cmmi5.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsf
-onts/cm/cmmi7.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfont
-s/cm/cmmib10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts
-/cmextra/cmmib7.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfo
-nts/cm/cmr10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts
-/cm/cmr12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
-/cmr17.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
-r5.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.p
-fb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><
-C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:
-/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Pr
-ogram Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on SAROW.pdf (3 pages, 215515 bytes).
+public/amsfonts/cm/cmbx12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/pu
+blic/amsfonts/cm/cmex10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/publ
+ic/amsfonts/cm/cmmi10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public
+/amsfonts/cm/cmmi5.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmmi7.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfo
+nts/cm/cmmib10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfon
+ts/cmextra/cmmib7.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/ams
+fonts/cm/cmr10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfon
+ts/cm/cmr12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/
+cm/cmr17.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
+cmr5.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7
+.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.p
+fb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
+<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on SAROW.pdf (2 pages, 162321 bytes).
 PDF statistics:
- 105 PDF objects out of 1000 (max. 8388607)
+ 69 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

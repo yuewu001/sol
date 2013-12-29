@@ -5,8 +5,8 @@
 > Functions: Class for Parsing parameters
 ************************************************************************/
 #include "Params.h"
-#include "common/util.h"
-#include "common/init_param.h"
+#include "utils/util.h"
+#include "utils/init_param.h"
 
 #include <iostream>
 #include <cstdlib>

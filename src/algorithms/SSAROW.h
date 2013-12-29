@@ -11,7 +11,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 #pragma once
 
 
-#include "../common/util.h"
+#include "../utils/util.h"
 #include "Optimizer.h"
 #include "../loss/SquaredHingeLoss.h"
 #include <cmath>

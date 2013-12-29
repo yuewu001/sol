@@ -12,7 +12,7 @@ and online optimization[J]. The Journal of Machine Learning Research,
 #pragma once
 
 #include "Optimizer.h"
-#include "../common/util.h"
+#include "../utils/util.h"
 #include <cmath>
 
 namespace SOL {

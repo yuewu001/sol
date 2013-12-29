@@ -1,108 +1,110 @@
 /*************************************************************************
-> File Name: FOBOS.h
+> File Name: STG.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/20 Tuesday 11:14:54
-> Functions: FOBOS: Efficient Online Batch Learning Using 
-					Forward Backward Splitting
-
+> Created Time: 2013/8/18 星期日 17:25:54
+> Functions: Sparse Online Learning With Truncated Gradient
 > Reference:
-		Duchi J, Singer Y. Efficient online and batch learning using 
-		forward backward splitting[J]. The Journal of Machine Learning 
-		Research, 2009, 10: 2899-2934.
-
-		This file implements the L1 and L2 square regularization
-		************************************************************************/
+Langford J, Li L, Zhang T. Sparse online learning via truncated 
+gradient[J]. The Journal of Machine Learning Research, 2009, 10: 
+777-801. 
+************************************************************************/
 
 #pragma once
-#include "../common/util.h"
 
+
+#include "../utils/util.h"
 #include "Optimizer.h"
-
-#include <cmath>
+#include <math.h>
+#include <limits>
 
 namespace SOL {
 	template <typename FeatType, typename LabelType>
-	class FOBOS: public Optimizer<FeatType, LabelType> {
+	class STG: public Optimizer<FeatType, LabelType> {
+	protected:
+		int K;
+
 	protected:
 		s_array<size_t> timeStamp;
 	protected:
 		float (*pEta_time)(size_t t, float pt);
 
 	public:
-		FOBOS(DataSet<FeatType, LabelType> &dataset, 
+		STG(DataSet<FeatType, LabelType> &dataset, 
 			LossFunction<FeatType, LabelType> &lossFunc);
-		~FOBOS();
+		virtual ~STG();
 
+	public:
+		void SetParameterEx(int K = -1);
 	protected:
 		//this is the core of different updating algorithms
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
+		//reset the optimizer to this initialization
+		virtual void BeginTrain();
+		//called when a train ends
+		virtual void EndTrain();
 
 		//Change the dimension of weights
 		virtual void UpdateWeightSize(IndexType newDim);
-
-		//reset
-		virtual void BeginTrain();
-		virtual void EndTrain();
-
-
 	};
 
 	template <typename FeatType, typename LabelType>
-	FOBOS<FeatType, LabelType>::FOBOS(DataSet<FeatType, LabelType> &dataset, 
+	STG<FeatType, LabelType>::STG(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
-	Optimizer<FeatType, LabelType>(dataset, lossFunc) {
+	Optimizer<FeatType, LabelType>(dataset, lossFunc){
+		this->id_str = "STG";
+		this->K = init_k;
 		this->timeStamp.resize(this->weightDim);
 	}
 
 	template <typename FeatType, typename LabelType>
-	FOBOS<FeatType, LabelType>::~FOBOS() {
+	STG<FeatType, LabelType>::~STG() {
 	}
 
-	/**
-	*  UpdateWeightVec: use L1 norm as the regularization term
-	*  this is the core of different updating algorithms
-	*  r(w) = lambda * |w|
-	*
-	* @tparam FeatType
-	* @tparam LabelType
-	* @Param:  x
-	* @Param:  y
-	*/
+	//this is the core of different updating algorithms
+	//return the predict
 	template <typename FeatType, typename LabelType>
-	float FOBOS<FeatType,LabelType>::UpdateWeightVec (
+	float STG<FeatType,LabelType>::UpdateWeightVec(
 		const DataPoint<FeatType, LabelType> &x) {
 			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
 
 			size_t featDim = x.indexes.size();
-			float y = this->Predict(x);
-			float gt_i = this->eta * this->lossFunc->GetGradient(x.label,y);
-
-			IndexType index_i = 0;
 			float alpha = this->eta * this->lambda;
+
+			float y = this->Predict(x); 
+			float gt_i = this->lossFunc->GetGradient(x.label,y) * this->eta;
+
 			size_t stepK = 0;
 			for (size_t i = 0; i < featDim; i++) {
-				index_i = x.indexes[i];
+				IndexType index_i = x.indexes[i];
 				//update the weight
 				this->weightVec[index_i] -= gt_i * x.features[i];
 
-				//lazy update
-				stepK = this->curIterNum - this->timeStamp[index_i];
-				this->timeStamp[index_i] = this->curIterNum;
+				//lazy update the weight
+				//truncated gradient
+				if (this->timeStamp[index_i] == 0) {
+					this->timeStamp[index_i] = this->curIterNum;
+					continue;
+				}
+				else{
+					stepK = this->curIterNum - this->timeStamp[index_i];
+					if (stepK < size_t(this->K))
+						continue;
 
-				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-					stepK * alpha);
+					stepK -= stepK % this->K;
+					this->timeStamp[index_i] += stepK;
+					this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+						stepK * alpha);
+				}
 			}
-
-			//update bias term
+			//bias term
 			this->weightVec[0] -= gt_i;
-
 			return y;
 	}
 
 
 	//reset the optimizer to this initialization
 	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType, LabelType>::BeginTrain() {
+	void STG<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		//reset time stamp
 		this->timeStamp.zeros();
@@ -119,19 +121,26 @@ namespace SOL {
 
 	//called when a train ends
 	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType, LabelType>::EndTrain() {
+	void STG<FeatType, LabelType>::EndTrain() {
 		for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
 			//truncated gradient
 			size_t stepK = this->curIterNum - this->timeStamp[index_i];
+			stepK -= stepK % this->K;
+
 			this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-				stepK * this->eta * this->lambda);
+				stepK * this->lambda * this->eta);
 		}
 		Optimizer<FeatType, LabelType>::EndTrain();
 	}
 
+	template <typename FeatType, typename LabelType>
+	void STG<FeatType, LabelType>::SetParameterEx(int k) {
+		this->K = k > 0 ? k : this->K;
+	}
+
 	//Change the dimension of weights
 	template <typename FeatType, typename LabelType>
-	void FOBOS<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
+	void STG<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
 		if (newDim < this->weightDim)
 			return;
 		else {
@@ -144,5 +153,4 @@ namespace SOL {
 			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
 		}
 	}
-		}
-
+}
