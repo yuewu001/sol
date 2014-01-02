@@ -4,10 +4,10 @@
   > Created Time: Thu 24 Oct 2013 08:09:38 PM
   > Descriptions: analyse the sparsity of data
  ************************************************************************/
-#include "DataPoint.h"
-#include "DataReader.h"
-#include "libsvmread.h"
-#include "MNISTReader.h"
+#include "../io/DataPoint.h"
+#include "../io/DataReader.h"
+#include "../io/libsvmread.h"
+#include "../io/mnist/MNISTReader.h"
 
 #include <string>
 using namespace std;
@@ -16,7 +16,7 @@ using namespace SOL;
 template <typename FeatType, typename LabelType>
 bool Analyze(DataReader<FeatType, LabelType> *reader) {
     if (reader == NULL){
-        cerr<<"data reader is emptyp!"<<endl;
+        cerr<<"data reader is empty!"<<endl;
         return false;
     }
 

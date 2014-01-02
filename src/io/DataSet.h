@@ -19,8 +19,6 @@
 #include "libsvmread.h"
 #include "../utils/util.h"
 
-#include "thread_primitive.h"
-
 #include <vector>
 #include <string>
 #include <fstream>

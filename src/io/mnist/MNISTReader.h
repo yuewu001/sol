@@ -12,7 +12,7 @@
 
 #ifndef HEADER_MINST_READER
 #define HEADER_MINST_READER
-#include "DataReader.h"
+#include "../DataReader.h"
 
 #include <fstream>
 using std::ios_base;

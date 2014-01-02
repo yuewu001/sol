@@ -8,7 +8,7 @@
 
 
 #include "libsvm_binary.h"
-#include "thread_primitive.h"
+#include "../utils/thread_primitive.h"
 
 namespace SOL{
 	template <typename T1, typename T2> class DataSet;
