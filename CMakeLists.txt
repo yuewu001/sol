@@ -20,10 +20,9 @@ set(io_files
     #src/io/gzip_io.h
     #src/io/zlib_io.cpp
     #src/io/zlib_io.h
-    src/io/io_handler.h
     src/io/io_interface.h
     src/io/libsvm_binary.h
-    src/io/libsvmread.h
+    src/io/libsvm_io.h
     src/io/parser.h
     src/io/s_array.h)
 

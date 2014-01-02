@@ -10,6 +10,9 @@
 #include "Params.h"
 
 #include "../io/DataReader.h"
+#include "../io/libsvm_io.h"
+#include "../io/libsvm_binary.h"
+#include "../utils/util.h"
 
 void Convert(const SOL::Params &param);
 void Cache(const SOL::Params &param);

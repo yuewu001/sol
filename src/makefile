@@ -3,8 +3,8 @@ DEBUG_FLAG=1
 DEBUG=-g -Wall
 RELEASE=-O2 -s
 
-INCLUDE=-I . -I ./data -I ./loss -I./optimizer
-VPATH=.:./data:./loss:./optimizer
+INCLUDE=-I . -I ./io -I ./loss -I./algorithms -I ./utils
+VPATH=.:./io:./loss:./algorithms:./utils
 
 CFLAGS=-c $(INCLUDE) -Wno-write-strings
 LDFLAGS=-lpthread -lz
@@ -23,7 +23,6 @@ all:$(TARGET)
 $(TARGET):main.o $(OBJS)
 	g++ $^ -o $@ $(LDFLAGS)
 
-main.o: main.cpp optimizer/STG.h optimizer/Optimizer.h
 %.o:%.cpp
 	g++ $< -o $@ $(CFLAGS)
 

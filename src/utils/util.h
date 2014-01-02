@@ -125,34 +125,37 @@ inline bool rename_file(const string& src_filename, const string& dst_filename){
 #else
 		cmd = "rm \"" + dst_filename + "\"";
 #endif
-		system(cmd.c_str());
-	}
-	//rename
+		if (system(cmd.c_str()) != 0){
+            std::cerr<<"del original cache file failed!"<<std::endl;
+            return false;
+        }
+    }
+    //rename
 #if WIN32
-	cmd = "ren \"";
-	cmd = cmd + src_filename + "\" \"";
-	//in windows, the second parameter of ren should not include path
-	cmd = cmd + dst_filename.substr(dst_filename.find_last_of("/\\") + 1) + "\"";
+    cmd = "ren \"";
+    cmd = cmd + src_filename + "\" \"";
+    //in windows, the second parameter of ren should not include path
+    cmd = cmd + dst_filename.substr(dst_filename.find_last_of("/\\") + 1) + "\"";
 #else
-	string cmd = "mv \"";
-	cmd = cmd + src_filename + "\" \"";
-	cmd = cmd + dst_filename + "\"";
+    cmd = "mv \"";
+    cmd = cmd + src_filename + "\" \"";
+    cmd = cmd + dst_filename + "\"";
 #endif
 
-	if(system(cmd.c_str()) != 0){
-		std::cerr<<"rename cahe file name failed!"<<std::endl;
-		return false;
-	}
-	return true;
+    if(system(cmd.c_str()) != 0){
+        std::cerr<<"rename cahe file name failed!"<<std::endl;
+        return false;
+    }
+    return true;
 }
 
 inline double get_current_time(){
 #if _WIN32
-	return GetTickCount() / 1000.0;
+    return GetTickCount() / 1000.0;
 #else
-	struct timeval tim;
-	gettimeofday(&tim, NULL);
-	return tim.tv_sec + tim.tv_usec / 1000000.0;
+    struct timeval tim;
+    gettimeofday(&tim, NULL);
+    return tim.tv_sec + tim.tv_usec / 1000000.0;
 #endif
 }
 #endif
