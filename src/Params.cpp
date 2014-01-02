@@ -33,9 +33,9 @@ namespace SOL {
 
 		opt.add("",0,0,',',"help message","-h","--help");
 
-		this->add_option("",0,1,"train file","-i", &this->fileName);
+		this->add_option("",0,1,"training file name","-i", &this->fileName);
 		this->add_option("",0,1,"test file name","-t",&this->test_fileName);
-		this->add_option("",0,1,"cached train file name","-c",&this->cache_fileName);
+		this->add_option("",0,1,"cached training file name","-c",&this->cache_fileName);
 		this->add_option("",0,1,"cached test file name","-tc",&this->test_cache_fileName);
 
 		this->add_option(init_data_type,0,1,"dataset type format","-dt",&this->str_data_type);
@@ -44,7 +44,7 @@ namespace SOL {
 		this->add_option(init_loss_type,0,1,"loss function type:\nHinge, Logit, Square, SquareHinge","-loss",&this->str_loss);
 
 		this->add_option(init_opti_method,0,1,
-			"optimization method:\nSGD, STG, RDA, RDA_E, FOBOS, Ada-RDA, Ada-FOBOS, AROW, SAROW, CW-RDA, SCW-RDA","-opt", &this->str_opt);
+			"optimization method:\nSGD, STG, RDA, RDA_E, FOBOS, Ada-RDA, Ada-FOBOS, AROW, AROW-TG, AROW-DA, AROW-FS,SCW, SCW-RDA","-opt", &this->str_opt);
 		this->add_option(init_is_learn_best_param,0,0,"learn best parameter", 
 			"-lbp", &this->is_learn_best_param);
 		this->add_option(init_eta,0,1,"learning rate", "-eta",&this->eta); 

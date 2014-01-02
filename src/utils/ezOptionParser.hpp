@@ -1832,12 +1832,12 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
         opts.append( *groups[k]->flags[j] );
 
         if (groups[k]->expectArgs) {
-            opts.append(" ARG");
+            opts.append(" arg");
 
             if (groups[k]->delim) {
                 opts.append("1[");
                 opts.append(1, groups[k]->delim);
-                opts.append("ARGn]");
+                opts.append("args]");
             }
         }
 

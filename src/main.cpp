@@ -180,17 +180,17 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
-	else if (param.str_opt == "SSAROW") {
+	else if (param.str_opt == "AROW-TG") {
 		SSAROW<T1,T2> *opti = new SSAROW<T1, T2>(dataset,lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
-	else if (param.str_opt == "ASAROW") {
+	else if (param.str_opt == "AROW-FS") {
 		ASAROW<T1,T2> *opti = new ASAROW<T1, T2>(dataset,lossFunc);
 		opti->SetParameterEx(param.K, param.r);
 		return opti;
 	}
-	else if (param.str_opt == "CW-RDA") {
+	else if (param.str_opt == "AROW-DA") {
 		CW_RDA<T1,T2> *opti = new CW_RDA<T1, T2>(dataset,lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
