@@ -38,48 +38,25 @@ int main(int argc, const char** args){
     if (param.Parse(argc,args) == false)
         return -1;
 
-	if (param.is_de_cache == true)
-		DeCache(param.in_fileName, param.out_fileName);
+	if (param.is_de_cache == true){
+		param.str_data_type = "cache";
+		Convert(param);
+	}
 	else if (param.is_cache == true)
-		Cache(param.in_fileName, param.out_fileName);
+		Cache(param);
 	return 0;
 }
 
-void Convert(const string &input_file, const string &output_file){
-	cout<<"Caching file..."<<endl;
-	libsvm_io reader(input_file);
-	if (reader.OpenReading() == false){
-		return;
-	}
-	DataSet<float, char> dt;
-	dt.Load(input_file,output_file);
-	size_t dataNum = 0;
-
-	size_t show_step = 1; //show information every show_step
-	size_t show_count = 2;
-	if(dt.Rewind()){
-		while(1){
-			const DataChunk<float, char> chunk = dt.GetChunk();
-			dataNum += chunk.dataNum;
-			if (chunk.dataNum == 0){
-				dt.FinishRead();
-				break;
-			}
-			dt.FinishRead();
-			if (show_count < dataNum){
-				printf("%lu samples cached\r",dataNum);
-				show_count = (1 << ++show_step);
-			}
-		}
-	}
-	printf("%lu samples cached\n",dataNum);
-}
-
-void Cache(const string &input_file, const string &output_file){
+void Cache(const Params &param){
 	cout<<"Caching file..."<<endl;
 	
 	DataSet<float, char> dt;
-	dt.Load(input_file,output_file);
+	DataReader<float, char> *reader = getReader<float, char>(param);
+	if (reader == NULL){
+		return;
+	}
+
+	dt.Load(reader,param.out_fileName);
 	size_t dataNum = 0;
 
 	size_t show_step = 1; //show information every show_step
@@ -100,16 +77,18 @@ void Cache(const string &input_file, const string &output_file){
 		}
 	}
 	printf("%lu samples cached\n",dataNum);
+	if (reader != NULL)
+		delete reader;
 }
 
-void DeCache(const string &input_file, const string &output_file){
-	cout<<"De-Caching file..."<<endl;
-	libsvm_binary reader(input_file);
-	if (reader.OpenReading() == false){
-		cerr<<"open "<<input_file<<" failed!"<<endl;
+void Convert(const Params &param){
+	cout<<"Convert file to libsvm"<<endl;
+	DataReader<float, char> *reader = getReader<float, char>(param);
+	if (reader->OpenReading() == false){
+		cerr<<"open "<<param.in_fileName<<" failed!"<<endl;
 		return;
 	}
-	string tmp_filename = output_file + ".writing";
+	string tmp_filename = param.out_fileName + ".writing";
 
 	libsvm_io writer(tmp_filename);
 	if(writer.OpenWriting() == false){
@@ -121,7 +100,7 @@ void DeCache(const string &input_file, const string &output_file){
 	size_t featNum = 0;
 	size_t show_step = 1; //show information every show_step
 	size_t show_count = 2;
-	while(reader.GetNextData(data) == true){
+	while(reader->GetNextData(data) == true){
 		dataNum++;
 		featNum += data.indexes.size();
 
@@ -135,8 +114,9 @@ void DeCache(const string &input_file, const string &output_file){
 		}
 	}
 	writer.Close();
-	if (reader.Good() == true && 
-		rename_file(tmp_filename, output_file) == true)
+	if (reader->Good() == true && 
+		rename_file(tmp_filename, param.out_fileName) == true)
 		printf("%lu samples (%lu features) de-cached\n",dataNum, featNum);
-	reader.Close();
+	reader->Close();
+	delete reader;
 }

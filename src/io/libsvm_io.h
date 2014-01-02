@@ -46,7 +46,7 @@ namespace SOL {
 					this->is_good = true;
 					this->writer_handler = NULL;
                 }
-                ~libsvm_io_() {
+                virtual ~libsvm_io_() {
                     this->Close();
                     if (line != NULL)
                         free(line);

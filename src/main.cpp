@@ -56,6 +56,7 @@ int main(int argc, const char** args) {
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
+	//_CrtSetBreakAlloc(2208);
 #endif
 	Params param;
 	if (param.Parse(argc, args) == false){

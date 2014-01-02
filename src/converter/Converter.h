@@ -7,8 +7,25 @@
 #ifndef HEADER_CONVERTER
 #define HEADER_CONVERTER
 
-void Convert(const string &input_file, const string &output_file);
-void Cache(const string &input_file, const string &output_file);
-void DeCache(const string &input_file, const string &output_file);
+#include "Params.h"
+
+#include "../io/DataReader.h"
+
+void Convert(const SOL::Params &param);
+void Cache(const SOL::Params &param);
+
+template <typename FeatType, typename LabelType>
+SOL::DataReader<FeatType, LabelType>* getReader(const SOL::Params &param){
+	string dt_type = param.str_data_type;
+	ToLowerCase(dt_type);
+	if (dt_type == "libsvm")
+		return new SOL::libsvm_io_<FeatType, LabelType>(param.in_fileName);
+	else if (dt_type == "cache")
+		return new SOL::libsvm_binary_<FeatType,LabelType>(param.in_fileName);
+	else {
+		std::cerr<<"unrecognized dataset type "<<dt_type<<std::endl;
+		return NULL;
+	}
+}
 
 #endif

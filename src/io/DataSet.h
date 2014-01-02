@@ -36,7 +36,6 @@ namespace SOL {
             string cache_fileName;
             bool is_cache;
 
-
             size_t bufSize; //buffer to load data
             size_t passNum; //number of passes
             size_t dataNum; //total data number
@@ -52,6 +51,7 @@ namespace SOL {
             bool is_on_loading; //this is used for Rewind to test if rewind can be performed
 
             DataReader<FeatType,LabelType> *reader;
+			bool is_reader_self_alloc;
 
             //thread-safety
             MUTEX data_lock;
@@ -72,6 +72,7 @@ namespace SOL {
                 this->is_on_loading = false;
                 this->reader = NULL;
                 this->is_cache = false;
+				this->is_reader_self_alloc = false;
 
                 this->CreateBuffer(buf_size);
 
@@ -82,7 +83,7 @@ namespace SOL {
             }
             ~DataSet() {
                 delete_mutex(&data_lock);
-                if (this->reader != NULL)
+				if (this->reader != NULL && this->is_reader_self_alloc == true)
                     delete this->reader;
 				this->reader = NULL;
 				this->ReleaseBuffer();
@@ -149,46 +150,83 @@ namespace SOL {
 #else
             template <typename T1, typename T2> friend void* thread_LoadData(void* param);
 #endif
+			//Load cached dataset
+			bool Load(const string& cache_filename) {
+				this->cache_fileName = cache_filename;
+				if (this->reader != NULL && this->is_reader_self_alloc == true)
+					delete this->reader;
+				this->is_cache = false;
+				this->reader = new libsvm_binary_<FeatType, LabelType>(this->cache_fileName);
+				this->is_reader_self_alloc = true;
 
-            //bind a data reader to the dataset
-            bool Load(const string& filename,  const string& cache_filename) {
-                this->fileName = filename;
-                this->cache_fileName = cache_filename;
+				if (this->reader != NULL){
+					if (this->reader->OpenReading() == false){
+						delete this->reader;
+						this->reader = NULL;
+						return false;
+					}
+				}
+				return true;
+			}
 
-                if (this->reader != NULL)
-                    delete this->reader;
-                this->reader = NULL;
+			//bind a data reader to the dataset
+			bool Load(DataReader<FeatType, LabelType> *ext_reader) {
+				if (this->reader != NULL && this->is_reader_self_alloc == true)
+						delete this->reader;
+					this->reader = ext_reader;
+					this->is_cache = false;
+					this->is_reader_self_alloc = false;
 
-                if (SOL_ACCESS(this->cache_fileName.c_str()) == 0){ //already cached
-                    this->is_cache = false;
-                    this->reader = new libsvm_binary_<FeatType, LabelType>(this->cache_fileName);
-                }
-                else if(SOL_ACCESS(this->fileName.c_str()) == 0){
-                    this->reader = new libsvm_io_<FeatType, LabelType>(this->fileName);
-                    if (this->cache_fileName.length() == 0 && this->passNum > 1){ 
-                        this->cache_fileName = "cache_file";
+					if (this->reader != NULL){
+						if (this->reader->OpenReading() == false){
+							return false;
+						}
+					}
+					return true;
+			}
 
-                        this->is_cache = true;
-                    }
-                    else if (this->cache_fileName.length() > 0)
-                        this->is_cache = true;
-                }
-                else
-                    return false;
+			//bind a data reader to the dataset
+			bool Load(DataReader<FeatType, LabelType> *ext_reader,
+				const string& cache_filename) {
+					if (SOL_ACCESS(cache_filename.c_str()) == 0){ //already cached
+						return this->Load(cache_filename);
+					}
+					else if(ext_reader != NULL){
+						if (this->Load(ext_reader) == false){
+							return false;
+						}
+						if (cache_filename.length() == 0 && this->passNum > 1){ 
+							this->cache_fileName = "cache_file";
+							this->is_cache = true;
+						}
+						else if (cache_filename.length() > 0){
+							this->cache_fileName = cache_filename;
+							this->is_cache = true;
+						}
+					}
+					else
+						return false;
+					
+					return true;
+			}
 
-                if (this->reader != NULL){
-                    if (this->reader->OpenReading() == false){
-                        delete this->reader;
-                        this->reader = NULL;
-                        return false;
-                    }
-                }
+			//bind a data reader to the dataset
+			bool Load(const string& filename,  const string& cache_filename) {
+				if (SOL_ACCESS(cache_filename.c_str()) == 0){ //already cached
+					return this->Load(cache_filename);
+				}
+				else {
+					this->fileName = filename;
+					DataReader<FeatType, LabelType>* new_reader 
+						= new libsvm_io_<FeatType, LabelType>(this->fileName);
+					bool ret = this->Load(new_reader, cache_filename);
+					this->is_reader_self_alloc = true;
+					return ret;
+				}
+			}
 
-                return true;
-            }
-
-            /////////////Data Access/////////////////////
-        public:
+			/////////////Data Access/////////////////////
+		public:
 
 			//get the next write chunk
 			inline DataChunk<FeatType, LabelType> &GetWriteChunk(){

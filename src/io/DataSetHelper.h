@@ -110,10 +110,13 @@ namespace SOL{
 				dataset->FinishParse();
 				return NULL;
 			}
-			dataset->reader->Close();
-			delete dataset->reader;
+			if (dataset->is_reader_self_alloc == true){
+				dataset->reader->Close();
+				delete dataset->reader;
+			}
 			//load cache file
 			dataset->reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
+			dataset->is_reader_self_alloc = true;
 			if (dataset->reader->OpenReading() == false){
 				cerr<<"load cache data failed!"<<endl;
 				dataset->FinishParse();
