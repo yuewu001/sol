@@ -11,7 +11,7 @@
 #include "utils/util.h"
 
 #include "io/DataSet.h"
-#include "io/libsvmread.h"
+#include "io/libsvm_io.h"
 
 #include "algorithms/SGD.h"
 #include "algorithms/STG.h"

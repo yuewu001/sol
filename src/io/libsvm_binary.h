@@ -32,9 +32,12 @@ namespace SOL {
                 //compressed codes of indexes
                 s_array<char> comp_codes;
 
+				bool is_good; //indicate if the current reader is good
+
             public:
                 libsvm_binary_(const std::string &fileName) {
                     this->fileName = fileName;
+					this->is_good = true;
                 }
 
                 ~libsvm_binary_() {
@@ -48,12 +51,14 @@ namespace SOL {
             public:
                 bool OpenReading() {
                     this->Close();
-                    return io_handler.open_file(this->fileName.c_str(), "rb");
+					this->is_good = io_handler.open_file(this->fileName.c_str(), "rb");
+					return this->is_good;
                 }
 
                 bool OpenWriting() {
                     this->Close();
-                    return io_handler.open_file(this->fileName.c_str(), "wb");
+					this->is_good = io_handler.open_file(this->fileName.c_str(), "wb");
+					return this->is_good;
                 }
 
                 void Rewind() {
@@ -65,100 +70,115 @@ namespace SOL {
                 }
 
                 inline bool Good() {
-                    return io_handler.good() == 0 ? true : false;
+					return this->is_good == true && io_handler.good() == 0 ? true : false;
                 }
 
-                bool GetNextData(DataPoint<FeatType, LabelType> &data) {
-                    data.erase();
-                    if (io_handler.read_data((char*)&(data.label),sizeof(LabelType)) == false){
-                        if (this->Good() == true){
-                            return false;
-                        }
-                        else{
-                            cerr<<"unexpected error occured when loading data!"<<endl;
-                            return false;
-                        }
-                    }
-                    //assert(data.label == 1 || data.label == -1);
-                    
-                    size_t featNum = 0;
-                    if(io_handler.read_data((char*)&featNum,sizeof(size_t)) == false){
-                        cerr<<"load feature number failed!"<<endl;
-                        return false;
-                    }
-                    if (featNum > 0){
-                        if(io_handler.read_data((char*)&data.max_index,sizeof(IndexType)) == false){
-                            cerr<<"load max index failed!"<<endl;
-                            return false;
-                        }
-                        unsigned int code_len = 0;
-                        if(io_handler.read_data((char*)&code_len, 
-                                    sizeof(unsigned int)) == false){
-                            cerr<<"read coded index length failed!"<<endl;
-                            return false;
-                        }
-                        this->comp_codes.resize(code_len);
-                        if(io_handler.read_data(this->comp_codes.begin,
-                                    code_len) == false){
-                            cerr<<"read coded index failed!"<<endl;
-                            return false;
-                        }
-                        decomp_index(this->comp_codes, data.indexes); 
-                        if (data.indexes.size() != featNum){
-                            cerr<<"decoded index number is not correct!"<<endl;
-                            return false;
-                        }
-                        data.features.resize(featNum);
-                        if (io_handler.read_data((char*)(data.features.begin), 
-                                    sizeof(float) * featNum) ==false){
-                            cerr<<"load features failed!"<<endl;
-                            return false;
-                        }
-						if (io_handler.read_data((char*)&(data.sum_sq),sizeof(float)) == false){
-                            cerr<<"load sum of square failed!"<<endl;
-                            return false;
+				bool GetNextData(DataPoint<FeatType, LabelType> &data) {
+					data.erase();
+					if (io_handler.read_data((char*)&(data.label),sizeof(LabelType)) == false){
+						if (this->Good() == true){
+							return false;
 						}
-                    }
-                    return true;
-                }
+						else{
+							cerr<<"unexpected error occured when loading data!"<<endl;
+							this->is_good = false;
+							return false;
+						}
+					}
+					//assert(data.label == 1 || data.label == -1);
 
-                bool WriteData(DataPoint<FeatType, LabelType> &data) {
-                    size_t featNum = data.indexes.size();
-                    if(io_handler.write_data((char*)&data.label,sizeof(LabelType)) == false){
-                        cerr<<"write label failed!"<<endl;
-                        return false;
-                    }
-                    
-                    if(io_handler.write_data((char*)&featNum,sizeof(size_t)) == false){
-                        cerr<<"write feat number failed!"<<endl;
-                        return false;
-                    }
-                    if (featNum > 0){
-                        if(io_handler.write_data((char*)&data.max_index,
-                                    sizeof(IndexType)) == false){
-                            cerr<<"write max index failed!"<<endl;
-                            return false;
-                        }
-                        this->comp_codes.erase();
-                        comp_index(data.indexes, this->comp_codes); 
-                        unsigned int code_len = (unsigned int)(this->comp_codes.size());
-                        if(io_handler.write_data((char*)&code_len, 
-                                    sizeof(unsigned int)) == false){
-                            cerr<<"write coded index length failed!"<<endl;
-                            return false;
-                        }
-                        if(io_handler.write_data(this->comp_codes.begin,
-                                    code_len) == false){
-                            cerr<<"write coded index failed!"<<endl;
-                            return false;
-                        }
-                        if(io_handler.write_data((char*)(data.features.begin), 
-                                    sizeof(float) * featNum) == false){
-                            cerr<<"write features failed!"<<endl;
-                            return false;
-                        }
+					size_t featNum = 0;
+					if(io_handler.read_data((char*)&featNum,sizeof(size_t)) == false){
+						cerr<<"load feature number failed!"<<endl;
+						this->is_good = false;
+						return false;
+					}
+					if (featNum > 0){
+						if(io_handler.read_data((char*)&data.max_index,sizeof(IndexType)) == false){
+							cerr<<"load max index failed!"<<endl;
+							this->is_good = false;
+							return false;
+						}
+						unsigned int code_len = 0;
+						if(io_handler.read_data((char*)&code_len, 
+							sizeof(unsigned int)) == false){
+								cerr<<"read coded index length failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						this->comp_codes.resize(code_len);
+						if(io_handler.read_data(this->comp_codes.begin,
+							code_len) == false){
+								cerr<<"read coded index failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						decomp_index(this->comp_codes, data.indexes); 
+						if (data.indexes.size() != featNum){
+							cerr<<"decoded index number is not correct!"<<endl;
+							this->is_good = false;
+							return false;
+						}
+						data.features.resize(featNum);
+						if (io_handler.read_data((char*)(data.features.begin), 
+							sizeof(float) * featNum) ==false){
+								cerr<<"load features failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						if (io_handler.read_data((char*)&(data.sum_sq),sizeof(float)) == false){
+							cerr<<"load sum of square failed!"<<endl;
+							this->is_good = false;
+							return false;
+						}
+					}
+					return true;
+				}
+
+				bool WriteData(DataPoint<FeatType, LabelType> &data) {
+					size_t featNum = data.indexes.size();
+					if(io_handler.write_data((char*)&data.label,sizeof(LabelType)) == false){
+						cerr<<"write label failed!"<<endl;
+						this->is_good = false;
+						return false;
+					}
+
+					if(io_handler.write_data((char*)&featNum,sizeof(size_t)) == false){
+						cerr<<"write feat number failed!"<<endl;
+						this->is_good = false;
+						return false;
+					}
+					if (featNum > 0){
+						if(io_handler.write_data((char*)&data.max_index,
+							sizeof(IndexType)) == false){
+								cerr<<"write max index failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						this->comp_codes.erase();
+						comp_index(data.indexes, this->comp_codes); 
+						unsigned int code_len = (unsigned int)(this->comp_codes.size());
+						if(io_handler.write_data((char*)&code_len, 
+							sizeof(unsigned int)) == false){
+								cerr<<"write coded index length failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						if(io_handler.write_data(this->comp_codes.begin,
+							code_len) == false){
+								cerr<<"write coded index failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
+						if(io_handler.write_data((char*)(data.features.begin), 
+							sizeof(float) * featNum) == false){
+								cerr<<"write features failed!"<<endl;
+								this->is_good = false;
+								return false;
+						}
 						if (io_handler.write_data((char*)&(data.sum_sq),sizeof(float)) == false){
 							cerr<<"write sum of square failed!"<<endl;
+							this->is_good = false;
 							return false;
 						}
 					}

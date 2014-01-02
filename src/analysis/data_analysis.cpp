@@ -6,7 +6,7 @@
  ************************************************************************/
 #include "../io/DataPoint.h"
 #include "../io/DataReader.h"
-#include "../io/libsvmread.h"
+#include "../io/libsvm_io.h"
 #include "../io/mnist/MNISTReader.h"
 
 #include <string>
@@ -111,7 +111,7 @@ int main(int argc, char** args){
 #endif
 	string filename = args[1];
 	//string filename = "/home/matthew/work/Data/aut/aut_train";
-	LibSVMReader reader(filename);
+	libsvm_io reader(filename);
 	if (Analyze(&reader) == false)
 		cerr<<"analyze dataset failed!"<<endl;
 	return 0;

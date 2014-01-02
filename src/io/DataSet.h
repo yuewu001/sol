@@ -16,7 +16,7 @@
 #include "DataPoint.h"
 #include "DataReader.h"
 #include "libsvm_binary.h"
-#include "libsvmread.h"
+#include "libsvm_io.h"
 #include "../utils/util.h"
 
 #include <vector>
@@ -164,15 +164,10 @@ namespace SOL {
                     this->reader = new libsvm_binary_<FeatType, LabelType>(this->cache_fileName);
                 }
                 else if(SOL_ACCESS(this->fileName.c_str()) == 0){
-                    this->reader = new LibSVMReader_<FeatType, LabelType>(this->fileName);
+                    this->reader = new libsvm_io_<FeatType, LabelType>(this->fileName);
                     if (this->cache_fileName.length() == 0 && this->passNum > 1){ 
                         this->cache_fileName = "cache_file";
-#if WIN32
-						string cmd = "del " + this->cache_fileName;
-#else
-						string cmd = "rm " + this->cache_fileName;
-#endif
-						system(cmd.c_str());
+
                         this->is_cache = true;
                     }
                     else if (this->cache_fileName.length() > 0)

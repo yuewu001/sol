@@ -68,7 +68,7 @@ namespace SOL{
              *
              * @Return: true if succeed
              */
-            virtual bool write_data(char* src, size_t length);
+            virtual bool write_data(const char* src, size_t length);
     };
 }
 

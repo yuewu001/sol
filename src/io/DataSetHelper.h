@@ -39,7 +39,7 @@ namespace SOL{
 			else
 				return false;
 		}
-		return false;
+		return true;
 	}
 
 	template <typename T1, typename T2>
@@ -60,24 +60,7 @@ namespace SOL{
 		(*cacher)->Close();
 		delete *cacher;
 		*cacher = NULL;	
-
-		//rename
-#if WIN32
-		string cmd = "ren \"";
-		cmd = cmd + tmpFileName + "\" \"";
-		//in windows, the second parameter of ren should not include path
-		cmd = cmd + cache_fileName.substr(cache_fileName.find_last_of("/\\") + 1) + "\"";
-#else
-		string cmd = "mv \"";
-		cmd = cmd + tmpFileName + "\" \"";
-		cmd = cmd + cache_fileName + "\"";
-#endif
-		
-		if(system(cmd.c_str()) != 0){
-			cerr<<"rename cahe file name failed!"<<endl;
-			return false;
-		}
-		return true;
+		return rename_file(tmpFileName, cache_fileName);
 	}
 
 	template <typename T1, typename T2>
@@ -98,11 +81,16 @@ namespace SOL{
 		do {
 			DataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
 			not_file_end = load_chunk(reader, chunk);
-			save_chunk(writer, chunk);
+			if (save_chunk(writer, chunk) == false){
+				dataset->EndWriteChunk();
+				break;
+			}
 			dataset->EndWriteChunk();
 		}while(not_file_end == true);
-
-		return end_cache(&writer, dataset->cache_fileName);
+		if (reader->Good() && writer->Good()) 
+			return end_cache(&writer, dataset->cache_fileName);
+		else
+			return false;
 	}
 
 	template <typename T1, typename T2> 
@@ -145,6 +133,10 @@ namespace SOL{
 					not_file_end = load_chunk(reader, chunk);
 					dataset->EndWriteChunk();
 				}while(not_file_end == true);
+				if (reader->Good() == false) {
+					cerr<<"Load cached dataset failed!"<<endl;
+					break;
+				}
 			}
 			else {
 				cerr<<"reader is incorrect!"<<endl;

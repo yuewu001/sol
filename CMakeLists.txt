@@ -60,6 +60,7 @@ set(util_files
 
 set(converter_files 
     src/converter/Converter.cpp
+    src/converter/Converter.h
     src/converter/Params.cpp
     src/converter/Params.h
     src/io/mnist/MNISTReader.h)

@@ -27,6 +27,7 @@
 #define SOL_ACCESS(x) access(x,F_OK)
 #endif
 
+#include <iostream>
 
 template <typename T>
 inline char Sgn(T x) {
@@ -86,7 +87,35 @@ inline void ToLowerCase(string &str) {
 	std::swap(str,dst_str);
 }
 
+inline bool rename_file(const string& src_filename, const string& dst_filename){
+	string cmd;
+	if (SOL_ACCESS(dst_filename.c_str()) == 0){
+		//del the original cache_file
+#if WIN32
+		cmd = "del \"" + dst_filename + "\"";
+#else
+		cmd = "rm \"" + dst_filename + "\"";
+#endif
+		system(cmd.c_str());
+	}
+	//rename
+#if WIN32
+	cmd = "ren \"";
+	cmd = cmd + src_filename + "\" \"";
+	//in windows, the second parameter of ren should not include path
+	cmd = cmd + dst_filename.substr(dst_filename.find_last_of("/\\") + 1) + "\"";
+#else
+	string cmd = "mv \"";
+	cmd = cmd + src_filename + "\" \"";
+	cmd = cmd + dst_filename + "\"";
+#endif
 
+	if(system(cmd.c_str()) != 0){
+		std::cerr<<"rename cahe file name failed!"<<std::endl;
+		return false;
+	}
+	return true;
+}
 
 inline double get_current_time(){
 #if _WIN32

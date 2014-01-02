@@ -38,7 +38,7 @@ namespace SOL {
 		this->add_option("",0,1,"cached train file name","-c",&this->cache_fileName);
 		this->add_option("",0,1,"cached test file name","-tc",&this->test_cache_fileName);
 
-		this->add_option(init_data_type,0,1,"data type format","-dt",&this->str_data_type);
+		this->add_option(init_data_type,0,1,"dataset type format","-dt",&this->str_data_type);
 		this->add_option(init_buf_size,0,1,"number of chunks for buffering","-bs",&this->buf_size);
 
 		this->add_option(init_loss_type,0,1,"loss function type:\nHinge, Logit, Square, SquareHinge","-loss",&this->str_loss);

@@ -111,7 +111,7 @@ namespace SOL{
      *
      * @Return: true of succeed
      */
-    bool basic_io::write_data(char* src, size_t length){
+    bool basic_io::write_data(const char* src, size_t length){
         return fwrite(src, 1, length, file) == length;
     }
 }

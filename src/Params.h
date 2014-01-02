@@ -10,8 +10,6 @@
 
 #include "utils/ezOptionParser.hpp"
 
-#include "io/parser.h"
-
 #include <string>
 #include <map>
 
