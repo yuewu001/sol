@@ -4,8 +4,8 @@
 	> Created Time: 2013/9/20 13:18:02
 	> Functions: 
  ************************************************************************/
-
-
+#define DLL_HEADER _declspec(dllexport)
+#include "SOL_interface.h"
 #include "Params.h"
 
 #include "utils/util.h"
@@ -215,4 +215,123 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
         return NULL;
     }
 }
+/**
+ *  sol_initialize : initialize an sol instance
+ *
+ * @Param:  argc: number of arguments
+ * @Param:  args: char* array, command line
+ *
+ * @Returns:  pointer of the initialized object
+ */
+
+long sol_init_dataset(int argc, const char** args){
+    Params param;
+    if (param.Parse(argc, args) == false){
+        return 0;
+    }
+
+    DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(param.passNum,param.buf_size);
+    if (dataset->Load(param.fileName, param.cache_fileName) == false){
+        cerr<<"ERROR: Load dataset "<<param.fileName<<" failed!"<<endl;
+        delete dataset;
+        return 0;
+    }
+    return (long)dataset;
+}
+
+long sol_init_loss(int argc, const char** args){
+    Params param;
+    if (param.Parse(argc, args) == false){
+        return 0;
+    }
+    LossFunction<FeatType, LabelType> *lossFunc = GetLossFunc<FeatType, LabelType>(param);
+    return (long)lossFunc;
+}
+
+long sol_init_optimizer(long dataset, long loss_func, int argc, const char** args){
+    Params param;
+    if (param.Parse(argc, args) == false){
+        return 0;
+    }
+    Optimizer<FeatType, LabelType> *opti = GetOptimizer(param,
+            *((DataSet<FeatType, LabelType>*)dataset),
+            *((LossFunction<FeatType, LabelType>*)loss_func));
+    if (opti == NULL) {
+        return 0;
+    }
+
+    opti->SetParameter(param.lambda,param.eta, param.power_t, param.initial_t);
+    if (param.is_normalize == true)
+        opti->SetNormalize(param.is_normalize);
+    if (param.is_learn_best_param == true){
+		opti->BestParameter();
+	}
+    return (long)opti;
+}
+
+/**
+ *  sol_train: train a model
+ *
+ * @Param: optimizer: initialized sol instance
+ * @Param:  t_errRate: average test error rate
+ * @Param:  var_t_errRate: variance of the test error rate
+ * @Param:  sparse_rate: sparse rate of the model
+ * @Param:  time_cost: time cost of the training
+ *
+ * @Returns:    
+ */
+void sol_train(long optimizer, float* learn_errRate, float* var_l_errRate, float* sparse_rate, float* time_cost){
+    Optimizer<FeatType, LabelType> *opti = (Optimizer<FeatType, LabelType> *)optimizer;
+    if (opti == NULL)
+        return;
+
+    opti->PrintOptInfo();
+
+    float l_errRate(0), l_varErr(0);	//learning error rate
+    float sparseRate(0);
+
+    //learning the model
+    double time1 = get_current_time();
+
+    opti->Learn(l_errRate,l_varErr,sparseRate);
+
+    double time2 = get_current_time();
+
+    *learn_errRate = l_errRate;
+    *var_l_errRate = l_varErr;
+    *sparse_rate = sparseRate;
+    *time_cost = (float)(time2 - time1);
+}
+
+void sol_test(long optimizer, long test_dataset, float* t_errRate, float* time_cost){
+    Optimizer<FeatType, LabelType> *opti = (Optimizer<FeatType, LabelType> *)optimizer;
+    if (opti == NULL)
+        return;
+    double time2 = get_current_time();
+    //test the model
+    *t_errRate = opti->Test(*((DataSet<FeatType, LabelType>*)test_dataset));
+    double time3 = get_current_time();
+
+    *time_cost = (float)(time3 - time2);
+}
+
+/**
+ *  sol_release : release initialized objects
+ *
+ * @Param:  handler
+ */
+void sol_release_dataset(long dataset){
+    delete (DataSet<FeatType, LabelType>*)dataset;
+}
+
+
+void sol_release_loss(long loss_func){
+   delete (LossFunction<FeatType, LabelType> *)loss_func; 
+}
+
+void sol_release_optimizer(long optimizer){
+    Optimizer<FeatType, LabelType> *opti = (Optimizer<FeatType, LabelType> *)optimizer;
+    delete opti;
+}
+
 
