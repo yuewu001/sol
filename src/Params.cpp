@@ -88,7 +88,7 @@ namespace SOL {
 	}
 
 	bool Params::Parse(int argc, const char** args) {
-		if (opt.isSet("-h")){
+		if (opt.isSet("-h") || argc == 1){
 			this->Help();
 			return false;
 		}
