@@ -71,6 +71,35 @@ inline float trunc_weight2(float w, float gravity){
         return (gravity < -w) ? gravity : -w;
 }
 
+inline void ToUpperCase(char* c_str) {
+    size_t i = 0;
+    while(1){
+        if (c_str[i] >= 'a' && c_str[i] <= 'z'){
+            c_str[i] -=  32;
+            i++;
+        }
+        else if (c_str[i] >= 'A' && c_str[i] <= 'Z'){
+            i++;
+        }
+        else
+            break;
+    }
+}
+inline void ToLowerCase(char* c_str) {
+    size_t i = 0;
+    while(1){
+        if (c_str[i] >= 'a' && c_str[i] <= 'z'){
+            i++;
+        }
+        else if (c_str[i] >= 'A' && c_str[i] <= 'Z'){
+            c_str[i] += 32;
+            i++;
+        }
+        else
+            break;
+    }
+}
+
 inline void ToUpperCase(string &str) {
 	string dst_str;
 	int len = str.length();

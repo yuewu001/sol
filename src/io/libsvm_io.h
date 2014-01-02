@@ -4,7 +4,8 @@
   > Created Time: 2013/8/18 星期日 20:25:28
   > Functions: libsvm io_hander
  ************************************************************************/
-#pragma once
+#ifndef HEADER_LIBSVM_READ
+#define HEADER_LIBSVM_READ
 
 #if _WIN32
 #define _CRT_SECURE_NO_WARNINGS
@@ -19,9 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <limits>
 #include <cmath>
-#include <sstream>
 
 using namespace std;
 
@@ -141,3 +140,5 @@ namespace SOL {
 		//for special definition
 		typedef libsvm_io_<float, char> libsvm_io;
 }
+
+#endif
