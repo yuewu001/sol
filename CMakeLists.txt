@@ -83,16 +83,16 @@ IF(UNIX)
     target_link_libraries(SOL pthread)
 ENDIF(UNIX)
 
-add_library(libSOL SHARED src/SOL_interface.h src/Params.cpp src/Params.h 
+add_library(SOLdll SHARED src/SOL_interface.h src/Params.cpp src/Params.h 
     src/main.cpp ${SRC_LIST}) 
 IF(UNIX)
-    target_link_libraries(libSOL pthread)
+    target_link_libraries(SOLdll pthread)
 ENDIF(UNIX)
 
-add_library(libSOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
+add_library(SOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
     src/main.cpp ${SRC_LIST}) 
 IF(UNIX)
-    target_link_libraries(libSOLstatic pthread)
+    target_link_libraries(SOLstatic pthread)
 ENDIF(UNIX)
 
 
@@ -103,7 +103,7 @@ IF(UNIX)
     target_link_libraries(Converter pthread)
 ENDIF(UNIX)
 
-install(TARGETS SOL analysis Converter libSOL libSOLstatic
+install(TARGETS SOL analysis Converter SOLdll SOLstatic
     RUNTIME DESTINATION .
     LIBRARY DESTINATION bin
     ARCHIVE DESTINATION lib)

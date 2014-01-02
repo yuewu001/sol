@@ -4,7 +4,9 @@
 	> Created Time: 2013/9/20 13:18:02
 	> Functions: 
  ************************************************************************/
+#if _WIN32
 #define DLL_HEADER _declspec(dllexport)
+#endif
 #include "SOL_interface.h"
 #include "Params.h"
 
