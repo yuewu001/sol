@@ -5,14 +5,16 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Installation 
 
 project(SOL)
 
-#IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-#    set (CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
-#    message(STATUS "${CMAKE_INSTALL_PREFIX}")
-#ENDIF()
-
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set (ARCHIVE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set (CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/cmake)
+
+#RPATH and library search setting
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}")
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(io_files 
     src/io/DataPoint.h
@@ -95,6 +97,7 @@ add_library(SOLdll SHARED src/SOL_interface.h src/Params.cpp src/Params.h
     src/SOL_interface.cpp src/SOLdll.h ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOLdll pthread)
+    set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-fPIC") 
 ENDIF(UNIX)
 
 add_library(SOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
@@ -123,11 +126,6 @@ SET_PROPERTY(TARGET testMNIST PROPERTY FOLDER "TestCases")
 install(TARGETS SOL analysis Converter SOLdll SOLstatic
     RUNTIME DESTINATION .
     LIBRARY DESTINATION .
-    ARCHIVE DESTINATION lib)
-
-install(TARGETS SOLdll
-    RUNTIME DESTINATION test
-    LIBRARY DESTINATION test
     ARCHIVE DESTINATION lib)
 
 install (FILES 
