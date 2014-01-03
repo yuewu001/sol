@@ -140,4 +140,7 @@ install (FILES
     src/io/DataReader.h
     src/loss/LossFunction.h
     src/algorithms/Optimizer.h
+    src/SOLdll.h
+    src/SOLstatic.h
+    src/SOL_interface.h
     DESTINATION include)

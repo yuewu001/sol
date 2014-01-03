@@ -10,3 +10,5 @@
 #define DLL_HEADER 
 
 #include "SOL_interface.h"
+
+#endif
