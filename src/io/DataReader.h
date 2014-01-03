@@ -13,6 +13,7 @@
 #include <vector>
 
 namespace SOL {
+	
 	template <typename FeatType, typename LabelType>
 	class DataReader {
 	public:

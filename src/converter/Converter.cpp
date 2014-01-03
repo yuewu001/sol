@@ -51,7 +51,7 @@ void Cache(const Params &param){
 	cout<<"Caching file..."<<endl;
 	
 	DataSet<float, char> dt;
-	DataReader<float, char> *reader = getReader<float, char>(param);
+	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.str_data_type);
 	if (reader == NULL){
 		return;
 	}
@@ -83,7 +83,7 @@ void Cache(const Params &param){
 
 void Convert(const Params &param){
 	cout<<"Convert file to libsvm"<<endl;
-	DataReader<float, char> *reader = getReader<float, char>(param);
+	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName,param.str_data_type);
 	if (reader->OpenReading() == false){
 		cerr<<"open "<<param.in_fileName<<" failed!"<<endl;
 		return;

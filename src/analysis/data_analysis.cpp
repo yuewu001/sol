@@ -7,7 +7,6 @@
 #include "../io/DataPoint.h"
 #include "../io/DataReader.h"
 #include "../io/libsvm_io.h"
-#include "../io/mnist/MNISTReader.h"
 
 #include <string>
 using namespace std;

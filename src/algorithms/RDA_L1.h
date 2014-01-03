@@ -30,9 +30,9 @@ namespace SOL {
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
 			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("Learning Rate: %.2f\n", this->eta0);
-			printf("Power t : 0.5f\n");
-			printf("lambda	: %.2f\n\n",this->lambda);
+			printf("Learning Rate: %g\n", this->eta0);
+			printf("Power t : 0.5\n");
+			printf("lambda	: %g\n\n",this->lambda);
 		}
 
 	protected:

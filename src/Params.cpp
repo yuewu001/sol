@@ -88,7 +88,7 @@ namespace SOL {
 	}
 
 	bool Params::Parse(int argc, const char** args) {
-		if (opt.isSet("-h") || argc == 1){
+		if (opt.isSet("-h")){
 			this->Help();
 			return false;
 		}
@@ -139,11 +139,7 @@ namespace SOL {
 					opt.get(iter->first.c_str())->getString(*(iter->second));
 		}
 
-		if (this->cache_fileName.size() == 0 && this->fileName.length() == 0){
-			cerr<<"ERROR: you must specify the training data\n"<<endl;
-            this->Help();
-			return false;
-		}
+		
 		return true;
 	}
 

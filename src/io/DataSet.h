@@ -13,10 +13,7 @@
 #endif
 
 #include "DataSetHelper.h"
-#include "DataPoint.h"
-#include "DataReader.h"
-#include "libsvm_binary.h"
-#include "libsvm_io.h"
+#include "sol_io.h"
 #include "../utils/util.h"
 
 #include <vector>
@@ -36,8 +33,8 @@ namespace SOL {
             string cache_fileName;
             bool is_cache;
 
-            size_t bufSize; //buffer to load data
-            size_t passNum; //number of passes
+            int bufSize; //buffer to load data
+            int passNum; //number of passes
             size_t dataNum; //total data number
 
             size_t curChunkNum;  //data number in buffer
@@ -59,7 +56,7 @@ namespace SOL {
             CV buffer_full;
 
         public:
-            DataSet(size_t passes = 1, int buf_size = -1) {
+            DataSet(int passes = 1, int buf_size = -1) {
                 this->head = NULL;
                 this->wt_ptr = NULL;
                 this->rd_ptr = NULL;
@@ -98,7 +95,7 @@ namespace SOL {
 
                 this->head = new DataChunk<FeatType,LabelType>;
                 DataChunk<FeatType,LabelType> *p = this->head;
-                for (size_t i = 1; i < this->bufSize; i++) {
+                for (int i = 1; i < this->bufSize; i++) {
                     p->next = new DataChunk<FeatType,LabelType>;
                     p = p->next;
                 }
@@ -211,14 +208,13 @@ namespace SOL {
 			}
 
 			//bind a data reader to the dataset
-			bool Load(const string& filename,  const string& cache_filename) {
+			bool Load(const string& filename,  const string& cache_filename, const string &dt_type = "libsvm") {
 				if (SOL_ACCESS(cache_filename.c_str()) == 0){ //already cached
 					return this->Load(cache_filename);
 				}
 				else {
 					this->fileName = filename;
-					DataReader<FeatType, LabelType>* new_reader 
-						= new libsvm_io_<FeatType, LabelType>(this->fileName);
+					DataReader<FeatType, LabelType>* new_reader = getReader<FeatType, LabelType>(filename, dt_type);
 					bool ret = this->Load(new_reader, cache_filename);
 					this->is_reader_self_alloc = true;
 					return ret;

@@ -7,25 +7,17 @@
 #ifndef HEADER_SOL_INTERFACE
 #define HEADER_SOL_INTERFACE
 
-#if _WIN32
 #ifndef DLL_HEADER
-#define DLL_HEADER _declspec(dllimport)
+#define DLL_HEADER 
 #endif
-#else
-#define DLL_HEADER
-#endif
-extern "C"{
-/**
- *  sol_initialize : initialize an sol instance
- *
- * @Param:  argc: number of arguments
- * @Param:  args: char* array, command line
- *
- * @Returns:  pointer of the initialized object
- */
 
-DLL_HEADER long sol_init_dataset(int argc, const char** args);
-DLL_HEADER long sol_init_loss(int argc, const char** args);
+extern "C"{
+DLL_HEADER long sol_init_dataset(const char* filename, const char* cache_filename, const char* dt_type, int passNum, int buf_size);
+DLL_HEADER long sol_init_dataset2(long dt_reader, int passNum, int buf_size);
+DLL_HEADER long sol_init_dataset3(long dt_reader, const char* cache_filename, int passNum, int buf_size);
+
+DLL_HEADER long sol_init_loss(const char* loss_type);
+
 DLL_HEADER long sol_init_optimizer(long dataset, long loss_func, int argc, const char** args);
 
 /**

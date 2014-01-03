@@ -42,7 +42,7 @@ namespace SOL {
 		*/
 		virtual void PrintOptInfo() const {
 			Optimizer<FeatType,LabelType>::PrintOptInfo();
-			printf("delta : %.2f\n\n", this->delta);
+			printf("delta : %g\n\n", this->delta);
 		}
 
 	protected:

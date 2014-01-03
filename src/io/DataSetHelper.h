@@ -103,7 +103,7 @@ namespace SOL{
 		DataSet<T1,T2>* dataset = static_cast<DataSet<T1,T2>*>(param);
 		DataReader<T1,T2>* reader = dataset->reader;
 
-		size_t pass = 0;
+		int pass = 0;
 		if (dataset->is_cache == true){
 			if(CacheLoad(dataset) == false){
 				cerr<<"caching data failed!"<<endl;
