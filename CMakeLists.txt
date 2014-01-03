@@ -127,6 +127,12 @@ install(TARGETS SOL analysis Converter SOLdll SOLstatic
     RUNTIME DESTINATION .
     LIBRARY DESTINATION .
     ARCHIVE DESTINATION lib)
+if (WIN32)
+    install(TARGETS SOLdll 
+        RUNTIME DESTINATION test
+        LIBRARY DESTINATION test
+        ARCHIVE DESTINATION lib)
+endif()
 
 install (FILES 
     src/io/DataPoint.h

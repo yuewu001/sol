@@ -1,3 +1,0 @@
-Converter.cpp
-Params.cpp
-Params.h
