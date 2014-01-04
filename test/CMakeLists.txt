@@ -8,13 +8,27 @@ link_directories(
     )
 
 add_executable(testDll testDll/testDll.cpp) 
-target_link_libraries(testDll SOLdll)
+IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+	target_link_libraries(testDll SOLdlld)
+ELSE()
+	target_link_libraries(testDll SOLdll)
+ENDIF()
 
-add_executable(testStatic testStatic/testStatic.cpp) 
-target_link_libraries(testStatic SOLstatic)
+
+add_executable(testStatic testStatic/testStatic.cpp)
+IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+	target_link_libraries(testStatic SOLstaticd)
+ELSE()
+	target_link_libraries(testStatic SOLstatic)
+ENDIF()
 
 add_executable(testMNIST testMNIST/testMNIST.cpp testMNIST/MNISTReader.h) 
-target_link_libraries(testMNIST SOLstatic)
+IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+	target_link_libraries(testMNIST SOLstaticd)
+ELSE()
+	target_link_libraries(testMNIST SOLstatic)
+ENDIF()
+
 
 install(TARGETS testDll testStatic testMNIST
     RUNTIME DESTINATION test

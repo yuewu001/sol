@@ -82,10 +82,28 @@ source_group("utils" FILES ${util_files})
 set (SRC_LIST
     ${io_files} ${loss_files} ${algo_files} ${util_files}
     )
+	
+
+IF (WIN32 AND MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
+	set (CMAKE_BUILD_TYPE "Debug|Release")	
+ENDIF()
+
+IF (CMAKE_COMPILER_IS_GNUCXX AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
+	set(CMAKE_BUILD_TYPE Release)
+ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -O2 -s")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+	
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+OPTION(DCMTK_WITH_DEBUG_POSTFIX "Use postfix 'd' for debug libraries (e.g. Release dcmsr.lib, Debug dcmsrd.lib)" ON)
+
+IF(DCMTK_WITH_DEBUG_POSTFIX)
+  SET(CMAKE_DEBUG_POSTFIX  "d")  
+ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 add_executable(SOL src/Params.cpp src/Params.h 
     src/main.cpp src/SOL_interface.cpp ${SRC_LIST}) 
@@ -94,14 +112,14 @@ IF(UNIX)
 ENDIF(UNIX)
 
 add_library(SOLdll SHARED src/SOL_interface.h src/Params.cpp src/Params.h 
-    src/SOL_interface.cpp src/SOLdll.h ${SRC_LIST}) 
+    src/SOL_interface.cpp  ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOLdll pthread)
     set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-fPIC") 
 ENDIF(UNIX)
 
 add_library(SOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
-    src/SOL_interface.cpp src/SOLstatic.h ${SRC_LIST}) 
+    src/SOL_interface.cpp ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOLstatic pthread)
 ENDIF(UNIX)
@@ -111,6 +129,13 @@ add_executable(Converter ${converter_files} ${io_files})
 IF(UNIX)
     target_link_libraries(Converter pthread)
 ENDIF(UNIX)
+
+
+IF(DCMTK_WITH_DEBUG_POSTFIX)  
+  set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
+  set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
+  set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
+ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 #Organize projects into folders
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -124,8 +149,8 @@ SET_PROPERTY(TARGET testStatic PROPERTY FOLDER "TestCases")
 SET_PROPERTY(TARGET testMNIST PROPERTY FOLDER "TestCases")
 
 install(TARGETS SOL analysis Converter SOLdll SOLstatic
-    RUNTIME DESTINATION .
-    LIBRARY DESTINATION .
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION bin
     ARCHIVE DESTINATION lib)
 if (WIN32)
     install(TARGETS SOLdll 
@@ -140,7 +165,37 @@ install (FILES
     src/io/DataReader.h
     src/loss/LossFunction.h
     src/algorithms/Optimizer.h
-    src/SOLdll.h
-    src/SOLstatic.h
     src/SOL_interface.h
     DESTINATION include)
+
+# ========================== build platform ==========================
+message(STATUS "")
+message(STATUS "  Platform:")
+message(STATUS "    Host:"             ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_VERSION} ${CMAKE_HOST_SYSTEM_PROCESSOR})
+if(CMAKE_CROSSCOMPILING)
+  message(STATUS "    Target:"         ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION} ${CMAKE_SYSTEM_PROCESSOR})
+endif()
+message(STATUS "    CMake:"            ${CMAKE_VERSION})
+message(STATUS "    CMake generator:"  ${CMAKE_GENERATOR})
+message(STATUS "    CMake build tool:" ${CMAKE_BUILD_TOOL})
+if(MSVC)
+  message(STATUS "    MSVC:"           ${MSVC_VERSION})
+endif()
+if(CMAKE_GENERATOR MATCHES Xcode)
+  message(STATUS "    Xcode:"          ${XCODE_VERSION})
+endif()
+if(NOT CMAKE_GENERATOR MATCHES "Xcode")
+  message(STATUS "    Configuration:"  ${CMAKE_BUILD_TYPE})
+endif()
+
+message(STATUS "")
+message(STATUS "  C/C++:")
+message(STATUS "    C++ Compiler:"           ${OPENCV_COMPILER_STR})
+message(STATUS "    C++ flags (Release):"    ${CMAKE_CXX_FLAGS_RELEASE})
+message(STATUS "    C++ flags (Debug):"       ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "    C flags (Release):"       ${CMAKE_C_FLAGS_RELEASE})
+message(STATUS "    C flags (Debug):"         ${CMAKE_C_FLAGS_DEBUG})
+if(NOT WIN32)  
+    message(STATUS "    Linker flags (Release):"  ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+    message(STATUS "    Linker flags (Debug):"    ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
+endif()
