@@ -7,26 +7,26 @@ include_directories(
 link_directories(
     )
 
-add_executable(testDll testDll/testDll.cpp) 
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
-	target_link_libraries(testDll SOLdlld)
-ELSE()
-	target_link_libraries(testDll SOLdll)
-ENDIF()
-
-
 add_executable(testStatic testStatic/testStatic.cpp)
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+IF (WIN32 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
 	target_link_libraries(testStatic SOLstaticd)
 ELSE()
 	target_link_libraries(testStatic SOLstatic)
 ENDIF()
 
 add_executable(testMNIST testMNIST/testMNIST.cpp testMNIST/MNISTReader.h) 
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+IF (WIN32 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
 	target_link_libraries(testMNIST SOLstaticd)
 ELSE()
 	target_link_libraries(testMNIST SOLstatic)
+ENDIF()
+
+
+add_executable(testDll testDll/testDll.cpp) 
+IF (WIN32 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug") 
+	target_link_libraries(testDll SOLdlld)
+ELSE()
+	target_link_libraries(testDll SOLdll)
 ENDIF()
 
 
