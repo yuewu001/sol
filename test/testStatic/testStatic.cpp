@@ -5,7 +5,7 @@
   > Functions: Test if dynamic dll works
  ************************************************************************/
 
-#include "SOL_interface.h"
+#include "SOLstatic.h"
 
 #include <iostream>
 #include <cstring>

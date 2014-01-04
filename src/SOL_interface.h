@@ -7,10 +7,6 @@
 #ifndef HEADER_SOL_INTERFACE
 #define HEADER_SOL_INTERFACE
 
-#ifndef DLL_HEADER
-#define DLL_HEADER 
-#endif
-
 extern "C"{
 DLL_HEADER long sol_init_dataset(const char* filename, const char* cache_filename, const char* dt_type, int passNum, int buf_size);
 DLL_HEADER long sol_init_dataset2(long dt_reader, int passNum, int buf_size);
