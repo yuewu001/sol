@@ -8,9 +8,7 @@
 #ifndef HEADER_PARSER_PARAM
 #define HEADER_PARSER_PARAM
 
-#include "common/ezOptionParser.hpp"
-
-#include "data/parser.h"
+#include "utils/ezOptionParser.hpp"
 
 #include <string>
 #include <map>

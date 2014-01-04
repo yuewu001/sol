@@ -36,15 +36,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'real-sim':
         train_file = 'real-sim/real-sim_train'
         test_file = 'real-sim/real-sim_test' 
-    elif dataset == 'epsilon':
-        train_file = 'epsilon/epsilon_normalized'
-        test_file = 'epsilon/epsilon_normalized.t'
     elif dataset == 'url':
         train_file = 'url_combined/url_train'
         test_file  = 'url_combined/url_test'
-    elif dataset == 'webspam':
-        train_file = 'webspam/webspam_unigram_train'
-        test_file  = 'webspam/webspam_unigram_test'
     elif dataset == 'webspam_trigram':
         if task == 'cv':
             train_file = 'webspam_trigram_15K/webspam_trigram_15K_train'
@@ -58,21 +52,12 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'aut':
         train_file = 'aut/aut_train'
         test_file = 'aut/aut_test'
-    elif dataset == 'news20':
-        train_file = 'news20/news20_train'
-        test_file = 'news20/news20_test'
-    elif dataset == 'gisette':
-        train_file = 'gisette/gisette_scale'
-        test_file = 'gisette/gisette_scale.t'
     elif dataset == 'pcmac':
         train_file = 'pcmac/pcmac_train'
         test_file = 'pcmac/pcmac_test'
     elif dataset == 'physic':
         train_file = 'physic/physic_train'
         test_file = 'physic/physic_test'
-    elif dataset == 'real-sim':
-        train_file = 'real-sim/real-sim_train'
-        test_file = 'real-sim/real-sim_test'
     elif dataset == 'synthetic':
         train_file = 'synthetic/synthetic_train'
         test_file = 'synthetic/synthetic_test'
@@ -168,11 +153,6 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
             'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
             'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':64}}
-    news20 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-            'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
-            'CW-RDA':{'-r':0.0625}, 'RDA':{'-eta':128}}
     pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
             'Ada-RDA':{'-eta':0.5, '-delta':0.125},
@@ -206,7 +186,7 @@ def get_model_param(ds, opt):
             'CW-RDA':{'-r':8.0},'RDA':{'-eta':16.0}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
-            'aut':aut, 'news20':news20,'physic':physic,
+            'aut':aut,'physic':physic,
             'pcmac':pcmac,'real-sim':realsim,
             'synthetic':synthetic, 'a9a':a9a}
 

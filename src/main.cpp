@@ -4,33 +4,14 @@
 	> Created Time: 2013/9/20 13:18:02
 	> Functions: 
  ************************************************************************/
-
-
 #include "Params.h"
 
-#include "common/util.h"
+#include "utils/util.h"
 
-#include "data/DataSet.h"
-#include "data/libsvmread.h"
-
-#include "optimizer/SGD.h"
-#include "optimizer/STG.h"
-#include "optimizer/RDA_L1.h"
-#include "optimizer/FOBOS.h"
-#include "optimizer/Ada_FOBOS.h"
-#include "optimizer/Ada_RDA.h"
-#include "optimizer/DAROW.h"
-#include "optimizer/SSAROW.h"
-#include "optimizer/ASAROW.h"
-#include "optimizer/SCW.h"
-#include "optimizer/CW_RDA.h"
-#include "optimizer/SCW_RDA.h"
-#include "optimizer/OFSGD.h"
-
-#include "loss/LogisticLoss.h"
-#include "loss/HingeLoss.h"
-#include "loss/SquareLoss.h"
-#include "loss/SquaredHingeLoss.h"
+#include "io/DataSet.h"
+#include "io/sol_io.h"
+#include "loss/sol_loss.h"
+#include "algorithms/sol_algorithms.h"
 
 #include <string>
 #include <iostream>
@@ -43,10 +24,7 @@ using namespace SOL;
 
 #define FeatType float
 #define LabelType char
-
-///////////////////////////function declarications/////////////////////
-void FakeInput(int &argc, char **args, char** &argv);
-template <typename T1, typename T2> LossFunction<T1,T2>* GetLossFunc(const Params &param);
+//to be defined in sol_interface.cpp
 template <typename T1, typename T2>
 Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
 
@@ -56,12 +34,19 @@ int main(int argc, const char** args) {
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
+	//_CrtSetBreakAlloc(2208);
 #endif
 	Params param;
 	if (param.Parse(argc, args) == false){
 		return -1;
 	}
-	LossFunction<FeatType, LabelType> *lossFunc = GetLossFunc<FeatType, LabelType>(param);
+	if (param.cache_fileName.size() == 0 && param.fileName.length() == 0){
+		cerr<<"ERROR: you must specify the training data\n"<<endl;
+		param.Help();
+		return -1;
+	}
+
+	LossFunction<FeatType, LabelType> *lossFunc = GetLossFunc<FeatType, LabelType>(param.str_loss);
 	if(lossFunc == NULL)
 		return -1;
 
@@ -129,89 +114,3 @@ int main(int argc, const char** args) {
 
 	return 0;
 }
-
-template <typename T1, typename T2>
-LossFunction<T1,T2>* GetLossFunc(const Params &param) {
-	if (param.str_loss == "Hinge")
-		return new HingeLoss<T1,T2>();
-	else if (param.str_loss == "Logit")
-		return new LogisticLoss<T1,T2>();
-	else if (param.str_loss == "Square")
-		return new SquareLoss<T1,T2>();
-	else if (param.str_loss == "SquareHinge")
-		return new SquaredHingeLoss<T1, T2>();
-	else{
-		cerr<<"ERROR: unrecognized Loss function "<<param.str_loss<<endl;
-		return NULL;
-	}
-}
-
-template <typename T1, typename T2>
-Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFunc) {
-	if (param.str_opt == "SGD")
-		return new SGD<T1,T2>(dataset,lossFunc);
-	else if (param.str_opt == "STG") {
-		STG<T1,T2> *opti = new STG<T1,T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.K);
-		return opti;
-	}
-	else if (param.str_opt == "RDA") 
-		return new RDA_L1<T1,T2>(dataset,lossFunc,false);
-	else if (param.str_opt == "RDA_E") {
-		RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,true);
-		opti->SetParameterEx(param.gamma_rou);
-		return opti;
-	}
-	else if (param.str_opt == "FOBOS") 
-		return new FOBOS<T1,T2>(dataset,lossFunc);
-	else if (param.str_opt == "Ada-RDA") {
-		Ada_RDA<T1,T2> *opti = new Ada_RDA<T1,T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.delta);
-		return opti;
-	}
-	else if (param.str_opt == "Ada-FOBOS") {
-		Ada_FOBOS<T1,T2> *opti = new Ada_FOBOS<T1,T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.delta);
-		return opti;
-	}
-	else if (param.str_opt == "AROW") {
-		DAROW<T1,T2> *opti = new DAROW<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (param.str_opt == "SSAROW") {
-		SSAROW<T1,T2> *opti = new SSAROW<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (param.str_opt == "ASAROW") {
-		ASAROW<T1,T2> *opti = new ASAROW<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.K, param.r);
-		return opti;
-	}
-	else if (param.str_opt == "CW-RDA") {
-		CW_RDA<T1,T2> *opti = new CW_RDA<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-    else if (param.str_opt == "SCW"){
-        SCW<T1, T2> *opti = new SCW<T1, T2>(dataset,lossFunc);
-        opti->SetParameterEx(param.phi,param.r);
-        return opti;
-    }
-    else if (param.str_opt == "SCW-RDA") {
-        SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
-        opti->SetParameterEx(param.phi, param.r);
-        return opti;
-    }
-    else if (param.str_opt == "OFSGD"){
-        OFSGD<T1, T2> *opti = new OFSGD<T1, T2>(dataset, lossFunc);
-        opti->SetParameterEx(param.K);
-        return opti;
-    }
-    else{
-        cerr<<"ERROR: unrecognized optimization method "<<param.str_opt<<endl;
-        return NULL;
-    }
-}
-

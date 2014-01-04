@@ -7,7 +7,7 @@
 
 #pragma once
 #include <cmath>
-#include "../common/util.h"
+#include "../utils/util.h"
 
 namespace SOL {
 	template <typename FeatType, typename LabelType>

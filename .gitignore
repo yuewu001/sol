@@ -4,7 +4,6 @@
 *.exe
 cscope.*
 tags
-test
 *tmp*
 *.log
 *.pyc
