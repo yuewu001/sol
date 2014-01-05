@@ -10,7 +10,7 @@ import run_liblinear
 
 
 #algorithm list
-opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
+opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
 
 #dataset list
 ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']

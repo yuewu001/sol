@@ -2,7 +2,7 @@
 """bach cross validation"""
 import os
 
-opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
+opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
 
 ds_list = ['a9a','aut','MNIST','pcmac','physic','news']
 
