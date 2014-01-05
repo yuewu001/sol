@@ -4,8 +4,9 @@
 import sys
 import os
 import re
+import exe_path
 
-exe_name = '..' + os.sep + 'SOL'
+exe_name = exe_path.SOL_exe_name
 
 def best_param(cmd_params, opt_name, output_file):
     #select the best learning rate

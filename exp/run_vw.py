@@ -1,14 +1,13 @@
 #This script is to run experiment automatically to test the performance of vw
 
-import sys
 import os
 import time
 import l1_def
-import dataset
 import run_util
 import vw_util
+import exe_path
 
-exe_name = 'vw'
+exe_name = exe_path.vw_exe_name
 
 def run_vw(train_file, test_file,ds,result_file, is_cache = True):
     tmp_folder = ds + '/vw_tmp'

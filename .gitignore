@@ -8,3 +8,5 @@ tags
 *.log
 *.pyc
 exp/result
+build/
+data/

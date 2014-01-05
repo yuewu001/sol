@@ -2,24 +2,14 @@
 """bach cross validation"""
 import os
 
-#opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['SGD','Ada-FOBOS','Ada-RDA', 'SSAROW','CW-RDA','RDA']
-#opt_list = ['Ada-FOBOS','Ada-RDA', 'CW-RDA']
-opt_list = ['CW-RDA']
+opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 
-#ds_list = ['news', 'rcv1', 'url']
-#ds_list = ['MNIST','news', 'rcv1','url']
-#ds_list = ['webspam_trigram']
-#ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim','webspam_trigram']
 ds_list = ['a9a','aut','MNIST','pcmac','physic','news']
-#ds_list = ['rcv1']
 
 fold_num = 5
 
 eta_search = '0.5:2.0:512'
-#eta_search = '0.5:2.0:256'
 delta_search = '0.03125:2:32'
-#delta_search = '0.5:2:256'
 r_search = delta_search
 
 for dt in ds_list:

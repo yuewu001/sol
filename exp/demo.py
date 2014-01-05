@@ -9,21 +9,22 @@ import run_vw
 import run_liblinear
 
 
-#opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
-#opt_list = ['STG','FOBOS','Ada-FOBOS', 'SSAROW','RDA','Ada-RDA', 'CW-RDA','ASAROW']
-opt_list = ['vw','SGD','liblinear']
+#algorithm list
+opt_list = ['STG','Ada-FOBOS','SSAROW', 'RDA','Ada-RDA', 'CW-RDA']
 
-#ds_list = ['news', 'rcv1', 'url']
+#dataset list
 ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']
-#ds_list = ['news20','gisette','url','physic','pcmac', 'webspam_trigram']
-#ds_list = ['MNIST','news','rcv1','url','aut','news20','gisette','physic','pcmac', 'real-sim']
-#ds_list = ['a9a']
 
+#number of times to randomize a dataset for averaged results
 rand_num = 10
-extra_cmd = ' -loss Hinge -norm '
+#extra command sent to SOL
+extra_cmd = ' -loss Hinge -norm'
 
-is_cache = False
-is_default_param = True
+#whether need to cache the dataset for fast processing speed
+is_cache = True
+#whether to use the default parameter settings of each algorithm, otherwise,
+#parameters will obtained from get_model_param in dataset.py
+is_default_param = False
 
 def add_to_dict(opt, result_all, result_once):
     if opt in result_all.keys(): #add to previous result

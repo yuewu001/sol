@@ -7,8 +7,6 @@ import os
 import run_util
 import dataset
 
-exe_cmd = ''
-
 def Usage():
     print 'Usage: CV dataset algorithm fold_num param start:step:end'
     print '\tstep: for multiplication'
@@ -18,7 +16,10 @@ if len(sys.argv) < 6 or len(sys.argv) % 2 == 1:
     sys.exit()
 
 exe_cmd = run_util.exe_name
+
+#extra command
 exe_cmd += ' -loss Hinge -norm '
+
 dt = sys.argv[1]
 opt_name = sys.argv[2]
 exe_cmd += ' -opt %s' %opt_name

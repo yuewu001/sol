@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import os
 import re
 
 #get the size of a readable model

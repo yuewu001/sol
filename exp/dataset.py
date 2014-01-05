@@ -4,6 +4,7 @@
 import sys
 import os
 import platform
+import exe_path
 
 # windows
 if platform.system() == 'Windows':
@@ -19,7 +20,7 @@ def analyze(file_name):
     info_name = file_name + '_info.txt'
     if os.path.exists(info_name) == False:
         print 'analyze %s' %file_name
-        cmd = '..' + os.sep + 'analysis %s' %file_name +' >> %s' %info_name
+        cmd = exe_path.analysis_exe_name + ' %s' %file_name +' >> %s' %info_name
         print cmd
         os.system(cmd)
 
@@ -80,7 +81,6 @@ def get_file_name(dataset, task = 'train'):
 def get_cv_data_list(dataset, fold_num):
     path_list = get_file_name(dataset,'cv')
     train_file = path_list[0]
-    test_file = path_list[0]
 
     # count number of lines
     count_cmd = 'wc -l %s' %train_file
@@ -127,6 +127,7 @@ def get_cmd_data(dataset):
 
     return get_cmd_data_by_file(train_file, test_file)
 
+#parameters for each dataset, obtained by cross-validation in general
 def get_model_param(ds, opt):
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},

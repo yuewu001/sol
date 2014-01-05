@@ -1,13 +1,10 @@
 #This script is to run experiment automatically to test the performance of the algorithm
 
-import sys
 import os
-import re
 import time
 import liblinear_util
 import run_util
-
-from l1_def import *
+import exe_path
 
 def run_liblinear(train_file, test_file,ds, result_file):
 
@@ -21,8 +18,8 @@ def run_liblinear(train_file, test_file,ds, result_file):
     model_file = tmp_folder + '/model'
     tmp_file   = tmp_folder + '/tmp.txt'
 
-    train_exe_name = '../extern/liblinear/train'
-    test_exe_name = '../extern/liblinear/predict'
+    train_exe_name = exe_path.liblinar_train_exe_name 
+    test_exe_name = exe_path.liblinar_test_exe_name 
 
     #make the result dir
     cmd = 'mkdir -p %s' %dst_folder
