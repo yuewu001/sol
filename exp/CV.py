@@ -30,7 +30,7 @@ if fold_num < 2 or fold_num > 26:
 
 split_list = dataset.get_cv_data_list(dt,fold_num)
 
-dst_folder = dt + '/cv'
+dst_folder = dt + os.sep + 'cv'
 os.system('mkdir -p %s' %dst_folder)
 
 #define the grid search item
