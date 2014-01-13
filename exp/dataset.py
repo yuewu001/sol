@@ -62,6 +62,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'synthetic':
         train_file = 'synthetic/synthetic_train'
         test_file = 'synthetic/synthetic_test'
+    elif dataset == 'synthetic2':
+        train_file = 'synthetic2/synthetic_train'
+        test_file = 'synthetic2/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()

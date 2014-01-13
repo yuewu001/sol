@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <fstream>
 
 /**
 *  namespace: Sparse Online Learning
@@ -111,6 +112,9 @@ namespace SOL {
 	protected:
 		//Change the dimension of weights
 		virtual void UpdateWeightSize(IndexType newDim);
+
+	public:
+		void SaveModel(const string& filename);
     };
     
     //calculate learning rate
@@ -372,5 +376,18 @@ namespace SOL {
 					this->weightVec.end);
 				this->weightDim = newDim;
 			}
+		}
+		template <typename FeatType, typename LabelType>
+		void Optimizer<FeatType, LabelType>::SaveModel(const string& filename){
+			ofstream outfile(filename.c_str(),ios::out | ios::binary);
+			if (!outfile){
+				cerr<<"open file "<<filename<<"failed!"<<endl;
+				return;
+			}
+			outfile<<"y = b + w x\n";
+			for (int i = 0; i < this->weightDim; i++){
+				outfile<<this->weightVec[i]<<"\n";
+			}
+			outfile.close();
 		}
 }

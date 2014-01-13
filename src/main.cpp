@@ -81,6 +81,10 @@ int main(int argc, const char** args) {
 		double time1 = get_current_time();
 
 		opti->Learn(l_errRate,l_varErr,sparseRate);
+		
+		if (param.out_readable_model.length() > 0){
+			opti->SaveModel(param.out_readable_model);
+		}
 
 		double time2 = get_current_time();
 

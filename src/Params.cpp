@@ -59,6 +59,7 @@ namespace SOL {
 		this->add_option(init_r,0,1,"r in Confidence weighted algorithms","-r",&this->r);
 		this->add_option(init_phi,0,1,"phi in SCW","-phi",&this->phi); 
 		this->add_option(init_normalize,0,0,"whether normalize the data","-norm",&this->is_normalize);
+		this->add_option("",false,1,"output readable model","-or",&this->out_readable_model);
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs, 

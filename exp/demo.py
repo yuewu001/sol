@@ -10,13 +10,15 @@ import run_liblinear
 
 
 #algorithm list
-opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+#opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+opt_list = ['SGD']
 
 #dataset list
-ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']
+#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']
+ds_list = ['synthetic2']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm'
 
@@ -24,7 +26,7 @@ extra_cmd = ' -loss Hinge -norm'
 is_cache = True
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
-is_default_param = False
+is_default_param = True
 
 def add_to_dict(opt, result_all, result_once):
     if opt in result_all.keys(): #add to previous result

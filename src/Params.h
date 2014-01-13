@@ -46,6 +46,8 @@ namespace SOL
 		string test_fileName; //test file name
 		string test_cache_fileName; //cached test file name
 
+		string out_readable_model; //output readable model
+
 		//dataset type
 		string str_data_type;
 		//loss function type
