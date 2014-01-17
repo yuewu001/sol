@@ -9,4 +9,8 @@ tags
 *.pyc
 exp/result
 build/
+*.aux
+*.bbl
+*.blg
+*.toc
 data/
