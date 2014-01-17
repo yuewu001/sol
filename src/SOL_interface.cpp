@@ -235,6 +235,11 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		opti->SetParameterEx(param.K);
 		return opti;
 	}
+	else if (str_opt == "SGD-FS"){
+		SGD_FS<T1,T2> *opti = new SGD_FS<T1,T2>(dataset,lossFunc);
+		opti->SetParameterEx(param.K);
+		return opti;
+	}
 	else{
 		cerr<<"ERROR: unrecognized optimization method "<<param.str_opt<<endl;
 		return NULL;

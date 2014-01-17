@@ -19,7 +19,7 @@ for dt in ds_list:
         print 'Cross validation on %s' %dt + ' with %s' %opt
         print '----------------------------------------------'
 
-        cmd = './CV.py {0} {1} {2} '.format(dt,opt,fold_num)
+        cmd = 'CV.py {0} {1} {2} '.format(dt,opt,fold_num)
 
         if 'AROW' in opt or 'CW-RDA' in opt:
             cmd += ' {0} {1}'.format('-r',r_search)

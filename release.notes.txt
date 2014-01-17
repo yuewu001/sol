@@ -1,0 +1,11 @@
+v0.1.1
+2014/1/13:
+	add save model
+v0.1.2
+2014/1/17	
+	batch_cv.py: fix bug: ./CV.py can not recognized on windows
+	need to add MinGW or Cygwin constraint for the scripts
+	
+	add SGD_FS.h
+	fix bug in OFSGD.h
+	

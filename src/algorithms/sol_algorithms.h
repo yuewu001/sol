@@ -14,6 +14,7 @@
 #include "SCW.h"
 #include "SCW_RDA.h"
 #include "OFSGD.h"
+#include "SGD_FS.h"
 
 namespace SOL{
    

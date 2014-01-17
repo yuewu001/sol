@@ -13,7 +13,8 @@ def run_liblinear(train_file, test_file,ds, result_file):
 
     dst_folder = './%s' %ds
     tmp_folder = dst_folder + '/liblinear'
-    os.system('mkdir -p %s' %tmp_folder)
+    #os.system('mkdir -p %s' %tmp_folder)
+    run_util.create_dir(tmp_folder)
 
     model_file = tmp_folder + '/model'
     tmp_file   = tmp_folder + '/tmp.txt'
@@ -22,8 +23,10 @@ def run_liblinear(train_file, test_file,ds, result_file):
     test_exe_name = exe_path.liblinar_test_exe_name 
 
     #make the result dir
-    cmd = 'mkdir -p %s' %dst_folder
-    os.system(cmd)
+    #cmd = 'mkdir -p %s' %dst_folder
+    #os.system(cmd)
+    run_util.create_dir(dst_folder)
+
 
     result_file = './%s' %tmp_folder + '/' + result_file
     #clear the file if it already exists

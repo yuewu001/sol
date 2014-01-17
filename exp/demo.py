@@ -116,7 +116,8 @@ for ds in ds_list:
     path_list = dataset.get_file_name(ds)
     dst_folder = ds
     dst_folder = ds
-    os.system("mkdir %s" %dst_folder)
+    #os.system("mkdir %s" %dst_folder)
+    run_util.create_dir(dst_folder)
 
     result_all = train_model(path_list, dst_folder)
 

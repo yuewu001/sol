@@ -58,6 +58,7 @@ set(algo_files
     src/algorithms/SCW.h
     src/algorithms/SCW_RDA.h
     src/algorithms/SGD.h
+	src/algorithms/SGD_FS.h
     src/algorithms/AROW_TG.h
     src/algorithms/STG.h)
 

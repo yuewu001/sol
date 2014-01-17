@@ -11,7 +11,8 @@ exe_name = exe_path.vw_exe_name
 
 def run_vw(train_file, test_file,ds,result_file, is_cache = True):
     tmp_folder = ds + '/vw_tmp'
-    os.system('mkdir -p %s' %tmp_folder)
+    #os.system('mkdir -p %s' %tmp_folder)
+    run_util.create_dir(tmp_folder)
     
     model_file = tmp_folder + '/vw_model'
     rd_model_file = tmp_folder + '/vw_model.txt'

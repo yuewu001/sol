@@ -5,8 +5,19 @@ import sys
 import os
 import re
 import exe_path
+import platform
 
 exe_name = exe_path.SOL_exe_name
+
+def create_dir(name):
+    # windows
+    if platform.system() == 'Windows':
+        os.system('mkdir %s' %name)
+    elif platform.system() == 'Linux':
+        os.system('mkdir -p %s' %name)
+    else:
+        print 'system type is not supported:'
+        sys.exit()
 
 def best_param(cmd_params, opt_name, output_file):
     #select the best learning rate

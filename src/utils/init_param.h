@@ -58,6 +58,9 @@ namespace SOL {
 	//is normalize the data
 	static const bool init_normalize = false;
 
+	//lambda for ofs
+	static const float init_ofs_delta = 0.01f;
+
 	static const char* init_loss_type = "Hinge";
 	static const char* init_data_type = "LibSVM";
 	static const char* init_opti_method = "SGD";
