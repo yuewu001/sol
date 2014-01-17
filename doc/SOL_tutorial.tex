@@ -151,16 +151,18 @@ Table~\ref{tab:summary-algorithms} gives a summary of the family of implemented 
         \begin{tabular}{l||c|l|l}
             \hline
             Problem Type   &  Methodology & Algorithm & Description \\\hline \hline
-            \multirow{12}{*}{Binary} &\multirow{4}{*}{\footnotesize First-Order}
+            \multirow{14}{*}{Binary} &\multirow{6}{*}{\footnotesize First-Order}
             & SGD & {\footnotesize Stochastic Gradient Descent~\cite{rosenblatt1958perceptron}} \\\cline{3-4}
             & & STG & {\footnotesize Truncated sparse online learning~\cite{langford2009sparse}} \\\cline{3-4}
             & &FOBOS & {\footnotesize Forward backward splitting~\cite{duchi2009efficient}}\\\cline{3-4}
-            & &RDA & {\scriptsize Regularized dual averaging~\cite{xiao2010dual}} \\\cline{2-4}
+            & &RDA & {\scriptsize Regularized dual averaging~\cite{xiao2010dual}} \\\cline{3-4}
+            & &OFSGD & {\scriptsize Online Feature Selection~\cite{wang2013online}} \\\cline{3-4}
+            & &SGD-FS& {\scriptsize SGD with truncation} \\\cline{2-4}
             &\multirow{8}{*}{\footnotesize Second-Order}
             &Ada-FOBOS & {\footnotesize Adaptive FOBOS~\cite{duchi2011adaptive}}\\\cline{3-4}
-            &Classification  & Ada-RDA &Adaptive regularized dual averaging~\cite{duchi2011adaptive}\\\cline{3-4}
+            & & Ada-RDA &Adaptive regularized dual averaging~\cite{duchi2011adaptive}\\\cline{3-4}
             & &AROW & Confidence weighted learning~\cite{crammer2009adaptive}\\\cline{3-4}
-            & &AROW-TG & Confidence weighted truncated gradient\\\cline{3-4}
+            Classification &&AROW-TG & Confidence weighted truncated gradient\\\cline{3-4}
             & &AROW-DA & Confidence weighted dual averaging\\\cline{3-4}
             & &AROW-FS & Confidence weighted feature selection\\\cline{3-4}
             & &SCW & Soft confidence weighted learning~\cite{wang2012exact}\\\cline{3-4}
@@ -427,8 +429,8 @@ Running SOL without any arguments or with '-help/-h' will produce a message whic
     \item \textbf{Algorithms and parameters}
         \begin{lstlisting}
         -opt    arg :   optimization method: 
-                        SGD, STG, RDA, RDA_E, FOBOS Ada-RDA, Ada-FOBOS, 
-                        AROW, AROW-TG, AROW-DA AROW-FS,SCW, SCW-RDA
+                        SGD, STG, RDA, RDA_E, FOBOS Ada-RDA, Ada-FOBOS, AROW, 
+                        AROW-TG, AROW-DA AROW-FS,SCW, SCW-RDA, OFSGD, SGD-FS
         -l1     arg :   L1 regularization parameter
         -norm       :   whether normalize the data, default is false
         -passes arg :   number of passes 
@@ -480,6 +482,16 @@ Running SOL without any arguments or with '-help/-h' will produce a message whic
                 AROW-DA& -r  &parameter of passive-aggressive update trade-off\\
                 \hline
                 AROW-FS & -k & no default\\
+                \hline
+                \multirow{2}{*}{SGD-fS}& -eta & learning rate\\
+                \cline{2-3}
+                & -k& no default\\
+                \hline
+                \multirow{3}{*}{OFSGD}& -eta & learning rate\\
+                \cline{2-3}
+                & -delta & shrinkage parameter\\
+                \cline{2-3}
+                & -k& no default\\
                 \hline
                 \multirow{2}{*}{SCW}& -phi & probability parameter in SCW\\
                 \cline{2-3}
