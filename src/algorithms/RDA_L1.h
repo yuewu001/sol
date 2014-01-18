@@ -32,6 +32,9 @@ namespace SOL {
 			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
 			printf("Learning Rate: %g\n", this->eta0);
 			printf("Power t : 0.5\n");
+			if (this->gamma_rou > 0){
+				printf("gamma rou: %g\n", this->gamma_rou);
+			}
 			printf("lambda	: %g\n\n",this->lambda);
 		}
 

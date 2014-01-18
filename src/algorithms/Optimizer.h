@@ -95,7 +95,7 @@ namespace SOL {
 		}
 
         void SetParameter(float lambda = -1, float eta0 = -1, 
-                float power_t = -1, size_t t0 = 0);
+                float power_t = -1, int t0 = -1);
 		//try and get the best parameter
 		virtual void BestParameter(); 
 
@@ -355,7 +355,7 @@ namespace SOL {
 
 		template <typename FeatType, typename LabelType>
 		void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0, 
-			float power_t,  size_t t0 ){
+			float power_t,  int t0 ){
 				this->lambda  = lambda >= 0 ? lambda : this->lambda;
 				this->eta0 = eta0 > 0 ? eta0 : this->eta0;
 				this->power_t = power_t >= 0 ? power_t : this->power_t;

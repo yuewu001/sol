@@ -60,6 +60,7 @@ namespace SOL {
 
 	//lambda for ofs
 	static const float init_ofs_delta = 0.01f;
+	static const float init_ofs_eta = 0.2f;
 
 	static const char* init_loss_type = "Hinge";
 	static const char* init_data_type = "LibSVM";

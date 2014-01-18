@@ -47,18 +47,18 @@ namespace SOL {
 			"optimization method:\nSGD, STG, RDA, RDA_E, FOBOS, Ada-RDA, Ada-FOBOS, AROW, AROW-TG, AROW-DA, AROW-FS,SCW, SCW-RDA","-opt", &this->str_opt);
 		this->add_option(init_is_learn_best_param,0,0,"learn best parameter", 
 			"-lbp", &this->is_learn_best_param);
-		this->add_option(init_eta,0,1,"learning rate", "-eta",&this->eta); 
-		this->add_option(init_power_t,0,1,"power t of decaying learning rate","-power_t",&this->power_t); 
-		this->add_option(init_initial_t,0,1,"initial iteration number","-t0",&this->initial_t);
-		this->add_option(init_lambda,0,1,"l1 regularization","-l1", &this->lambda);
-		this->add_option(1,0,1,"number of passes","-passes", &this->passNum);
-		this->add_option(init_k,0,1,
-			"number of k in truncated gradient descent or feature selection","-k", &this->K);
-		this->add_option(init_gammarou,0,1,"gamma times rou in enhanced RDA (RDA_E)", "-grou",&this->gamma_rou); 
-		this->add_option(init_delta,0,1,"delta in Adaptive algorithms(Ada-)","-delta", &this->delta);
-		this->add_option(init_r,0,1,"r in Confidence weighted algorithms","-r",&this->r);
-		this->add_option(init_phi,0,1,"phi in SCW","-phi",&this->phi); 
 		this->add_option(init_normalize,0,0,"whether normalize the data","-norm",&this->is_normalize);
+		this->add_option(-1,0,1,"learning rate", "-eta",&this->eta); 
+		this->add_option(-1,0,1,"power t of decaying learning rate","-power_t",&this->power_t); 
+		this->add_option(-1,0,1,"initial iteration number","-t0",&this->initial_t);
+		this->add_option(-1,0,1,"l1 regularization","-l1", &this->lambda);
+		this->add_option(1,0,1,"number of passes","-passes", &this->passNum);
+		this->add_option(-1,0,1,
+			"number of k in truncated gradient descent or feature selection","-k", &this->K);
+		this->add_option(-1,0,1,"gamma times rou in enhanced RDA (RDA_E)", "-grou",&this->gamma_rou); 
+		this->add_option(-1,0,1,"delta in Adaptive algorithms(Ada-)","-delta", &this->delta);
+		this->add_option(-1,0,1,"r in Confidence weighted algorithms","-r",&this->r);
+		this->add_option(-1,0,1,"phi in SCW","-phi",&this->phi); 
 		this->add_option("",false,1,"output readable model","-or",&this->out_readable_model);
 	}
 

@@ -159,7 +159,7 @@ namespace SOL {
 	//set parameters for specific optimizers
 	template <typename FeatType, typename LabelType>
 	void Ada_RDA<FeatType, LabelType>::SetParameterEx(float delta) {
-		this->delta = delta >= 0 ? delta : this->delta;
+		this->delta = delta > 0 ? delta : this->delta;
 	}
 
 	//Change the dimension of weights

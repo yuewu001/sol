@@ -35,6 +35,13 @@ namespace SOL {
 
 	public:
 		void SetParameterEx(int K = -1);
+		/**
+		* PrintOptInfo print the info of optimization algorithm
+		*/
+		virtual void PrintOptInfo() const {
+			Optimizer<FeatType,LabelType>::PrintOptInfo();
+			printf("k	: %d\n\n",this->K);
+		}
 	protected:
 		//this is the core of different updating algorithms
 		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);

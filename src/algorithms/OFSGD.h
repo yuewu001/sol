@@ -68,6 +68,7 @@ namespace SOL {
 		this->id_str = "OFSGD";
 		this->K = 0;
 		this->delta = init_ofs_delta;
+		this->eta0 = init_ofs_eta;
 
 		this->index_vec.resize(this->weightDim);
 		this->index_vec.zeros();
@@ -117,16 +118,18 @@ namespace SOL {
 				for (IndexType i = 0; i < this->weightDim; i++)
 					this->weightVec[i] *= coeff;
 			}
-			//truncate
-			//sort
-			for (size_t i = 0; i < this->weightDim; i++){
-				this->abs_weightVec[i] = fabsf(this->weightVec[this->index_vec[i]]);
-			}
-			this->Sort(this->abs_weightVec.begin,1,
-				this->weightDim - 1,this->index_vec.begin); 
-			//truncate
-			for (IndexType i = this->K + 1; i < this->weightDim; i++){
-				this->weightVec[this->index_vec[i]] = 0;
+			if (this->K > 0){
+				//truncate
+				//sort
+				for (size_t i = 0; i < this->weightDim; i++){
+					this->abs_weightVec[i] = fabsf(this->weightVec[this->index_vec[i]]);
+				}
+				this->Sort(this->abs_weightVec.begin,1,
+					this->weightDim - 1,this->index_vec.begin); 
+				//truncate
+				for (IndexType i = this->K + 1; i < this->weightDim; i++){
+					this->weightVec[this->index_vec[i]] = 0;
+				}
 			}
 			return y;
 	}
@@ -135,11 +138,6 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	void OFSGD<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
-		if (this->K < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
-			exit(0);
-		}
 		this->w_norm = 0;
 		this->norm_coeff = 1.f / sqrtf(this->delta);
 
@@ -155,13 +153,7 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	void OFSGD<FeatType, LabelType>::SetParameterEx(int k, float Delta) {
-		if (k < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
-			exit(0);
-		}
-		else
-			this->K = k;
+		this->K = k > 0 ? k : this->K;
 		this->delta = Delta > 0 ? Delta : this->delta;
 	}
 

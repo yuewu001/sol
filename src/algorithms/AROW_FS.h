@@ -45,7 +45,7 @@ namespace SOL {
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
 			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("k:\t%g\n", this->K);
+			printf("k:\t%d\n", this->K);
 			printf("r:\t%g\n\n", this->r);
 		}
 	protected:

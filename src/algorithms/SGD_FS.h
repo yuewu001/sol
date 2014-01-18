@@ -35,10 +35,7 @@ namespace SOL {
 		* PrintOptInfo print the info of optimization algorithm
 		*/
 		virtual void PrintOptInfo() const {
-			printf("--------------------------------------------------\n");
-			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("eta:\t%.2f\n", this->eta0);
-			printf("Power t : %g\n",this->power_t);
+			Optimizer<FeatType,LabelType>::PrintOptInfo();
 			printf("K:\t%d\n\n", this->K);
 		}
 	protected:
@@ -96,17 +93,18 @@ namespace SOL {
 			}
 			//update bias 
 			this->weightVec[0] -= this->eta * gt_i;
-
-			//truncate
-			//sort
-			for (size_t i = 0; i < this->weightDim; i++){
-				this->abs_weightVec[index_i] = fabsf(this->weightVec[this->index_vec[index_i]]);
-			}
-			this->Sort(this->abs_weightVec.begin,1,
-				this->weightDim - 1,this->index_vec.begin); 
-			//truncate
-			for (IndexType i = this->K + 1; i < this->weightDim; i++){
-				this->weightVec[this->index_vec[i]] = 0;
+			if (this->K > 0){
+				//truncate
+				//sort
+				for (size_t i = 0; i < this->weightDim; i++){
+					this->abs_weightVec[index_i] = fabsf(this->weightVec[this->index_vec[index_i]]);
+				}
+				this->Sort(this->abs_weightVec.begin,1,
+					this->weightDim - 1,this->index_vec.begin); 
+				//truncate
+				for (IndexType i = this->K + 1; i < this->weightDim; i++){
+					this->weightVec[this->index_vec[i]] = 0;
+				}
 			}
 			return y;
 	}
@@ -115,11 +113,6 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	void SGD_FS<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
-		if (this->K < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
-			exit(0);
-		}
 		if (this->power_t == 0.5)
 			this->pEta_time = pEta_sqrt;
 		else if(this->power_t == 0)
@@ -128,7 +121,6 @@ namespace SOL {
 			this->pEta_time = pEta_linear;
 		else
 			this->pEta_time = pEta_general;
-
 	}
 
 	//called when a train ends
@@ -139,13 +131,7 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	void SGD_FS<FeatType, LabelType>::SetParameterEx(int k) {
-		if (k < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
-			exit(0);
-		}
-		else
-			this->K = k;
+		this->K = k > 0 ? k : this->K;
 	}
 
 	//Change the dimension of weights
