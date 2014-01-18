@@ -135,65 +135,69 @@ def get_model_param(ds, opt):
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
-            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':64}}
+            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
+            'AROW-DA':{'-r':0.03125}, 'RDA':{'-eta':64}}
     MNIST = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'SSAROW':{'-r':0.25}, 'ASAROW':{'-r':0.25},
-            'CW-RDA':{'-r':4}, 'RDA':{'-eta':8}}
+            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
+            'AROW-DA':{'-r':4}, 'RDA':{'-eta':8}}
     rcv1 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.125},
-            'SSAROW':{'-r':2}, 'ASAROW':{'-r':2},
-            'CW-RDA':{'-r':2}, 'RDA':{'-eta':128}}
+            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
+            'AROW-DA':{'-r':2}, 'RDA':{'-eta':128}}
     url = {'SGD':{'-eta':256},'STG':{'-eta':256},'FOBOS':{'-eta':256},
             'Ada-FOBOS':{'-eta':4, '-delta':0.0625},
             'Ada-RDA':{'-eta':4, '-delta':0.0625},
-            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
-            'CW-RDA':{'-r':0.03125}, 'RDA':{'-eta':512}}
+            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
+            'AROW-DA':{'-r':0.03125}, 'RDA':{'-eta':512}}
     aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':1, '-delta':0.25},
             'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-            'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
-            'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':64}}
+            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
+            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':64}}
     pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
             'Ada-RDA':{'-eta':0.5, '-delta':0.125},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':2}, 'RDA':{'-eta':32}}
+            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
+            'AROW-DA':{'-r':2}, 'RDA':{'-eta':32}}
     physic = {'SGD':{'-eta':32},'STG':{'-eta':32},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
             'Ada-RDA':{'-eta':2, '-delta':1},
-            'SSAROW':{'-r':0.5}, 'ASAROW':{'-r':0.5},
-            'CW-RDA':{'-r':0.5}, 'RDA':{'-eta':256}}
+            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
+            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256}}
     realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
             'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
             'Ada-RDA':{'-eta':512, '-delta':0.0625},
-            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
-            'CW-RDA':{'-r':4}, 'RDA':{'-eta':256}}
+            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
+            'AROW-DA':{'-r':4}, 'RDA':{'-eta':256}}
     webspam_trigram = {'SGD':{'-eta':64},'STG':{'-eta':64},
             'FOBOS':{'-eta':64},
             'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
             'Ada-RDA':{'-eta':8, '-delta':0.03125},
-            'SSAROW':{'-r':0.03125}, 'ASAROW':{'-r':0.03125},
-            'CW-RDA':{'-r':0.03125},'RDA':{'-eta':512}}
+            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
+            'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
     synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
             'Ada-FOBOS':{'-eta':0.5, '-delta':16},
             'Ada-RDA':{'-eta':4, '-delta':32},
-            'SSAROW':{'-r':4}, 'ASAROW':{'-r':4},
-            'CW-RDA':{'-r':32.0},'RDA':{'-eta':16.0}}
+            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
+            'AROW-DA':{'-r':32.0},'RDA':{'-eta':16.0}}
+    synthetic2 = {'SGD':{'-eta':0.5},'STG':{'-eta':0.5}, 'FOBOS':{'-eta':0.5},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
+            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
+            'AROW-DA':{'-r':2.0},'RDA':{'-eta':16.0}}
     a9a = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
             'Ada-FOBOS':{'-eta':1, '-delta':0.125},
             'Ada-RDA':{'-eta':1, '-delta':0.25},
-            'SSAROW':{'-r':1}, 'ASAROW':{'-r':1},
-            'CW-RDA':{'-r':8.0},'RDA':{'-eta':16.0}}
+            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
+            'AROW-DA':{'-r':8.0},'RDA':{'-eta':16.0}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
             'pcmac':pcmac,'real-sim':realsim,
-            'synthetic':synthetic, 'a9a':a9a}
-
+	    'synthetic':synthetic, 'a9a':a9a, 'synthetic2':synthetic2} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():

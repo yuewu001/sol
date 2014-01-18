@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: DataPoint.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 20:13:31
+> Created Time: 2013/8/18 Sunday 20:13:31
 > Functions: Data Point Definition
 ************************************************************************/
 

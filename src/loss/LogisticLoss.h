@@ -1,7 +1,7 @@
 /*************************************************************************
 	> File Name: LogisticLoss.h
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-	> Created Time: 2013/8/18 星期日 17:11:42
+	> Created Time: 2013/8/18 Sunday 17:11:42
 	> Functions: Logistic loss for binary classification
  ************************************************************************/
 

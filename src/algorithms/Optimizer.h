@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: Optimizer.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 16:04:18
+> Created Time: 2013/8/18 Sunday 16:04:18
 > Functions: Base class for different algorithms to do online learning
 ************************************************************************/
 
@@ -385,7 +385,7 @@ namespace SOL {
 				return;
 			}
 			outfile<<"y = b + w x\n";
-			for (int i = 0; i < this->weightDim; i++){
+			for (IndexType i = 0; i < this->weightDim; i++){
 				outfile<<this->weightVec[i]<<"\n";
 			}
 			outfile.close();

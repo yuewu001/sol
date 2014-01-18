@@ -1,7 +1,7 @@
 /*************************************************************************
 	> File Name: SquareLoss.h
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-	> Created Time: 2013/8/18 星期日 17:19:33
+	> Created Time: 2013/8/18 Sunday 17:19:33
 	> Functions: Square Loss
  ************************************************************************/
 

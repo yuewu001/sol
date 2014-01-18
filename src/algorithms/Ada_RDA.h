@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: Ada_RDA.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 17:25:54
+> Created Time: 2013/8/18 Sunday 17:25:54
 > Functions: Adaptive RDA
 > Reference:
 Duchi J, Hazan E, Singer Y. Adaptive subgradient methods for 

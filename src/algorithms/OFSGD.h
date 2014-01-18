@@ -34,7 +34,7 @@ namespace SOL {
 		virtual ~OFSGD();
 
 	public:
-		void SetParameterEx(int k);
+		void SetParameterEx(int k, float delta);
 		/**
 		* PrintOptInfo print the info of optimization algorithm
 		*/
@@ -57,7 +57,8 @@ namespace SOL {
 		virtual void UpdateWeightSize(IndexType newDim);
 
 	protected:
-		void QuickSort(float *a, int low, int high, IndexType *m_index);
+		void QuickSort(float *a, IndexType low, IndexType high, IndexType *m_index);
+		void Sort(float *a, IndexType low, IndexType high, IndexType *m_index);
 	};
 
 	template <typename FeatType, typename LabelType>
@@ -121,10 +122,10 @@ namespace SOL {
 			for (size_t i = 0; i < this->weightDim; i++){
 				this->abs_weightVec[i] = fabsf(this->weightVec[this->index_vec[i]]);
 			}
-			this->QuickSort(this->abs_weightVec.begin,1,
+			this->Sort(this->abs_weightVec.begin,1,
 				this->weightDim - 1,this->index_vec.begin); 
 			//truncate
-			for (int i = this->K + 1; i < this->weightDim; i++){
+			for (IndexType i = this->K + 1; i < this->weightDim; i++){
 				this->weightVec[this->index_vec[i]] = 0;
 			}
 			return y;
@@ -153,7 +154,7 @@ namespace SOL {
 	}
 
 	template <typename FeatType, typename LabelType>
-	void OFSGD<FeatType, LabelType>::SetParameterEx(int k) {
+	void OFSGD<FeatType, LabelType>::SetParameterEx(int k, float Delta) {
 		if (k < 1){
 			cerr<<"Please specify a valid number of weights to keep!\n";
 			cerr<<"current number: "<<this->K<<endl;
@@ -161,6 +162,7 @@ namespace SOL {
 		}
 		else
 			this->K = k;
+		this->delta = Delta > 0 ? Delta : this->delta;
 	}
 
 	//Change the dimension of weights
@@ -182,11 +184,54 @@ namespace SOL {
 	}
 
 	template <typename FeatType, typename LabelType>
-	void OFSGD<FeatType, LabelType>::QuickSort(float *a, int low, int high, IndexType *m_index) {// from great to small
-		int i = low;
-		int j = high;
+	void OFSGD<FeatType, LabelType>::Sort(float *a, IndexType low, IndexType high, IndexType *m_index) {// from great to small
+		//move all zeros to the end
+		IndexType i = low;
+		IndexType j = high;
 		float temp = a[low]; 
-		int temp_ind = m_index[low];
+		IndexType temp_ind = m_index[low];
+
+		//move all zeros to the end
+		while(i < j){
+			while(i < j && a[i] != 0) i++;
+			while(i < j && a[j] == 0) j--;
+			if (i < j){ //swap a[i], a[j]
+				temp = a[i]; temp_ind = m_index[i];
+				a[i] = a[j]; m_index[i] = m_index[j];
+				a[j] = temp; m_index[j] = temp_ind;
+			}
+		}
+		if (j > this->K){
+			this->QuickSort(a,low,j,m_index);
+		}
+	}
+
+	template <typename FeatType, typename LabelType>
+	void OFSGD<FeatType, LabelType>::QuickSort(float *a, IndexType low, IndexType high, IndexType *m_index) {// from great to small
+		//one pass maopao
+		float temp ;
+		IndexType temp_ind; 
+		IndexType i = low;
+		IndexType j = high;
+		//one pass maopao
+		bool is_sorted = true;
+		for (i = low; i < high; i++){
+			if (a[i] < a[i+1]){ //swap
+				temp = a[i];
+				temp_ind = m_index[i];
+				is_sorted = false;
+				break;
+			}
+		}
+		if (is_sorted == true)
+			return;
+
+		a[i] = a[low];
+		m_index[i] = m_index[low];
+		a[low] = temp;
+		m_index[low] = temp_ind;
+
+		i = low;
 
 		while (i < j) {
 			while ((i < j) && (temp >= a[j]))
@@ -210,10 +255,12 @@ namespace SOL {
 		a[i] = temp;
 		m_index[i] = temp_ind;
 
-		if (low < i) 
+		if (i > this->K && low < i) {
 			QuickSort(a, low, i-1, m_index);  
-		if (i < high) 
+		}
+		else if (i < this->K && i < high) {
 			QuickSort(a, j+1, high, m_index);  
+		}
 	}
 }
 

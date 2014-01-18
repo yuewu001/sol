@@ -62,18 +62,18 @@ ASAROW_list = [0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2, 0.15,0.10, 0.05, 0.025, 0.01,0.0
 def get_MNIST(opt_name):
     return MNIST_util
 def get_synthetic(opt_name):
-    if opt_name == 'SSAROW':
+    if opt_name == 'AROW-TG':
         return synthetic_SSAROW
     else:
         return synthetic_util
 
 def get_rcv1(opt_name):
-    if opt_name == 'SSAROW':
+    if opt_name == 'AROW-TG':
         return rcv1_SSAROW
     else:
         return rcv1_util
 def get_url(opt_name):
-    if opt_name == 'RDA' or opt_name == 'Ada-RDA' or opt_name == 'CW-RDA':
+    if opt_name == 'RDA' or opt_name == 'Ada-RDA' or opt_name == 'AROW-DA':
         return url_rda
     else:
         return url_util
@@ -81,13 +81,13 @@ def get_url(opt_name):
 def get_news(opt_name):
     return rcv1_util
 def get_webspam_trigram(opt_name):
-    if opt_name == 'RDA' or opt_name == 'Ada-RDA' or opt_name == 'CW-RDA':
+    if opt_name == 'RDA' or opt_name == 'Ada-RDA' or opt_name == 'AROW-DA':
         return webspam_trigram_rda
     else:
         return webspam_trigram_util
 
 def get_lambda_list(dataset, opt_name):
-    if opt_name == 'ASAROW':
+    if opt_name == 'AROW-FS':
         return ASAROW_list
     if opt_name == 'SGD':
         return SGD_list

@@ -1,7 +1,7 @@
 /*************************************************************************
 	> File Name: HingeLoss.h
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-	> Created Time: 2013/8/18 星期日 16:58:22
+	> Created Time: 2013/8/18 Sunday 16:58:22
 	> Functions: Hinge Loss function, for SVM
  ************************************************************************/
 

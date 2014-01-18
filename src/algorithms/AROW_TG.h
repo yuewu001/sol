@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: Diagonal AROW
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 17:25:54
+> Created Time: 2013/8/18 Sunday 17:25:54
 > Functions: Diagonal Adaptive Regularization of Weight Vectors
 > Reference: 
 Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization 

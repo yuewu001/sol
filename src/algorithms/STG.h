@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: STG.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 17:25:54
+> Created Time: 2013/8/18 Sunday 17:25:54
 > Functions: Sparse Online Learning With Truncated Gradient
 > Reference:
 Langford J, Li L, Zhang T. Sparse online learning via truncated 

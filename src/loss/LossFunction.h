@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: LossFunction.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 16:48:55
+> Created Time: 2013/8/18 Sunday 16:48:55
 > Functions: base class for loss function
 ************************************************************************/
 

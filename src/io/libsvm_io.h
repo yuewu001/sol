@@ -1,7 +1,7 @@
 /*************************************************************************
   > File Name: libsvmread.h
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-  > Created Time: 2013/8/18 星期日 20:25:28
+  > Created Time: 2013/8/18 Sunday 20:25:28
   > Functions: libsvm io_hander
  ************************************************************************/
 #ifndef HEADER_LIBSVM_READ

@@ -2,9 +2,10 @@
 """bach cross validation"""
 import os
 
-opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+#opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+opt_list = ['SGD-FS','OFSGD']
 
-ds_list = ['a9a','aut','MNIST','pcmac','physic','news']
+ds_list = ['a9a','aut','MNIST','pcmac','physic','news','rcv1']
 
 fold_num = 5
 
@@ -23,7 +24,7 @@ for dt in ds_list:
 
         if 'AROW' in opt or 'CW-RDA' in opt:
             cmd += ' {0} {1}'.format('-r',r_search)
-        elif 'Ada' in opt:
+        elif 'Ada' in opt or opt == 'OFSGD':
             cmd += ' {0} {1}'.format('-delta',delta_search)
             cmd += ' {0} {1}'.format('-eta',eta_search)
         else:

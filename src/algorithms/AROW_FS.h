@@ -1,7 +1,7 @@
 /*************************************************************************
 > File Name: Sparse Diagonal AROW
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 星期日 17:25:54
+> Created Time: 2013/8/18 Sunday 17:25:54
 > Functions: Diagonal Adaptive Regularization of Weight Vectors
 > Reference: 
 Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization 
@@ -45,7 +45,7 @@ namespace SOL {
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
 			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("lambda:\t%g\n", this->lambda);
+			printf("k:\t%g\n", this->K);
 			printf("r:\t%g\n\n", this->r);
 		}
 	protected:
@@ -64,7 +64,7 @@ namespace SOL {
 	ASAROW<FeatType, LabelType>::ASAROW(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "ASAROW";
+		this->id_str = "AROW for Feature Selection";
 		this->r = init_r;
 		this->K = 0;
 		this->sigma_w.resize(this->weightDim);

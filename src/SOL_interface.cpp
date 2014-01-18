@@ -232,7 +232,7 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 	}
 	else if (str_opt == "OFSGD"){
 		OFSGD<T1, T2> *opti = new OFSGD<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K);
+		opti->SetParameterEx(param.K, param.delta);
 		return opti;
 	}
 	else if (str_opt == "SGD-FS"){
