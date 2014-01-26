@@ -11,18 +11,23 @@
 
 #include "../utils/util.h"
 #include "Optimizer.h"
-#include "../loss/SquaredHingeLoss.h"
-#include <cmath>
-#include <limits>
+#include <math.h>
+
 
 namespace SOL {
 	template <typename FeatType, typename LabelType>
 	class SOSOL: public Optimizer<FeatType, LabelType> {
-        inline char Sign(float x) {
+        inline float Sign(float x) {
             if (x >= 0.f)
-                return 1;
+                return 1.f;
             else
-                return -1;
+                return -1.f;
+        }
+        inline float Abs(float x) {
+            if (x >= 0.f)
+                return x;
+            else
+                return -x;
         }
 	protected:
 		s_array<float> theta;
@@ -86,23 +91,28 @@ namespace SOL {
 	float SOSOL<FeatType,LabelType>::UpdateWeightVec(
 		const DataPoint<FeatType, LabelType> &x) {
 
-		    this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
+		    //this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
+			this->eta = this->eta0;
+
 		    size_t featDim = x.indexes.size();
 		    IndexType index_i = 0;
 
 			//obtain w_t
 			for (size_t i = 0; i < featDim; i++) {
 				index_i = x.indexes[i];
-				A_inv_w[index_i] -= (A_inv_w[index_i] * x.features[i]);
+				A_inv_w[index_i] -= (A_inv_w[index_i] * x.features[i])*(A_inv_w[index_i] * x.features[i]) / (this->r + x.features[i] * A_inv_w[index_i] * x.features[i]);
 				u_t[index_i] = A_inv_w[index_i] * this->theta[index_i];
-				float abs_u_minus_lambda = fabsf(u_t[index_i]) - this->lambda;
+				float abs_u_minus_lambda = Abs(u_t[index_i]) - this->lambda;
 				if (abs_u_minus_lambda < 0)
 					abs_u_minus_lambda = 0;
+				else
+					abs_u_minus_lambda = abs_u_minus_lambda*1.f;
 				this->weightVec[index_i] = Sign(u_t[index_i]) * abs_u_minus_lambda;
 			}
 
 		    //predict
 			float y = this->Predict(x);  // TIM: return is +1 or -1, right?
+
 			//get gradient
 //			float gt_i = this->lossFunc->GetGradient(x.label,y);
 			float ell = this->lossFunc->GetLoss(x.label,y); //TIM: why other algorithms dont calculate loss in weights updating?
@@ -110,7 +120,8 @@ namespace SOL {
 			//update
 			if (ell > 0)
 				for (size_t i = 0; i < featDim; i++) {
-					this->theta[index_i] += this->eta * y * x.features[i];
+					index_i = x.indexes[i];
+					this->theta[index_i] += this->eta * x.label * x.features[i];
 				}
 
 			return y;
