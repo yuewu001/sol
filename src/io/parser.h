@@ -154,10 +154,12 @@ namespace SOL{
 		int num_dec = 0;
 		if (*p == '.') {
 			p++;
-			while (*p >= '0' && *p <= '9') {
+			while (*p >= '0' && *p <= '9' && num_dec != 7) {
 				acc = acc *10 + *p++ - '0' ;
 				num_dec++;
 			}
+			while (*p >= '0' && *p <= '9')
+				p++;
 		}
 
 		int exp_acc = 0;
