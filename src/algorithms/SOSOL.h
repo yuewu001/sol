@@ -78,10 +78,10 @@ namespace SOL {
 
 	template <typename FeatType, typename LabelType>
 	SOSOL<FeatType, LabelType>::~SOSOL() {
-		if (this->lossFunc != NULL){
-			delete this->lossFunc;
-			this->lossFunc = NULL;
-		}
+//		if (this->lossFunc != NULL){
+//			delete this->lossFunc;
+//			this->lossFunc = NULL;
+//		}
 	}
 
 	//this is the core of different updating algorithms
