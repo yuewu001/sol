@@ -85,6 +85,23 @@ SOL features a very simple installation procedure. The project is managed by Cma
 
     3. Open the project, Rebuild the `ALL_BUILD` project and then build the `INSTALL` project
 
+3. For linux users with Eclipse
+
+    1. `cd` to the directory of SOL
+    
+    2.  make a folder for building the project, like  `mkdir build`
+
+    3. `cd` to the folder above and generate the project by
+
+            cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local ..
+
+    4. Install cmakeed plugin into Eclipse.
+    	
+    	     cmakeed: http://cmakeed.sourceforge.net/updates/
+
+    5. Import the existing project from `build` into Eclipse.
+    
+    6. Build the project throught right click on the project, and then select 'Make Targets' -> 'Build'.
 
 Quick Start
 ===========

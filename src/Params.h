@@ -63,7 +63,7 @@ namespace SOL
 		int K; //for STG method
 		float gamma_rou; //for RDA
 		float delta; //for Ada-
-		float r; //for AROW
+		float r; //for AROW, and SOSOL
 		float phi; //for SCW
 
 		int buf_size; //number of chunks in dataset 

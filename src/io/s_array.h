@@ -102,6 +102,12 @@ namespace SOL {
 			void zeros(){
 				memset(this->begin, 0, sizeof(T) * this->size());
 			}
+
+			//TIM: need?
+			void ones(){
+				memset(this->begin, 1.f, sizeof(T) * this->size());
+			}
+
 			//reset all the elements in the array to zero
 			void zeros(T* iter_begin, T* iter_end){
 				memset(iter_begin, 0, sizeof(T) * (iter_end - iter_begin));
