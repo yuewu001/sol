@@ -113,7 +113,7 @@ ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 add_executable(SOL src/Params.cpp src/Params.h 
     src/main.cpp src/SOL_interface.cpp ${SRC_LIST})
 
-add_executable(SyntheticData src/SyntheticData.cpp) 
+#add_executable(SyntheticData src/SyntheticData.cpp) 
     
      
 IF(UNIX)
@@ -142,7 +142,7 @@ ENDIF(UNIX)
 
 IF(DCMTK_WITH_DEBUG_POSTFIX)  
   set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
-  set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
+  #set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
@@ -158,7 +158,7 @@ SET_PROPERTY(TARGET testDll PROPERTY FOLDER "TestCases")
 SET_PROPERTY(TARGET testStatic PROPERTY FOLDER "TestCases")
 SET_PROPERTY(TARGET testMNIST PROPERTY FOLDER "TestCases")
 
-install(TARGETS SOL analysis Converter SOLdll SOLstatic SyntheticData
+install(TARGETS SOL analysis Converter SOLdll SOLstatic
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION bin
     ARCHIVE DESTINATION lib)
