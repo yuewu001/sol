@@ -62,6 +62,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'synthetic2':
         train_file = 'synthetic2/synthetic_train'
         test_file = 'synthetic2/synthetic_test'
+    elif dataset == 'synthetic3':
+        train_file = 'synthetic3/synthetic_train'
+        test_file = 'synthetic3/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -147,7 +150,7 @@ def get_model_param(ds, opt):
             'AROW-DA':{'-r':8.0},'RDA':{'-eta':16.0},
             'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':8}}
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':0.0625},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
             'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
             'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
             'AROW-DA':{'-r':0.25}, 'RDA':{'-eta':64}, 'SGD-FS':{'-eta':64}}
@@ -196,13 +199,18 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':32, '-delta':32},
             'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
             'AROW-DA':{'-r':2.0},'RDA':{'-eta':128},
-            'OFSGD':{'-eta':0.0625,'-delta':0.03125},'SGD-FS':{'-eta':64}}
-    synthetic2 = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':2},
-            'Ada-RDA':{'-eta':0.25, '-delta':0.125},
-            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
-            'AROW-DA':{'-r':8.0},'RDA':{'-eta':4},
-            'OFSGD':{'-eta':0.0625,'-delta':0.03125},'SGD-FS':{'-eta':64}}
+            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
+    synthetic2 = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':1.0, '-delta':4.0},
+            'Ada-RDA':{'-eta':2.0, '-delta':16.0},
+            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
+            'AROW-DA':{'-r':4.0},'RDA':{'-eta':8},
+            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
+    synthetic3 = {'SGD':{'-eta':4.0},'STG':{'-eta':4.0},'FOBOS':{'-eta':4.0},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':1.0},
+            'Ada-RDA':{'-eta':0.5, '-delta':8.0},
+            'AROW-TG':{'-r':16}, 'AROW-FS':{'-r':16},
+            'AROW-DA':{'-r':32.0},'RDA':{'-eta':8}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
