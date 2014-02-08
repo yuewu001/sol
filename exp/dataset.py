@@ -25,10 +25,7 @@ def analyze(file_name):
         os.system(cmd)
 
 def get_file_name(dataset, task = 'train'):
-    if dataset == 'svmguide3':
-        train_file = 'svmguide3/svmguide3' 
-        test_file = 'svmguide3/svmguide3.t' 
-    elif dataset == 'rcv1':
+    if dataset == 'rcv1':
         train_file = 'rcv1/rcv1.train' 
         test_file = 'rcv1/rcv1.test'
     elif dataset == 'news':
@@ -37,15 +34,6 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'a9a':
         train_file = 'uci/a9a'
         test_file = 'uci/a9a.t'
-    elif dataset == 'a7a':
-        train_file = 'a7a/a7a'
-        test_file = 'a7a/a7a.t'
-    elif dataset == 'a8a':
-        train_file = 'a8a/a8a'
-        test_file = 'a8a/a8a.t'
-    elif dataset == 'real-sim':
-        train_file = 'real-sim/real-sim_train'
-        test_file = 'real-sim/real-sim_test' 
     elif dataset == 'url':
         train_file = 'url_combined/url_train'
         test_file  = 'url_combined/url_test'
@@ -152,36 +140,34 @@ def get_cmd_data(dataset):
 
 #parameters for each dataset, obtained by cross-validation in general
 def get_model_param(ds, opt):
-    a9a = {'SGD':{'-eta':1},'STG':{'-eta':1},'FOBOS':{'-eta':1},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
-            'Ada-RDA':{'-eta':0.25, '-delta':0.125},
-            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
-            'AROW-DA':{'-r':64.0},'RDA':{'-eta':1.0},
-            'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':1}}
+    a9a = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
+            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
+            'Ada-RDA':{'-eta':1, '-delta':0.25},
+            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
+            'AROW-DA':{'-r':8.0},'RDA':{'-eta':16.0},
+            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':8}}
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'AROW-TG':{'-r':0.125}, 'AROW-FS':{'-r':0.125},
-            'AROW-DA':{'-r':0.125}, 'RDA':{'-eta':512},
-            'SGD-FS':{'-eta':64}}
-    MNIST = {'SGD':{'-eta':0.25},'STG':{'-eta':0.25},'FOBOS':{'-eta':0.25},
-            'Ada-FOBOS':{'-eta':0.0625, '-delta':0.25},
-            'Ada-RDA':{'-eta':0.03125, '-delta':0.125},
-            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
-            'AROW-DA':{'-r':512}, 'RDA':{'-eta':0.125},
-            'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':0.25}}
+            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
+            'AROW-DA':{'-r':0.25}, 'RDA':{'-eta':64}, 'SGD-FS':{'-eta':64}}
+    MNIST = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':0.0625},
+            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
+            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
+            'AROW-DA':{'-r':4}, 'RDA':{'-eta':8},
+            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
     rcv1 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.125},
             'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
             'AROW-DA':{'-r':2}, 'RDA':{'-eta':128},
             'SGD-FS':{'-eta':32}}
-    url = {'SGD':{'-eta':4},'STG':{'-eta':4},'FOBOS':{'-eta':4},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
-            'Ada-RDA':{'-eta':0.25, '-delta':0.0625},
-            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':1}, 'RDA':{'-eta':16},
-            'SGD-FS':{'-eta':4}}
+    url = {'SGD':{'-eta':256},'STG':{'-eta':256},'FOBOS':{'-eta':256},
+            'Ada-FOBOS':{'-eta':4, '-delta':0.0625},
+            'Ada-RDA':{'-eta':4, '-delta':0.0625},
+            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
+            'AROW-DA':{'-r':0.25}, 'RDA':{'-eta':256}, 'SGD-FS':{'-eta':256}}
     aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':1, '-delta':0.25},
             'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
@@ -198,41 +184,29 @@ def get_model_param(ds, opt):
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
             'Ada-RDA':{'-eta':2.0, '-delta':1.0},
             'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256},
-            'SGD-FS':{'-eta':32}}
-    realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
-            'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
-            'Ada-RDA':{'-eta':512, '-delta':0.0625},
-            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
-            'AROW-DA':{'-r':4}, 'RDA':{'-eta':256}}
+            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256},'SGD-FS':{'-eta':32}}
     webspam_trigram = {'SGD':{'-eta':64},'STG':{'-eta':64},
             'FOBOS':{'-eta':64},
             'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
             'Ada-RDA':{'-eta':8, '-delta':0.03125},
             'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
             'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
-    synthetic = {'SGD':{'-eta':0.5},'STG':{'-eta':0.5},'FOBOS':{'-eta':0.5},
-            'Ada-FOBOS':{'-eta':0.03125, '-delta':0.03125},
-            'Ada-RDA':{'-eta':4, '-delta':32},
-            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':32.0},'RDA':{'-eta':16.0}}
-    synthetic2 = {'SGD':{'-eta':16},'STG':{'-eta':16}, 'FOBOS':{'-eta':16},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
-            'Ada-RDA':{'-eta':1, '-delta':8},
+    synthetic = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
+            'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
+            'Ada-RDA':{'-eta':32, '-delta':32},
             'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':4.0},'RDA':{'-eta':64.0},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':16}}
-    a7a = {'SGD-FS':{'-eta':0.5},'AROW-FS':{'-r':16},
-            'OFSGD':{'-eta':0.03125,'-delta':0.000625}}
-    a8a = {'SGD-FS':{'-eta':1},'AROW-FS':{'-r':16},
-            'OFSGD':{'-eta':0.03125,'-delta':0.000625}}
-    svmguide3 = {'SGD-FS':{'-eta':1},'AROW-FS':{'-r':0.5},
-            'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
+            'AROW-DA':{'-r':2.0},'RDA':{'-eta':128},
+            'OFSGD':{'-eta':0.0625,'-delta':0.03125},'SGD-FS':{'-eta':64}}
+    synthetic2 = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':2},
+            'Ada-RDA':{'-eta':0.25, '-delta':0.125},
+            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
+            'AROW-DA':{'-r':8.0},'RDA':{'-eta':4},
+            'OFSGD':{'-eta':0.0625,'-delta':0.03125},'SGD-FS':{'-eta':64}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
-            'pcmac':pcmac,'real-sim':realsim,
-            'synthetic':synthetic, 'a9a':a9a, 'a7a':a7a, 'a8a':a8a,'synthetic2':synthetic2} 
+            'pcmac':pcmac,'synthetic':synthetic,'a9a':a9a,'synthetic2':synthetic2} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():

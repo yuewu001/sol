@@ -4,18 +4,24 @@ import os
 import dataset
 import exe_path
 
-opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA']
-opt_list = ['SGD','AROW-TG','Ada-FOBOS']
+opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA','OFSGD']
+#opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA']
+#opt_list = ['SGD','AROW-TG', 'AROW-DA', 'RDA']
+opt_list = ['SGD','Ada-FOBOS','AROW-TG']
+#opt_list = ['SGD','AROW-TG']
+#opt_list = ['RDA','AROW-DA','Ada-RDA']
+#opt_list = ['OFSGD']
 
-ds_list = ['pcmac','a9a','MNIST','aut','news','physic','rcv1','url']
-ds_list = ['synthetic']
-
-fold_num = 2
+ds_list = ['pcmac','a9a','MNIST','aut']#,]#,'rcv1','url']
+ds_list = ['synthetic2']
+fold_num =2
 
 const_eta_search = '0.03125:2.0:32'
-eta_search = '0.5:2:512'
+eta_search = '0.25:2.0:256'
 delta_search = '0.03125:2.0:32'
-r_search = '0.5:2:512'
+#delta_search = '0.03125:2.0:32'
+r_search = '0.25:2.0:256'
+#r_search = delta_search 
 delta_ofs_search = '0.0003125:2:0.32'
 
 for dt in ds_list:
@@ -26,7 +32,7 @@ for dt in ds_list:
         print 'Cross validation on %s' %dt + ' with %s' %opt
         print '----------------------------------------------'
 
-        cmd = exe_path.CV_script + ' {0} {1} {2} '.format(dt,opt,fold_num)
+        cmd = exe_path.cv_script + ' {0} {1} {2} '.format(dt,opt,fold_num)
 
         if 'AROW' in opt: 
             cmd += ' {0} {1}'.format('-r',r_search)

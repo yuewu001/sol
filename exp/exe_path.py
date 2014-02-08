@@ -11,11 +11,11 @@ if platform.system() == "Windows":
     liblinar_train_exe_name = r'..\extern\liblinear\train.exe'
     liblinar_test_exe_name = r'..\extern\liblinear\train.exe'
     analysis_exe_name = r'..\install\bin\analysis.exe'
-    CV_script = r'CV.py'
+    cv_script = r'CV.py'
 else:
     SOL_exe_name = '../install/bin/SOL'
     vw_exe_name = 'vw'
     liblinar_train_exe_name = '../extern/liblinear/train'
     liblinar_test_exe_name = '../extern/liblinear/test'
     analysis_exe_name = '../install/bin/analysis'
-    CV_script = r'./CV.py'
+    cv_script = r'./CV.py'

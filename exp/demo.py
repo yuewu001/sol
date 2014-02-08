@@ -10,22 +10,24 @@ import run_liblinear
 
 
 #algorithm list
-#opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA', 'AROW-FS','SGD-FS','OFSGD']
-#opt_list = ['SGD-FS','OFSGD','AROW-FS','STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+opt_list = ['SGD-FS','OFSGD','AROW-FS','STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
 opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA','AROW-FS']
-opt_list = ['AROW-FS','SGD-FS','OFSGD']
-opt_list = ['STG','FOBOS','AROW-TG','Ada-FOBOS']
-opt_list = ['AROW-TG']
+#opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG']
+opt_list = ['FOBOS','Ada-FOBOS','AROW-TG']
+#opt_list = ['AROW-FS','SGD-FS','OFSGD']
+#opt_list = ['RDA','Ada-RDA','AROW-DA']
+#opt_list = ['AROW-TG']
+#opt_list = ['AROW-TG']
 
 #dataset list
 ds_list = ['MNIST','a9a','pcmac','aut']
 #ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['synthetic']
+ds_list = ['synthetic2']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
 #extra command sent to SOL
-extra_cmd = ' -loss Hinge '
+extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
 is_cache = True

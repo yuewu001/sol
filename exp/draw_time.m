@@ -1,11 +1,5 @@
-function draw_time(dataset, type)
+function draw_time(dataset, type, xmin, xmax, ymin, ymax)
 close all;
-if (~exist('ymin','var'))
-    ymin = 0;
-end
-if (~exist('ymax','var'))
-    ymax = 0;
-end
 
 color_list = {'r','m','b','black'};
 color_num = size(color_list,2);
@@ -19,14 +13,14 @@ folder_name = strcat(dataset,'/');
 mkdir figs
 opt_list_file = strcat(folder_name,'opt_list.txt');
 if type == 'TG'
-    %opt_list = {'SSAROW.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
-    opt_list = {'AROW-TG.txt';'STG.txt';'Ada-FOBOS.txt'};
+    %opt_list = {'AROW-TG.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
+    opt_list = {'AROW-TG.txt';'Ada-FOBOS.txt';'STG.txt';'FOBOS.txt'};
 elseif type =='DA'
-    opt_list = {'AROW-DA.txt';'RDA.txt';'Ada-RDA.txt'};
+    opt_list = {'AROW-DA.txt';'Ada-RDA.txt';'RDA.txt'};    
 elseif type == 'FS'
-    opt_list = {'AROW-FS.txt';'SGD-FS.txt';'OFSGD.txt'};
-elseif type == 'CMP'
-    opt_list = {'AROW-FS.txt';'AROW-TG.txt';'AROW-DA.txt'};
+    opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
+elseif type == 'CP'
+    opt_list = {'AROW-TG.txt';'AROW-DA.txt'};
 end
 %opt_list = textread(opt_list_file,'%s');
 
@@ -80,8 +74,14 @@ folder_name = strcat(folder_name,'-');
 figure(1) %learning error rate
 %title('training time vs sparsity', 'fontsize',14)
 
-ylabel('training time (s)', 'fontsize',14)
-xlabel('sparsity (%)', 'fontsize',14)
-legend(legend_content,'location','northwest')
+ylabel('training time (s)', 'fontsize',28)
+xlabel('sparsity (%)', 'fontsize',28)
+
+if (exist('xmin','var'))
+    axis([xmin xmax ymin ymax])
+end
+legend(legend_content,'location','northwest', 'fontsize',22)
+set(gca,'Fontsize',24);
+
 print(strcat(folder_name,strcat(type,'-time-sparse')),'-dpdf')
 %close all
