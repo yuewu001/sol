@@ -27,10 +27,13 @@ mkdir figs
 
 opt_list_file = strcat(folder_name,'opt_list.txt');
 if type == 'TG'
-    opt_list = {'AROW-TG.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
+    %opt_list = {'AROW-TG.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
+    opt_list = {'AROW-TG.txt';'STG.txt';'FOBOS.txt';'Ada-FOBOS.txt'};
 elseif type =='DA'
     opt_list = {'AROW-DA.txt';'RDA.txt';'Ada-RDA.txt'};
 elseif type == 'FS'
+    opt_list = {'AROW-FS.txt';'SGD-FS.txt';'OFSGD.txt'};
+elseif type == 'CMP'
     opt_list = {'AROW-FS.txt';'AROW-TG.txt';'AROW-DA.txt'};
 end
 
@@ -65,7 +68,7 @@ for k = 1:1:opt_num
     grid on
     box on
     hold on
-    plot(sparse_vec, t_err_vec, color_shape,'LineWidth',2,'markersize',5);
+    plot(sparse_vec, t_err_vec, color_shape,'LineWidth',2,'markersize',5);    
 	
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num

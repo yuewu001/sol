@@ -61,6 +61,7 @@ namespace SOL {
 		this->u_t.resize(this->weightDim);
 		this->sigma_w.resize(this->weightDim);
 		this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
+		//this->is_normalize = true; //CW_RDA requires normalization
 	}
 
 	template <typename FeatType, typename LabelType>

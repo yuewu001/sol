@@ -19,11 +19,14 @@ folder_name = strcat(dataset,'/');
 mkdir figs
 opt_list_file = strcat(folder_name,'opt_list.txt');
 if type == 'TG'
-    opt_list = {'SSAROW.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
+    %opt_list = {'SSAROW.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
+    opt_list = {'AROW-TG.txt';'STG.txt';'Ada-FOBOS.txt'};
 elseif type =='DA'
-    opt_list = {'CW-RDA.txt';'RDA.txt';'Ada-RDA.txt'};
+    opt_list = {'AROW-DA.txt';'RDA.txt';'Ada-RDA.txt'};
 elseif type == 'FS'
-    opt_list = {'ASAROW.txt';'SSAROW.txt';'CW-RDA.txt'};
+    opt_list = {'AROW-FS.txt';'SGD-FS.txt';'OFSGD.txt'};
+elseif type == 'CMP'
+    opt_list = {'AROW-FS.txt';'AROW-TG.txt';'AROW-DA.txt'};
 end
 %opt_list = textread(opt_list_file,'%s');
 

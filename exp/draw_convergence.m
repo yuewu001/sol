@@ -26,7 +26,9 @@ if type == 'TG'
 elseif type =='DA'
     opt_list = {'CW-RDA.txt';'RDA.txt';'Ada-RDA.txt'};
 elseif type == 'FS'
-    opt_list = {'ASAROW.txt';'SSAROW.txt';'CW-RDA.txt'};
+    opt_list = {'AROW-FS.txt';'SGD-FS.txt';'OFSGD.txt'};
+elseif type == 'CMP'
+    opt_list = {'AROW-FS.txt';'AROW-TG.txt';'AROW-DA.txt'};
 end
 %opt_list = textread(opt_list_file,'%s');
 

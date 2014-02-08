@@ -16,7 +16,7 @@ def run_experiment(opt_name,result_file, dataset, extra_cmd):
     
     lambda_list = l1_def.get_lambda_list(dataset, opt_name)
 
-    if opt_name == 'ASAROW':
+    if opt_name == 'AROW-FS' or opt_name == 'SGD-FS' or opt_name == 'OFSGD':
         temp_list = extra_cmd.split()
         train_file = ''
         for k in range(0,len(temp_list)):
@@ -29,7 +29,7 @@ def run_experiment(opt_name,result_file, dataset, extra_cmd):
         data_valid_dim = run_util.get_valid_dim(train_file)
 
     for l1 in lambda_list:
-        if opt_name == 'ASAROW':
+        if opt_name == 'AROW-FS' or opt_name == 'SGD-FS' or opt_name == 'OFSGD':
             l1 = (int)(l1 * data_valid_dim)
             if l1 < 1:
 		        continue

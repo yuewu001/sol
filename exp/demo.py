@@ -10,17 +10,22 @@ import run_liblinear
 
 
 #algorithm list
-opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA', 'AROW-FS']
-#opt_list = ['SGD']
+#opt_list = ['STG','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA', 'AROW-FS','SGD-FS','OFSGD']
+#opt_list = ['SGD-FS','OFSGD','AROW-FS','STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA','AROW-FS']
+opt_list = ['AROW-FS','SGD-FS','OFSGD']
+opt_list = ['STG','FOBOS','AROW-TG','Ada-FOBOS']
+opt_list = ['AROW-TG']
 
 #dataset list
-#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1']
-ds_list = ['synthetic2']
+ds_list = ['MNIST','a9a','pcmac','aut']
+#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
+ds_list = ['synthetic']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
-extra_cmd = ' -loss Hinge -norm'
+extra_cmd = ' -loss Hinge '
 
 #whether need to cache the dataset for fast processing speed
 is_cache = True
@@ -63,10 +68,6 @@ def train_model(path_list,dst_folder):
 
     for k in range(0,rand_num):
         if rand_num > 1:
-            #remove previous file
-            open(rand_file,'w').close()
-            os.system('rm -f %s' %rand_file_cache)
-
             print 'shuffle datset...'
             sol_shuffle.sol_shuffle(train_file, rand_file)
 
@@ -100,6 +101,12 @@ def train_model(path_list,dst_folder):
 
                 result_once = run_util.parse_result(result_file, parse_file);
             result_all = add_to_dict(opt,result_all, result_once)
+
+        #remove previous file
+        if rand_num > 1:
+            os.system('rm -f %s' %rand_file_cache)
+            os.system('rm -f %s' %rand_file)
+
 
     #average the result
     for opt in opt_list:

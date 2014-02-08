@@ -64,7 +64,7 @@ namespace SOL {
 	SSAROW<FeatType, LabelType>::SSAROW(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc) {
-		this->id_str = "SSAROW";
+		this->id_str = "truncated gradient AROW";
 		this->r = init_r;
 		this->sigma_w.resize(this->weightDim);
 		this->timeStamp.resize(this->weightDim);

@@ -10,7 +10,7 @@ import exe_path
 if platform.system() == 'Windows':
     rootDir = 'D:/Coding/SOL/data/'
 elif platform.system() == 'Linux':
-    rootDir = '/home/matthew/work/Data/'
+    rootDir = '/root/v-yuewu/SOL/data/'
 else:
     print 'system type is not supported:'
     sys.exit()
@@ -25,7 +25,10 @@ def analyze(file_name):
         os.system(cmd)
 
 def get_file_name(dataset, task = 'train'):
-    if dataset == 'rcv1':
+    if dataset == 'svmguide3':
+        train_file = 'svmguide3/svmguide3' 
+        test_file = 'svmguide3/svmguide3.t' 
+    elif dataset == 'rcv1':
         train_file = 'rcv1/rcv1.train' 
         test_file = 'rcv1/rcv1.test'
     elif dataset == 'news':
@@ -34,6 +37,12 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'a9a':
         train_file = 'uci/a9a'
         test_file = 'uci/a9a.t'
+    elif dataset == 'a7a':
+        train_file = 'a7a/a7a'
+        test_file = 'a7a/a7a.t'
+    elif dataset == 'a8a':
+        train_file = 'a8a/a8a'
+        test_file = 'a8a/a8a.t'
     elif dataset == 'real-sim':
         train_file = 'real-sim/real-sim_train'
         test_file = 'real-sim/real-sim_test' 
@@ -81,7 +90,7 @@ def get_file_name(dataset, task = 'train'):
 
     return path_list
 
-def get_cv_data_list(dataset, fold_num):
+def split_dataset(dataset, fold_num):
     path_list = get_file_name(dataset,'cv')
     train_file = path_list[0]
 
@@ -105,6 +114,17 @@ def get_cv_data_list(dataset, fold_num):
             .format(split_line_num,train_file, train_file) 
 
     os.system(split_cmd)
+    return split_list
+
+def get_cv_data_list(dataset, fold_num):
+    path_list = get_file_name(dataset,'cv')
+    train_file = path_list[0]
+
+    #catch all the sub files, note that fold-num must less 26
+    split_list = []
+    for k in range(0,fold_num):
+        file_name = train_file + '_cva' + chr(ord('a') + k)
+        split_list.append(file_name)
 
     return split_list
 
@@ -132,41 +152,54 @@ def get_cmd_data(dataset):
 
 #parameters for each dataset, obtained by cross-validation in general
 def get_model_param(ds, opt):
+    a9a = {'SGD':{'-eta':1},'STG':{'-eta':1},'FOBOS':{'-eta':1},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
+            'Ada-RDA':{'-eta':0.25, '-delta':0.125},
+            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
+            'AROW-DA':{'-r':64.0},'RDA':{'-eta':1.0},
+            'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':1}}
     news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
             'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
-            'AROW-DA':{'-r':0.03125}, 'RDA':{'-eta':64}}
-    MNIST = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
-            'AROW-DA':{'-r':4}, 'RDA':{'-eta':8}}
+            'AROW-TG':{'-r':0.125}, 'AROW-FS':{'-r':0.125},
+            'AROW-DA':{'-r':0.125}, 'RDA':{'-eta':512},
+            'SGD-FS':{'-eta':64}}
+    MNIST = {'SGD':{'-eta':0.25},'STG':{'-eta':0.25},'FOBOS':{'-eta':0.25},
+            'Ada-FOBOS':{'-eta':0.0625, '-delta':0.25},
+            'Ada-RDA':{'-eta':0.03125, '-delta':0.125},
+            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
+            'AROW-DA':{'-r':512}, 'RDA':{'-eta':0.125},
+            'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':0.25}}
     rcv1 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
             'Ada-RDA':{'-eta':0.5, '-delta':0.125},
             'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':2}, 'RDA':{'-eta':128}}
-    url = {'SGD':{'-eta':256},'STG':{'-eta':256},'FOBOS':{'-eta':256},
-            'Ada-FOBOS':{'-eta':4, '-delta':0.0625},
-            'Ada-RDA':{'-eta':4, '-delta':0.0625},
-            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
-            'AROW-DA':{'-r':0.03125}, 'RDA':{'-eta':512}}
+            'AROW-DA':{'-r':2}, 'RDA':{'-eta':128},
+            'SGD-FS':{'-eta':32}}
+    url = {'SGD':{'-eta':4},'STG':{'-eta':4},'FOBOS':{'-eta':4},
+            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
+            'Ada-RDA':{'-eta':0.25, '-delta':0.0625},
+            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
+            'AROW-DA':{'-r':1}, 'RDA':{'-eta':16},
+            'SGD-FS':{'-eta':4}}
     aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':1, '-delta':0.25},
             'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
             'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':64}}
-    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8},
+            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':64},
+            'OFSGD':{'-eta':0.25,'-delta':0.0003125},'SGD-FS':{'-eta':32}}
+    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8}, 'FOBOS':{'-eta':8},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.125},
-            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
-            'AROW-DA':{'-r':2}, 'RDA':{'-eta':32}}
-    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},
+            'Ada-RDA':{'-eta':0.25, '-delta':0.25},
+            'AROW-TG':{'-r':1.0}, 'AROW-FS':{'-r':1.0},
+            'AROW-DA':{'-r':2.0}, 'RDA':{'-eta':32.0},
+            'OFSGD':{'-eta':1,'-delta':0.000625},'SGD-FS':{'-eta':8}}
+    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
             'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
-            'Ada-RDA':{'-eta':2, '-delta':1},
+            'Ada-RDA':{'-eta':2.0, '-delta':1.0},
             'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256}}
+            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256},
+            'SGD-FS':{'-eta':32}}
     realsim = {'SGD':{'-eta':512},'STG':{'-eta':512},
             'Ada-FOBOS':{'-eta':512, '-delta':0.0625},
             'Ada-RDA':{'-eta':512, '-delta':0.0625},
@@ -178,26 +211,28 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':8, '-delta':0.03125},
             'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
             'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
-    synthetic = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':16},
+    synthetic = {'SGD':{'-eta':0.5},'STG':{'-eta':0.5},'FOBOS':{'-eta':0.5},
+            'Ada-FOBOS':{'-eta':0.03125, '-delta':0.03125},
             'Ada-RDA':{'-eta':4, '-delta':32},
-            'AROW-TG':{'-r':4}, 'AROW-FS':{'-r':4},
+            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
             'AROW-DA':{'-r':32.0},'RDA':{'-eta':16.0}}
-    synthetic2 = {'SGD':{'-eta':0.5},'STG':{'-eta':0.5}, 'FOBOS':{'-eta':0.5},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.03125},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
-            'AROW-DA':{'-r':2.0},'RDA':{'-eta':16.0}}
-    a9a = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
-            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
-            'Ada-RDA':{'-eta':1, '-delta':0.25},
-            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
-            'AROW-DA':{'-r':8.0},'RDA':{'-eta':16.0}}
+    synthetic2 = {'SGD':{'-eta':16},'STG':{'-eta':16}, 'FOBOS':{'-eta':16},
+            'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
+            'Ada-RDA':{'-eta':1, '-delta':8},
+            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
+            'AROW-DA':{'-r':4.0},'RDA':{'-eta':64.0},
+            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':16}}
+    a7a = {'SGD-FS':{'-eta':0.5},'AROW-FS':{'-r':16},
+            'OFSGD':{'-eta':0.03125,'-delta':0.000625}}
+    a8a = {'SGD-FS':{'-eta':1},'AROW-FS':{'-r':16},
+            'OFSGD':{'-eta':0.03125,'-delta':0.000625}}
+    svmguide3 = {'SGD-FS':{'-eta':1},'AROW-FS':{'-r':0.5},
+            'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
             'pcmac':pcmac,'real-sim':realsim,
-	    'synthetic':synthetic, 'a9a':a9a, 'synthetic2':synthetic2} 
+            'synthetic':synthetic, 'a9a':a9a, 'a7a':a7a, 'a8a':a8a,'synthetic2':synthetic2} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():
