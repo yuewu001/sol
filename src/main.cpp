@@ -9,6 +9,7 @@
 #include "utils/util.h"
 
 #include "io/DataSet.h"
+#include "io/MPDataSet.h"
 #include "io/sol_io.h"
 #include "loss/sol_loss.h"
 #include "algorithms/sol_algorithms.h"
@@ -50,7 +51,7 @@ int main(int argc, const char** args) {
 	if(lossFunc == NULL)
 		return -1;
 
-	DataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size);
+	MPDataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size, MPBufferType_FALSE);
 	if (dataset.Load(param.fileName, param.cache_fileName) == false){
 		cerr<<"ERROR: Load dataset "<<param.fileName<<" failed!"<<endl;
 		delete lossFunc;

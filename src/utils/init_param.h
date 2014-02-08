@@ -73,6 +73,7 @@ namespace SOL {
 	////////////////////Data Set Reader Parameters///////////////////////////
 	static const size_t init_chunk_size = 256;
 	static const size_t init_buf_size = 2;
+    static const size_t init_mp_buf_size = 1024;
 
 	//////////////////////Zlib Parameters/////////////////////////////
 	static const int zlib_deflate_level = -1; // use default deflate level

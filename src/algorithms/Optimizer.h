@@ -180,7 +180,7 @@ namespace SOL {
 
             printf("Iterate No.\t\tError Rate\t\t\n");
             while(1) {
-                const DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
+                DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
                 //all the data has been processed!
                 if(chunk.dataNum  == 0) {
 					dataSet.FinishRead();
@@ -188,7 +188,7 @@ namespace SOL {
 				}
 
                 for (size_t i = 0; i < chunk.dataNum; i++) {
-                    const DataPoint<FeatType, LabelType> &data = chunk.data[i];
+                    DataPoint<FeatType, LabelType> &data = chunk.data[i];
 
 					IndexType* p_index = data.indexes.begin;
 					float* p_feat = data.features.begin;
@@ -205,8 +205,10 @@ namespace SOL {
 					this->UpdateWeightSize(data.dim());
 					float y = this->UpdateWeightVec(data); 
 					//loss
-					if (this->lossFunc->IsCorrect(data.label,y) == false)
+					if (chunk.is_inherited == false && this->lossFunc->IsCorrect(data.label, y) == false){
 						errorNum++;
+						data.loss = this->lossFunc->GetLoss(data.label, y);
+					}
 
 					if (show_count == this->curIterNum){
 						printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
@@ -259,7 +261,7 @@ namespace SOL {
 			float errorRate(0);
 			//test
 			while(1) {
-				const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk();
+				const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk(true);
 				if(chunk.dataNum  == 0) //"all the data has been processed!"
 					break;
 				for (size_t i = 0; i < chunk.dataNum; i++) {

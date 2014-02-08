@@ -27,6 +27,7 @@ namespace SOL {
 		s_array<FeatType> features;
 		LabelType label;
 		FeatType sum_sq; //sum of square
+		float loss;
 
 		//for copy and release control
 		int *count;
@@ -39,6 +40,7 @@ namespace SOL {
 			this->max_index = 0;
 			this->label = 0;
 			this->sum_sq = 0;
+			this->loss = 0;
 		}
 
 		//copy constructor
@@ -48,7 +50,8 @@ namespace SOL {
 			this->label = point.label;
 			this->count = point.count;
 			this->max_index = point.max_index;
-			this->sum_sq = 0;
+			this->sum_sq = point.sum_sq;
+			this->loss = point.loss;
 			++(*count);
 		}
 
@@ -68,6 +71,7 @@ namespace SOL {
 				this->label = data.label;
 				this->max_index = data.max_index;
 				this->sum_sq = data.sum_sq;
+				this->loss = data.loss;
 				this->count = data.count;
 				++(*count);
 				return *this;
@@ -88,14 +92,25 @@ namespace SOL {
 			this->features.erase();
 			this->max_index = 0;
 			this->sum_sq = 0;
+			this->loss = 0;
 		}
-
+		void clone(DataPoint<FeatType, LabelType> &dstPt) const{
+			dstPt.label = this->label;
+			dstPt.max_index = this->max_index;
+			dstPt.sum_sq = this->sum_sq;
+			dstPt.loss = this->loss;
+			dstPt.indexes.resize(this->indexes.size());
+			memcpy(dstPt.indexes.begin, this->indexes.begin, this->indexes.size() * sizeof(IndexType));
+			dstPt.features.resize(this->features.size());
+			memcpy(dstPt.features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
+		}
 
 		DataPoint<FeatType, LabelType> clone() const{
 			DataPoint<FeatType, LabelType> newPt; 
 			newPt.label = this->label;
 			newPt.max_index = this->max_index;
 			newPt.sum_sq = this->sum_sq;
+			newPt.loss = this->loss;
 			newPt.indexes.resize(this->indexes.size());
 			memcpy(newPt.indexes.begin,this->indexes.begin, this->indexes.size() * sizeof(IndexType) );
 			newPt.features.resize(this->features.size());
@@ -116,16 +131,38 @@ namespace SOL {
 	};
 	template <typename FeatType, typename LabelType> 
 	struct DataChunk{
-		DataPoint<FeatType, LabelType> data[init_chunk_size];
+		DataPoint<FeatType, LabelType> *data;
 		size_t dataNum;
+		size_t chunk_size;
 		DataChunk *next;
 		bool is_inuse;
 		bool is_parsed;
+		bool is_inherited; //judge if the class is inherited from DataChunk
 
-		DataChunk():dataNum(0),next(NULL), is_inuse(false), is_parsed(false){
+		DataChunk(size_t chunkSize = init_chunk_size) :dataNum(0), chunk_size(chunkSize),
+			next(NULL), is_inuse(false), is_parsed(false), is_inherited(false){
+			if (this->chunk_size == 0){
+				std::cerr << "error occured at file: " << __FILE__ << ": line" << __LINE__ <<
+					"\nERROR: chunk size for multi-pass should be a positive!" << std::endl;
+				exit(2);
+			}
+			try{
+				this->data = new DataPoint<FeatType, LabelType>[this->chunk_size];
+			}
+			catch (std::bad_alloc &ex){
+				std::cerr << ex.what();
+				std::cerr << " allocate of " << this->chunk_size
+					<< " failed in constructing DataChunk. out of memory? in file "
+					<< __FILE__ << " line " << __LINE__ << std::endl;
+				exit(1);
+			}
+		}
+		virtual ~DataChunk(){
+			if (this->data != NULL)
+				delete[]this->data;
 		}
 		void erase() {
-			for (size_t i = 0; i < dataNum; i++)
+			for (size_t i = 0; i < this->chunk_size; i++)
 				data[i].erase();
 			dataNum = 0;
 		}

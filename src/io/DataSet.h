@@ -5,7 +5,8 @@
   > Functions: Class to interact with datasets
  ************************************************************************/
 
-#pragma once
+#ifndef HEADER_DATASET
+#define HEADER_DATASET
 
 
 #if WIN32
@@ -28,7 +29,7 @@ using namespace std;
 namespace SOL {
     //data set, can work in both read-and-write mode and read-once mode
     template <typename FeatType, typename LabelType> class DataSet {		
-        private:
+        protected:
             string fileName;
             string cache_fileName;
             bool is_cache;
@@ -78,7 +79,7 @@ namespace SOL {
                 initialize_condition_variable(&data_available);
                 initialize_condition_variable(&buffer_full);
             }
-            ~DataSet() {
+            virtual ~DataSet() {
                 delete_mutex(&data_lock);
 				if (this->reader != NULL && this->is_reader_self_alloc == true)
                     delete this->reader;
@@ -86,7 +87,7 @@ namespace SOL {
 				this->ReleaseBuffer();
             }
 
-        private:
+        protected:
             bool CreateBuffer(int buf_size = 0) {
                 this->ReleaseBuffer();
                 this->bufSize = buf_size > 0 ? buf_size : init_buf_size;
@@ -106,7 +107,7 @@ namespace SOL {
                 return true;
             }
 
-        private:
+        protected:
             void ClearBuffer() {
                 DataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
@@ -262,7 +263,7 @@ namespace SOL {
 			}
 
 			//get the data to read
-			inline const DataChunk<FeatType, LabelType>& GetChunk() {
+			virtual DataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) {
 				mutex_lock(&this->data_lock);
 				//check if there is available data
 				if (this->rd_ptr->is_parsed == true){
@@ -285,7 +286,7 @@ namespace SOL {
 				}
 			}
 
-			void FinishRead() {
+			virtual void FinishRead() {
 				mutex_lock(&this->data_lock);
 				this->rd_ptr->is_inuse = false;
 				//notice that the last data have been processed
@@ -319,3 +320,4 @@ namespace SOL {
 			}
 	};
 }
+#endif
