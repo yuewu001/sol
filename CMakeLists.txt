@@ -5,6 +5,8 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Installation 
 
 project(SOL)
 
+set(CMAKE_VERBOSE_MAKEFILE ON) 
+
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set (ARCHIVE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
@@ -109,7 +111,11 @@ IF(DCMTK_WITH_DEBUG_POSTFIX)
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 add_executable(SOL src/Params.cpp src/Params.h 
-    src/main.cpp src/SOL_interface.cpp ${SRC_LIST}) 
+    src/main.cpp src/SOL_interface.cpp ${SRC_LIST})
+
+#add_executable(SyntheticData src/SyntheticData.cpp) 
+    
+     
 IF(UNIX)
     target_link_libraries(SOL pthread)
 ENDIF(UNIX)
@@ -118,7 +124,7 @@ add_library(SOLdll SHARED src/SOL_interface.h src/Params.cpp src/Params.h
     src/SOL_interface.cpp  ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOLdll pthread)
-    set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-fPIC") 
+    set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-fPIC -std=c++0x") 
 ENDIF(UNIX)
 
 add_library(SOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
@@ -136,6 +142,7 @@ ENDIF(UNIX)
 
 IF(DCMTK_WITH_DEBUG_POSTFIX)  
   set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
+  #set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
