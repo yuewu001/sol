@@ -65,6 +65,7 @@ namespace SOL {
 	static const char* init_loss_type = "Hinge";
 	static const char* init_data_type = "LibSVM";
 	static const char* init_opti_method = "SGD";
+	static const char* init_mp_type = "none"; //init multi-pass type
 
 	//trying the optimal parameters
 

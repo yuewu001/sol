@@ -54,6 +54,8 @@ namespace SOL
 		string str_loss;
 		//optimization method
 		string str_opt;
+		//multi-pass type
+		string str_mp_type;
 
 		int passNum;
 

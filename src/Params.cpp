@@ -45,6 +45,7 @@ namespace SOL {
 
 		this->add_option(init_opti_method,0,1,
 			"optimization method:\nSGD, STG, RDA, RDA_E, FOBOS, Ada-RDA, Ada-FOBOS, AROW, AROW-TG, AROW-DA, AROW-FS,SCW, SCW-RDA, SOSOL","-opt", &this->str_opt);
+		this->add_option(init_mp_type,0,1,"multi-pass type: none, \n\tall, false_predict","-mpt",&this->str_mp_type);
 		this->add_option(init_is_learn_best_param,0,0,"learn best parameter", 
 			"-lbp", &this->is_learn_best_param);
 		this->add_option(init_normalize,0,0,"whether normalize the data","-norm",&this->is_normalize);

@@ -5,6 +5,8 @@
 #include "DataReader.h"
 #include "libsvm_io.h"
 #include "libsvm_binary.h"
+#include "DataSet.h"
+#include "MPDataSet.h"
 
 namespace SOL{
 	template <typename FeatType, typename LabelType>
@@ -14,6 +16,21 @@ namespace SOL{
 			return new SOL::libsvm_io_<FeatType, LabelType>(filename);
 		else if (dt_type == "cache")
 			return new SOL::libsvm_binary_<FeatType,LabelType>(filename);
+		else {
+			std::cerr<<"unrecognized data reader type "<<dt_type<<std::endl;
+			return NULL;
+		}
+	}
+
+	template <typename FeatType, typename LabelType>
+	DataSet<FeatType, LabelType>* getDataSet(int passNum, int buf_size, string dt_type){
+		ToLowerCase(dt_type);
+		if (dt_type == "none")
+			return new SOL::DataSet<FeatType, LabelType>(passNum, buf_size);
+		else if (dt_type == "all")
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL);
+		else if (dt_type == "false_predict")
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_FALSE_PREDICT);
 		else {
 			std::cerr<<"unrecognized dataset type "<<dt_type<<std::endl;
 			return NULL;

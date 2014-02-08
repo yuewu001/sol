@@ -51,14 +51,16 @@ int main(int argc, const char** args) {
 	if(lossFunc == NULL)
 		return -1;
 
-	MPDataSet<FeatType, LabelType> dataset(param.passNum,param.buf_size, MPBufferType_FALSE);
-	if (dataset.Load(param.fileName, param.cache_fileName) == false){
+	DataSet<FeatType,LabelType>* pDataset = getDataSet<FeatType, LabelType>(param.passNum, param.buf_size, param.str_mp_type);
+
+	if (pDataset->Load(param.fileName, param.cache_fileName) == false){
 		cerr<<"ERROR: Load dataset "<<param.fileName<<" failed!"<<endl;
+		delete pDataset;
 		delete lossFunc;
 		return -1;
 	}
 
-	Optimizer<FeatType, LabelType> *opti = GetOptimizer(param,dataset,*lossFunc);
+	Optimizer<FeatType, LabelType> *opti = GetOptimizer(param,*pDataset,*lossFunc);
 	if (opti == NULL) {
 		delete lossFunc;
 		return -1;
@@ -89,7 +91,7 @@ int main(int argc, const char** args) {
 
 		double time2 = get_current_time();
 
-		printf("data number: %lu\n",dataset.size());
+		printf("data number: %lu\n",pDataset->size());
 		printf("Learn error rate: %.2f +/- %.2f %%\n",l_errRate * 100, l_varErr * 100);
 
 		double time3 = 0;

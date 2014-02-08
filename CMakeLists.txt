@@ -20,8 +20,10 @@ set (CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/cmake)
 
 set(io_files 
     src/io/DataPoint.h
+    src/io/MPBuffer.h
     src/io/DataReader.h
     src/io/DataSet.h
+    src/io/MPDataSet.h
     src/io/DataSetHelper.h
     src/io/basic_io.cpp
     src/io/basic_io.h
