@@ -35,6 +35,9 @@ namespace SOL {
 				case SOL::MPBufferType_FALSE_PREDICT:
 					this->pMp_Buffer = new MPBuffer_FALSE_PREDICT<FeatType, LabelType>(mp_buf_size);
 					break;
+				case SOL::MPBufferType_RESERVIOR:
+					this->pMp_Buffer = new MPBuffer_RESERVIOR<FeatType, LabelType>(mp_buf_size);
+					break;
 				default:
 					this->pMp_Buffer = NULL;
 					break;

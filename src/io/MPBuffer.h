@@ -10,12 +10,15 @@
 
 #include "DataPoint.h"
 
+#include <ctime>
+
 namespace SOL{
 
 	enum MPBufferType{
 		MPBufferType_None = 0, //no buffer
 		MPBufferType_ALL = 1, //buffer all data
 		MPBufferType_FALSE_PREDICT = 2, //buffer false predictions
+		MPBufferType_RESERVIOR = 3, //reservior sampling
 	};
 
     template <typename FeatType, typename LabelType> 
@@ -59,6 +62,40 @@ namespace SOL{
 					if (this->dataNum < this->chunk_size)
 						this->dataNum++;
 				}
+			}
+		};
+		template <typename FeatType, typename LabelType>
+		struct MPBuffer_RESERVIOR :public MPBuffer<FeatType, LabelType>{
+			size_t total_num; //total number of pushed instances
+			MPBuffer_RESERVIOR(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+				//srand(time(NULL));
+				this->total_num = 0;
+			}
+
+			void Push(DataPoint<FeatType, LabelType> &srcPt){
+				this->total_num++;
+				if (this->dataNum < this->chunk_size){ //less than the buffer
+					srcPt.clone(this->data[this->insert_pos]);
+					this->insert_pos++;
+					this->dataNum++;
+				}
+				else{//sampling
+					//sample from a Bernoulli distribution to determine whether we need to insert the current sample
+					//if (this->bernolli(this->chunk_size,this->total_num)){
+					{
+						this->insert_pos = rand() % this->chunk_size;
+						srcPt.clone(this->data[this->insert_pos]);
+					}
+				}
+			}
+			bool bernolli(size_t limit, size_t max_num) {
+				static double max1 = RAND_MAX + 1.0;
+				static double max2 = std::pow(2, 32);
+				if (max_num < RAND_MAX)
+					return rand() / max1 * max_num < limit;
+				else
+					return (((rand() & 0x00007FE0) >> 5) + ((rand() & 0x00007FF0) << 6) + ((rand() & 0x00007FF0) << 17)) 
+					/ max2 * max_num < limit;
 			}
 		};
 }

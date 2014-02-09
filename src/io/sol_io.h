@@ -23,14 +23,16 @@ namespace SOL{
 	}
 
 	template <typename FeatType, typename LabelType>
-	DataSet<FeatType, LabelType>* getDataSet(int passNum, int buf_size, string dt_type){
+	DataSet<FeatType, LabelType>* getDataSet(int passNum, int buf_size, string dt_type, int mp_buf_size){
 		ToLowerCase(dt_type);
 		if (dt_type == "none")
 			return new SOL::DataSet<FeatType, LabelType>(passNum, buf_size);
 		else if (dt_type == "all")
-			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL);
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL,mp_buf_size);
 		else if (dt_type == "false_predict")
-			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_FALSE_PREDICT);
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_FALSE_PREDICT,mp_buf_size);
+		else if (dt_type == "reservior")
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_RESERVIOR,mp_buf_size);
 		else {
 			std::cerr<<"unrecognized dataset type "<<dt_type<<std::endl;
 			return NULL;

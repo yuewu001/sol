@@ -69,6 +69,7 @@ namespace SOL
 		float phi; //for SCW
 
 		int buf_size; //number of chunks in dataset 
+		int mp_buf_size; //size of buffer for multi-pass
 
 		int initial_t;
 		float power_t; 

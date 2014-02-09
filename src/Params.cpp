@@ -40,6 +40,7 @@ namespace SOL {
 
 		this->add_option(init_data_type,0,1,"dataset type format","-dt",&this->str_data_type);
 		this->add_option(init_buf_size,0,1,"number of chunks for buffering","-bs",&this->buf_size);
+		this->add_option(init_mp_buf_size,0,1,"size of buffer for multi-pass","-mbs",&this->mp_buf_size);
 
 		this->add_option(init_loss_type,0,1,"loss function type:\nHinge, Logit, Square, SquareHinge","-loss",&this->str_loss);
 

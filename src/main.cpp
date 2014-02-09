@@ -51,7 +51,7 @@ int main(int argc, const char** args) {
 	if(lossFunc == NULL)
 		return -1;
 
-	DataSet<FeatType,LabelType>* pDataset = getDataSet<FeatType, LabelType>(param.passNum, param.buf_size, param.str_mp_type);
+	DataSet<FeatType,LabelType>* pDataset = getDataSet<FeatType, LabelType>(param.passNum, param.buf_size, param.str_mp_type,param.mp_buf_size);
 
 	if (pDataset->Load(param.fileName, param.cache_fileName) == false){
 		cerr<<"ERROR: Load dataset "<<param.fileName<<" failed!"<<endl;
