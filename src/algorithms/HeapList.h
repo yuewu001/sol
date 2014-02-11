@@ -27,6 +27,7 @@ namespace SOL{
 
 	public:
 		HeapList() :K(0), data_num(0), value_list(NULL){}
+		IndexType GetK() const { return this->K;}
 
 	public:
 		inline IndexType get_pos(IndexType id) const {
