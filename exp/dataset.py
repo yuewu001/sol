@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'D:/Coding/SOL/data/'
+    rootDir = 'E:/users/v-wuyue/sol/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:
@@ -28,25 +28,15 @@ def get_file_name(dataset, task = 'train'):
     if dataset == 'rcv1':
         train_file = 'rcv1/rcv1.train' 
         test_file = 'rcv1/rcv1.test'
+    elif dataset == 'a8a':
+        train_file = 'a8a/a8a' 
+        test_file = 'a8a/a8a.t'
+    elif dataset == 'gisette':
+        train_file = 'gisette/gisette_scale' 
+        test_file = 'gisette/gisette_scale.t'
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 
-    elif dataset == 'a9a':
-        train_file = 'uci/a9a'
-        test_file = 'uci/a9a.t'
-    elif dataset == 'url':
-        train_file = 'url_combined/url_train'
-        test_file  = 'url_combined/url_test'
-    elif dataset == 'webspam_trigram':
-        if task == 'cv':
-            train_file = 'webspam_trigram_15K/webspam_trigram_15K_train'
-            test_file  = 'webspam_trigram_15K/webspam_trigram_15K_test'
-        else:
-            train_file = 'webspam_trigram/webspam_trigram_train'
-            test_file  = 'webspam_trigram/webspam_trigram_test'
-    elif dataset =='MNIST':
-        train_file = 'MNIST/train38'
-        test_file  = 'MNIST/test38'
     elif dataset == 'aut':
         train_file = 'aut/aut_train'
         test_file = 'aut/aut_test'
