@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'E:/users/v-wuyue/sol/data/'
+    rootDir = 'E:/users/v-wuyue/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:
@@ -46,15 +46,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'physic':
         train_file = 'physic/physic_train'
         test_file = 'physic/physic_test'
-    elif dataset == 'synthetic':
-        train_file = 'synthetic/synthetic_train'
-        test_file = 'synthetic/synthetic_test'
-    elif dataset == 'synthetic2':
-        train_file = 'synthetic2/synthetic_train'
-        test_file = 'synthetic2/synthetic_test'
-    elif dataset == 'synthetic3':
-        train_file = 'synthetic3/synthetic_train'
-        test_file = 'synthetic3/synthetic_test'
+    elif dataset == 'synthetic_ofs':
+        train_file = 'synthetic_ofs/synthetic_train'
+        test_file = 'synthetic_ofs/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
