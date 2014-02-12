@@ -178,27 +178,11 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':8, '-delta':0.03125},
             'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
             'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
-    synthetic = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
-            'Ada-RDA':{'-eta':32, '-delta':32},
-            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':2.0},'RDA':{'-eta':128},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
-    synthetic2 = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':1.0, '-delta':4.0},
-            'Ada-RDA':{'-eta':2.0, '-delta':16.0},
-            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
-            'AROW-DA':{'-r':4.0},'RDA':{'-eta':8},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
-    synthetic3 = {'SGD':{'-eta':4.0},'STG':{'-eta':4.0},'FOBOS':{'-eta':4.0},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':1.0},
-            'Ada-RDA':{'-eta':0.5, '-delta':8.0},
-            'AROW-TG':{'-r':16}, 'AROW-FS':{'-r':16},
-            'AROW-DA':{'-r':32.0},'RDA':{'-eta':8}}
+    synthetic_ofs = {'AROW-FS':{'-r':32}, 'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':0.25}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
-            'pcmac':pcmac,'synthetic':synthetic,'a9a':a9a,'synthetic2':synthetic2} 
+            'pcmac':pcmac,'a9a':a9a,'synthetic_ofs':synthetic_ofs} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():
