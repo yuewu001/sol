@@ -56,7 +56,8 @@ set(algo_files
     src/algorithms/AROW_DA.h
     src/algorithms/DAROW.h
     src/algorithms/FOBOS.h
-    src/algorithms/HeapList.h
+    src/algorithms/MaxHeap.h
+    src/algorithms/MinHeap.h
     src/algorithms/OFSGD.h
     src/algorithms/Optimizer.h
     src/algorithms/RDA_L1.h
