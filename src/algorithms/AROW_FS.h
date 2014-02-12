@@ -14,7 +14,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 
 #include "../utils/util.h"
 #include "Optimizer.h"
-#include "HeapList.h"
+#include "MaxHeap.h"
 #include <algorithm>
 #include <math.h>
 #include <vector>
@@ -26,7 +26,7 @@ namespace SOL {
 		float r;
 		s_array<float> sigma_w;
 
-		HeapList<float> heap;
+		MaxHeap<float> heap;
 
 		IndexType K; //keep top K elemetns
 

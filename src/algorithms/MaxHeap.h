@@ -1,12 +1,12 @@
 /*************************************************************************
-  > File Name: HeapList.h
+  > File Name: MaxHeap.h
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: Sat 09 Nov 2013 11:03:03 AM
   > Descriptions: Heap list to select topK elements
   ************************************************************************/
 
-#ifndef HEADER_HEAP_LIST
-#define HEADER_HEAP_LIST
+#ifndef HEADER_MAX_HEAP_LIST
+#define HEADER_MAX_HEAP_LIST
 
 #include "../io/s_array.h"
 
@@ -15,7 +15,7 @@
 
 using namespace std;
 namespace SOL{
-	template <typename T> class HeapList{
+	template <typename T> class MaxHeap{
 	private:
 		s_array<IndexType> id2pos_map; //record the sorted position of each data
 		s_array<IndexType> pos2id_map; //record the index of weight for each sorted position
@@ -26,7 +26,7 @@ namespace SOL{
 		const T* value_list;  //const pointer to the data
 
 	public:
-		HeapList() :K(0), data_num(0), value_list(NULL){}
+		MaxHeap() :K(0), data_num(0), value_list(NULL){}
 		IndexType GetK() const { return this->K;}
 
 	public:
@@ -248,8 +248,10 @@ namespace SOL{
 				this->pos2id_map[i] = top_id;
 				this->id2pos_map[top_id] = i;
 
+				cout << this->value_list[top_id] << " ";
 				this->HeapAdjust(0, i - 1);
 			}
+			cout << endl;
 		}
 
 		void Output(){
@@ -259,7 +261,7 @@ namespace SOL{
 			}
 			std::cout << "\nid to pos ";
 			for (IndexType i = 0; i != this->K; i++){
-				std::cout << this->id2pos_map[this->pos2id_map[i]] << " ";
+				std::cout << this->id2pos_map[i] << " ";
 				//std::cout<<this->value_list[this->pos2id_map[i]]<<" ";
 			}
 			std::cout << "\n";

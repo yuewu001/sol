@@ -10,6 +10,7 @@
 
 #include "../utils/util.h"
 #include "Optimizer.h"
+#include "MinHeap.h"
 #include <algorithm>
 #include <math.h>
 #include <queue>
@@ -20,8 +21,9 @@ namespace SOL {
 	protected:
 		IndexType K; //keep top K elemetns
 
-		s_array<IndexType> index_vec;
 		s_array<float> abs_weightVec;
+
+		MinHeap<float> minHeap;
 
 		float (*pEta_time)(size_t t, float pt);
 	public:
@@ -48,10 +50,6 @@ namespace SOL {
 
 		//Change the dimension of weights
 		virtual void UpdateWeightSize(IndexType newDim);
-
-	protected:
-		void QuickSort(float *a, IndexType low, IndexType high, IndexType *m_index);
-		void Sort(float *a, IndexType low, IndexType high, IndexType *m_index);
 	};
 
 	template <typename FeatType, typename LabelType>
@@ -61,8 +59,6 @@ namespace SOL {
 		this->id_str = "SGD_FS";
 		this->K = 0;
 
-		this->index_vec.resize(this->weightDim);
-		this->index_vec.zeros();
 		this->abs_weightVec.resize(this->weightDim);
 	}
 
@@ -90,21 +86,35 @@ namespace SOL {
 			for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
 				this->weightVec[index_i] -= this->eta * gt_i * x.features[i];
+				this->abs_weightVec[index_i] = fabsf(this->weightVec[index_i]);
 			}
 			//update bias 
 			this->weightVec[0] -= this->eta * gt_i;
 			if (this->K > 0){
+				this->minHeap.BuildHeap();
 				//truncate
-				//sort
-				for (size_t i = 0; i < this->weightDim; i++){
-					this->abs_weightVec[index_i] = fabsf(this->weightVec[this->index_vec[index_i]]);
+				IndexType ret_id;
+				for (IndexType i = 0; i < this->weightDim - 1; i++){
+					if (this->minHeap.UpdateHeap(i, ret_id) == true){
+						this->weightVec[ret_id + 1] = 0;
+						this->abs_weightVec[ret_id + 1] = 0;
+					}
 				}
-				this->Sort(this->abs_weightVec.begin,1,
-					this->weightDim - 1,this->index_vec.begin); 
-				//truncate
-				for (IndexType i = this->K + 1; i < this->weightDim; i++){
-					this->weightVec[this->index_vec[i]] = 0;
+				/*
+				//test if top K is in
+				float min_top = 100000;
+				float max_not_top = -10000;
+				for (IndexType i = 1; i < this->weightDim ; i++){
+					if (this->minHeap.is_topK(i - 1) == true){
+						min_top = min_top > this->abs_weightVec[i] ? this->abs_weightVec[i] : min_top;
+					}
+					else{
+						max_not_top = max_not_top < this->abs_weightVec[i] ? this->abs_weightVec[i] : max_not_top;
+						this->weightVec[i] = 0;
+						this->abs_weightVec[i] = 0;
+					}
 				}
+				*/
 			}
 			return y;
 	}
@@ -115,12 +125,18 @@ namespace SOL {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		if (this->power_t == 0.5)
 			this->pEta_time = pEta_sqrt;
-		else if(this->power_t == 0)
+		else if (this->power_t == 0)
 			this->pEta_time = pEta_const;
 		else if (this->power_t == 1)
 			this->pEta_time = pEta_linear;
 		else
 			this->pEta_time = pEta_general;
+
+		if (this->K > 1){
+			if (this->weightDim < this->K + 1)
+				this->UpdateWeightSize(this->K);
+			this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
+		}
 	}
 
 	//called when a train ends
@@ -140,96 +156,13 @@ namespace SOL {
 		if (newDim < this->weightDim)
 			return;
 		else {
-			this->index_vec.reserve(newDim + 1);
-			this->index_vec.resize(newDim + 1);
-			for (size_t index_i = this->weightDim; index_i < newDim + 1; index_i++)
-				this->index_vec[index_i] = index_i;
-
 			this->abs_weightVec.reserve(newDim + 1);
 			this->abs_weightVec.resize(newDim + 1);
+			this->abs_weightVec.zeros(this->abs_weightVec.begin + this->weightDim, this->abs_weightVec.end);
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
-		}
-	}
+			this->minHeap.UpdateDataNum(newDim, this->abs_weightVec.begin + 1);
 
-	
-	template <typename FeatType, typename LabelType>
-	void SGD_FS<FeatType, LabelType>::Sort(float *a, IndexType low, IndexType high, IndexType *m_index) {// from great to small
-		//move all zeros to the end
-		IndexType i = low;
-		IndexType j = high;
-		float temp = a[low]; 
-		IndexType temp_ind = m_index[low];
-
-		//move all zeros to the end
-		while(i < j){
-			while(i < j && a[i] != 0) i++;
-			while(i < j && a[j] == 0) j--;
-			if (i < j){ //swap a[i], a[j]
-				temp = a[i]; temp_ind = m_index[i];
-				a[i] = a[j]; m_index[i] = m_index[j];
-				a[j] = temp; m_index[j] = temp_ind;
-			}
-		}
-		if (j > this->K){
-			this->QuickSort(a,low,j,m_index);
-		}
-	}
-
-	template <typename FeatType, typename LabelType>
-	void SGD_FS<FeatType, LabelType>::QuickSort(float *a, IndexType low, IndexType high, IndexType *m_index) {// from great to small
-		//one pass maopao
-		float temp ;
-		IndexType temp_ind; 
-		IndexType i = low;
-		IndexType j = high;
-		//one pass maopao
-		bool is_sorted = true;
-		for (i = low; i < high; i++){
-			if (a[i] < a[i+1]){ //swap
-				temp = a[i];
-				temp_ind = m_index[i];
-				is_sorted = false;
-				break;
-			}
-		}
-		if (is_sorted == true)
-			return;
-
-		a[i] = a[low];
-		m_index[i] = m_index[low];
-		a[low] = temp;
-		m_index[low] = temp_ind;
-
-		i = low;
-
-		while (i < j) {
-			while ((i < j) && (temp >= a[j]))
-				j--;
-			if(i<j) {
-				a[i] = a[j];
-				m_index[i] = m_index[j];
-				i ++;
-			}
-
-			while (i<j && (a[i] >= temp)) 
-				i++;
-			if (i<j) {
-				a[j] = a[i];
-				m_index[j] = m_index[i];
-
-				j--;
-			}
-		}
-
-		a[i] = temp;
-		m_index[i] = temp_ind;
-
-		if (i > this->K && low < i) {
-			QuickSort(a, low, i-1, m_index);  
-		}
-		else if (i < this->K && i < high) {
-			QuickSort(a, j+1, high, m_index);  
+			Optimizer<FeatType, LabelType>::UpdateWeightSize(newDim);
 		}
 	}
 }
