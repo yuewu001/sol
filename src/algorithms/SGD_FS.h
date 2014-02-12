@@ -132,7 +132,7 @@ namespace SOL {
 		else
 			this->pEta_time = pEta_general;
 
-		if (this->K > 1){
+		if (this->K > 0){
 			if (this->weightDim < this->K + 1)
 				this->UpdateWeightSize(this->K);
 			this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);

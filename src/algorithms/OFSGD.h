@@ -148,7 +148,7 @@ namespace SOL {
 		this->shrinkage = 1.f - this->delta * this->eta0;
 		this->power_t = 0;
 
-		if (this->K > 1){
+		if (this->K > 0){
 			if (this->weightDim < this->K + 1)
 				this->UpdateWeightSize(this->K);
 			this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
