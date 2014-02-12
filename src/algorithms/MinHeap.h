@@ -1,5 +1,5 @@
 /*************************************************************************
-  > File Name: MaxHeap.h
+  > File Name: MinHeap.h
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: Sat 09 Nov 2013 11:03:03 AM
   > Descriptions: Heap list to select topK elements
@@ -15,7 +15,7 @@
 
 using namespace std;
 namespace SOL{
-	template <typename T> class MaxHeap{
+	template <typename T> class MinHeap{
 	private:
 		s_array<IndexType> id2pos_map; //record the sorted position of each data
 		s_array<IndexType> pos2id_map; //record the index of weight for each sorted position
@@ -26,7 +26,7 @@ namespace SOL{
 		const T* value_list;  //const pointer to the data
 
 	public:
-		MaxHeap() :K(0), data_num(0), value_list(NULL){}
+		MinHeap() :K(0), data_num(0), value_list(NULL){}
 		IndexType GetK() const { return this->K;}
 
 	public:
@@ -194,8 +194,8 @@ namespace SOL{
 				IndexType par_pos = (cur_pos - 1) / 2;
 				if (cur_pos == 0)
 					par_pos = 0;
-				//the current value increases
-				if (this->value_list[this->pos2id_map[cur_pos]] >
+				//the current value decreases
+				if (this->value_list[this->pos2id_map[cur_pos]] < 
 					this->value_list[this->pos2id_map[par_pos]]){
 					do{
 						//swap parent and itself
@@ -209,19 +209,19 @@ namespace SOL{
 						if (cur_pos == 0)
 							break;
 						par_pos = (cur_pos - 1) / 2;
-					} while (par_pos >= 0 && this->value_list[this->pos2id_map[cur_pos]] >
+					} while (par_pos >= 0 && this->value_list[this->pos2id_map[cur_pos]] <
 						this->value_list[this->pos2id_map[par_pos]]);
 
 					return false;
 				}
-				//the current value decreases
+				//the current value increases
 				this->HeapAdjust(cur_pos, this->K - 1);
 				return false;
 			}
 			else{
 				ret_id = this->pos2id_map[0];
 				T thresh_val = this->value_list[ret_id];
-				if (this->value_list[data_id] < thresh_val){
+				if (this->value_list[data_id] > thresh_val){
 					//swap with the top element of the heap
 					this->id2pos_map[ret_id] = this->K;
 					this->id2pos_map[data_id] = 0;
@@ -248,8 +248,10 @@ namespace SOL{
 				this->pos2id_map[i] = top_id;
 				this->id2pos_map[top_id] = i;
 
+				cout << this->value_list[top_id]<<" ";
 				this->HeapAdjust(0, i - 1);
 			}
+			cout << endl;
 		}
 
 		void Output(){
@@ -259,14 +261,14 @@ namespace SOL{
 			}
 			std::cout << "\nid to pos ";
 			for (IndexType i = 0; i != this->K; i++){
-				std::cout << this->id2pos_map[this->pos2id_map[i]] << " ";
+				std::cout << this->id2pos_map[i] << " ";
 				//std::cout<<this->value_list[this->pos2id_map[i]]<<" ";
 			}
 			std::cout << "\n";
 
 		}
 
-	private:
+	public:
 		void BuildHeap(){
 			IndexType i = (this->K - 1) / 2 + 1;
 			do{
@@ -289,11 +291,11 @@ namespace SOL{
 			IndexType i = s;
 			for (i = 2 * s + 1; i <= m; i = 2 * i + 1){
 				if (i < m &&
-					this->value_list[this->pos2id_map[i]] <
+					this->value_list[this->pos2id_map[i]] > 
 					this->value_list[this->pos2id_map[i + 1]])
-					i++; //j is the bigger child
+					i++; //i is the smaller child
 
-				if (cur_val >= this->value_list[this->pos2id_map[i]])
+				if (cur_val <= this->value_list[this->pos2id_map[i]])
 					break;
 				//set parent node to be child node
 				this->pos2id_map[s] = this->pos2id_map[i];
