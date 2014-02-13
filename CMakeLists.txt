@@ -164,7 +164,7 @@ SET_PROPERTY(TARGET testDll PROPERTY FOLDER "TestCases")
 SET_PROPERTY(TARGET testStatic PROPERTY FOLDER "TestCases")
 SET_PROPERTY(TARGET testMNIST PROPERTY FOLDER "TestCases")
 
-install(TARGETS SOL analysis Converter SOLdll SOLstatic
+install(TARGETS SOL analysis dtcleaner Converter SOLdll SOLstatic
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION bin
     ARCHIVE DESTINATION lib)
