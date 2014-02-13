@@ -7,17 +7,14 @@
 #include "../io/DataPoint.h"
 #include "../io/DataReader.h"
 #include "../io/libsvm_io.h"
+#include "../utils/util.h"
 
 #include <string>
 using namespace std;
 using namespace SOL;
 
-template <typename FeatType, typename LabelType>
-bool Detect(DataReader<FeatType, LabelType> *reader, s_array<char> &index_set) {
-    if (reader == NULL){
-        cerr<<"data reader is empty!"<<endl;
-        return false;
-    }
+bool Detect(const string& filename, s_array<char> &index_set) {
+	libsvm_io reader(filename);
 
 	size_t max_show_count = 100000;
 	size_t show_count = 1000;
@@ -25,11 +22,11 @@ bool Detect(DataReader<FeatType, LabelType> *reader, s_array<char> &index_set) {
     size_t featNum = 0;
     IndexType max_index = 0;
     index_set.resize(0);
-    DataPoint<FeatType, LabelType> data;
-    if (reader->OpenReading() == true) {
-        reader->Rewind();
+    DataPoint<float,char> data;
+    if (reader.OpenReading() == true) {
+        reader.Rewind();
         while(true) {
-            if (reader->GetNextData(data) == true) {
+            if (reader.GetNextData(data) == true) {
                 if (data.indexes.size() == 0)
                     continue;
                 if (max_index < data.dim()){
@@ -65,15 +62,12 @@ bool Detect(DataReader<FeatType, LabelType> *reader, s_array<char> &index_set) {
 		cerr<<"Can not open file to read!"<<endl;
 		return false;
 	}
-	cerr<<"\n";
-	reader->Close();
 	size_t valid_dim = 0;
 	for (size_t i = 0; i < index_set.size(); i++) {
 		if (index_set[i] == 1)
 			valid_dim++;
 	}
 	cout<<"data number  : "<<dataNum<<"\n";
-	cout<<"feat number  : "<<featNum<<"\n";
 	cout<<"valid dim    : "<<max_index<<"\n";
 	cout<<"nonzero feat : "<<valid_dim<<"\n";
 	if (max_index > 0){
@@ -82,7 +76,7 @@ bool Detect(DataReader<FeatType, LabelType> *reader, s_array<char> &index_set) {
 
 	return true;
 }
-void Convert(const string& in_filename, const string& out_filename, const s_array<float> &index_set){
+void Convert(const string& in_filename, const string& out_filename, const s_array<IndexType> &index_set){
     libsvm_io reader(in_filename);
 
 	cout<<"remove useless features not appeared "<<endl;
@@ -101,7 +95,7 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 	size_t dataNum = 0;
 	size_t show_step = 1; //show information every show_step
 	size_t show_count = 2;
-	while(reader->GetNextData(data) == true){
+	while(reader.GetNextData(data) == true){
 		dataNum++;
 
         size_t featNum = data.indexes.size();
@@ -114,20 +108,20 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 		}
 
 		if (show_count < dataNum){
-			printf("%lu samples de-cached\r",dataNum);
+			printf("%lu samples processed\r",dataNum);
 			show_count = (1 << ++show_step);
 		}
 	}
 	writer.Close();
 	if (reader.Good() == true && 
-		rename_file(tmp_filename, param.out_fileName) == true)
-		printf("%lu samples (%lu features) de-cached\n",dataNum, featNum);
+		rename_file(tmp_filename,out_filename) == true)
+		printf("%lu samples processed\n",dataNum);
 	reader.Close();
 }
 
 int main(int argc, char** args){ 
-	if (argc != 2){
-		cout<<"Usage: data_analysis data_file"<<endl;
+	if (argc != 3){
+		cout<<"Usage: dtcleaner in_file out_file"<<endl;
 		return 0;
 	}
 	//check memory leak in VC++
@@ -137,10 +131,10 @@ int main(int argc, char** args){
 	_CrtSetDbgFlag( tmpFlag );
 #endif
 	string filename = args[1];
+	string out_filename = args[2];
 	//string filename = "/home/matthew/work/Data/aut/aut_train";
     s_array<char> index_set;
-	libsvm_io reader(filename);
-	if (Analyze(&reader,index_set) == false)
+	if (Detect(filename,index_set) == false)
 		cerr<<"analyze dataset failed!"<<endl;
     s_array<IndexType> new_index;
     size_t featDim = index_set.size();
@@ -152,5 +146,6 @@ int main(int argc, char** args){
             new_index[i] = index++;
         }
     }
+	Convert(filename, out_filename, new_index);
 	return 0;
 }
