@@ -100,7 +100,8 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 
         size_t featNum = data.indexes.size();
         for (size_t i = 0; i < featNum; i++){
-            data.indexes[i] = index_set[data.indexes[i] - 1];
+			if (data.indexes[i] < index_set.size() && index_set[data.indexes[i] - 1] != 0)
+				data.indexes[i] = index_set[data.indexes[i] - 1];
         }
 
 		if (writer.WriteData(data) == false){
@@ -120,10 +121,11 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 }
 
 int main(int argc, char** args){ 
-	if (argc != 3){
-		cout<<"Usage: dtcleaner in_file out_file"<<endl;
+	if (argc < 3){
+		cout<<"Usage: dtcleaner in_file out_file [in_file2 out_file2]"<<endl;
 		return 0;
 	}
+	
 	//check memory leak in VC++
 #if defined(_MSC_VER) && defined(_DEBUG)
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
@@ -132,6 +134,12 @@ int main(int argc, char** args){
 #endif
 	string filename = args[1];
 	string out_filename = args[2];
+	string in_filename2;
+	string out_filename2;
+	if (argc == 5){
+		in_filename2 = args[3];
+		out_filename2 = args[4];
+	}
 	//string filename = "/home/matthew/work/Data/aut/aut_train";
     s_array<char> index_set;
 	if (Detect(filename,index_set) == false)
@@ -147,5 +155,7 @@ int main(int argc, char** args){
         }
     }
 	Convert(filename, out_filename, new_index);
+	if (out_filename2.length() > 0)
+		Convert(in_filename2, out_filename2, new_index);
 	return 0;
 }
