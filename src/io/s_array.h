@@ -105,7 +105,9 @@ namespace SOL {
 
 			//TIM: need?
 			void ones(){
-				memset(this->begin, 1.f, sizeof(T) * this->size());
+				size_t len = this->size();
+				for (size_t i = 0; i < len; i++)
+					this->begin[i] = 1;
 			}
 
 			//reset all the elements in the array to zero

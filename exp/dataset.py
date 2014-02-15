@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'D:/Coding/SOL/data/'
+    rootDir = 'E:/users/v-wuyue/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:
@@ -28,25 +28,15 @@ def get_file_name(dataset, task = 'train'):
     if dataset == 'rcv1':
         train_file = 'rcv1/rcv1.train' 
         test_file = 'rcv1/rcv1.test'
+    elif dataset == 'a8a':
+        train_file = 'a8a/a8a' 
+        test_file = 'a8a/a8a.t'
+    elif dataset == 'gisette':
+        train_file = 'gisette/gisette_scale' 
+        test_file = 'gisette/gisette_scale.t'
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 
-    elif dataset == 'a9a':
-        train_file = 'uci/a9a'
-        test_file = 'uci/a9a.t'
-    elif dataset == 'url':
-        train_file = 'url_combined/url_train'
-        test_file  = 'url_combined/url_test'
-    elif dataset == 'webspam_trigram':
-        if task == 'cv':
-            train_file = 'webspam_trigram_15K/webspam_trigram_15K_train'
-            test_file  = 'webspam_trigram_15K/webspam_trigram_15K_test'
-        else:
-            train_file = 'webspam_trigram/webspam_trigram_train'
-            test_file  = 'webspam_trigram/webspam_trigram_test'
-    elif dataset =='MNIST':
-        train_file = 'MNIST/train38'
-        test_file  = 'MNIST/test38'
     elif dataset == 'aut':
         train_file = 'aut/aut_train'
         test_file = 'aut/aut_test'
@@ -56,15 +46,9 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'physic':
         train_file = 'physic/physic_train'
         test_file = 'physic/physic_test'
-    elif dataset == 'synthetic':
-        train_file = 'synthetic/synthetic_train'
-        test_file = 'synthetic/synthetic_test'
-    elif dataset == 'synthetic2':
-        train_file = 'synthetic2/synthetic_train'
-        test_file = 'synthetic2/synthetic_test'
-    elif dataset == 'synthetic3':
-        train_file = 'synthetic3/synthetic_train'
-        test_file = 'synthetic3/synthetic_test'
+    elif dataset == 'synthetic_ofs':
+        train_file = 'synthetic_ofs/synthetic_train'
+        test_file = 'synthetic_ofs/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -194,27 +178,11 @@ def get_model_param(ds, opt):
             'Ada-RDA':{'-eta':8, '-delta':0.03125},
             'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
             'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
-    synthetic = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
-            'Ada-RDA':{'-eta':32, '-delta':32},
-            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':2.0},'RDA':{'-eta':128},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
-    synthetic2 = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':1.0, '-delta':4.0},
-            'Ada-RDA':{'-eta':2.0, '-delta':16.0},
-            'AROW-TG':{'-r':8}, 'AROW-FS':{'-r':8},
-            'AROW-DA':{'-r':4.0},'RDA':{'-eta':8},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
-    synthetic3 = {'SGD':{'-eta':4.0},'STG':{'-eta':4.0},'FOBOS':{'-eta':4.0},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':1.0},
-            'Ada-RDA':{'-eta':0.5, '-delta':8.0},
-            'AROW-TG':{'-r':16}, 'AROW-FS':{'-r':16},
-            'AROW-DA':{'-r':32.0},'RDA':{'-eta':8}}
+    synthetic_ofs = {'AROW-FS':{'-r':32}, 'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':0.25}}
     ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
             'url':url,'webspam_trigram':webspam_trigram,
             'aut':aut,'physic':physic,
-            'pcmac':pcmac,'synthetic':synthetic,'a9a':a9a,'synthetic2':synthetic2} 
+            'pcmac':pcmac,'a9a':a9a,'synthetic_ofs':synthetic_ofs} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():

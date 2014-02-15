@@ -14,7 +14,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 
 #include "../utils/util.h"
 #include "Optimizer.h"
-#include "HeapList.h"
+#include "MaxHeap.h"
 #include <algorithm>
 #include <math.h>
 #include <vector>
@@ -26,7 +26,7 @@ namespace SOL {
 		float r;
 		s_array<float> sigma_w;
 
-		HeapList<float> heap;
+		MaxHeap<float> heap;
 
 		IndexType K; //keep top K elemetns
 
@@ -82,22 +82,21 @@ namespace SOL {
 			float y = this->Predict(x);
 			//y /= this->curIterNum;
 			float alpha_t = 1 - x.label * y;
-			size_t featDim = x.indexes.size();
-			//calculate beta_t
-			float beta_t = this->r;
-			for (size_t i = 0; i < featDim; i++){
-				beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
-			}
-			beta_t = 1.f / beta_t;
-
-			IndexType index_i = 0;
 			if(alpha_t > 0){
-				alpha_t *= beta_t; 
+				IndexType index_i = 0;
+				size_t featDim = x.indexes.size();
+				//calculate beta_t
+				float beta_t = this->r;
+				for (size_t i = 0; i < featDim; i++){
+					beta_t += x.features[i] * x.features[i] * this->sigma_w[x.indexes[i]];
+				}
+				beta_t = 1.f / beta_t;
+				alpha_t *= beta_t;
 				for (size_t i = 0; i < featDim; i++){
 					index_i = x.indexes[i];
 					if (this->heap.is_topK(index_i - 1)){
 						//update u_t
-						this->weightVec[index_i] += alpha_t * 
+						this->weightVec[index_i] += alpha_t *
 							this->sigma_w[index_i] * x.label * x.features[i];
 					}
 					else{
@@ -105,10 +104,10 @@ namespace SOL {
 					}
 					//update sigma_w
 					//this->sigma_w[index_i] -= beta_t * this->sigma_w[index_i] * this->sigma_w[index_i] * x.features[i] * x.features[i];
-					this->sigma_w[index_i] *= this->r / (this->r + 
+					this->sigma_w[index_i] *= this->r / (this->r +
 						this->sigma_w[index_i] * x.features[i] * x.features[i]);
 					IndexType ret_id;
-					this->heap.UpdateHeap(index_i - 1, ret_id); 
+					this->heap.UpdateHeap(index_i - 1, ret_id);
 					//heap.Output(); 
 				}
 				//bias term
@@ -124,8 +123,8 @@ namespace SOL {
 	void ASAROW<FeatType, LabelType>::BeginTrain() {
 		Optimizer<FeatType, LabelType>::BeginTrain();
 		if (this->K < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
+			cerr << "Please specify a valid number of weights to keep!\n";
+			cerr << "current number: " << this->K << endl;
 			exit(0);
 		}
 		if (this->weightDim < this->K + 1){
@@ -133,7 +132,7 @@ namespace SOL {
 		}
 		this->sigma_w.set_value(1);
 		heap.Init(this->weightDim - 1, this->K, this->sigma_w.begin + 1);
-        //this->is_normalize = true; //AROW requires normalization
+		//this->is_normalize = true; //AROW requires normalization
 	}
 
 	//called when a train ends
@@ -145,8 +144,8 @@ namespace SOL {
 	template <typename FeatType, typename LabelType>
 	void ASAROW<FeatType, LabelType>::SetParameterEx(int k, float r) {
 		if (k < 1){
-			cerr<<"Please specify a valid number of weights to keep!\n";
-			cerr<<"current number: "<<this->K<<endl;
+			cerr << "Please specify a valid number of weights to keep!\n";
+			cerr << "current number: " << this->K << endl;
 			exit(0);
 		}
 		else
@@ -167,7 +166,7 @@ namespace SOL {
 				this->sigma_w.end, 1);
 
 			heap.UpdateDataNum(newDim, this->sigma_w.begin + 1);
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			Optimizer<FeatType, LabelType>::UpdateWeightSize(newDim);
 		}
 	}
 
@@ -182,8 +181,8 @@ namespace SOL {
 		float min_errorRate = 1;
 		float bestr = 1;
 
-		for (float r_temp = init_r_min;  r_temp <= init_r_max; r_temp *= init_r_step) {
-			cout<<"r = "<<r_temp<<"\n";
+		for (float r_temp = init_r_min; r_temp <= init_r_max; r_temp *= init_r_step) {
+			cout << "r = " << r_temp << "\n";
 			this->r = r_temp;
 			float errorRate(0);
 			errorRate = this->Train();
@@ -192,12 +191,12 @@ namespace SOL {
 				bestr = r_temp;
 				min_errorRate = errorRate;
 			}
-			cout<<" mistake rate: "<<errorRate * 100<<" %\n";
+			cout << " mistake rate: " << errorRate * 100 << " %\n";
 		}
 
 		this->r = bestr;
 		this->lambda = prevLambda;
-		cout<<"Best Parameter:\tr = "<<this->r<<"\n\n";
+		cout << "Best Parameter:\tr = " << this->r << "\n\n";
 	}
 }
 #endif

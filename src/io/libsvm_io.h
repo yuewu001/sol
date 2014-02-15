@@ -140,7 +140,7 @@ namespace SOL {
 					size_t featNum = data.indexes.size();
 					fprintf(writer_handler, "%d", data.label);
 					for (IndexType i = 0; i < featNum; i++){
-						fprintf(writer_handler, " %d:%f", data.indexes[i], data.features[i]);
+						fprintf(writer_handler," %d:%g",data.indexes[i], data.features[i]);
 					}
 					fprintf(writer_handler, "\n");
 					return true;

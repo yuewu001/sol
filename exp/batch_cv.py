@@ -10,11 +10,12 @@ opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA','OFSGD']
 opt_list = ['SGD','Ada-FOBOS','AROW-TG']
 #opt_list = ['SGD','AROW-TG']
 #opt_list = ['RDA','AROW-DA','Ada-RDA']
-#opt_list = ['OFSGD']
+opt_list = ['OFSGD','AROW','SGD']
 
 ds_list = ['pcmac','a9a','MNIST','aut']#,]#,'rcv1','url']
-ds_list = ['synthetic2']
-fold_num =2
+ds_list = ['a8a','gisette','news','physic']
+ds_list = ['synthetic_ofs']
+fold_num =5
 
 const_eta_search = '0.03125:2.0:32'
 eta_search = '0.25:2.0:256'
