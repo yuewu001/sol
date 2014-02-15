@@ -10,13 +10,19 @@ import run_liblinear
 
 
 #algorithm list
-opt_list = ['AROW-FS','SGD-FS','OFSGD']
+opt_list = ['SGD-FS','OFSGD','AROW-FS','STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
+opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA','AROW-FS']
+#opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG']
+opt_list = ['FOBOS','Ada-FOBOS','AROW-TG']
+#opt_list = ['AROW-FS','SGD-FS','OFSGD']
+#opt_list = ['RDA','Ada-RDA','AROW-DA']
 #opt_list = ['AROW-TG']
+opt_list = ['AROW-TG']
 
 #dataset list
 ds_list = ['MNIST','a9a','pcmac','aut']
 #ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['synthetic_ofs']
+ds_list = ['a9a']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1

@@ -18,7 +18,7 @@ if len(sys.argv) < 6 or len(sys.argv) % 2 == 1:
 exe_cmd = run_util.exe_name
 
 #extra command
-exe_cmd += ' -loss Hinge -norm '
+exe_cmd += ' -loss Hinge '
 
 dt = sys.argv[1]
 opt_name = sys.argv[2]

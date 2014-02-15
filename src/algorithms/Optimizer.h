@@ -177,6 +177,7 @@ namespace SOL {
             float errorNum(0);
             size_t show_step = 1; //show information every show_step
             size_t show_count = 2;
+			size_t data_count = 0;
 
             printf("Iterate No.\t\tError Rate\t\t\n");
             while(1) {
@@ -205,15 +206,18 @@ namespace SOL {
 					this->UpdateWeightSize(data.dim());
 					float y = this->UpdateWeightVec(data); 
 					//loss
-					if (chunk.is_inherited == false && this->lossFunc->IsCorrect(data.label, y) == false){
-						errorNum++;
-						data.margin = y * data.label; 
-					}
+					if (chunk.is_inherited == false){
+						if (this->lossFunc->IsCorrect(data.label, y) == false){
+                            errorNum++;
+                                data.margin = y * data.label; 
+						}
+						data_count++;
 
-					if (show_count == this->curIterNum){
-						printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
-							errorNum / (float)(this->curIterNum));
-						show_count = (1 << ++show_step);
+						if (show_count == data_count){
+							printf("%lu\t\t\t%.6f\t\t\n",data_count, 
+								errorNum / (float)(data_count));
+							show_count = (1 << ++show_step);
+						}
 					}
 					this->curIterNum++;
 				}
