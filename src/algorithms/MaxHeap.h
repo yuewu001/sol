@@ -30,11 +30,17 @@ namespace SOL{
 		IndexType GetK() const { return this->K;}
 
 	public:
+		inline IndexType get_id(IndexType pos) const {
+			return this->pos2id_map[pos];
+		}
 		inline IndexType get_pos(IndexType id) const {
 			return this->id2pos_map[id];
 		}
 		inline bool is_topK(IndexType id) const {
 			return this->id2pos_map[id] < this->K;
+		}
+		inline T GetHeapLimit() const {
+			return this->value_list[this->pos2id_map[0]];
 		}
 
 	private:
@@ -59,6 +65,11 @@ namespace SOL{
 		 */
 		bool Init(IndexType dataNum, IndexType topK, const T* init_value){
 			//assert(topK > 0 && init_value != NULL);
+			if (topK < 1){
+				std::cerr << "ERROR: topK should be no less than 1, current value " <<topK<< std::endl;
+				exit(-1);
+			}
+
 			this->release();
 			this->pos2id_map.resize(topK);
 			this->id2pos_map.resize(dataNum);
@@ -133,6 +144,7 @@ namespace SOL{
 			else if (newK == this->K)
 				return;
 
+			this->pos2id_map.reserve(newK);
 			this->pos2id_map.resize(newK);
 			//update id2pos for those ids not in the heap
 			//update pos2id fr new added pos
@@ -151,7 +163,7 @@ namespace SOL{
 			this->BuildHeap();
 			//make sure most confident values are in the heap
 			IndexType ret_id;
-			for (IndexType i = 0, j = this->K; i != this->data_num; i++){
+			for (IndexType i = 0; i != this->data_num; i++){
 				if (this->is_topK(i) == false){
 					this->UpdateHeap(i, ret_id);
 				}
@@ -178,6 +190,7 @@ namespace SOL{
 		}
 
 	public:
+
 		/**
 		 * UpdateHeap : update the value of the specified item and adjust heap
 		 * Note that: when value in the heap increases to the largest among all
@@ -315,7 +328,7 @@ namespace SOL{
 		 * @Param new_num: new total data number
 		 */
 		void UpdateDataNum(IndexType new_num, const T* value_list){
-			if (new_num < data_num || this->id2pos_map.size() == 0)
+			if (new_num < data_num)
 				return;
 
 			this->id2pos_map.resize(new_num);

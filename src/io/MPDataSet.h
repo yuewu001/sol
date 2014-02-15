@@ -32,8 +32,8 @@ namespace SOL {
 				case SOL::MPBufferType_ALL:
 					this->pMp_Buffer = new MPBuffer_ALL<FeatType, LabelType>(mp_buf_size);
 					break;
-				case SOL::MPBufferType_FALSE_PREDICT:
-					this->pMp_Buffer = new MPBuffer_FALSE_PREDICT<FeatType, LabelType>(mp_buf_size);
+				case SOL::MPBufferType_MARGIN:
+					this->pMp_Buffer = new MPBuffer_LARGE_MARGIN<FeatType, LabelType>(mp_buf_size);
 					break;
 				case SOL::MPBufferType_RESERVIOR:
 					this->pMp_Buffer = new MPBuffer_RESERVIOR<FeatType, LabelType>(mp_buf_size);

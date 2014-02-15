@@ -29,12 +29,12 @@ namespace SOL{
 			return new SOL::DataSet<FeatType, LabelType>(passNum, buf_size);
 		else if (dt_type == "all")
 			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL,mp_buf_size);
-		else if (dt_type == "false_predict")
-			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_FALSE_PREDICT,mp_buf_size);
+		else if (dt_type == "margin")
+			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_MARGIN,mp_buf_size);
 		else if (dt_type == "reservior")
 			return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_RESERVIOR,mp_buf_size);
 		else {
-			std::cerr<<"unrecognized dataset type "<<dt_type<<std::endl;
+			std::cerr<<"ERROR: unrecognized dataset type "<<dt_type<<std::endl;
 			return NULL;
 		}
 	}

@@ -10,14 +10,17 @@
 
 #include "DataPoint.h"
 
+#include "../algorithms/MaxHeap.h"
+
 #include <ctime>
+#include <limits>
 
 namespace SOL{
 
 	enum MPBufferType{
 		MPBufferType_None = 0, //no buffer
 		MPBufferType_ALL = 1, //buffer all data
-		MPBufferType_FALSE_PREDICT = 2, //buffer false predictions
+		MPBufferType_MARGIN = 2, //buffer false predictions
 		MPBufferType_RESERVIOR = 3, //reservior sampling
 	};
 
@@ -48,22 +51,41 @@ namespace SOL{
 			}
 		};
 		template <typename FeatType, typename LabelType>
-		struct MPBuffer_FALSE_PREDICT :public MPBuffer<FeatType, LabelType>{
-			MPBuffer_FALSE_PREDICT(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+		struct MPBuffer_LARGE_MARGIN:public MPBuffer<FeatType, LabelType>{
+		private:
+			MaxHeap<float> marginHeap;
+			s_array<float> marginVec;
+			s_array<int> bufIdVec;
+			static float max_float;
+		public:
+			MPBuffer_LARGE_MARGIN(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+				this->marginVec.resize(bufSize);
+				for (s_array<float>::iterator iter = this->marginVec.begin;
+					iter != this->marginVec.end; iter++)
+					*iter = max_float;
+				//this->marginHeap.Init(1,1, this->marginVec.begin);
 			}
 
 			void Push(DataPoint<FeatType, LabelType> &srcPt){
-				if (this->insert_pos == this->chunk_size){
-					this->insert_pos = 0;
+				static IndexType ret_id;
+				if (this->dataNum < this->chunk_size){
+					this->dataNum++;
+					this->marginHeap.UpdateDataNum(this->dataNum, this->marginVec.begin);
+					this->marginHeap.ResizeHeap(this->dataNum);
 				}
-				if (srcPt.margin > 0) {
+
+				if (srcPt.margin < this->marginHeap.GetHeapLimit()){
+					this->insert_pos = this->marginHeap.get_id(0);
 					srcPt.clone(this->data[this->insert_pos]);
-					this->insert_pos++;
-					if (this->dataNum < this->chunk_size)
-						this->dataNum++;
+					this->marginVec[this->insert_pos] = srcPt.margin;
+					this->marginHeap.UpdateHeap(this->insert_pos,ret_id);
 				}
 			}
 		};
+		template <typename FeatType, typename LabelType>
+		float MPBuffer_LARGE_MARGIN<FeatType, LabelType>::max_float =
+			(std::numeric_limits<float>::max)();
+
 		template <typename FeatType, typename LabelType>
 		struct MPBuffer_RESERVIOR :public MPBuffer<FeatType, LabelType>{
 			size_t total_num; //total number of pushed instances
@@ -94,7 +116,7 @@ namespace SOL{
 				if (max_num < RAND_MAX)
 					return rand() / max1 * max_num < limit;
 				else
-					return (((rand() & 0x00007FE0) >> 5) + ((rand() & 0x00007FF0) << 6) + ((rand() & 0x00007FF0) << 17)) 
+					return (((rand() & 0x00007FE0) >> 5) + ((rand() & 0x00007FF0) << 6) + ((rand() & 0x00007FF0) << 17))
 					/ max2 * max_num < limit;
 			}
 		};
