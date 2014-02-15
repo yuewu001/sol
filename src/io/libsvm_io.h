@@ -60,8 +60,18 @@ namespace SOL {
                 }
 				bool OpenWriting() {
 					this->Close();
-					this->writer_handler  = fopen(this->fileName.c_str(), "wb");
+#if _WIN32
+					errno_t ret = fopen_s(&this->writer_handler, this->fileName.c_str(),"wb");
+					if (ret != 0){
+						printf("error %d: can't open file %s\n", ret, this->fileName.c_str());
+						this->is_good = false;
+					}
+					else
+						this->is_good = true;
+#else
+					this->writer_handler = fopen(this->fileName.c_str(), "wb");
 					this->is_good = this->writer_handler != NULL ? true : false;
+#endif
 					return this->is_good;
 				}
 
@@ -77,18 +87,18 @@ namespace SOL {
 				}
 
 				virtual inline bool Good() {
-					return this->is_good == true && io_hander.good() == 0 ? true: false;
+					return this->is_good == true && io_hander.good() == 0 ? true : false;
 				}
 
 				virtual bool GetNextData(DataPoint<FeatType, LabelType> &data) {
-					if(io_hander.read_line(line, max_line_len) == NULL)
+					if (io_hander.read_line(line, max_line_len) == NULL)
 						return false;
 
 					LabelType labelVal;
 					char* p = line, *endptr = NULL;
 					if (*p == '\0')
 						return false;
-					labelVal = (LabelType)parseInt(p,&endptr);
+					labelVal = (LabelType)parseInt(p, &endptr);
 					if (endptr == p) {
 						fprintf(stderr, "parse label failed.\n");
 						this->is_good = false;
@@ -99,27 +109,27 @@ namespace SOL {
 					IndexType index;
 					FeatType feat;
 					// features
-					while(1) {
+					while (1) {
 						p = strip_line(endptr);
 						if (*p == '\0')
 							break;
-						index = (IndexType)(parseUint(p,&endptr));
+						index = (IndexType)(parseUint(p, &endptr));
 						if (endptr == p) { //parse index failed
-							fprintf(stderr,"parse index value failed!\n%s", p);
+							fprintf(stderr, "parse index value failed!\n%s", p);
 							this->is_good = false;
 							return false;
 						}
 
 						p = endptr;
-						feat = parseFloat(p,&endptr);
+						feat = parseFloat(p, &endptr);
 						//feat =(float)(strtod(val,&endptr));
 						if (endptr == p) {
-							fprintf(stderr,"parse feature value failed!\n");
+							fprintf(stderr, "parse feature value failed!\n");
 							this->is_good = false;
 							return false;
 						}
 
-						data.AddNewFeat(index,feat);
+						data.AddNewFeat(index, feat);
 					}
 					data.label = labelVal;
 
@@ -128,11 +138,11 @@ namespace SOL {
 
 				bool WriteData(DataPoint<FeatType, LabelType> &data) {
 					size_t featNum = data.indexes.size();
-					fprintf(writer_handler,"%d", data.label);
+					fprintf(writer_handler, "%d", data.label);
 					for (IndexType i = 0; i < featNum; i++){
-						fprintf(writer_handler," %d:%f",data.indexes[i], data.features[i]);
+						fprintf(writer_handler, " %d:%f", data.indexes[i], data.features[i]);
 					}
-					fprintf(writer_handler,"\n");
+					fprintf(writer_handler, "\n");
 					return true;
 				}
 		};

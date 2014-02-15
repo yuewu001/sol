@@ -27,7 +27,7 @@ namespace SOL {
 		s_array<FeatType> features;
 		LabelType label;
 		FeatType sum_sq; //sum of square
-		float loss;
+		float margin;
 
 		//for copy and release control
 		int *count;
@@ -40,7 +40,7 @@ namespace SOL {
 			this->max_index = 0;
 			this->label = 0;
 			this->sum_sq = 0;
-			this->loss = 0;
+			this->margin= 0;
 		}
 
 		//copy constructor
@@ -51,7 +51,7 @@ namespace SOL {
 			this->count = point.count;
 			this->max_index = point.max_index;
 			this->sum_sq = point.sum_sq;
-			this->loss = point.loss;
+			this->margin= point.margin;
 			++(*count);
 		}
 
@@ -71,7 +71,7 @@ namespace SOL {
 				this->label = data.label;
 				this->max_index = data.max_index;
 				this->sum_sq = data.sum_sq;
-				this->loss = data.loss;
+				this->margin = data.margin;
 				this->count = data.count;
 				++(*count);
 				return *this;
@@ -92,13 +92,13 @@ namespace SOL {
 			this->features.erase();
 			this->max_index = 0;
 			this->sum_sq = 0;
-			this->loss = 0;
+			this->margin = 0;
 		}
 		void clone(DataPoint<FeatType, LabelType> &dstPt) const{
 			dstPt.label = this->label;
 			dstPt.max_index = this->max_index;
 			dstPt.sum_sq = this->sum_sq;
-			dstPt.loss = this->loss;
+			dstPt.margin = this->margin;
 			dstPt.indexes.resize(this->indexes.size());
 			memcpy(dstPt.indexes.begin, this->indexes.begin, this->indexes.size() * sizeof(IndexType));
 			dstPt.features.resize(this->features.size());
@@ -110,7 +110,7 @@ namespace SOL {
 			newPt.label = this->label;
 			newPt.max_index = this->max_index;
 			newPt.sum_sq = this->sum_sq;
-			newPt.loss = this->loss;
+			newPt.margin = this->margin;
 			newPt.indexes.resize(this->indexes.size());
 			memcpy(newPt.indexes.begin,this->indexes.begin, this->indexes.size() * sizeof(IndexType) );
 			newPt.features.resize(this->features.size());

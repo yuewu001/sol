@@ -56,7 +56,7 @@ namespace SOL{
 				if (this->insert_pos == this->chunk_size){
 					this->insert_pos = 0;
 				}
-				if (srcPt.loss > 0) {
+				if (srcPt.margin > 0) {
 					srcPt.clone(this->data[this->insert_pos]);
 					this->insert_pos++;
 					if (this->dataNum < this->chunk_size)

@@ -207,7 +207,7 @@ namespace SOL {
 					//loss
 					if (chunk.is_inherited == false && this->lossFunc->IsCorrect(data.label, y) == false){
 						errorNum++;
-						data.loss = this->lossFunc->GetLoss(data.label, y);
+						data.margin = this->lossFunc->GetLoss(data.label, y);
 					}
 
 					if (show_count == this->curIterNum){
