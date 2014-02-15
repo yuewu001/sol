@@ -90,7 +90,7 @@ def parse_result(input_file, output_file):
     dec_pattern = "\d+\.?\d*"
     pattern_l = re.compile(r'Learn error rate:\s*(' + dec_pattern + ').*\s*')
     pattern_t = re.compile(r'Test error rate:\s*(' + dec_pattern + ').*\s*')
-    pattern_s = re.compile(r'Sparsification Rate:\s*(' + dec_pattern + ').*\s*')
+    pattern_s = re.compile(r'Non-Zero weight number:\s*(' + dec_pattern + ').*\s*')
     pattern_lt= re.compile(r'Learning time:\s*(' +dec_pattern + ')\s*s') 
     
     result_l = pattern_l.findall(open(input_file,'r').read())

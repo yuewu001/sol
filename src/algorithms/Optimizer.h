@@ -108,6 +108,7 @@ namespace SOL {
 		float Test(DataSet<FeatType, LabelType> &testSet);
 
 		float GetSparseRate(IndexType total_len = 0);
+		IndexType GetNonZeroNum();
 
 	protected:
 		//Change the dimension of weights
@@ -311,21 +312,29 @@ namespace SOL {
 			return predict;
 		}
 
+		template <typename FeatType, typename LabelType>
+		IndexType Optimizer<FeatType, LabelType>::GetNonZeroNum(){
+			IndexType non_zeroNum(0);
+			if (this->weightDim == 1)
+				return 0;
+
+			for (IndexType i = 1; i < this->weightDim; i++) {
+				if (this->weightVec[i] != 0)
+					non_zeroNum++;
+			}
+			return non_zeroNum;
+		}
 
 		template <typename FeatType, typename LabelType>
 		float Optimizer<FeatType, LabelType>::GetSparseRate(IndexType total_len) {
-			float zeroNum(0);
 			if (this->weightDim == 1)
 				return 1;
-
-			for (IndexType i = 1; i < this->weightDim; i++) {
-				if (this->weightVec[i] == 0)
-					zeroNum++;
-			}
+			IndexType zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
+			
 			if (total_len > 0)
-				return zeroNum / total_len;
+				return zeroNum / (float)total_len;
 			else
-				return zeroNum / (this->weightDim - 1);
+				return zeroNum / (float)(this->weightDim - 1);
 		}
 
 		//try and get the best parameter

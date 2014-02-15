@@ -82,5 +82,5 @@ if (exist('xmin','var'))
 end
 set(gca,'Fontsize',24);
 legend(legend_content,'Location','NorthWest', 'fontsize',22)
-print(strcat(folder_name,'-test-sparse'),'-dpdf')
+print(strcat(folder_name,'-test-sparse'),'-dpng')
 %close all

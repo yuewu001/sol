@@ -14,7 +14,7 @@ opt_list = ['OFSGD','AROW','SGD']
 
 ds_list = ['pcmac','a9a','MNIST','aut']#,]#,'rcv1','url']
 ds_list = ['a8a','gisette','news','physic']
-ds_list = ['synthetic_ofs']
+ds_list = ['pcmac','aut']
 fold_num =5
 
 const_eta_search = '0.03125:2.0:32'

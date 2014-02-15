@@ -110,7 +110,8 @@ int main(int argc, const char** args) {
 				cout<<"load test set failed!"<<endl;
 		}
 
-		printf("Sparsification Rate: %.2f %%\n", sparseRate * 100);
+		printf("Non-Zero weight number: %u\n", opti->GetNonZeroNum());
+		printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 		printf("Learning time: %.3f s\n", (float)(time2 - time1));
 		if (is_test)
 			printf("Test time: %.3f s\n", (float)(time3 - time2));

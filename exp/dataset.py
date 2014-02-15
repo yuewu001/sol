@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'E:/users/v-wuyue/data/'
+    rootDir = 'D:/v-wuyue/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:
@@ -25,30 +25,36 @@ def analyze(file_name):
         os.system(cmd)
 
 def get_file_name(dataset, task = 'train'):
-    if dataset == 'rcv1':
-        train_file = 'rcv1/rcv1.train' 
-        test_file = 'rcv1/rcv1.test'
-    elif dataset == 'a8a':
-        train_file = 'a8a/a8a' 
-        test_file = 'a8a/a8a.t'
-    elif dataset == 'gisette':
-        train_file = 'gisette/gisette_scale' 
-        test_file = 'gisette/gisette_scale.t'
-    elif dataset == 'news':
-        train_file = 'news/news_train'
-        test_file = 'news/news_test' 
-    elif dataset == 'aut':
+    if dataset == 'aut':
         train_file = 'aut/aut_train'
         test_file = 'aut/aut_test'
     elif dataset == 'pcmac':
         train_file = 'pcmac/pcmac_train'
         test_file = 'pcmac/pcmac_test'
-    elif dataset == 'physic':
-        train_file = 'physic/physic_train'
-        test_file = 'physic/physic_test'
-    elif dataset == 'synthetic_ofs':
-        train_file = 'synthetic_ofs/synthetic_train'
-        test_file = 'synthetic_ofs/synthetic_test'
+    elif dataset == 'basehock':
+        train_file = 'basehock/basehock_train'
+        test_file = 'basehock/basehock_test' 
+    elif dataset == 'relathe':
+        train_file = 'relathe/relathe_train'
+        test_file = 'relathe/relathe_test' 
+    elif dataset == 'ccat':
+        train_file = 'ccat/ccat_train' 
+        test_file = 'ccat/ccat_test'
+    elif dataset == 'gisette':
+        train_file = 'gisette/gisette_scale' 
+        test_file = 'gisette/gisette_scale.t'
+    elif dataset == 'real-sim':
+        train_file = 'real-sim/real-sim_train' 
+        test_file = 'real-sim/real-sim_test'
+    elif dataset == 'news':
+        train_file = 'news/news_train'
+        test_file = 'news/news_test' 
+    elif dataset == 'synthetic_100_10K_100K':
+        train_file = 'synthetic_ofs/100_10K_100K/synthetic_train'
+        test_file = 'synthetic_ofs/100_10K_100K/synthetic_test'
+    elif dataset == 'synthetic_200_20K_100K':
+        train_file = 'synthetic_ofs/200_20K_100K/synthetic_train'
+        test_file = 'synthetic_ofs/200_20K_100K/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -127,62 +133,16 @@ def get_cmd_data(dataset):
 
 #parameters for each dataset, obtained by cross-validation in general
 def get_model_param(ds, opt):
-    a9a = {'SGD':{'-eta':8},'STG':{'-eta':8},'FOBOS':{'-eta':8},
-            'Ada-FOBOS':{'-eta':1, '-delta':0.125},
-            'Ada-RDA':{'-eta':1, '-delta':0.25},
-            'AROW-TG':{'-r':1}, 'AROW-FS':{'-r':1},
-            'AROW-DA':{'-r':8.0},'RDA':{'-eta':16.0},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':8}}
-    news = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':0.03125},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
-            'AROW-DA':{'-r':0.25}, 'RDA':{'-eta':64}, 'SGD-FS':{'-eta':64}}
-    MNIST = {'SGD':{'-eta':64},'STG':{'-eta':64},'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':0.25, '-delta':0.0625},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.0625},
-            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
-            'AROW-DA':{'-r':4}, 'RDA':{'-eta':8},
-            'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'SGD-FS':{'-eta':64}}
-    rcv1 = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.0625},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.125},
-            'AROW-TG':{'-r':2}, 'AROW-FS':{'-r':2},
-            'AROW-DA':{'-r':2}, 'RDA':{'-eta':128},
-            'SGD-FS':{'-eta':32}}
-    url = {'SGD':{'-eta':256},'STG':{'-eta':256},'FOBOS':{'-eta':256},
-            'Ada-FOBOS':{'-eta':4, '-delta':0.0625},
-            'Ada-RDA':{'-eta':4, '-delta':0.0625},
-            'AROW-TG':{'-r':0.25}, 'AROW-FS':{'-r':0.25},
-            'AROW-DA':{'-r':0.25}, 'RDA':{'-eta':256}, 'SGD-FS':{'-eta':256}}
-    aut = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-            'Ada-FOBOS':{'-eta':1, '-delta':0.25},
-            'Ada-RDA':{'-eta':0.5, '-delta':0.03125},
-            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':64},
-            'OFSGD':{'-eta':0.25,'-delta':0.0003125},'SGD-FS':{'-eta':32}}
-    pcmac = {'SGD':{'-eta':8},'STG':{'-eta':8}, 'FOBOS':{'-eta':8},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.5},
-            'Ada-RDA':{'-eta':0.25, '-delta':0.25},
-            'AROW-TG':{'-r':1.0}, 'AROW-FS':{'-r':1.0},
-            'AROW-DA':{'-r':2.0}, 'RDA':{'-eta':32.0},
-            'OFSGD':{'-eta':1,'-delta':0.000625},'SGD-FS':{'-eta':8}}
-    physic = {'SGD':{'-eta':32},'STG':{'-eta':32},'FOBOS':{'-eta':32},
-            'Ada-FOBOS':{'-eta':0.5, '-delta':0.125},
-            'Ada-RDA':{'-eta':2.0, '-delta':1.0},
-            'AROW-TG':{'-r':0.5}, 'AROW-FS':{'-r':0.5},
-            'AROW-DA':{'-r':0.5}, 'RDA':{'-eta':256},'SGD-FS':{'-eta':32}}
-    webspam_trigram = {'SGD':{'-eta':64},'STG':{'-eta':64},
-            'FOBOS':{'-eta':64},
-            'Ada-FOBOS':{'-eta':2, '-delta':0.03125},
-            'Ada-RDA':{'-eta':8, '-delta':0.03125},
-            'AROW-TG':{'-r':0.03125}, 'AROW-FS':{'-r':0.03125},
-            'AROW-DA':{'-r':0.03125},'RDA':{'-eta':512}}
-    synthetic_ofs = {'AROW-FS':{'-r':32}, 'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'SGD-FS':{'-eta':0.25}}
-    ds_opt_param = {'news':news,'MNIST':MNIST,'rcv1':rcv1,
-            'url':url,'webspam_trigram':webspam_trigram,
-            'aut':aut,'physic':physic,
-            'pcmac':pcmac,'a9a':a9a,'synthetic_ofs':synthetic_ofs} 
+    aut = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    pcmac = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':1.0,'-delta':0.000625}}
+    basehock = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
+    relathe = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':2.0,'-delta':0.0003125}}
+    ccat = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    gisette = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':128},'OFSGD':{'-eta':0.125,'-delta':0.0003125}}
+    real_sim = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':16},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    synthetic_100_10K_100K = {'AROW-FS':{'-r':128},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
+    ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,'gisette':gisette,
+            'real-sim':real_sim,'synthetic_100_10K_100K':synthetic_100_10K_100K} 
     cmd = ''
     if ds in ds_opt_param.keys():
         if opt in ds_opt_param[ds].keys():

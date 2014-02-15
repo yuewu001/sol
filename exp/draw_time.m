@@ -1,4 +1,4 @@
-function draw_time(dataset, type, xmin, xmax, ymin, ymax)
+function draw_time(dataset,xmin, xmax, ymin, ymax)
 close all;
 
 color_list = {'r','m','b','black'};
@@ -12,16 +12,9 @@ cur_shape_index = 1;
 folder_name = strcat(dataset,'/');
 mkdir figs
 opt_list_file = strcat(folder_name,'opt_list.txt');
-if type == 'TG'
-    %opt_list = {'AROW-TG.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
-    opt_list = {'AROW-TG.txt';'Ada-FOBOS.txt';'STG.txt';'FOBOS.txt'};
-elseif type =='DA'
-    opt_list = {'AROW-DA.txt';'Ada-RDA.txt';'RDA.txt'};    
-elseif type == 'FS'
-    opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
-elseif type == 'CP'
-    opt_list = {'AROW-TG.txt';'AROW-DA.txt'};
-end
+
+opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
+
 %opt_list = textread(opt_list_file,'%s');
 
 opt_num = size(opt_list,1);
@@ -32,15 +25,9 @@ for k = 1:1:opt_num
     result_file = opt_list{k,1};
     opt_name = my_split(result_file,'.');
     opt_name = opt_name{1,1};
-    if strcmp(opt_name, 'SSAROW') 
-        legend_content{1,k} = 'AROW-TG';
-    elseif strcmp(opt_name,'CW-RDA')
-        legend_content{1,k} = 'AROW-DA';
-    elseif strcmp(opt_name,'ASAROW')
-        legend_content{1,k} = 'AROW-FS';
-    else
-        legend_content{1,k} = opt_name;
-    end
+
+    legend_content{1,k} = opt_name;
+   
 
     result = load(strcat(folder_name, result_file));
    
@@ -83,5 +70,5 @@ end
 legend(legend_content,'location','northwest', 'fontsize',22)
 set(gca,'Fontsize',24);
 
-print(strcat(folder_name,strcat(type,'-time-sparse')),'-dpdf')
+print(strcat(folder_name,'-time-sparse'),'-dpng')
 %close all

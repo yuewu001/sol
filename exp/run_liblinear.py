@@ -5,53 +5,52 @@ import time
 import liblinear_util
 import run_util
 import exe_path
+import l1_def
+import sys
 
-def run_liblinear(train_file, test_file,ds, result_file):
-
-    result_once = [0,0,0,0]
-    os.system('mkdir ./tmp')
-
-    dst_folder = './%s' %ds
-    tmp_folder = dst_folder + '/liblinear'
-    #os.system('mkdir -p %s' %tmp_folder)
-    run_util.create_dir(tmp_folder)
-
-    model_file = tmp_folder + '/model'
-    tmp_file   = tmp_folder + '/tmp.txt'
+def run_liblinear(train_file, test_file,ds, ori_result_file):
+    result_all = []
 
     train_exe_name = exe_path.liblinar_train_exe_name 
     test_exe_name = exe_path.liblinar_test_exe_name 
 
     #make the result dir
-    #cmd = 'mkdir -p %s' %dst_folder
-    #os.system(cmd)
+    dst_folder = './%s' %ds
     run_util.create_dir(dst_folder)
 
+    c_list = l1_def.get_lambda_list(ds,'liblinear')
 
-    result_file = './%s' %tmp_folder + '/' + result_file
-    #clear the file if it already exists
-    open(result_file,'w').close()
+    for c in c_list:
+        result_once = [0,0,0,0]
+        model_file = dst_folder + '/ll_model%g' %c
+        predict_file   = dst_folder + '/ll_predict%g' %c
 
-   
-    #evaluate the result
-    train_cmd = train_exe_name + ' %s' %train_file + ' %s' %model_file 
-    test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %tmp_file + '>> %s' %result_file
-    
-    print train_cmd
-    start_time =time.time()
-    os.system(train_cmd)
-    end_time = time.time()
 
-    #parse learning time
-    train_time = (float)(end_time - start_time) 
-    result_once[3] = train_time
-    
-    #predict
-    print test_cmd
-    os.system(test_cmd)
-    result_once[1] = liblinear_util.parse_error_rate(result_file)
-    valid_dim = run_util.get_valid_dim(train_file)
-    model_size = liblinear_util.get_model_size(model_file)
-    result_once[2] = 100 - (model_size * 100.0 / valid_dim)
+        result_file = dst_folder + '/' + ori_result_file + '_%f' %c
+        #clear the file if it already exists
+        open(result_file,'w').close()
 
-    return [result_once]
+        #evaluate the result
+        train_cmd = train_exe_name + ' -s 5 -c %f' %c + ' %s' %train_file + ' %s' %model_file 
+        test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %predict_file + '>> %s' %result_file
+        #test_cmd = test_exe_name + ' %s' %test_file + ' %s' %model_file + ' %s' %predict_file 
+        
+        print train_cmd
+        start_time =time.time()
+        os.system(train_cmd)
+        end_time = time.time()
+
+        #parse learning time
+        train_time = (float)(end_time - start_time) 
+        result_once[3] = train_time
+        
+        #predict
+        print test_cmd
+        os.system(test_cmd)
+        result_once[1] = liblinear_util.parse_error_rate(result_file)
+        valid_dim = run_util.get_valid_dim(train_file)
+        model_size = liblinear_util.get_model_size(model_file)
+        result_once[2] = model_size
+
+        result_all.append(result_once)
+    return result_all

@@ -79,7 +79,7 @@ namespace SOL {
 			this->r = init_r;
 			this->K = 0;
 			this->w_full.resize(this->weightDim);
-			this->tolerance = 1.05;
+			this->tolerance = 1.05f;
 		}
 
 	template <typename FeatType, typename LabelType>
