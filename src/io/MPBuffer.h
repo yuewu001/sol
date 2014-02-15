@@ -81,21 +81,20 @@ namespace SOL{
 				}
 				else{//sampling
 					//sample from a Bernoulli distribution to determine whether we need to insert the current sample
-					//if (this->bernolli(this->chunk_size,this->total_num)){
-					{
-						this->insert_pos = rand() % this->chunk_size;
+					this->insert_pos = this->bernolli(this->total_num);
+					if (this->insert_pos < this->chunk_size){
 						srcPt.clone(this->data[this->insert_pos]);
 					}
 				}
 			}
-			bool bernolli(size_t limit, size_t max_num) {
+			size_t bernolli(size_t max_num) {
 				static double max1 = RAND_MAX + 1.0;
 				static double max2 = std::pow(2, 32);
 				if (max_num < RAND_MAX)
-					return rand() / max1 * max_num < limit;
+					return size_t(rand() / max1 * max_num);
 				else
-					return (((rand() & 0x00007FE0) >> 5) + ((rand() & 0x00007FF0) << 6) + ((rand() & 0x00007FF0) << 17)) 
-					/ max2 * max_num < limit;
+					return size_t((((rand() & 0x00007FE0) >> 5) + ((rand() & 0x00007FF0) << 6) + ((rand() & 0x00007FF0) << 17)) 
+					/ max2 * max_num);
 			}
 		};
 }

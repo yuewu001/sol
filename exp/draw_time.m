@@ -1,4 +1,4 @@
-function draw_time(dataset, type, xmin, xmax, ymin, ymax)
+function draw_time(dataset, xmin, xmax, ymin, ymax)
 close all;
 
 color_list = {'r','m','b','black'};
@@ -11,35 +11,23 @@ cur_shape_index = 1;
 
 folder_name = strcat(dataset,'/');
 mkdir figs
-opt_list_file = strcat(folder_name,'opt_list.txt');
-if type == 'TG'
-    %opt_list = {'AROW-TG.txt';'FOBOS.txt';'STG.txt';'Ada-FOBOS.txt'};
-    opt_list = {'AROW-TG.txt';'Ada-FOBOS.txt';'STG.txt';'FOBOS.txt'};
-elseif type =='DA'
-    opt_list = {'AROW-DA.txt';'Ada-RDA.txt';'RDA.txt'};    
-elseif type == 'FS'
-    opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
-elseif type == 'CP'
-    opt_list = {'AROW-TG.txt';'AROW-DA.txt'};
-end
-%opt_list = textread(opt_list_file,'%s');
+opt_list = {'SGD_none.txt';'SGD_all.txt';'SGD_reservior.txt'};
 
 opt_num = size(opt_list,1);
 
 legend_content = cell(1,opt_num);
-
+bf_size_list = [64,128,256,512,1024,2048,4096,9182];
 for k = 1:1:opt_num
     result_file = opt_list{k,1};
     opt_name = my_split(result_file,'.');
     opt_name = opt_name{1,1};
-    if strcmp(opt_name, 'SSAROW') 
-        legend_content{1,k} = 'AROW-TG';
-    elseif strcmp(opt_name,'CW-RDA')
-        legend_content{1,k} = 'AROW-DA';
-    elseif strcmp(opt_name,'ASAROW')
-        legend_content{1,k} = 'AROW-FS';
-    else
-        legend_content{1,k} = opt_name;
+   
+    if strcmp(opt_name, 'SGD_none') == 1
+        legend_content{1,k} = 'Perceptron';
+    elseif strcmp(opt_name, 'SGD_all') == 1
+        legend_content{1,k} = 'newest';
+    elseif strcmp(opt_name, 'SGD_reservior') == 1 
+        legend_content{1,k} = 'reservior';
     end
 
     result = load(strcat(folder_name, result_file));
@@ -54,7 +42,7 @@ for k = 1:1:opt_num
 	hold on
     grid on
     box on
-	plot(sparse_vec, l_time_vec, color_shape,'LineWidth',2,'markersize',5);	 
+	plot(bf_size_list, l_time_vec, color_shape,'LineWidth',2,'markersize',5);	 
     
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -75,7 +63,7 @@ figure(1) %learning error rate
 %title('training time vs sparsity', 'fontsize',14)
 
 ylabel('training time (s)', 'fontsize',28)
-xlabel('sparsity (%)', 'fontsize',28)
+xlabel('buffer size (%)', 'fontsize',28)
 
 if (exist('xmin','var'))
     axis([xmin xmax ymin ymax])
@@ -83,5 +71,5 @@ end
 legend(legend_content,'location','northwest', 'fontsize',22)
 set(gca,'Fontsize',24);
 
-print(strcat(folder_name,strcat(type,'-time-sparse')),'-dpdf')
+print(strcat(folder_name,'-time-sparse'),'-dpng')
 %close all

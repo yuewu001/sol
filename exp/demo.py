@@ -17,12 +17,12 @@ opt_list = ['FOBOS','Ada-FOBOS','AROW-TG']
 #opt_list = ['AROW-FS','SGD-FS','OFSGD']
 #opt_list = ['RDA','Ada-RDA','AROW-DA']
 #opt_list = ['AROW-TG']
-#opt_list = ['AROW-TG']
+opt_list = ['AROW-TG']
 
 #dataset list
 ds_list = ['MNIST','a9a','pcmac','aut']
 #ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['synthetic2']
+ds_list = ['a9a']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
