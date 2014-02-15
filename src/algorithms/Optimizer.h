@@ -208,13 +208,13 @@ namespace SOL {
 					//loss
 					if (chunk.is_inherited == false){
 						if (this->lossFunc->IsCorrect(data.label, y) == false){
-                            errorNum++;
-                                data.margin = y * data.label; 
+							errorNum++;
+							data.margin = y * data.label;
 						}
 						data_count++;
 
 						if (show_count == data_count){
-							printf("%lu\t\t\t%.6f\t\t\n",data_count, 
+							printf("%lu\t\t\t%.6f\t\t\n", data_count,
 								errorNum / (float)(data_count));
 							show_count = (1 << ++show_step);
 						}
@@ -230,52 +230,52 @@ namespace SOL {
 
 		//learn a model and return the mistake rate and its variance
 		template <typename FeatType, typename LabelType>
-		float Optimizer<FeatType, LabelType>::Learn(float &aveErrRate, float &varErrRate, 
+		float Optimizer<FeatType, LabelType>::Learn(float &aveErrRate, float &varErrRate,
 			float &sparseRate, int numOfTimes) {
-				float * errorRateVec = new float[numOfTimes];
-				float * sparseRateVec = new float[numOfTimes];
+			float * errorRateVec = new float[numOfTimes];
+			float * sparseRateVec = new float[numOfTimes];
 
-				for (int i = 0; i < numOfTimes; i++) {
-					//random order
-					errorRateVec[i] = this->Train();
-					sparseRateVec[i] = this->GetSparseRate();
-				}
-				aveErrRate = Average(errorRateVec, numOfTimes);
-				varErrRate = Variance(errorRateVec, numOfTimes);
-				sparseRate = Average(sparseRateVec, numOfTimes);
+			for (int i = 0; i < numOfTimes; i++) {
+				//random order
+				errorRateVec[i] = this->Train();
+				sparseRateVec[i] = this->GetSparseRate();
+			}
+			aveErrRate = Average(errorRateVec, numOfTimes);
+			varErrRate = Variance(errorRateVec, numOfTimes);
+			sparseRate = Average(sparseRateVec, numOfTimes);
 
-				delete []errorRateVec;
-				delete []sparseRateVec;
+			delete[]errorRateVec;
+			delete[]sparseRateVec;
 
-				return aveErrRate;
+			return aveErrRate;
 		}
 
 		//learn a model
 		template <typename FeatType, typename LabelType>
 		float Optimizer<FeatType, LabelType>::Learn(int numOfTimes) {
 			float aveErrRate, varErrRate, sparseRate;
-			return this->Learn(aveErrRate, varErrRate,sparseRate, numOfTimes);
+			return this->Learn(aveErrRate, varErrRate, sparseRate, numOfTimes);
 		}
 
 		//test the performance on the given set
 		template <typename FeatType, typename LabelType>
 		float Optimizer<FeatType, LabelType>::Test(DataSet<FeatType, LabelType> &testSet) {
-			if(testSet.Rewind() == false)
+			if (testSet.Rewind() == false)
 				return 1.f;
 			float errorRate(0);
 			//test
-			while(1) {
-				const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk(true);
-				if(chunk.dataNum  == 0) //"all the data has been processed!"
+			while (1) {
+				const DataChunk<FeatType, LabelType> &chunk = testSet.GetChunk(true);
+				if (chunk.dataNum == 0) //"all the data has been processed!"
 					break;
 				for (size_t i = 0; i < chunk.dataNum; i++) {
-					const DataPoint<FeatType , LabelType> &data = chunk.data[i];
+					const DataPoint<FeatType, LabelType> &data = chunk.data[i];
 					IndexType* p_index = data.indexes.begin;
 					float* p_feat = data.features.begin;
 					if (is_normalize){
 						if (data.sum_sq != 1){
 							float norm = sqrtf(data.sum_sq);
-							while(p_index != data.indexes.end){
+							while (p_index != data.indexes.end){
 								*p_feat /= norm;
 								p_index++; p_feat++;
 							}
@@ -283,7 +283,7 @@ namespace SOL {
 					}
 					//predict
 					float predict = this->Test_Predict(data);
-					if (this->lossFunc->IsCorrect(data.label,predict) == false)
+					if (this->lossFunc->IsCorrect(data.label, predict) == false)
 						errorRate++;
 				}
 				testSet.FinishRead();
@@ -308,7 +308,7 @@ namespace SOL {
 			float predict = 0;
 			IndexType* p_index = data.indexes.begin;
 			float* p_feat = data.features.begin;
-			while(p_index != data.indexes.end){
+			while (p_index != data.indexes.end){
 				predict += this->weightVec[*p_index++] * (*p_feat++);
 			}
 			predict += this->weightVec[0];
@@ -342,8 +342,8 @@ namespace SOL {
 			float min_errorRate = 1;
 			float bestEta = 1;
 
-			for (float eta_c = init_eta_min; eta_c<= init_eta_max; eta_c *= init_eta_step) {
-				cout<<"eta0 = "<<eta_c<<"\n";
+			for (float eta_c = init_eta_min; eta_c <= init_eta_max; eta_c *= init_eta_step) {
+				cout << "eta0 = " << eta_c << "\n";
 				float errorRate(0);
 				this->eta0 = eta_c;
 				errorRate += this->Train();
@@ -352,47 +352,47 @@ namespace SOL {
 					bestEta = eta_c;
 					min_errorRate = errorRate;
 				}
-				cout<<"mistake rate: "<<errorRate * 100<<" %\n";
+				cout << "mistake rate: " << errorRate * 100 << " %\n";
 			}
 			this->eta0 = bestEta;
 			this->lambda = prev_lambda;
-			cout<<"Best Parameter:\teta = "<<this->eta0<<"\n\n";
+			cout << "Best Parameter:\teta = " << this->eta0 << "\n\n";
 		}
 
 		template <typename FeatType, typename LabelType>
-		void Optimizer<FeatType, LabelType>::SetParameter(float lambda , float eta0, 
-			float power_t,  int t0 ){
-				this->lambda  = lambda >= 0 ? lambda : this->lambda;
-				this->eta0 = eta0 > 0 ? eta0 : this->eta0;
-				this->power_t = power_t >= 0 ? power_t : this->power_t;
-				this->initial_t = t0 > 0 ? t0: this->initial_t;
+		void Optimizer<FeatType, LabelType>::SetParameter(float lambda, float eta0,
+			float power_t, int t0){
+			this->lambda = lambda >= 0 ? lambda : this->lambda;
+			this->eta0 = eta0 > 0 ? eta0 : this->eta0;
+			this->power_t = power_t >= 0 ? power_t : this->power_t;
+			this->initial_t = t0 > 0 ? t0 : this->initial_t;
 		}
 
 		//Change the dimension of weights
 		template <typename FeatType, typename LabelType>
 		void Optimizer<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-			if (newDim < this->weightDim) 
+			if (newDim < this->weightDim)
 				return;
 			else {
 				newDim++; //reserve the 0-th
 				this->weightVec.reserve(newDim);
-				this->weightVec.resize(newDim); 
+				this->weightVec.resize(newDim);
 				//set the new value to zero
-				this->weightVec.zeros(this->weightVec.begin + this->weightDim, 
+				this->weightVec.zeros(this->weightVec.begin + this->weightDim,
 					this->weightVec.end);
 				this->weightDim = newDim;
 			}
 		}
 		template <typename FeatType, typename LabelType>
 		void Optimizer<FeatType, LabelType>::SaveModel(const string& filename){
-			ofstream outfile(filename.c_str(),ios::out | ios::binary);
+			ofstream outfile(filename.c_str(), ios::out | ios::binary);
 			if (!outfile){
-				cerr<<"open file "<<filename<<"failed!"<<endl;
+				cerr << "open file " << filename << "failed!" << endl;
 				return;
 			}
-			outfile<<"y = b + w x\n";
+			outfile << "y = b + w x\n";
 			for (IndexType i = 0; i < this->weightDim; i++){
-				outfile<<this->weightVec[i]<<"\n";
+				outfile << this->weightVec[i] << "\n";
 			}
 			outfile.close();
 		}
