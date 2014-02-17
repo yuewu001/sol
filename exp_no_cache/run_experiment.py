@@ -16,6 +16,8 @@ def run_experiment(opt_name,result_file, dataset, extra_cmd):
 
     if 'synthetic' in dataset:
         bs_list = l1_def.get_lambda_list(dataset, opt_name)
+    elif opt_name == 'liblinear':
+        bs_list = l1_def.get_lambda_list(dataset, opt_name)
     else:
         temp_list = extra_cmd.split()
         train_file = ''
@@ -27,12 +29,15 @@ def run_experiment(opt_name,result_file, dataset, extra_cmd):
             print 'no input file is specified!'
             sys.exit()
         data_valid_dim = run_util.get_valid_dim(train_file)
+        print data_valid_dim
         lambda_list = l1_def.get_lambda_list(dataset, opt_name)
 
-        bs_list = lambda_list
-        b_num = len(bs_list)
+        bs_list = [] 
+        b_num = len(lambda_list)
         for i in range(0,b_num):
-            bs_list[i] = data_valid_dim * (1 - lambda_list[i])
+            dim = data_valid_dim * (1 - lambda_list[i])
+            if dim > 0:
+                bs_list.append(dim)
 
     for bs in bs_list:
         cmd = cmd_prefix + ' -k %d' %bs + cmd_postfix

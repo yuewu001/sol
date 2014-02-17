@@ -49,6 +49,12 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 
+    elif dataset == 'rcv1':
+        train_file = 'rcv1/rcv1_train'
+        test_file = 'rcv1/rcv1_test' 
+    elif dataset == 'url':
+        train_file = 'url_combined/url_train'
+        test_file = 'url_combined/url_test' 
     elif dataset == 'synthetic_100_10K_100K':
         train_file = 'synthetic_ofs/100_10K_100K/synthetic_train'
         test_file = 'synthetic_ofs/100_10K_100K/synthetic_test'
@@ -143,11 +149,13 @@ def get_model_param(ds, opt):
     ccat = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     gisette = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':128},'OFSGD':{'-eta':0.125,'-delta':0.0003125}}
     real_sim = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':16},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    news = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':64},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    rcv1 = {'AROW-FS':{'-r':2},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    url= {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     synthetic_100_10K_100K = {'AROW-FS':{'-r':128},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
     synthetic_200_20K_100K = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
     synthetic_200_1M_1M = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
-    ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,'gisette':gisette,
-            'real-sim':real_sim,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_1M_1M':synthetic_200_1M_1M}
+    ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,'gisette':gisette, 'real-sim':real_sim,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_1M_1M':synthetic_200_1M_1M,'news':news,'rcv1':rcv1,'url':url}
     
     cmd = ''
     if ds in ds_opt_param.keys():

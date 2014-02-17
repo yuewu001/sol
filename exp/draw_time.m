@@ -13,7 +13,7 @@ folder_name = strcat(dataset,'/');
 mkdir figs
 opt_list_file = strcat(folder_name,'opt_list.txt');
 
-opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
+opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt';'liblinear.txt';'fgm.txt'};
 
 %opt_list = textread(opt_list_file,'%s');
 
@@ -25,11 +25,16 @@ for k = 1:1:opt_num
     result_file = opt_list{k,1};
     opt_name = my_split(result_file,'.');
     opt_name = opt_name{1,1};
-
-    legend_content{1,k} = opt_name;
    
-
     result = load(strcat(folder_name, result_file));
+
+    if strcmp(opt_name,'SGD-FS') == 1
+        legend_content{1,k} = 'PE_{trunc}';
+    elseif strcmp(opt_name,'OFSGD') == 1
+        legend_content{1,k} = 'SPOFS';
+    else
+        legend_content{1,k} = opt_name;
+    end
    
     sparse_vec = result(:,3);
     l_time_vec = result(:,4);  
@@ -62,7 +67,7 @@ figure(1) %learning error rate
 %title('training time vs sparsity', 'fontsize',14)
 
 ylabel('training time (s)', 'fontsize',28)
-xlabel('sparsity (%)', 'fontsize',28)
+xlabel('#Selected Features', 'fontsize',28)
 
 if (exist('xmin','var'))
     axis([xmin xmax ymin ymax])
@@ -70,5 +75,5 @@ end
 legend(legend_content,'location','northwest', 'fontsize',22)
 set(gca,'Fontsize',24);
 
-print(strcat(folder_name,'-time-sparse'),'-dpng')
+print(strcat(folder_name,'-time-sparse'),'-dpdf')
 %close all

@@ -7,20 +7,19 @@ import sol_shuffle
 import run_experiment
 import run_vw
 import run_liblinear
-import run_fgm
 
 
 #algorithm list
 opt_list = ['AROW-FS','SGD-FS','OFSGD']
-opt_list = ['fgm','liblinear']
-#opt_list = ['liblinear']
+#opt_list = ['SGD']
 
 #dataset list
-ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
+ds_list = ['MNIST','a9a','pcmac','aut']
 #ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
+ds_list = ['relathe','ccat','real-sim']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 10
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
@@ -82,9 +81,6 @@ def train_model(path_list,dst_folder):
             elif  opt == 'liblinear':
                 result_file = 'liblinear_result_%d' %k + '.txt'
                 result_once = run_liblinear.run_liblinear(rand_file, test_file, ds, result_file)
-            elif opt == 'fgm':
-                result_file = 'fgm_result_%d' %k + '.txt'
-                result_once = run_fgm.run_fgm(rand_file, test_file, ds, result_file)
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 

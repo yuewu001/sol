@@ -2,8 +2,7 @@
 
 SGD_list = [0]
 vw_list = [0]
-
-sparse_vec = [0.1,0,2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.975, 0.99,0.995]
+sparse_vec = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.975, 0.99,0.995]
 def get_synthetic_100_10K_100K(opt_name):
     if opt_name == 'liblinear':
         return [0.00001,0.0001,0.00025,0.0005,0.00075,0.001,0.01,0.015,0.016,0.017,0.018,0.019,0.02]
@@ -25,13 +24,12 @@ def get_synthetic_200_1M_1M(opt_name):
         return [200]
 
 def get_lambda_list(dataset, opt_name):
-def get_lambda_list(dataset, opt_name):
     if dataset == 'synthetic_100_10K_100K':
         return get_synthetic_100_10K_100K(opt_name)
     elif dataset == 'synthetic_200_20K_100K':
         return get_synthetic_200_20K_100K(opt_name)
     elif dataset == 'synthetic_200_1M_1M':
-        return get_synthetic_200_1M_1M(opt_name)    
+        return get_synthetic_200_1M_1M(opt_name)
     else:
         return sparse_vec
 
