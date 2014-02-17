@@ -34,7 +34,7 @@ namespace SOL {
 
 				bool is_good;
 
-                IndexType featDim = 0;
+                IndexType featDim;
 
             public:
                 csv_io_(const string &fileName) {
@@ -43,6 +43,7 @@ namespace SOL {
                     line = (char *) malloc(max_line_len*sizeof(char));
 					this->is_good = true;
 					this->writer_handler = NULL;
+					this->featDim = 0;
                 }
                 virtual ~csv_io_() {
                     this->Close();
