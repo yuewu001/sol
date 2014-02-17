@@ -62,6 +62,7 @@ namespace SOL {
 		this->add_option(-1,0,1,"r in Confidence weighted algorithms and SOSOL","-r",&this->r);
 		this->add_option(-1,0,1,"phi in SCW","-phi",&this->phi); 
 		this->add_option("",false,1,"output readable model","-or",&this->out_readable_model);
+		this->add_option("",false,1,"input model","-m",&this->in_model_filename);
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs, 

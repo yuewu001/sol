@@ -48,6 +48,8 @@ namespace SOL
 
 		string out_readable_model; //output readable model
 
+		string in_model_filename; //model filename
+
 		//dataset type
 		string str_data_type;
 		//loss function type
