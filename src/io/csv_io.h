@@ -104,13 +104,17 @@ namespace SOL {
 					// features
 					while (1) {
 						p = strip_line(endptr);
-						while (*p == ','){
-							index++;
-							p++;
-							p = strip_line(p);
-						}
 						if (*p == '\0')
 							break;
+						if (*p == ','){
+							index++;
+						}
+						else{
+							fprintf(stderr,"incorrect csv file %s\n",p);
+							this->is_good = false;
+							return false;
+						}
+						p = strip_line(p);
 						feat = parseFloat_CSV(p, &endptr);
 						//feat =(float)(strtod(val,&endptr));
 						if (endptr == p) {
@@ -118,8 +122,8 @@ namespace SOL {
 							this->is_good = false;
 							return false;
 						}
-
-						data.AddNewFeat(index, feat);
+						if (feat != 0)
+							data.AddNewFeat(index, feat);
 					}
 					data.label = labelVal;
 
@@ -134,9 +138,11 @@ namespace SOL {
 						fprintf(writer_handler, ",");
 						if (data.indexes[i] == j)
 							fprintf(writer_handler, "%g", data.features[i++]);
+						else
+							fprintf(writer_handler,"0");
 					}
 					for (; j <= featDim; j++)
-						fprintf(writer_handler, ",");
+						fprintf(writer_handler, ",0");
 
 					fprintf(writer_handler, "\n");
 					return true;
