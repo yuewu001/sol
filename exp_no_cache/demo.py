@@ -13,9 +13,11 @@ import run_fgm
 #algorithm list
 opt_list = ['fgm','liblinear']
 opt_list = ['fgm']
+opt_list = ['AROW-FS','OFSGD','SGD-FS']
 
 #dataset list
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
+ds_list = ['relathe','pcmac','basehock']
 #ds_list = ['news','rcv1','url']
 #ds_list = ['rcv1','url']
 

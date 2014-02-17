@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'D:/v-wuyue/data/'
+    rootDir = 'E:/users/v-wuyue/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:
@@ -139,7 +139,7 @@ def get_model_param(ds, opt):
     aut = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     pcmac = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':1.0,'-delta':0.000625}}
     basehock = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
-    relathe = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':2.0,'-delta':0.0003125}}
+    relathe = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':4.0,'-delta':0.0003125}}
     ccat = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     gisette = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':128},'OFSGD':{'-eta':0.125,'-delta':0.0003125}}
     real_sim = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':16},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}

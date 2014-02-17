@@ -25,7 +25,6 @@ def get_synthetic_200_1M_1M(opt_name):
         return [200]
 
 def get_lambda_list(dataset, opt_name):
-def get_lambda_list(dataset, opt_name):
     if dataset == 'synthetic_100_10K_100K':
         return get_synthetic_100_10K_100K(opt_name)
     elif dataset == 'synthetic_200_20K_100K':

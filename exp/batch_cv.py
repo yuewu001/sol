@@ -10,11 +10,11 @@ opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA','OFSGD']
 opt_list = ['SGD','Ada-FOBOS','AROW-TG']
 #opt_list = ['SGD','AROW-TG']
 #opt_list = ['RDA','AROW-DA','Ada-RDA']
-opt_list = ['OFSGD','AROW','SGD']
+opt_list = ['OFSGD']
 
 ds_list = ['pcmac','a9a','MNIST','aut']#,]#,'rcv1','url']
 ds_list = ['a8a','gisette','news','physic']
-ds_list = ['pcmac','aut']
+ds_list = ['relathe','pcmac','basehock']
 fold_num =5
 
 const_eta_search = '0.03125:2.0:32'
