@@ -107,6 +107,7 @@ namespace SOL {
 						if (*p == '\0')
 							break;
 						if (*p == ','){
+							p++;
 							index++;
 						}
 						else{
