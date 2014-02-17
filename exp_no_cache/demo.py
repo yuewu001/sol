@@ -12,12 +12,12 @@ import run_fgm
 
 #algorithm list
 opt_list = ['fgm','liblinear']
-opt_list = ['fgm']
+opt_list = ['liblinear']
 
 #dataset list
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-#ds_list = ['news','rcv1','url']
-#ds_list = ['rcv1','url']
+#ds_list = ['relathe','pcmac','basehock']
+#ds_list = ['ccat','aut','real-sim']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1

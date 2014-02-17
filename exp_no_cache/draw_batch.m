@@ -14,7 +14,7 @@ folder_name = strcat(dataset,'/');
 mkdir figs
 
 opt_list_file = strcat(folder_name,'opt_list.txt');
-opt_list = {'AROW-FS.txt';'fgm.txt'};
+opt_list = {'AROW-FS.txt';'liblinear.txt';'fgm.txt'};
 
 %opt_list = textread(opt_list_file,'%s');
 
