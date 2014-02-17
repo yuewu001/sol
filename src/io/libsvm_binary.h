@@ -9,7 +9,7 @@
 #define HEADER_LIBSVM_BINARY
 
 
-#include "DataReader.h"
+#include "DataHandler.h"
 #include "basic_io.h"
 //#include "zlib_io.h"
 //#include "gzip_io.h"
@@ -22,7 +22,7 @@ using namespace std;
 
 namespace SOL {
     template <typename FeatType, typename LabelType>
-        class libsvm_binary_:public DataReader<FeatType, LabelType> {
+        class libsvm_binary_:public DataHandler<FeatType, LabelType> {
             private:
                 std::string fileName;
                 basic_io io_handler;

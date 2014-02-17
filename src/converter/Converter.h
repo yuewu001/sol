@@ -9,9 +9,6 @@
 
 #include "Params.h"
 
-#include "../io/sol_io.h"
-#include "../utils/util.h"
-
 void Convert(const SOL::Params &param);
 void Cache(const SOL::Params &param);
 

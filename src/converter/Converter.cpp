@@ -14,10 +14,7 @@
 
 #include "Converter.h"
 
-#include "../io/libsvm_io.h"
-#include "../io/libsvm_binary.h"
-#include "../io/DataSet.h"
-
+#include "../io/sol_io.h"
 
 #include <fstream>
 #include <cstdio>
@@ -37,13 +34,13 @@ int main(int argc, const char** args){
     Params param;
     if (param.Parse(argc,args) == false)
         return -1;
-
-	if (param.is_de_cache == true){
-		param.str_data_type = "cache";
-		Convert(param);
-	}
-	else if (param.is_cache == true)
+	ToLowerCase(param.src_data_type);
+	ToLowerCase(param.dst_data_type);
+	if (param.dst_data_type == "cache"){
 		Cache(param);
+	}
+	else
+		Convert(param);
 	return 0;
 }
 
@@ -51,7 +48,7 @@ void Cache(const Params &param){
 	cout<<"Caching file..."<<endl;
 	
 	DataSet<float, char> dt;
-	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.str_data_type);
+	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.src_data_type);
 	if (reader == NULL){
 		return;
 	}
@@ -81,42 +78,65 @@ void Cache(const Params &param){
 		delete reader;
 }
 
+template <typename FeatType, typename LabelType>
+IndexType GetDataDim(DataReader<FeatType, LabelType> * reader){
+	reader->Rewind();
+	IndexType featDim = 0;
+    DataPoint<FeatType, LabelType> data;
+	while (reader->GetNextData(data) == true){
+		if (featDim < data.dim())
+			featDim = data.dim();
+	}
+	return featDim;
+}
+
 void Convert(const Params &param){
-	cout<<"Convert file to libsvm"<<endl;
-	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName,param.str_data_type);
+	cout << "Convert file from "<<param.src_data_type<<" to " <<param.dst_data_type<< endl;
+	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.src_data_type);
 	if (reader->OpenReading() == false){
-		cerr<<"open "<<param.in_fileName<<" failed!"<<endl;
+		cerr << "open " << param.in_fileName << " failed!" << endl;
 		return;
 	}
 	string tmp_filename = param.out_fileName + ".writing";
 
-	libsvm_io writer(tmp_filename);
-	if(writer.OpenWriting() == false){
-		cerr<<"open output file" <<tmp_filename<<" failed!"<<endl;
+	DataHandler<float, char> *writer = getWriter<float, char>(tmp_filename, param.dst_data_type);
+	if (writer->OpenWriting() == false){
+		cerr << "open output file" << tmp_filename << " failed!" << endl;
 		return;
+	}
+	if (param.dst_data_type == "csv"){
+		IndexType featDim = GetDataDim<float, char>(reader);
+		if (writer->SetExtraInfo((const char*)(&featDim)) == false) {
+			delete reader;
+			delete writer;
+			return;
+		}
 	}
 	DataPoint<float, char> data;
 	size_t dataNum = 0;
 	size_t featNum = 0;
 	size_t show_step = 1; //show information every show_step
 	size_t show_count = 2;
-	while(reader->GetNextData(data) == true){
+
+	reader->Rewind();
+	while (reader->GetNextData(data) == true){
 		dataNum++;
 		featNum += data.indexes.size();
 
-		if (writer.WriteData(data) == false){
+		if (writer->WriteData(data) == false){
 			break;
 		}
 
 		if (show_count < dataNum){
-			printf("%lu samples de-cached\r",dataNum);
+			printf("%lu samples de-cached\r", dataNum);
 			show_count = (1 << ++show_step);
 		}
 	}
-	writer.Close();
-	if (reader->Good() == true && 
+	writer->Close();
+	if (reader->Good() == true &&
 		rename_file(tmp_filename, param.out_fileName) == true)
-		printf("%lu samples (%lu features) de-cached\n",dataNum, featNum);
+		printf("%lu samples (%lu features) converted\n", dataNum, featNum);
 	reader->Close();
 	delete reader;
+	delete writer;
 }

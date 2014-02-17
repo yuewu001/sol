@@ -36,10 +36,8 @@ namespace SOL {
 		this->add_option("",true,1,"input file","-i", &this->in_fileName);
 		this->add_option("",true,1,"output file name","-o",&this->out_fileName);
 
-		this->add_option(init_data_type,0,1,"dataset type format","-dt",&this->str_data_type);
-
-		this->add_option(false,0,0,"cache the input file","-c",&this->is_cache);
-		this->add_option(false,0,0,"de-cache the input file","-d",&this->is_de_cache);
+		this->add_option(init_data_type,0,1,"source dataset type format","-sdt",&this->src_data_type);
+		this->add_option("cache",0,1,"dstination dataset type format","-ddt",&this->dst_data_type);
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs, 
