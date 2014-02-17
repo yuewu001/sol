@@ -88,12 +88,14 @@ namespace SOL {
 			//we use the oposite of w
 			float y = this->Predict(x);
 			size_t featDim = x.indexes.size();
-			this->eta = this->eta0;
+			//this->eta = this->eta0;
 
+			/*
 			//shrinkage
 			for (size_t i = 0; i < this->weightDim; i++){
 				this->weightVec[i] *= shrinkage;
 			}
+			*/
 
 			float gt_i = this->lossFunc->GetGradient(x.label,y);
 			if (gt_i == 0){
@@ -104,10 +106,10 @@ namespace SOL {
 			
 			//update with sgd
 			for (size_t i = 0; i < featDim; i++) {
-				this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];
+				this->weightVec[x.indexes[i]] -= this->eta0 * gt_i * x.features[i];
 			}
 			//update bias 
-			this->weightVec[0] -= this->eta * gt_i;
+			this->weightVec[0] -= this->eta0 * gt_i;
 
 			w_norm = 0;
 			for (size_t i = 0; i < this->weightDim; i++)
@@ -147,7 +149,7 @@ namespace SOL {
 
 		this->shrinkage = 1.f - this->delta * this->eta0;
 		this->power_t = 0;
-
+		
 		if (this->K > 0){
 			if (this->weightDim < this->K + 1)
 				this->UpdateWeightSize(this->K);
