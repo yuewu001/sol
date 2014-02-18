@@ -63,17 +63,19 @@ def run_mRMR(train_file, test_file,ds, result_file):
     data_valid_dim = run_util.get_valid_dim(train_file)
     data_num = run_util.get_data_num(train_file)
 
-    if 'synthetic' in ds:
-        bs_list = l1_def.get_lambda_list(dataset,'fgm')
-    else:
-        lambda_list = l1_def.get_lambda_list(ds,'fgm')
+    bs_list = l1_def.get_lambda_list(dataset,'mRMR')
+    
+    #if 'synthetic' in ds:
+    #    bs_list = l1_def.get_lambda_list(dataset,'mRMR')
+    #else:
+    #    lambda_list = l1_def.get_lambda_list(ds,'mRMR')
 
-        bs_list = [] 
-        b_num = len(lambda_list)
-        for i in range(0,b_num):
-            dim = int(data_valid_dim * (1 - lambda_list[i]))
-            if dim > 0 and dim <= 500:
-                bs_list.append(dim)
+    #    bs_list = [] 
+    #    b_num = len(lambda_list)
+    #    for i in range(0,b_num):
+    #        dim = int(data_valid_dim * (1 - lambda_list[i]))
+    #        if dim > 0 and dim <= 500:
+    #            bs_list.append(dim)
 
     #clear the file if it already exists
     open(result_file,'w').close()
