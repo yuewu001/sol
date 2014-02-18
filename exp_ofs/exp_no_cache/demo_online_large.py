@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+sys.path.append('../')
 import dataset
 import run_util
 import sol_shuffle
@@ -12,11 +13,11 @@ import run_fgm
 
 #algorithm list
 opt_list = ['AROW-FS','SGD-FS']
-#opt_list = ['SGD-FS','OFSGD']
+opt_list = ['SGD-FS']
 
 #dataset list
 ds_list = ['news','rcv1','url']
-ds_list = ['rcv1','url']
+ds_list = ['url']
 #ds_list = ['synthetic_200_1M_1M']
 
 #number of times to randomize a dataset for averaged results

@@ -1,5 +1,4 @@
-function draw_online(dataset,xmin, xmax, ymin, ymax)
-%dataset = 'synthetic_ofs'
+function draw_time_online(dataset,xmin, xmax, ymin, ymax)
 close all;
 
 color_list = {'r','m','b','black'};
@@ -12,9 +11,9 @@ cur_shape_index = 1;
 
 folder_name = strcat(dataset,'/');
 mkdir figs
-
 opt_list_file = strcat(folder_name,'opt_list.txt');
-opt_list = {'AROW-FS.txt';'liblinear.txt';'fgm.txt'};
+
+opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
 
 %opt_list = textread(opt_list_file,'%s');
 
@@ -36,22 +35,19 @@ for k = 1:1:opt_num
     else
         legend_content{1,k} = opt_name;
     end
-    
-    l_err_vec = result(:,1);
-    t_err_vec = result(:,2);
-    sparse_vec = result(:,3);    
-    
-    if strcmp(opt_name,'SGD-FS') == 1 || strcmp(opt_name,'OFSGD') == 1 || strcmp(opt_name,'AROW-FS') == 1
-        t_err_vec = 100 - t_err_vec;
-    end
+   
+    sparse_vec = result(:,3);
+    l_time_vec = result(:,4);  
+    l_time_vec(1) = l_time_vec(2);
+
 	color_shape = strcat(color_list{1,cur_color_index}, '-');
     color_shape = strcat(color_shape, shape_list{1,cur_shape_index});
     figure(1)    
+	hold on
     grid on
     box on
-    hold on
-    plot(sparse_vec, t_err_vec, color_shape,'LineWidth',2,'markersize',5);    
-	
+	plot(sparse_vec, l_time_vec, color_shape,'LineWidth',2,'markersize',5);	 
+    
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
         cur_color_index = 1;
@@ -66,10 +62,13 @@ end
 
 folder_name = strcat('figs/',dataset);
 folder_name = strcat(folder_name,'-');
+	
 figure(1) %learning error rate
-%title('test error rate vs sparsity', 'fontsize',14)
-ylabel('Test Accuracy (%)', 'fontsize',28)
+%title('training time vs sparsity', 'fontsize',14)
+
+ylabel('training time (s)', 'fontsize',28)
 xlabel('#Selected features', 'fontsize',28)
+
 if (exist('xmin','var'))
     axis([xmin xmax ymin ymax])
 end
@@ -77,5 +76,7 @@ set(gca,'Fontsize',24);
 gca_legend = legend(legend_content,'Location','SouthEast', 'fontsize',18);
 po=get( gca_legend, 'Position' ); 
 set( gca_legend, 'Position', [po(1) + 0.03, po(2)+0.22, po(3), po(4)] );
-print(strcat(folder_name,'test-sparse'),'-dpdf')
+
+
+print(strcat(folder_name,'time-sparse'),'-dpdf')
 %close all

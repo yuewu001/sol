@@ -4,17 +4,12 @@ import os
 import dataset
 import exe_path
 
-opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA','OFSGD']
-#opt_list = ['SGD','Ada-FOBOS','Ada-RDA','AROW-TG', 'AROW-DA', 'RDA']
-#opt_list = ['SGD','AROW-TG', 'AROW-DA', 'RDA']
-opt_list = ['SGD','Ada-FOBOS','AROW-TG']
-#opt_list = ['SGD','AROW-TG']
-#opt_list = ['RDA','AROW-DA','Ada-RDA']
 opt_list = ['OFSGD','AROW','SGD']
+opt_list = ['OFSGD']
 
 ds_list = ['pcmac','a9a','MNIST','aut']#,]#,'rcv1','url']
 ds_list = ['a8a','gisette','news','physic']
-ds_list = ['synthetic_200_20K_100K']
+ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K']
 fold_num =5
 
 const_eta_search = '0.03125:2.0:32'
