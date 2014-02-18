@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'D:/Data/libsvm/'
+    rootDir = 'D:/v-wuyue/data/'
 elif platform.system() == 'Linux':
     rootDir = '/root/v-yuewu/SOL/data/'
 else:

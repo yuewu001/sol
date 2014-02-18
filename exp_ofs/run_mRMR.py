@@ -72,7 +72,7 @@ def run_mRMR(train_file, test_file,ds, result_file):
         b_num = len(lambda_list)
         for i in range(0,b_num):
             dim = int(data_valid_dim * (1 - lambda_list[i]))
-            if dim > 0:
+            if dim > 0 and dim <= 500:
                 bs_list.append(dim)
 
     #clear the file if it already exists
