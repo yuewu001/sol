@@ -15,6 +15,7 @@ if platform.system() == "Windows":
     fgm_train = r'..\extern\FGM\FGM.exe'
     fgm_test = r'..\extern\FGM\Predict.exe'
     mRMR = r'..\extern\mRMR\mrmr_win32.exe'
+    csv_converter = r'..\install\bin\Converter.exe'
 else:
     SOL_exe_name = '../install/bin/SOL'
     vw_exe_name = 'vw'
@@ -24,3 +25,4 @@ else:
     cv_script = r'./CV.py'
     fgm_train = r'../extern/FGM/FGM.exe'
     fgm_test = r'../extern/FGM/Predict.exe'
+    csv_converter = r'../install/bin/Converter'

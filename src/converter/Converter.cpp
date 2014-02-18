@@ -128,7 +128,7 @@ void Convert(const Params &param){
 		}
 
 		if (show_count < dataNum){
-			printf("%lu samples de-cached\r", dataNum);
+			printf("%lu samples converted\r", dataNum);
 			show_count = (1 << ++show_step);
 		}
 	}
