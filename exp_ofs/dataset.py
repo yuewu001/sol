@@ -142,20 +142,19 @@ def get_cmd_data(dataset):
 
 #parameters for each dataset, obtained by cross-validation in general
 def get_model_param(ds, opt):
-    aut = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    aut = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
     pcmac = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':1.0,'-delta':0.000625}}
     basehock = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
     relathe = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':4.0,'-delta':0.0003125}}
-    ccat = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
-    gisette = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':128},'OFSGD':{'-eta':0.125,'-delta':0.0003125}}
-    real_sim = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':16},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
+    ccat = {'AROW-FS':{'-r':1.0},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
+    real_sim = {'AROW-FS':{'-r':0.5},'SGD-FS':{'-eta':16},'OFSGD':{'-eta':0.5,'-delta':0.0003125}}
     news = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':64},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     rcv1 = {'AROW-FS':{'-r':2},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     url = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     synthetic_100_10K_100K = {'AROW-FS':{'-r':128},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.0625,'-delta':0.0003125}}
     synthetic_200_20K_100K = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
     synthetic_200_1M_1M = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125}}
-    ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,'gisette':gisette,
+    ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,
             'real-sim':real_sim,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_10K_100K':synthetic_200_20K_100K,'synthetic_100_1M_1M':synthetic_200_1M_1M,'rcv1':rcv1,'news':news,'url':url}
     
     cmd = ''

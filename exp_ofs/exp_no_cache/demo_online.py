@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
 import sys
-sys.path.append('../')
 
+sys.path.append('..')
 import dataset
 import run_util
 import sol_shuffle
@@ -14,12 +14,10 @@ import run_fgm
 
 #algorithm list
 opt_list = ['AROW-FS','SGD-FS','OFSGD']
-opt_list = ['AROW-FS']
+opt_list = ['OFSGD']
 
 #dataset list
-ds_list = ['MNIST','a9a','pcmac','aut']
-#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['synthetic_200_1M_1M']
+ds_list = ['relathe','pcmac','basehock','aut','ccat','real-sim']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
