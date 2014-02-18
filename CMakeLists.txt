@@ -22,6 +22,7 @@ set(io_files
     src/io/DataPoint.h
     src/io/MPBuffer.h
     src/io/DataReader.h
+    src/io/DataHandler.h
     src/io/DataSet.h
     src/io/MPDataSet.h
     src/io/DataSetHelper.h
@@ -35,6 +36,7 @@ set(io_files
     src/io/io_interface.h
     src/io/libsvm_binary.h
     src/io/libsvm_io.h
+    src/io/csv_io.h
     src/io/sol_io.h
     src/io/parser.h
     src/io/s_array.h)
@@ -65,6 +67,7 @@ set(algo_files
     src/algorithms/SCW_RDA.h
     src/algorithms/SGD.h
 	src/algorithms/SGD_FS.h
+    src/algorithms/mRMR_OGD.h
     src/algorithms/AROW_TG.h
     src/algorithms/STG.h)
 

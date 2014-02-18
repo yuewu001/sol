@@ -132,3 +132,15 @@ def get_valid_dim(trainfile):
     dim = (int)(result_list[0])
     
     return dim
+def get_data_num(trainfile):
+    filename = trainfile + '_info.txt'
+    dim = 0
+    pattern = re.compile(r'data number\s*:\s*(\d+)')
+    result_list = pattern.findall(open(filename,'r').read())
+    if len(result_list) != 1:
+        print result_list
+        print 'parse failed'
+        sys.exit()
+    num = (int)(result_list[0])
+    
+    return num

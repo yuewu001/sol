@@ -11,7 +11,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "DataReader.h"
+#include "DataHandler.h"
 #include "basic_io.h"
 #include "parser.h"
 
@@ -26,7 +26,7 @@ using namespace std;
 
 namespace SOL {
     template <typename FeatType, typename LabelType>
-        class libsvm_io_: public DataReader<FeatType, LabelType> { 
+        class libsvm_io_: public DataHandler<FeatType, LabelType> { 
             private:
                 string fileName;
                 basic_io io_hander;

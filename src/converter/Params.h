@@ -42,13 +42,11 @@ namespace SOL
         public:
             //input data
             string in_fileName; //source file name
-            string out_fileName; //cached file name
+            string out_fileName; //output file name
 
             //dataset type
-            string str_data_type;
-
-            bool is_cache; //cache the file
-            bool is_de_cache; //de-cache the file
+            string src_data_type;
+            string dst_data_type;
 
         public:
             Params();

@@ -17,6 +17,7 @@
 #include "SGD_FS.h"
 #include "SOSOL.h"
 #include "AROW_AdaFS.h"
+#include "mRMR_OGD.h"
 
 namespace SOL{
    
