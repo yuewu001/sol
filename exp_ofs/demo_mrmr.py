@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-
-sys.path.append('..')
 import dataset
 import run_util
 import sol_shuffle
@@ -10,22 +8,23 @@ import run_experiment
 import run_vw
 import run_liblinear
 import run_fgm
+import run_mRMR
 
 
 #algorithm list
-opt_list = ['AROW-FS','SGD-FS','OFSGD']
-opt_list = ['OFSGD']
+opt_list = ['mRMR']
 
 #dataset list
-ds_list = ['relathe','pcmac','basehock','aut','ccat','real-sim']
+ds_list = ['relathe','pcmac','basehock']#,'ccat','aut','real-sim']
+#ds_list = ['relathe']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 10
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
-is_cache = False
+is_cache = True
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
 is_default_param = False
@@ -85,6 +84,21 @@ def train_model(path_list,dst_folder):
             elif opt == 'fgm':
                 result_file = 'fgm_result_%d' %k + '.txt'
                 result_once = run_fgm.run_fgm(rand_file, test_file, ds, result_file)
+            elif opt == 'mRMR':
+                result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
+                result_once = run_mRMR.run_mRMR(rand_file, test_file, ds, result_file)
+
+                print '\nparsing result...'
+                #write the result to file
+                parse_file = dst_folder +'/%s' %opt + '_%d' %k + '.txt'
+
+                result_once2 = run_util.parse_result(result_file, parse_file);
+                bs_num = len(result_once)
+                if bs_num != len(result_once2):
+                    print 'inconsistent parsing result'
+                for m in range(0,bs_num):
+                    result_once[m][0] = result_once2[m][0]
+                    result_once[m][1] = result_once2[m][1]
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 
