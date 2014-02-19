@@ -180,6 +180,7 @@ namespace SOL {
 					if (*p++ == ',')
 						this->featDim++;
 				}
+				return true;
 			}
 		};
 
