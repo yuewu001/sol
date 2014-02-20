@@ -122,6 +122,7 @@ void Convert(const Params &param){
 	while (reader->GetNextData(data) == true){
 		dataNum++;
 		featNum += data.indexes.size();
+		data.Sort();
 
 		if (writer->WriteData(data) == false){
 			break;
