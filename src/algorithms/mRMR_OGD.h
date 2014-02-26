@@ -33,7 +33,7 @@ namespace SOL {
 
 		public:
 			//load the feature selection result
-			bool LoadFSResult(const string& filename);
+			bool LoadFSResult(const string& filename, int k = -1);
 		};
 
 		template <typename FeatType, typename LabelType>
@@ -84,7 +84,7 @@ namespace SOL {
 
 		//load the feature selection result
 		template <typename FeatType, typename LabelType>
-		bool mRMR_OGD<FeatType, LabelType>::LoadFSResult(const string& filename){
+		bool mRMR_OGD<FeatType, LabelType>::LoadFSResult(const string& filename, int k = -1){
 			this->max_index = 0;
 			this->sel_feat_flag_vec.erase();
 			basic_io io_handler;
@@ -114,6 +114,9 @@ namespace SOL {
 						this->sel_feat_flag_vec.end);
 				}
 				this->sel_feat_flag_vec[featIndex] = 1;
+				if (k > 0 ){					
+					if (--k == 0)break;
+				}
 			}
 			delete []line;
 			return err_code == 0 ? true : false;

@@ -52,7 +52,7 @@ int main(int argc, const char** args){
 		release(dataset,loss_func);
 		return -1;
 	}
-	long opti = sol_init_optimizer(dataset, loss_func,args_vec.size(), &(args_vec[0]));
+	long opti = sol_init_optimizer(dataset, loss_func,(int)(args_vec.size()), &(args_vec[0]));
 	if  (opti == 0){
 		release(dataset, loss_func, opti);
 		return -1;

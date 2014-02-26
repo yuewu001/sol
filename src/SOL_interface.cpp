@@ -252,7 +252,7 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 	}
 	else if (str_opt == "MRMR_OGD"){
 		mRMR_OGD<T1,T2> *opti = new mRMR_OGD<T1,T2>(dataset,lossFunc);
-		if (opti->LoadFSResult(param.in_model_filename) == false){
+		if (opti->LoadFSResult(param.in_model_filename,param.K) == false){
 			delete opti;
 			return NULL;
 		}

@@ -69,7 +69,7 @@ void Cache(const Params &param){
 			dt.FinishRead();
 			if (show_count < dataNum){
 				printf("%lu samples cached\r",dataNum);
-				show_count = (1 << ++show_step);
+				show_count = (size_t(1) << ++show_step);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ void Convert(const Params &param){
 
 		if (show_count < dataNum){
 			printf("%lu samples converted\r", dataNum);
-			show_count = (1 << ++show_step);
+			show_count = (size_t(1) << ++show_step);
 		}
 	}
 	writer->Close();

@@ -49,7 +49,7 @@ namespace ez {
 	};
 	/* ################################################################### */
 	static bool isdigit(const std::string & s, int i=0) {
-		int n = s.length();
+		int n = static_cast<int>(s.length());
 		for(; i < n; ++i)
 			switch(s[i]) {
 			case '0': case '1': case '2':
@@ -62,7 +62,7 @@ namespace ez {
 	};
 	/* ################################################################### */
 	static bool isdigit(const std::string * s, int i=0) {
-		int n = s->length();
+		int n = static_cast<int>(s->length());
 		for(; i < n; ++i)
 			switch(s->at(i)) {
 			case '0': case '1': case '2':
@@ -294,7 +294,7 @@ namespace ez {
 	};
 	/* ################################################################### */
 	static void ToLowerASCII(std::string & s) {
-		int n = s.size();
+		int n = int(s.size());
 		int i=0;
 		char c;
 		for(; i < n; ++i) {
@@ -316,7 +316,7 @@ namespace ez {
 		bool  in_TEXT;
 		bool  in_SPACE;
 
-		len = strlen(CmdLine);
+		len = (unsigned long)(strlen(CmdLine));
 		i = ((len+2)/2)*sizeof(void*) + sizeof(void*);
 
 		argv = (char**)malloc(i + (len+2)*sizeof(char));
@@ -607,7 +607,7 @@ _list: comma-delimited string
 
         int nop = 0;
         if (_op != 0)
-            nop = strlen(_op);
+            nop = (int)strlen(_op);
 
         switch(nop) {
             case 0: op = NOOP; break;
@@ -657,7 +657,7 @@ _list: comma-delimited string
         std::list<std::string*> split;
         std::list<std::string*>::iterator it;
         SplitDelim(unsplit, ',', split);
-        size = split.size();
+        size = (int)split.size();
         std::string **strings = new std::string*[size];
 
         int i = 0;
@@ -1421,7 +1421,7 @@ void ezOptionParser::resetArgs() {
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, ezOptionValidator* validator) {
-    int id = this->groups.size();
+    int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
     g->isRequired = required;
@@ -1444,7 +1444,7 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, ezOptionValidator* validator) {
-    int id = this->groups.size();
+    int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
     g->isRequired = required;
@@ -1471,7 +1471,7 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, ezOptionValidator* validator) {
-    int id = this->groups.size();
+    int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
     g->isRequired = required;
@@ -1501,7 +1501,7 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, const char * flag4, ezOptionValidator* validator) {
-    int id = this->groups.size();
+    int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
     g->isRequired = required;
@@ -1583,11 +1583,11 @@ bool ezOptionParser::exportFile(const char * filename, bool all) {
                     out.append("\n");
                 }
             } else {
-                int n = g->args.size();
+                int n = (int)g->args.size();
                 for(int j=0; j < n; ++j) {
                     out.append(*stringPtrs[i]);
                     out.append(" ");
-                    m = g->args[j]->size();
+                    m = (int)(g->args[j]->size());
 
                     for(int k=0; k < m; ++k) {
                         quote = ( (*g->args[j]->at(k)).find_first_of(" \t") != std::string::npos );
@@ -1667,7 +1667,7 @@ bool ezOptionParser::importFile(const char * filename, char comment) {
     for(iter=lines.begin(); iter != lines.end(); ++iter) {
         line = *iter;
         str = line->c_str();
-        n = line->size();
+        n = (int)(line->size());
         sq.clear();
         dq.clear();
         if (n) {
@@ -1679,7 +1679,7 @@ bool ezOptionParser::importFile(const char * filename, char comment) {
             } else {
                 // Erase whitespace prefix.
                 line->erase(0,pos);
-                n = line->size();
+                n = (int)(line->size());
             }
 
             if (line->at(0)=='"')
@@ -1808,7 +1808,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
 
     for(i=0; i < groups.size(); ++i) {
         std::sort(groups[i]->flags.begin(), groups[i]->flags.end(), CmpOptStringPtr);
-        stringPtrToIndexMap[groups[i]->flags[0]] = i;
+        stringPtrToIndexMap[groups[i]->flags[0]] = (int)i;
         stringPtrs[i] = groups[i]->flags[0];
     }
 
@@ -1869,7 +1869,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
         if (layout == STAGGER)
             maxlen = sortedOpts[i].size();
 
-        int pad = gutter + maxlen;
+        int pad = (int)(gutter + maxlen);
         helpwidth = width - pad;        
 
         // All the following split-fu could be optimized by just using substring (offset, length) tuples, but just to get it done, we'll do some not-too expensive string copying.

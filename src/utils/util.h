@@ -102,7 +102,7 @@ inline void ToLowerCase(char* c_str) {
 
 inline void ToUpperCase(string &str) {
 	string dst_str;
-	int len = str.length();
+	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(toupper(str[i]));
 	std::swap(str,dst_str);
@@ -110,7 +110,7 @@ inline void ToUpperCase(string &str) {
 
 inline void ToLowerCase(string &str) {
 	string dst_str;
-	int len = str.length();
+	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(tolower(str[i]));
 	std::swap(str,dst_str);

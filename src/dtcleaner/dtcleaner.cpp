@@ -110,7 +110,7 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 
 		if (show_count < dataNum){
 			printf("%lu samples processed\r",dataNum);
-			show_count = (1 << ++show_step);
+			show_count = ((size_t)(1) << ++show_step);
 		}
 	}
 	writer.Close();

@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 import os
 import sys
-import dataset
+
 import run_util
 import sol_shuffle
 import run_experiment
 import run_vw
 import run_liblinear
+import run_fgm
+import dataset
 
 
 #algorithm list
-opt_list = ['AROW-FS','SGD-FS','OFSGD']
-#opt_list = ['SGD']
+opt_list = ['fgm']
 
 #dataset list
-ds_list = ['MNIST','a9a','pcmac','aut']
-#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['relathe','ccat','real-sim']
+ds_list = ['news','rcv1']
+#ds_list = ['url']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
@@ -70,6 +70,8 @@ def train_model(path_list,dst_folder):
         cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file, is_cache)
         dataset.analyze(rand_file);
 
+        print rand_file
+
         for opt in opt_list:
             print '-----------------------------------'
             print ' Experiment on %s' %opt + ' Random %d' %k 
@@ -81,6 +83,9 @@ def train_model(path_list,dst_folder):
             elif  opt == 'liblinear':
                 result_file = 'liblinear_result_%d' %k + '.txt'
                 result_once = run_liblinear.run_liblinear(rand_file, test_file, ds, result_file)
+            elif opt == 'fgm':
+                result_file = 'fgm_result_%d' %k + '.txt'
+                result_once = run_fgm.run_fgm(rand_file, test_file, ds, result_file)
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 

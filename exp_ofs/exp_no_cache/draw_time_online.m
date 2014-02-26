@@ -29,9 +29,11 @@ for k = 1:1:opt_num
     result = load(strcat(folder_name, result_file));
 
     if strcmp(opt_name,'SGD-FS') == 1
-        legend_content{1,k} = 'PE_{trunc}';
+        legend_content{1,k} = 'PET';
     elseif strcmp(opt_name,'OFSGD') == 1
-        legend_content{1,k} = 'SPOFS';
+        legend_content{1,k} = 'FOFS';
+    elseif strcmp(opt_name,'AROW-FS') == 1
+        legend_content{1,k} = 'SOFS';
     else
         legend_content{1,k} = opt_name;
     end

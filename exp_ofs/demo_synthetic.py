@@ -13,10 +13,11 @@ import run_fgm
 #algorithm list
 opt_list = ['AROW-FS','SGD-FS','OFSGD']
 #opt_list = ['fgm','liblinear']
-opt_list = ['OFSGD']
+opt_list = ['AROW','SGD']
 
 #dataset list
 ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K']
+ds_list = ['synthetic_500_1B_1000']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 10

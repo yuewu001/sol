@@ -26,7 +26,7 @@ def run_fgm(train_file, test_file,ds, ori_result_file):
         bs_list = []
         b_num = len(lambda_list)
         for i in range(0,b_num):
-            dim = data_valid_dim * (1 - lambda_list[i])
+            dim = (int)(data_valid_dim * (1 - lambda_list[i]))
             if dim > 0:
                 bs_list.append(dim)
 

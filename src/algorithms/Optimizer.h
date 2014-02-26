@@ -179,9 +179,11 @@ namespace SOL {
             size_t show_step = 1; //show information every show_step
             size_t show_count = 2;
 
+			//double train_time  = 0;
             printf("Iterate No.\t\tError Rate\t\t\n");
             while(1) {
                 DataChunk<FeatType,LabelType> &chunk = dataSet.GetChunk();
+				//double time1 = get_current_time();
                 //all the data has been processed!
                 if(chunk.dataNum  == 0) {
 					dataSet.FinishRead();
@@ -214,14 +216,16 @@ namespace SOL {
 					if (show_count == this->curIterNum){
 						printf("%lu\t\t\t%.6f\t\t\n",this->curIterNum, 
 							errorNum / (float)(this->curIterNum));
-						show_count = (1 << ++show_step);
+						show_count = (size_t(1) << ++show_step);
 					}
 					this->curIterNum++;
 				}
+				//double time2 = get_current_time();
+				//train_time += time2 - time1;
 				dataSet.FinishRead();
 			}
 			this->EndTrain();
-
+			//cout<<"Purely Training Time: "<<train_time<<" s"<<endl;
 			return errorNum / dataSet.size();
 		}
 
@@ -260,9 +264,11 @@ namespace SOL {
 			if(testSet.Rewind() == false)
 				return 1.f;
 			float errorRate(0);
+			//double test_time = 0;
 			//test
 			while(1) {
 				const DataChunk<FeatType,LabelType> &chunk = testSet.GetChunk(true);
+				//double time1 = get_current_time();
 				if(chunk.dataNum  == 0) //"all the data has been processed!"
 					break;
 				for (size_t i = 0; i < chunk.dataNum; i++) {
@@ -283,8 +289,11 @@ namespace SOL {
 					if (this->lossFunc->IsCorrect(data.label,predict) == false)
 						errorRate++;
 				}
+				//double time2 = get_current_time();
+				//test_time += time2 - time1;
 				testSet.FinishRead();
 			}
+			//printf("accumulated test time %lf ms\n",test_time);
 			errorRate /= testSet.size();
 			return errorRate;
 		}
@@ -292,10 +301,12 @@ namespace SOL {
 		template <typename FeatType, typename LabelType>
 		float Optimizer<FeatType, LabelType>::Test_Predict(const DataPoint<FeatType, LabelType> &data) {
 			float predict = 0;
-			int dim = data.indexes.size();
-			for (int i = 0; i < dim; i++){
-				if (data.indexes[i] < this->weightDim)
-					predict += this->weightVec[data.indexes[i]] * data.features[i];
+			size_t dim = data.indexes.size();
+			IndexType index_i;
+			for (size_t i = 0; i < dim; i++){
+				index_i = data.indexes[i];
+				if (index_i < this->weightDim && this->weightVec[index_i] != 0)
+					predict += this->weightVec[index_i] * data.features[i];
 			}
 			predict += this->weightVec[0];
 			return predict;
