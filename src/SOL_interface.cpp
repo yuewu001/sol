@@ -210,8 +210,8 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
-	else if (str_opt == "AROW-FS") {
-		ASAROW<T1,T2> *opti = new ASAROW<T1, T2>(dataset,lossFunc);
+	else if (str_opt == "SOFS") {
+		SOFS<T1,T2> *opti = new SOFS<T1, T2>(dataset,lossFunc);
 		opti->SetParameterEx(param.K, param.r);
 		return opti;
 	}
@@ -230,13 +230,13 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		opti->SetParameterEx(param.phi, param.r);
 		return opti;
 	}
-	else if (str_opt == "OFSGD"){
-		OFSGD<T1, T2> *opti = new OFSGD<T1, T2>(dataset, lossFunc);
+	else if (str_opt == "FOFS"){
+		FOFS<T1, T2> *opti = new FOFS<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K, param.delta);
 		return opti;
 	}
-	else if (str_opt == "SGD-FS"){
-		SGD_FS<T1,T2> *opti = new SGD_FS<T1,T2>(dataset,lossFunc);
+	else if (str_opt == "PET"){
+		PET<T1,T2> *opti = new PET<T1,T2>(dataset,lossFunc);
 		opti->SetParameterEx(param.K);
 		return opti;
 	}
