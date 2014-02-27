@@ -1,1 +1,0 @@
-zless $1 | sed -e 's/^-1/0 |f/' | sed -e 's/^1/1 |f/' 
