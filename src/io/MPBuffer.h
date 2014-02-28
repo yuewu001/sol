@@ -53,7 +53,7 @@ namespace SOL{
 		template <typename FeatType, typename LabelType>
 		struct MPBuffer_LARGE_MARGIN:public MPBuffer<FeatType, LabelType>{
 		private:
-			MaxHeap<float> marginHeap;
+			MaxHeap<float, size_t> marginHeap;
 			s_array<float> marginVec;
 			s_array<int> bufIdVec;
 			static float max_float;
@@ -67,7 +67,7 @@ namespace SOL{
 			}
 
 			void Push(DataPoint<FeatType, LabelType> &srcPt){
-				static IndexType ret_id;
+				static size_t ret_id;
 				if (this->dataNum < this->chunk_size){
 					this->dataNum++;
 					this->marginHeap.UpdateDataNum(this->dataNum, this->marginVec.begin);

@@ -15,31 +15,31 @@
 
 using namespace std;
 namespace SOL{
-	template <typename T> class MaxHeap{
+	template <typename value_type, typename index_type = IndexType> class MaxHeap{
 	private:
-		s_array<IndexType> id2pos_map; //record the sorted position of each data
-		s_array<IndexType> pos2id_map; //record the index of weight for each sorted position
+		s_array<index_type> id2pos_map; //record the sorted position of each data
+		s_array<index_type> pos2id_map; //record the index of weight for each sorted position
 
-		IndexType K; //keep top K elemetns
-		IndexType data_num;
+		index_type K; //keep top K elemetns
+		index_type data_num;
 
-		const T* value_list;  //const pointer to the data
+		const value_type* value_list;  //const pointer to the data
 
 	public:
 		MaxHeap() :K(0), data_num(0), value_list(NULL){}
-		IndexType GetK() const { return this->K;}
+		index_type GetK() const { return this->K;}
 
 	public:
-		inline IndexType get_id(IndexType pos) const {
+		inline index_type get_id(index_type pos) const {
 			return this->pos2id_map[pos];
 		}
-		inline IndexType get_pos(IndexType id) const {
+		inline index_type get_pos(index_type id) const {
 			return this->id2pos_map[id];
 		}
-		inline bool is_topK(IndexType id) const {
+		inline bool is_topK(index_type id) const {
 			return this->id2pos_map[id] < this->K;
 		}
-		inline T GetHeapLimit() const {
+		inline value_type GetHeapLimit() const {
 			return this->value_list[this->pos2id_map[0]];
 		}
 
@@ -63,7 +63,7 @@ namespace SOL{
 		 * @Param topK: keep top K elements in the heap
 		 * @Param init_value: initial values
 		 */
-		bool Init(IndexType dataNum, IndexType topK, const T* init_value){
+		bool Init(index_type dataNum, index_type topK, const value_type* init_value){
 			//assert(topK > 0 && init_value != NULL);
 			if (topK < 1){
 				std::cerr << "ERROR: topK should be no less than 1, current value " <<topK<< std::endl;
@@ -75,10 +75,10 @@ namespace SOL{
 			this->id2pos_map.resize(dataNum);
 
 			//init all positions 
-			for (IndexType i = 0; i < dataNum; i++){
+			for (index_type i = 0; i < dataNum; i++){
 				this->id2pos_map[i] = i;
 			}
-			for (IndexType i = 0; i < topK; i++){
+			for (index_type i = 0; i < topK; i++){
 				this->pos2id_map[i] = i;
 			}
 
@@ -97,22 +97,22 @@ namespace SOL{
 		 * @Param topK: keep top K elements in the heap
 		 * @Param init_value: initial values
 		 */
-		bool Init(IndexType dataNum, IndexType topK,
-			const IndexType* init_id, const T* init_value){
+		bool Init(index_type dataNum, index_type topK,
+			const index_type* init_id, const value_type* init_value){
 			//assert(topK > 0 && init_id != NULL && init_value != NULL);
 			this->release();
 			this->pos2id_map.resize(topK);
 			this->id2pos_map.resize(dataNum);
 
 			//init all the pos of ids to topK
-			for (IndexType i = 0; i != dataNum; i++){
+			for (index_type i = 0; i != dataNum; i++){
 				this->id2pos_map[i] = topK;
 			}
 
-			for (IndexType i = 0; i != topK; i++){
+			for (index_type i = 0; i != topK; i++){
 				this->pos2id_map[i] = init_id[i];
 			}
-			for (IndexType i = 0; i != topK; i++){
+			for (index_type i = 0; i != topK; i++){
 				this->id2pos_map[this->pos2id_map[i]] = i;
 			}
 
@@ -124,7 +124,7 @@ namespace SOL{
 		}
 
 	public:
-		void ResizeHeap(IndexType newK){
+		void ResizeHeap(index_type newK){
 			if (newK == this->K)
 				return;
 			else if (newK > this->K)
@@ -137,7 +137,7 @@ namespace SOL{
 		/**
 		*	Enlarge number of K in the heap
 		**/
-		void EnlargeHeap(IndexType newK){
+		void EnlargeHeap(index_type newK){
 			if (newK < this->K){
 				cerr << "new K(" << newK << ") must be no less than original K(" << this->K<< ") in EnlargeHeap!" << endl;
 			}
@@ -148,7 +148,7 @@ namespace SOL{
 			this->pos2id_map.resize(newK);
 			//update id2pos for those ids not in the heap
 			//update pos2id fr new added pos
-			for (IndexType i = 0, j = this->K; i != this->data_num; i++){
+			for (index_type i = 0, j = this->K; i != this->data_num; i++){
 				if (this->is_topK(i) == false){
 					if (j < newK){
 						this->pos2id_map[j] = i;
@@ -162,15 +162,15 @@ namespace SOL{
 			this->K = newK;
 			this->BuildHeap();
 			//make sure most confident values are in the heap
-			IndexType ret_id;
-			for (IndexType i = 0; i != this->data_num; i++){
+			index_type ret_id;
+			for (index_type i = 0; i != this->data_num; i++){
 				if (this->is_topK(i) == false){
 					this->UpdateHeap(i, ret_id);
 				}
 			}
 		}
 
-		void ShrinkHeap(IndexType newK){
+		void ShrinkHeap(index_type newK){
 			if (newK > this->K)
 				cerr << "new K(" << newK << ") must be no larger than original K(" << this->K<< ") in ShrinkHeap!" << endl;
 			else if (newK == this->K)
@@ -180,8 +180,8 @@ namespace SOL{
 				this->K = newK;
 				this->BuildHeap();
 				//make sure most confident values are in the heap
-				IndexType ret_id;
-				for (IndexType i = 0, j = this->K; i != this->data_num; i++){
+				index_type ret_id;
+				for (index_type i = 0, j = this->K; i != this->data_num; i++){
 					if (this->is_topK(i) == false){
 						this->UpdateHeap(i, ret_id);
 					}
@@ -201,10 +201,10 @@ namespace SOL{
 
 		 * @Return: true if replaced by the input data_id
 		 */
-		bool UpdateHeap(IndexType data_id, IndexType &ret_id){
-			IndexType cur_pos = this->id2pos_map[data_id];
+		bool UpdateHeap(index_type data_id, index_type &ret_id){
+			index_type cur_pos = this->id2pos_map[data_id];
 			if (cur_pos < this->K){
-				IndexType par_pos = (cur_pos - 1) / 2;
+				index_type par_pos = (cur_pos - 1) / 2;
 				if (cur_pos == 0)
 					par_pos = 0;
 				//the current value increases
@@ -233,7 +233,7 @@ namespace SOL{
 			}
 			else{
 				ret_id = this->pos2id_map[0];
-				T thresh_val = this->value_list[ret_id];
+				value_type thresh_val = this->value_list[ret_id];
 				if (this->value_list[data_id] < thresh_val){
 					//swap with the top element of the heap
 					this->id2pos_map[ret_id] = this->K;
@@ -255,7 +255,7 @@ namespace SOL{
 			this->BuildHeap();
 			for (int i = this->K - 1; i > 0; i--){
 				//swap top and last
-				IndexType top_id = this->pos2id_map[0];
+				index_type top_id = this->pos2id_map[0];
 				this->pos2id_map[0] = this->pos2id_map[i];
 				this->id2pos_map[this->pos2id_map[i]] = 0;
 				this->pos2id_map[i] = top_id;
@@ -269,11 +269,11 @@ namespace SOL{
 
 		void Output(){
 			cout << "pos to id ";
-			for (IndexType i = 0; i != this->K; i++){
+			for (index_type i = 0; i != this->K; i++){
 				std::cout << this->pos2id_map[i] << " ";
 			}
 			std::cout << "\nid to pos ";
-			for (IndexType i = 0; i != this->K; i++){
+			for (index_type i = 0; i != this->K; i++){
 				std::cout << this->id2pos_map[i] << " ";
 				//std::cout<<this->value_list[this->pos2id_map[i]]<<" ";
 			}
@@ -283,7 +283,7 @@ namespace SOL{
 
 	private:
 		void BuildHeap(){
-			IndexType i = (this->K - 1) / 2 + 1;
+			index_type i = (this->K - 1) / 2 + 1;
 			do{
 				i--;
 				HeapAdjust(i, this->K - 1);
@@ -296,12 +296,12 @@ namespace SOL{
 		 * @Param s: r[s+1, ..., m] is a heap, adjust the heap so that r[s,..,m] is a heap
 		 * @Param m
 		 */
-		void HeapAdjust(IndexType s, IndexType m){
+		void HeapAdjust(index_type s, index_type m){
 			//assert(s >= 0 && s < this->K);
-			IndexType cur_id = this->pos2id_map[s];
-			T cur_val = this->value_list[cur_id];
+			index_type cur_id = this->pos2id_map[s];
+			value_type cur_val = this->value_list[cur_id];
 
-			IndexType i = s;
+			index_type i = s;
 			for (i = 2 * s + 1; i <= m; i = 2 * i + 1){
 				if (i < m &&
 					this->value_list[this->pos2id_map[i]] <
@@ -327,13 +327,13 @@ namespace SOL{
 		 *
 		 * @Param new_num: new total data number
 		 */
-		void UpdateDataNum(IndexType new_num, const T* value_list){
+		void UpdateDataNum(index_type new_num, const value_type* value_list){
 			if (new_num < data_num)
 				return;
 
 			this->id2pos_map.resize(new_num);
 			//set the rest
-			for (IndexType i = this->data_num; i < new_num; i++)
+			for (index_type i = this->data_num; i < new_num; i++)
 				this->id2pos_map[i] = i;
 			this->data_num = new_num;
 
