@@ -51,7 +51,7 @@ set(loss_files
 
 set(algo_files
     src/algorithms/sol_algorithms.h
-    src/algorithms/AROW_FS.h
+    src/algorithms/SOFS.h
     src/algorithms/AROW_AdaFS.h
     src/algorithms/Ada_FOBOS.h
     src/algorithms/Ada_RDA.h
@@ -60,13 +60,13 @@ set(algo_files
     src/algorithms/FOBOS.h
     src/algorithms/MaxHeap.h
     src/algorithms/MinHeap.h
-    src/algorithms/OFSGD.h
+    src/algorithms/FOFS.h
     src/algorithms/Optimizer.h
     src/algorithms/RDA_L1.h
     src/algorithms/SCW.h
     src/algorithms/SCW_RDA.h
     src/algorithms/SGD.h
-	src/algorithms/SGD_FS.h
+	src/algorithms/PET.h
     src/algorithms/mRMR_OGD.h
     src/algorithms/AROW_TG.h
     src/algorithms/STG.h)
