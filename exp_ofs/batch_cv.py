@@ -9,7 +9,7 @@ opt_list = ['FOFS','AROW','SGD']
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
 ds_list = ['news','rcv1','url']
 ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K']
-    fold_num =5
+fold_num =5
 
 const_eta_search = '0.03125:2.0:32'
 eta_search = '0.25:2.0:256'
