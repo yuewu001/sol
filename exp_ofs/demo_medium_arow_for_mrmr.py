@@ -1,32 +1,29 @@
 #!/usr/bin/env python
 import os
 import sys
-sys.path.append('../')
+
 import dataset
 import run_util
 import sol_shuffle
-import run_experiment
+import run_experiment_for_mrmr
 import run_vw
 import run_liblinear
 import run_fgm
 
 
 #algorithm list
-opt_list = ['AROW-FS','SGD-FS']
-opt_list = ['SGD-FS']
+opt_list = ['AROW-FS']
 
 #dataset list
-ds_list = ['news','rcv1','url']
-ds_list = ['url']
-#ds_list = ['synthetic_200_1M_1M']
+ds_list = ['relathe','pcmac','basehock','aut','ccat','real-sim']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 10
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
-is_cache = False #True
+is_cache = False
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
 is_default_param = False
@@ -94,7 +91,7 @@ def train_model(path_list,dst_folder):
                 if is_default_param == False:
                     cmd += dataset.get_model_param(ds, opt)
 
-                run_experiment.run_experiment(opt,result_file,ds, cmd)
+                run_experiment_for_mrmr.run_experiment(opt,result_file,ds, cmd)
 
                 print '\nparsing result...'
                 #write the result to file

@@ -20,20 +20,12 @@ def get_synthetic_200_20K_100K(opt_name):
     else:
         return [150,160,170,180,190,200,220,240,260,280,300,400]
 
-def get_synthetic_200_1M_1M(opt_name):
-    if opt_name == 'liblinear':
-        #return [0.0001,0.0002,0.0003,0.0004,0.0005,0.0006,0.0008,0.0007,0.0009,0.001,0.01,0.012,0.013,0.014,0.015,0.016,0.018,0.02]
-        return [0.012]
-    else:
-        return [200]
 def get_synthetic_500_1B_1M(opt_name):
     if opt_name == 'liblinear':
         #return [0.0001,0.0002,0.0003,0.0004,0.0005,0.0006,0.0008,0.0007,0.0009,0.001,0.01,0.012,0.013,0.014,0.015,0.016,0.018,0.02]
         return [0.012]
     else:
         return [500]
-def get_webspam(opt_name):
-    return [0.9999,0.9998,0.9997,0.9996]
 
 def get_lambda_list(ds, opt_name):
     if opt_name == 'AROW' or opt_name == 'SGD':
@@ -42,14 +34,8 @@ def get_lambda_list(ds, opt_name):
         return get_synthetic_100_10K_100K(opt_name)
     elif ds == 'synthetic_200_20K_100K':
         return get_synthetic_200_20K_100K(opt_name)
-    elif ds == 'synthetic_200_1M_1M':
-        return get_synthetic_200_1M_1M(opt_name)    
-    elif ds == 'synthetic_200_1B_1M':
-        return get_synthetic_200_1M_1M(opt_name)    
-    elif ds == 'synthetic_500_1B_1M' or ds == 'synthetic_500_1B_1000':
+    elif ds == 'synthetic_500_1B_1M':
         return get_synthetic_500_1B_1M(opt_name)    
-    elif ds == 'webspam':
-        return get_webspam(opt_name)
     elif opt_name == 'liblinear':
         return ll_vec
     elif opt_name == 'mRMR':

@@ -10,7 +10,7 @@ import exe_path
 if platform.system() == 'Windows':
     rootDir = 'D:/Coding/SOL/data/'
 elif platform.system() == 'Linux':
-    rootDir = '/root/v-yuewu/SOL/data/'
+    rootDir = '/home/matthew/work/Data/'
 else:
     print 'system type is not supported:'
     sys.exit()

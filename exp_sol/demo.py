@@ -10,27 +10,18 @@ import run_liblinear
 
 
 #algorithm list
-opt_list = ['SGD-FS','OFSGD','AROW-FS','STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA']
-opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG', 'RDA','Ada-RDA', 'AROW-DA','AROW-FS']
-#opt_list = ['STG','FOBOS','Ada-FOBOS','AROW-TG']
-opt_list = ['FOBOS','Ada-FOBOS','AROW-TG']
-#opt_list = ['AROW-FS','SGD-FS','OFSGD']
-#opt_list = ['RDA','Ada-RDA','AROW-DA']
-#opt_list = ['AROW-TG']
-#opt_list = ['AROW-TG']
+opt_list = ['STG','FOBOS','Ada-FOBOS','RDA','Ada-RDA','AROW-TG','AROW-DA']
 
 #dataset list
-ds_list = ['MNIST','a9a','pcmac','aut']
-#ds_list = ['MNIST','a9a','physic','pcmac','aut','news','rcv1','url']
-ds_list = ['synthetic2']
+ds_list = ['pcmac']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 5
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
-is_cache = True
+is_cache = False
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
 is_default_param = False

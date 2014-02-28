@@ -12,19 +12,26 @@ import run_mRMR
 
 
 #algorithm list
-opt_list = ['mRMR']
+#batch algorithm
+opt_list = ['liblinear','fgm','mRMR']
+#online algorithm
+opt_list = ['SOFS','FOFS','PET']
 
 #dataset list
+#synthetic data
+ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K']
+#medium data
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['ccat']
+#large data
+ds_list = ['news','rcv1']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 10
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
-is_cache = True
+is_cache = False
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
 is_default_param = False
@@ -99,6 +106,10 @@ def train_model(path_list,dst_folder):
                 for m in range(0,bs_num):
                     result_once[m][0] = result_once2[m][0]
                     result_once[m][1] = result_once2[m][1]
+                    if result_once[m][2] == 0:
+                        result_once[m][2] = result_once2[m][2]
+                    if result_once[m][3] == 0:
+                        result_once[m][3] = result_once2[m][3]
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 

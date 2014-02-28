@@ -100,6 +100,4 @@ if ymax ~= 0
 end
 ylabel('learning error rate', 'fontsize',14)
 xlabel('Number of Samples', 'fontsize',14)
-legend(legend_content,'location','northeast')
-print(strcat(folder_name,strcat(type,'-conv')),'-dpdf')
-%close all
+legend(legend_content,'location','northeast')

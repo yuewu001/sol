@@ -10,7 +10,7 @@ import exe_path
 if platform.system() == 'Windows':
     rootDir = 'D:/v-wuyue/data/'
 elif platform.system() == 'Linux':
-    rootDir = '/root/v-yuewu/SOL/data/'
+    rootDir = '/home/matthew/work/Data/'
 else:
     print 'system type is not supported:'
     sys.exit()
@@ -55,27 +55,15 @@ def get_file_name(dataset, task = 'train'):
     elif dataset == 'url':
         train_file = 'url_combined/url_train'
         test_file = 'url_combined/url_test' 
-    elif dataset == 'webspam':
-        train_file = 'webspam/webspam_train'
-        test_file = 'webspam/webspam_test' 
     elif dataset == 'synthetic_100_10K_100K':
         train_file = 'synthetic_ofs/100_10K_100K/synthetic_train'
         test_file = 'synthetic_ofs/100_10K_100K/synthetic_test'
     elif dataset == 'synthetic_200_20K_100K':
         train_file = 'synthetic_ofs/200_20K_100K/synthetic_train'
         test_file = 'synthetic_ofs/200_20K_100K/synthetic_test'
-    elif dataset == 'synthetic_200_1M_1M':
-        train_file = 'synthetic_ofs/200_1M_1M/synthetic_train'
-        test_file = 'synthetic_ofs/200_1M_1M/synthetic_test'
-    elif dataset == 'synthetic_200_1B_1M':
-        train_file = 'synthetic_ofs/200_1B_1M/synthetic_train'
-        test_file = 'synthetic_ofs/200_1B_1M/synthetic_test'
     elif dataset == 'synthetic_500_1B_1M':
         train_file = 'synthetic_ofs/500_1B_1M/synthetic_train'
         test_file = 'synthetic_ofs/500_1B_1M/synthetic_test'
-    elif dataset == 'synthetic_500_1B_1000':
-        train_file = 'synthetic_ofs/500_1B_1000/synthetic_train_1'
-        test_file = 'synthetic_ofs/500_1B_1000/synthetic_test'
     else:
         print 'unrecoginized dataset'
         sys.exit()
@@ -163,16 +151,12 @@ def get_model_param(ds, opt):
     news = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':64},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     rcv1 = {'AROW-FS':{'-r':2},'SGD-FS':{'-eta':32},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
     url = {'AROW-FS':{'-r':0.25},'SGD-FS':{'-eta':256},'OFSGD':{'-eta':0.25,'-delta':0.0003125}}
-    webspam = {'AROW-FS':{'-r':0.03125},'SGD':{'-eta':64},'AROW':{'-r':0.03125}}
     synthetic_100_10K_100K = {'AROW-FS':{'-r':128},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.0625,'-delta':0.0003125},'AROW':{'-r':128},'SGD':{'-eta':8}}
     synthetic_200_20K_100K = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'AROW':{'-r':64},'SGD':{'-eta':8}}
-    synthetic_200_1M_1M = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'AROW':{'-r':64},'SGD':{'-eta':8}}
-    synthetic_200_1B_1M = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'AROW':{'-r':64},'SGD':{'-eta':8}}
     synthetic_500_1B_1M = {'AROW-FS':{'-r':64},'SGD-FS':{'-eta':8},'OFSGD':{'-eta':0.03125,'-delta':0.0003125},'AROW':{'-r':64},'SGD':{'-eta':8}}
     ds_opt_param = {'aut':aut,'pcmac':pcmac,'basehock':basehock,'relathe':relathe,'ccat':ccat,'real-sim':real_sim,
-            'synthetic_100_10K_100K':synthetic_100_10K_100K,'synthetic_200_20K_100K':synthetic_200_20K_100K,
-            'synthetic_200_1M_1M':synthetic_200_1M_1M,'synthetic_200_1B_1M':synthetic_200_1B_1M,
-            'rcv1':rcv1,'news':news,'url':url,'synthetic_500_1B_1M':synthetic_500_1B_1M,'synthetic_500_1B_1000':synthetic_500_1B_1M,'webspam':webspam}
+            'synthetic_100_10K_100K':synthetic_100_10K_100K,'synthetic_200_20K_100K':synthetic_200_20K_100K, 
+            'rcv1':rcv1,'news':news,'url':url,'synthetic_500_1B_1M':synthetic_500_1B_1M}
     
     cmd = ''
     if ds in ds_opt_param.keys():
