@@ -14,3 +14,5 @@ build/
 *.blg
 *.toc
 data/
+install
+extern
