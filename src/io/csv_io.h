@@ -62,8 +62,18 @@ namespace SOL {
 				}
 				bool OpenWriting() {
 					this->Close();
+#if _WIN32
+					errno_t ret = fopen_s(&this->writer_handler, this->fileName.c_str(),"wb");
+					if (ret != 0){
+						printf("error %d: can't open file %s\n", ret, this->fileName.c_str());
+						this->is_good = false;
+					}
+					else
+						this->is_good = true;
+#else
 					this->writer_handler = fopen(this->fileName.c_str(), "wb");
 					this->is_good = this->writer_handler != NULL ? true : false;
+#endif
 					return this->is_good;
 				}
 

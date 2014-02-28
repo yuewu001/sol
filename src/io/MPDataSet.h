@@ -32,8 +32,8 @@ namespace SOL {
 				case SOL::MPBufferType_ALL:
 					this->pMp_Buffer = new MPBuffer_ALL<FeatType, LabelType>(mp_buf_size);
 					break;
-				case SOL::MPBufferType_FALSE_PREDICT:
-					this->pMp_Buffer = new MPBuffer_FALSE_PREDICT<FeatType, LabelType>(mp_buf_size);
+				case SOL::MPBufferType_MARGIN:
+					this->pMp_Buffer = new MPBuffer_LARGE_MARGIN<FeatType, LabelType>(mp_buf_size);
 					break;
 				case SOL::MPBufferType_RESERVIOR:
 					this->pMp_Buffer = new MPBuffer_RESERVIOR<FeatType, LabelType>(mp_buf_size);
@@ -91,7 +91,8 @@ namespace SOL {
 
 					if (this->pMp_Buffer->is_inuse == false){
 						//check if the next chunk is ready
-						if (this->rd_ptr->next->is_parsed == false){
+						//if (this->rd_ptr->next->is_parsed == false){
+						{
 							//not ready, clone into mp buffer
 							for (size_t i = 0; i < this->rd_ptr->dataNum; i++){
 								this->pMp_Buffer->Push(this->rd_ptr->data[i]);
@@ -103,7 +104,7 @@ namespace SOL {
 						this->rd_ptr = this->rd_ptr->next;
 						condition_variable_signal_all(&this->buffer_full);
 					}
-					else
+					//else
 						this->pMp_Buffer->is_inuse = false;
 
 					mutex_unlock(&this->data_lock);

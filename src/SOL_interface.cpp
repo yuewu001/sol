@@ -32,7 +32,7 @@ using namespace SOL;
 
 //to be defined in sol_interface.cpp
 template <typename T1, typename T2>
-Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFun);
+Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFun);
 
 extern "C"{
 	/**
@@ -45,12 +45,12 @@ extern "C"{
 	*/
 	long sol_init_dataset(const char* filename, const char* cache_filename, const char* dt_type, int passNum, int buf_size){
 		if (filename == NULL && cache_filename == NULL){
-			cerr<<"no input is specified!"<<endl;
+			cerr << "no input is specified!" << endl;
 			return 0;
 		}
-		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum,buf_size);
-		if (dataset->Load(filename,cache_filename, dt_type) == false){
-			cerr<<"ERROR: Load dataset "<<filename<<" failed!"<<endl;
+		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum, buf_size);
+		if (dataset->Load(filename, cache_filename, dt_type) == false){
+			cerr << "ERROR: Load dataset " << filename << " failed!" << endl;
 			delete dataset;
 			return 0;
 		}
@@ -58,17 +58,17 @@ extern "C"{
 	}
 
 	long sol_init_dataset2(long dt_reader, int passNum, int buf_size){
-		return sol_init_dataset3(dt_reader,"", passNum, buf_size);
+		return sol_init_dataset3(dt_reader, "", passNum, buf_size);
 	}
 
 	long sol_init_dataset3(long dt_reader, const char* cache_filename, int passNum, int buf_size){
 		if (dt_reader == 0){
-			cerr<<"no reader is specified!"<<endl;
+			cerr << "no reader is specified!" << endl;
 			return 0;
 		}
-		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum,buf_size);
-		if (dataset->Load((DataReader<FeatType,LabelType>*)dt_reader,cache_filename) == false){
-			cerr<<"ERROR: Load dataset failed!"<<endl;
+		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum, buf_size);
+		if (dataset->Load((DataReader<FeatType, LabelType>*)dt_reader, cache_filename) == false){
+			cerr << "ERROR: Load dataset failed!" << endl;
 			delete dataset;
 			return 0;
 		}
@@ -76,7 +76,7 @@ extern "C"{
 	}
 
 	long sol_init_loss(const char* loss_type){
-		return (long)GetLossFunc<FeatType, LabelType>(loss_type); 
+		return (long)GetLossFunc<FeatType, LabelType>(loss_type);
 	}
 
 	long sol_init_optimizer(long dataset, long loss_func, int argc, const char** args){
@@ -91,7 +91,7 @@ extern "C"{
 			return 0;
 		}
 
-		opti->SetParameter(param.lambda,param.eta, param.power_t, param.initial_t);
+		opti->SetParameter(param.lambda, param.eta, param.power_t, param.initial_t);
 		if (param.is_normalize == true)
 			opti->SetNormalize(param.is_normalize);
 		if (param.is_learn_best_param == true){
@@ -109,7 +109,7 @@ extern "C"{
 	* @Param:  sparse_rate: sparse rate of the model
 	* @Param:  time_cost: time cost of the training
 	*
-	* @Returns:    
+	* @Returns:
 	*/
 	void sol_train(long optimizer, float* learn_errRate, float* var_l_errRate, float* sparse_rate, float* time_cost){
 		Optimizer<FeatType, LabelType> *opti = (Optimizer<FeatType, LabelType> *)optimizer;
@@ -124,7 +124,7 @@ extern "C"{
 		//learning the model
 		double time1 = get_current_time();
 
-		opti->Learn(l_errRate,l_varErr,sparseRate);
+		opti->Learn(l_errRate, l_varErr, sparseRate);
 
 		double time2 = get_current_time();
 
@@ -159,7 +159,7 @@ extern "C"{
 
 
 	void sol_release_loss(long loss_func){
-		LossFunction<FeatType, LabelType> * loss = (LossFunction<FeatType, LabelType> *)loss_func; 
+		LossFunction<FeatType, LabelType> * loss = (LossFunction<FeatType, LabelType> *)loss_func;
 		if (loss != NULL)
 			delete loss;
 	}
@@ -171,62 +171,62 @@ extern "C"{
 	}
 }
 template <typename T1, typename T2>
-Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, LossFunction<T1,T2> &lossFunc) {
+Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFunc) {
 	string str_opt = param.str_opt;
 	ToUpperCase(str_opt);
 	if (str_opt == "SGD")
-		return new SGD<T1,T2>(dataset,lossFunc);
+		return new SGD<T1, T2>(dataset, lossFunc);
 	else if (str_opt == "STG") {
-		STG<T1,T2> *opti = new STG<T1,T2>(dataset,lossFunc);
+		STG<T1, T2> *opti = new STG<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K);
 		return opti;
 	}
-	else if (str_opt == "RDA") 
-		return new RDA_L1<T1,T2>(dataset,lossFunc,false);
+	else if (str_opt == "RDA")
+		return new RDA_L1<T1, T2>(dataset, lossFunc, false);
 	else if (str_opt == "RDA_E") {
-		RDA_L1<T1,T2> *opti = new RDA_L1<T1,T2>(dataset,lossFunc,true);
+		RDA_L1<T1, T2> *opti = new RDA_L1<T1, T2>(dataset, lossFunc, true);
 		opti->SetParameterEx(param.gamma_rou);
 		return opti;
 	}
-	else if (str_opt == "FOBOS") 
-		return new FOBOS<T1,T2>(dataset,lossFunc);
+	else if (str_opt == "FOBOS")
+		return new FOBOS<T1, T2>(dataset, lossFunc);
 	else if (str_opt == "ADA-RDA") {
-		Ada_RDA<T1,T2> *opti = new Ada_RDA<T1,T2>(dataset,lossFunc);
+		Ada_RDA<T1, T2> *opti = new Ada_RDA<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.delta);
 		return opti;
 	}
 	else if (str_opt == "ADA-FOBOS") {
-		Ada_FOBOS<T1,T2> *opti = new Ada_FOBOS<T1,T2>(dataset,lossFunc);
+		Ada_FOBOS<T1, T2> *opti = new Ada_FOBOS<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.delta);
 		return opti;
 	}
 	else if (str_opt == "AROW") {
-		DAROW<T1,T2> *opti = new DAROW<T1, T2>(dataset,lossFunc);
+		DAROW<T1, T2> *opti = new DAROW<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
 	else if (str_opt == "AROW-TG") {
-		SSAROW<T1,T2> *opti = new SSAROW<T1, T2>(dataset,lossFunc);
+		SSAROW<T1, T2> *opti = new SSAROW<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
 	else if (str_opt == "SOFS") {
-		SOFS<T1,T2> *opti = new SOFS<T1, T2>(dataset,lossFunc);
+		SOFS<T1, T2> *opti = new SOFS<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K, param.r);
 		return opti;
 	}
 	else if (str_opt == "AROW-DA") {
-		CW_RDA<T1,T2> *opti = new CW_RDA<T1, T2>(dataset,lossFunc);
+		CW_RDA<T1, T2> *opti = new CW_RDA<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
 	else if (str_opt == "SCW"){
-		SCW<T1, T2> *opti = new SCW<T1, T2>(dataset,lossFunc);
-		opti->SetParameterEx(param.phi,param.r);
+		SCW<T1, T2> *opti = new SCW<T1, T2>(dataset, lossFunc);
+		opti->SetParameterEx(param.phi, param.r);
 		return opti;
 	}
 	else if (str_opt == "SCW-RDA") {
-		SCW_RDA<T1,T2> *opti = new SCW_RDA<T1, T2>(dataset,lossFunc);
+		SCW_RDA<T1, T2> *opti = new SCW_RDA<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.phi, param.r);
 		return opti;
 	}
@@ -236,23 +236,23 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 		return opti;
 	}
 	else if (str_opt == "PET"){
-		PET<T1,T2> *opti = new PET<T1,T2>(dataset,lossFunc);
+		PET<T1, T2> *opti = new PET<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K);
 		return opti;
 	}
 	else if (str_opt == "SOSOL"){
-		SOSOL<T1,T2> *opti = new SOSOL<T1,T2>(dataset,lossFunc);
+		SOSOL<T1, T2> *opti = new SOSOL<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
 	else if (str_opt == "AROW-ADAFS"){
-		AROW_AdaFS<T1,T2> *opti = new AROW_AdaFS<T1,T2>(dataset,lossFunc);
+		AROW_AdaFS<T1, T2> *opti = new AROW_AdaFS<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K, param.r);
 		return opti;
 	}
 	else if (str_opt == "MRMR_OGD"){
-		mRMR_OGD<T1,T2> *opti = new mRMR_OGD<T1,T2>(dataset,lossFunc);
-		if (opti->LoadFSResult(param.in_model_filename,param.K) == false){
+		mRMR_OGD<T1, T2> *opti = new mRMR_OGD<T1, T2>(dataset, lossFunc);
+		if (opti->LoadFSResult(param.in_model_filename, param.K) == false){
 			delete opti;
 			return NULL;
 		}
@@ -260,7 +260,7 @@ Optimizer<T1,T2>* GetOptimizer(const Params &param, DataSet<T1,T2> &dataset, Los
 	}
 
 	else{
-		cerr<<"ERROR: unrecognized optimization method "<<param.str_opt<<endl;
+		cerr << "ERROR: unrecognized optimization method " << param.str_opt << endl;
 		return NULL;
 	}
 }
