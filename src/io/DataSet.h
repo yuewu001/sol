@@ -56,6 +56,10 @@ namespace SOL {
             CV data_available;
             CV buffer_full;
 
+			//double time1;
+			//double time2;
+			//double load_time;
+
         public:
             DataSet(int passes = 1, int buf_size = -1) {
                 this->head = NULL;
@@ -78,6 +82,8 @@ namespace SOL {
                 initialize_mutex(&this->data_lock);
                 initialize_condition_variable(&data_available);
                 initialize_condition_variable(&buffer_full);
+
+				//this->load_time = 0;
             }
             virtual ~DataSet() {
                 delete_mutex(&data_lock);
@@ -232,6 +238,7 @@ namespace SOL {
 					this->wt_ptr->is_inuse = true;
 					DataChunk<FeatType, LabelType>* p = this->wt_ptr;
 					mutex_unlock(&this->data_lock);
+					//this->time1 = get_current_time();
 					return *p;
 				}
 				else{
@@ -250,6 +257,8 @@ namespace SOL {
 				//}
 				this->wt_ptr = this->wt_ptr->next;
 				condition_variable_signal_all(&this->data_available);
+				//this->time2 = get_current_time();
+				//this->load_time += time2 - time1;
 				mutex_unlock(&this->data_lock);
 			}
 
@@ -259,6 +268,7 @@ namespace SOL {
 				this->load_finished = true;
 				this->is_on_loading = false;
 				condition_variable_signal_all(&this->data_available);
+				//cout<<"loading time: "<<this->load_time<<" s"<<endl;
 				mutex_unlock(&this->data_lock);
 			}
 

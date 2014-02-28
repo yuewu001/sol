@@ -120,6 +120,24 @@ namespace SOL {
 
 		IndexType dim() const {return this->max_index;}
 
+		bool is_sorted() const {
+			bool sorted = true;
+			if (this->indexes.size() <= 1)
+				return true;
+			for (IndexType *iter = this->indexes.begin + 1, *iter0 = this->indexes.begin; iter != this->indexes.end; iter0++,iter++){
+				if (*iter0 > *iter){
+					sorted = false;
+					break;
+				}
+			}
+			return sorted;
+		}
+		void Sort() {
+			if (this->is_sorted() == true)
+				return;
+			QuickSort(this->indexes.begin,this->features.begin, 0,this->indexes.size() -1 );
+		}
+
 	private:
 		void release() {
 			--(*count); 

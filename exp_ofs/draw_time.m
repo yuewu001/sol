@@ -1,7 +1,7 @@
 function draw_time(dataset,xmin, xmax, ymin, ymax)
 close all;
 
-color_list = {'r','m','b','black'};
+color_list = {'r','m','b','black','g'};
 color_num = size(color_list,2);
 shape_list = {'+','s','o','*','v','d'};
 shape_num = size(shape_list,2);

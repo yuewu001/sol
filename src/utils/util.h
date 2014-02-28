@@ -102,7 +102,7 @@ inline void ToLowerCase(char* c_str) {
 
 inline void ToUpperCase(string &str) {
 	string dst_str;
-	int len = str.length();
+	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(toupper(str[i]));
 	std::swap(str,dst_str);
@@ -110,7 +110,7 @@ inline void ToUpperCase(string &str) {
 
 inline void ToLowerCase(string &str) {
 	string dst_str;
-	int len = str.length();
+	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(tolower(str[i]));
 	std::swap(str,dst_str);
@@ -157,5 +157,42 @@ inline double get_current_time(){
     gettimeofday(&tim, NULL);
     return tim.tv_sec + tim.tv_usec / 1000000.0;
 #endif
+}
+
+template <typename T1, typename T2>
+void QuickSort(T1 *a, T2 *b, size_t low, size_t high){ // from small to great
+    size_t i = low;
+    size_t j = high;
+    T1 temp = a[low]; // select the first element as the indicator
+    T2 temp_ind = b[low];
+
+    while (i < j) {
+        while ((i < j) && (temp < a[j])){ // scan right side
+            j--;
+        }
+        if(i<j) {
+            a[i] = a[j];
+            b[i] = b[j];
+            i ++;
+        }
+
+        while (i<j && (a[i] < temp)){       // scan left side
+            i++;
+        }
+        if (i<j) {
+            a[j] = a[i];
+            b[j] = b[i];
+            j--;
+        }
+    }
+    a[i] = temp;
+    b[i] = temp_ind;
+
+    if (low < i) {
+        QuickSort(a, b, low, i-1);  // sort left subset
+    }
+    if (i < high) {
+        QuickSort(a, b, j+1, high);  // sort right subset
+    }
 }
 #endif

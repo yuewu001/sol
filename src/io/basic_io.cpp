@@ -90,14 +90,14 @@ namespace SOL{
      * @Return: size of data read in bytes
      */
     char* basic_io::read_line(char* &dst, size_t &dst_len){
-        size_t len;
-        if(fgets(dst,dst_len,file) == NULL)
+        static size_t len(0);
+        if(fgets(dst,static_cast<int>(dst_len),file) == NULL)//note: there may exist problem here if dst_len > int_max
             return NULL;
         while(strrchr(dst,'\n') == NULL) {
             dst_len *= 2;
             dst = (char *) realloc(dst, dst_len);
             len = strlen(dst);
-            if(fgets(dst+len,dst_len-len,file) == NULL)
+            if(fgets(dst+len,static_cast<int>(dst_len-len),file) == NULL)
                 break;
         }
         return dst;

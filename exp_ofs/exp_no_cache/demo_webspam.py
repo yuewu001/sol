@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 import os
 import sys
-import dataset
+
+sys.path.append('../')
 import run_util
 import sol_shuffle
 import run_experiment
 import run_vw
 import run_liblinear
 import run_fgm
-import run_mRMR
+import dataset
 
 
 #algorithm list
-opt_list = ['mRMR']
+opt_list = ['AROW','SGD','AROW-FS']
 
 #dataset list
-ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K','relathe','pcmac','basehock','ccat','aut','real-sim']
-#ds_list = ['synthetic_100_10K_100K']
+ds_list = ['webspam']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
@@ -24,7 +24,7 @@ rand_num = 1
 extra_cmd = ' -loss Hinge -norm '
 
 #whether need to cache the dataset for fast processing speed
-is_cache = True
+is_cache = False #True
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
 is_default_param = False
@@ -70,6 +70,8 @@ def train_model(path_list,dst_folder):
         cmd_data = dataset.get_cmd_data_by_file(rand_file, test_file, is_cache)
         dataset.analyze(rand_file);
 
+        print rand_file
+
         for opt in opt_list:
             print '-----------------------------------'
             print ' Experiment on %s' %opt + ' Random %d' %k 
@@ -84,25 +86,6 @@ def train_model(path_list,dst_folder):
             elif opt == 'fgm':
                 result_file = 'fgm_result_%d' %k + '.txt'
                 result_once = run_fgm.run_fgm(rand_file, test_file, ds, result_file)
-            elif opt == 'mRMR':
-                result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
-                result_once = run_mRMR.run_mRMR(rand_file, test_file, ds, result_file)
-
-                print '\nparsing result...'
-                #write the result to file
-                parse_file = dst_folder +'/%s' %opt + '_%d' %k + '.txt'
-
-                result_once2 = run_util.parse_result(result_file, parse_file);
-                bs_num = len(result_once)
-                if bs_num != len(result_once2):
-                    print 'inconsistent parsing result'
-                for m in range(0,bs_num):
-                    result_once[m][0] = result_once2[m][0]
-                    result_once[m][1] = result_once2[m][1]
-                    if result_once[m][2] == 0:
-                        result_once[m][2] = result_once2[m][2]
-                    if result_once[m][3] == 0:
-                        result_once[m][3] = result_once2[m][3]
             else:
                 result_file = dst_folder + '/%s' %opt + '_result_%d' %k + '.txt'
 

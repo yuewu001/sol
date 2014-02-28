@@ -12,11 +12,12 @@ import run_mRMR
 
 
 #algorithm list
+opt_list = ['liblinear','fgm','mRMR']
 opt_list = ['mRMR']
+#opt_list = ['fgm','liblinear']
 
 #dataset list
-ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K','relathe','pcmac','basehock','ccat','aut','real-sim']
-#ds_list = ['synthetic_100_10K_100K']
+ds_list = ['synthetic_500_1B_1000']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1

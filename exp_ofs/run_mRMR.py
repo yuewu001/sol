@@ -63,29 +63,32 @@ def run_mRMR(train_file, test_file,ds, result_file):
     data_valid_dim = run_util.get_valid_dim(train_file)
     data_num = run_util.get_data_num(train_file)
 
-    bs_list = l1_def.get_lambda_list(dataset,'mRMR')
+    #bs_list = l1_def.get_lambda_list(ds,'mRMR')
     
-    #if 'synthetic' in ds:
-    #    bs_list = l1_def.get_lambda_list(dataset,'mRMR')
-    #else:
-    #    lambda_list = l1_def.get_lambda_list(ds,'mRMR')
+    if 'synthetic' in ds:
+        bs_list = l1_def.get_lambda_list(ds,'mRMR')
+    else:
+        lambda_list = l1_def.get_lambda_list(ds,'mRMR')
 
-    #    bs_list = [] 
-    #    b_num = len(lambda_list)
-    #    for i in range(0,b_num):
-    #        dim = int(data_valid_dim * (1 - lambda_list[i]))
-    #        if dim > 0 and dim <= 500:
-    #            bs_list.append(dim)
+        bs_list = [] 
+        b_num = len(lambda_list)
+        for i in range(0,b_num):
+            dim = int(data_valid_dim * (1 - lambda_list[i]))
+            if dim > 0 and dim <= 500:
+                bs_list.append(dim)
+
+    bs_list = l1_def.get_lambda_list(ds,'mRMR')
 
     #clear the file if it already exists
     open(result_file,'w').close()
 
     for bs in bs_list:
         result_once = [0,0,0,0]
-        model_file = dst_folder + '/mRMR_model%g' %bs
-        parse_file = dst_folder + '/mRMR_model_parse%g' %bs
+        model_file = dst_folder + '/mRMR_model%d' %bs
+        parse_file = dst_folder + '/mRMR_model_parse%d' %bs 
 
         if os.path.exists(model_file) == False:
+            print model_file + ' not exist'
             csv_train_file = train_file + '.csv'
             if os.path.exists(csv_train_file) == False:
                 #convert data
@@ -112,9 +115,9 @@ def run_mRMR(train_file, test_file,ds, result_file):
 
         #run OGD
         cmd_data = dataset.get_cmd_data_by_file(train_file, test_file,True)
-        cmd = exe_path.SOL_exe_name + cmd_data + ' -m %s' %parse_file
+        cmd = exe_path.SOL_exe_name + cmd_data + ' -m %s' %parse_file + ' -k %d' %bs
         cmd += dataset.get_model_param(ds,'SGD-FS')
-        cmd += ' -opt mRMR_OGD >> %s' %result_file
+        cmd += ' -opt mRMR_OGD -norm -loss Hinge >> %s' %result_file
 
         print cmd
         os.system(cmd)

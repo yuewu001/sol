@@ -1,9 +1,9 @@
-function draw_time_online(dataset,xmin, xmax, ymin, ymax)
+function draw_time(dataset,xmin, xmax, ymin, ymax)
 close all;
 
-color_list = {'r','m','b','black'};
+color_list = {'r','m','b','black','g'};
 color_num = size(color_list,2);
-shape_list = {'s','+','*','v'};
+shape_list = {'s','+','*','v','o'};
 shape_num = size(shape_list,2);
 
 cur_color_index = 1;
@@ -13,7 +13,7 @@ folder_name = strcat(dataset,'/');
 mkdir figs
 opt_list_file = strcat(folder_name,'opt_list.txt');
 
-opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt'};
+opt_list = {'AROW-FS.txt';'OFSGD.txt';'SGD-FS.txt';'liblinear.txt';'fgm.txt'};
 
 %opt_list = textread(opt_list_file,'%s');
 
@@ -29,9 +29,11 @@ for k = 1:1:opt_num
     result = load(strcat(folder_name, result_file));
 
     if strcmp(opt_name,'SGD-FS') == 1
-        legend_content{1,k} = 'PE_{trunc}';
+        legend_content{1,k} = 'PET';
     elseif strcmp(opt_name,'OFSGD') == 1
-        legend_content{1,k} = 'SPOFS';
+        legend_content{1,k} = 'FOFS';
+    elseif strcmp(opt_name,'AROW-FS') == 1
+        legend_content{1,k} = 'SOFS';
     else
         legend_content{1,k} = opt_name;
     end
@@ -43,10 +45,10 @@ for k = 1:1:opt_num
 	color_shape = strcat(color_list{1,cur_color_index}, '-');
     color_shape = strcat(color_shape, shape_list{1,cur_shape_index});
     figure(1)    
+	semilogy(sparse_vec, l_time_vec, color_shape,'LineWidth',2,'markersize',10);	 
 	hold on
     grid on
     box on
-	plot(sparse_vec, l_time_vec, color_shape,'LineWidth',2,'markersize',15);	 
     
     cur_color_index = cur_color_index + 1;
     if cur_color_index > color_num
@@ -67,16 +69,13 @@ figure(1) %learning error rate
 %title('training time vs sparsity', 'fontsize',14)
 
 ylabel('training time (s)', 'fontsize',28)
-xlabel('#Selected features', 'fontsize',28)
+xlabel('#Selected Features', 'fontsize',28)
 
 if (exist('xmin','var'))
     axis([xmin xmax ymin ymax])
 end
+legend(legend_content,'location','northwest', 'fontsize',22)
 set(gca,'Fontsize',24);
-gca_legend = legend(legend_content,'Location','SouthEast', 'fontsize',18);
-po=get( gca_legend, 'Position' ); 
-set( gca_legend, 'Position', [po(1), po(2)+0.1, po(3), po(4)] );
-
 
 print(strcat(folder_name,'time-sparse'),'-dpdf')
 %close all

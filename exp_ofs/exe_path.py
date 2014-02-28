@@ -10,6 +10,8 @@ if platform.system() == "Windows":
     vw_exe_name = 'vw'
     liblinar_train_exe_name = r'..\extern\liblinear\train.exe'
     liblinar_test_exe_name = r'..\extern\liblinear\predict.exe'
+    liblinar_train_exe_name = r'..\extern\FGM\FGM.exe'
+    liblinar_test_exe_name = r'..\extern\FGM\Predict.exe'
     analysis_exe_name = r'..\install\bin\analysis.exe'
     cv_script = r'CV.py'
     fgm_train = r'..\extern\FGM\FGM.exe'
