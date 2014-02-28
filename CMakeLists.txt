@@ -104,7 +104,7 @@ ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ")
 	
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
@@ -119,10 +119,6 @@ ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 add_executable(SOL src/Params.cpp src/Params.h 
     src/main.cpp src/SOL_interface.cpp ${SRC_LIST})
-
-#add_executable(SyntheticData src/SyntheticData.cpp) 
-    
-     
 IF(UNIX)
     target_link_libraries(SOL pthread)
 ENDIF(UNIX)
@@ -131,7 +127,7 @@ add_library(SOLdll SHARED src/SOL_interface.h src/Params.cpp src/Params.h
     src/SOL_interface.cpp  ${SRC_LIST}) 
 IF(UNIX)
     target_link_libraries(SOLdll pthread)
-    set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-fPIC -std=c++0x") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
 ENDIF(UNIX)
 
 add_library(SOLstatic STATIC src/SOL_interface.h src/Params.cpp src/Params.h 
@@ -210,6 +206,7 @@ endif()
 message(STATUS "")
 message(STATUS "  C/C++:")
 message(STATUS "    C++ Compiler:"           ${OPENCV_COMPILER_STR})
+message(STATUS "    C++ flags: "    ${CMAKE_CXX_FLAGS})
 message(STATUS "    C++ flags (Release):"    ${CMAKE_CXX_FLAGS_RELEASE})
 message(STATUS "    C++ flags (Debug):"       ${CMAKE_CXX_FLAGS_DEBUG})
 message(STATUS "    C flags (Release):"       ${CMAKE_C_FLAGS_RELEASE})

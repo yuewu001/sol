@@ -181,7 +181,7 @@ namespace SOL{
 				this->BuildHeap();
 				//make sure most confident values are in the heap
 				index_type ret_id;
-				for (index_type i = 0, j = this->K; i != this->data_num; i++){
+				for (index_type i = 0; i != this->data_num; i++){
 					if (this->is_topK(i) == false){
 						this->UpdateHeap(i, ret_id);
 					}

@@ -28,7 +28,7 @@ namespace SOL{
         struct MPBuffer:public DataChunk<FeatType,LabelType>{
             size_t insert_pos;
 
-            MPBuffer(size_t bufSize = init_mp_buf_size):DataChunk(bufSize),insert_pos(0){
+            MPBuffer(size_t bufSize = init_mp_buf_size):DataChunk<FeatType, LabelType>(bufSize),insert_pos(0){
 				this->is_inherited = true;
             }
 
@@ -37,7 +37,7 @@ namespace SOL{
 
 		template <typename FeatType, typename LabelType>
 		struct MPBuffer_ALL :public MPBuffer<FeatType, LabelType>{
-			MPBuffer_ALL(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+			MPBuffer_ALL(size_t bufSize = init_mp_buf_size) :MPBuffer<FeatType, LabelType>(bufSize){
 			}
 
 			void Push(DataPoint<FeatType, LabelType> &srcPt){
@@ -58,7 +58,7 @@ namespace SOL{
 			s_array<int> bufIdVec;
 			static float max_float;
 		public:
-			MPBuffer_LARGE_MARGIN(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+			MPBuffer_LARGE_MARGIN(size_t bufSize = init_mp_buf_size) :MPBuffer<FeatType, LabelType>(bufSize){
 				this->marginVec.resize(bufSize);
 				for (s_array<float>::iterator iter = this->marginVec.begin;
 					iter != this->marginVec.end; iter++)
@@ -89,7 +89,7 @@ namespace SOL{
 		template <typename FeatType, typename LabelType>
 		struct MPBuffer_RESERVIOR :public MPBuffer<FeatType, LabelType>{
 			size_t total_num; //total number of pushed instances
-			MPBuffer_RESERVIOR(size_t bufSize = init_mp_buf_size) :MPBuffer(bufSize){
+			MPBuffer_RESERVIOR(size_t bufSize = init_mp_buf_size) :MPBuffer<FeatType, LabelType>(bufSize){
 				//srand(time(NULL));
 				this->total_num = 0;
 			}

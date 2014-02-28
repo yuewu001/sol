@@ -22,8 +22,8 @@ namespace SOL {
 			MPBuffer<FeatType, LabelType> *pMp_Buffer;
 
         public:
-            MPDataSet(int passes = 1, int buf_size = -1, MPBufferType buf_type = MPBuffer_None, int mp_buf_size = init_mp_buf_size):
-				DataSet(passes, buf_size){
+            MPDataSet(int passes = 1, int buf_size = -1, MPBufferType buf_type = MPBufferType_None, int mp_buf_size = init_mp_buf_size):
+				DataSet<FeatType, LabelType>(passes, buf_size){
 				switch (buf_type)
 				{
 				case SOL::MPBufferType_None:

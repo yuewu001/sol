@@ -102,8 +102,6 @@ namespace SOL {
 				return y;
 			}
 
-			IndexType index_i = 0;
-			
 			//update with sgd
 			for (size_t i = 0; i < featDim; i++) {
 				this->weightVec[x.indexes[i]] -= this->eta0 * gt_i * x.features[i];

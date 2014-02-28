@@ -19,7 +19,6 @@ bool Detect(const string& filename, s_array<char> &index_set) {
 	size_t max_show_count = 100000;
 	size_t show_count = 1000;
     size_t dataNum = 0;
-    size_t featNum = 0;
     IndexType max_index = 0;
     index_set.resize(0);
     DataPoint<float,char> data;
