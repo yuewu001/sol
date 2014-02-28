@@ -64,7 +64,7 @@ namespace SOL {
 	SOFS<FeatType, LabelType>::SOFS(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "AROW for Feature Selection";
+		this->id_str = "Second Order Online Feature Selection";
 		this->r = init_r;
 		this->K = 0;
 		this->sigma_w.resize(this->weightDim);

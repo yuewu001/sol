@@ -45,7 +45,7 @@ namespace SOL {
 		this->add_option(init_loss_type,0,1,"loss function type:\nHinge, Logit, Square, SquareHinge","-loss",&this->str_loss);
 
 		this->add_option(init_opti_method,0,1,
-			"optimization method:\nSGD, STG, RDA, RDA_E, FOBOS, Ada-RDA, Ada-FOBOS, AROW, AROW-TG, AROW-DA, AROW-FS,SCW, SCW-RDA, SOSOL","-opt", &this->str_opt);
+			"optimization method:\nSGD, STG, FOBOS, RDA, RDA_E,\nAda-RDA, Ada-FOBOS, \nAROW, AROW-TG, AROW-DA, SCW, SCW-RDA, \nSOSOL,PET,FOFS,SOFS","-opt", &this->str_opt);
 		this->add_option(init_mp_type,0,1,"multi-pass type: none, \n\tall, false_predict","-mpt",&this->str_mp_type);
 		this->add_option(init_is_learn_best_param,0,0,"learn best parameter", 
 			"-lbp", &this->is_learn_best_param);

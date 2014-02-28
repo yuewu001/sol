@@ -68,7 +68,7 @@ namespace SOL {
 	FOFS<FeatType, LabelType>::FOFS(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "FOFS";
+		this->id_str = "First Order Online Feature Selection";
 		this->K = 0;
 		this->delta = init_ofs_delta;
 		this->eta0 = init_ofs_eta;

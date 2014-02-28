@@ -56,7 +56,7 @@ namespace SOL {
 	PET<FeatType, LabelType>::PET(DataSet<FeatType, LabelType> &dataset, 
 		LossFunction<FeatType, LabelType> &lossFunc):
 	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "PET";
+		this->id_str = "Perceptron with Truncation";
 		this->K = 0;
 
 		this->abs_weightVec.resize(this->weightDim);
