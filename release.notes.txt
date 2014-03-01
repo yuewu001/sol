@@ -22,3 +22,4 @@ v0.2.0
     6. add a new tool dtcleaner to remove those never-appear features in
         datasets
     7.  fix some bugs
+	8. update tutorial
