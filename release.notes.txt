@@ -11,3 +11,14 @@ v0.1.2
 	add SOSOL.h by Tim
 	
 	some other changes to the scripts
+
+v0.2.0
+    1. add online feature selection algorithms: PET, FOFS, SOFS
+    2. speed up PET and FOFS with a heap
+    3. add scripts of online feature selection experiments
+    4. support a new datatype:  csv
+    5. add multi-pass learning, strategies include: reservoir sampling, latest
+        sampling, margin sampling
+    6. add a new tool dtcleaner to remove those never-appear features in
+        datasets
+    7.  fix some bugs

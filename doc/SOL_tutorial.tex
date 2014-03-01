@@ -81,7 +81,7 @@
 % Comment out these three lines to get the minimal LaTeX document
 \title{\LARGE\textsf{SOL}: A Large Scale Sparse Online Learning Library}
 
-\subtitle{Version 0.1.0}
+\subtitle{Version 0.2.0}
 
 \author{}
 
@@ -90,11 +90,13 @@
 \begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
     \textsf{SOL} is an open-source library for large-scale sparse online learning,
     which consists of a family of efficient and scalable sparse online learning
-    algorithms for large-scale online  classification tasks. We have offered
-    easy-to-use command-line tools and examples for users and developers. We also
-    have made comprehensive documents available for both beginners and advanced
-    users. SOL is not only a machine learning tool, but also a comprehensive
-    experimental platform for conducting large scale sparse online learning research.
+    and online feature selection algorithms for large-scale high dimensional
+    online  classification tasks. We have offered easy-to-use command-line
+    tools and examples for users and developers. We also have made
+    comprehensive documents available for both beginners and advanced users.
+    SOL is not only a machine learning tool, but also a comprehensive
+    experimental platform for conducting large scale sparse online learning and
+    online feature selection research.
 \end{abstract}
 
 \newpage
@@ -106,14 +108,19 @@
 
 Sparse online learning represents a family algorithms which try to explore
 structure of features and learn a sparse model. It is valuable in handling
-extremely large scale high dimensional datasets, which cannot be loaded into
-memory.  The problem has been widely studied in batch learning, which is
-effective but not scalable to large scale high dimensional data. Over the past
-years, a variety of online learning algorithms have been proposed to explore
-sparsity and maintain the benefits of online algorithms. However, there is very
-few comprehensive libraries which include most of the state-of-the-art
-algorithms for researchers to make easy side-by-side comparisons and for
-developers to explore their various applications.
+extremely large scale high dimensional datasets. The problem has been widely
+studied in batch learning, which is effective but not scalable to large scale
+high dimensional data. There are two major problems for conventional algorithms
+in dealing with such kind of data: 1) the data is too large and the dimension
+is too high to be loaded into memory; 2) many algorithms assume that training
+examples are given as a prior, which may not hold in some real-world
+applications where examples arrive in an online manner or it is expensive to
+collect the full information of training data. Over the past years, a variety
+of online learning algorithms have been proposed to explore sparsity and
+maintain the benefits of online algorithms. However, there is very few
+comprehensive libraries which include most of the state-of-the-art algorithms
+for researchers to make easy side-by-side comparisons and for developers to
+explore their various applications.
 
 In this work, we develop \textsf{SOL}, an easy-to-use sparse online learning
 tool that consists of a family of existing and recent state-of-the-art sparse
@@ -133,7 +140,7 @@ is an empirical loss and takes the form of $\sum_{i=1}^t{l_i}$ for a sequence
 of loss functions $l_i$. $r(w)$ is a regularization term and often takes the
 form of $\textit{L1}$ $(r(w) = |w|)$ or $\textit{L0}$ $(r(w) = |w|_0)$ norm.
 $R$ is a pre-defined threshold to control sparsity of the model. With
-lagrangian multiplier method, equation~\eqref{equ:obj0} can be reformulated as:
+Lagrangian multiplier method, equation~\eqref{equ:obj0} can be reformulated as:
 \begin{equation}
     \min_{w}{f(w) + \lambda r(w)}
     \label{equ:obj}
@@ -148,25 +155,26 @@ Table~\ref{tab:summary-algorithms} gives a summary of the family of implemented 
 %\begin{center}
     \begin{small}
         \renewcommand{\arraystretch}{1.3}
-        \begin{tabular}{l||c|l|l}
+        \begin{tabular}{l||c|l|c|l}
             \hline
-            Problem Type   &  Methodology & Algorithm & Description \\\hline \hline
+            Problem Type   &  Methodology & Algorithm & $r(w)$& Description \\\hline \hline
             \multirow{14}{*}{Binary} &\multirow{6}{*}{\footnotesize First-Order}
-            & SGD & {\footnotesize Stochastic Gradient Descent~\cite{rosenblatt1958perceptron}} \\\cline{3-4}
-            & & STG & {\footnotesize Truncated sparse online learning~\cite{langford2009sparse}} \\\cline{3-4}
-            & &FOBOS & {\footnotesize Forward backward splitting~\cite{duchi2009efficient}}\\\cline{3-4}
-            & &RDA & {\scriptsize Regularized dual averaging~\cite{xiao2010dual}} \\\cline{3-4}
-            & &OFSGD & {\scriptsize Online Feature Selection~\cite{wang2013online}} \\\cline{3-4}
-            & &SGD-FS& {\scriptsize SGD with truncation} \\\cline{2-4}
+            & SGD &$\ell_1$& {\footnotesize Stochastic Gradient Descent~\cite{rosenblatt1958perceptron}} \\\cline{3-5}
+            & & STG &$\ell_1$& {\footnotesize Truncated sparse online learning~\cite{langford2009sparse}} \\\cline{3-5}
+            & &FOBOS & $\ell_1$ & {\footnotesize Forward backward splitting~\cite{duchi2009efficient}}\\\cline{3-5}
+            & &RDA &$\ell_1$& {\scriptsize Regularized dual averaging~\cite{xiao2010dual}} \\\cline{3-5}
+            & &PET& $\ell_0$& {\scriptsize Perceptron with Truncation} \\\cline{3-5}
+            & &FOFS & $\ell_0$& {\scriptsize Online Feature
+                Selection~\cite{wang2013online}} \\\cline{2-5}
             &\multirow{8}{*}{\footnotesize Second-Order}
-            &Ada-FOBOS & {\footnotesize Adaptive FOBOS~\cite{duchi2011adaptive}}\\\cline{3-4}
-            & & Ada-RDA &Adaptive regularized dual averaging~\cite{duchi2011adaptive}\\\cline{3-4}
-            & &AROW & Confidence weighted learning~\cite{crammer2009adaptive}\\\cline{3-4}
-            Classification &&AROW-TG & Confidence weighted truncated gradient\\\cline{3-4}
-            & &AROW-DA & Confidence weighted dual averaging\\\cline{3-4}
-            & &AROW-FS & Confidence weighted feature selection\\\cline{3-4}
-            & &SCW & Soft confidence weighted learning~\cite{wang2012exact}\\\cline{3-4}
-            & &SCW-RDA & Soft confidence weighted dual averaging\\\cline{3-4}
+            &Ada-FOBOS &$\ell_1$& {\footnotesize Adaptive FOBOS~\cite{duchi2011adaptive}}\\\cline{3-5}
+            & & Ada-RDA &$\ell_1$&Adaptive regularized dual averaging~\cite{duchi2011adaptive}\\\cline{3-5}
+            & &AROW &$\ell_1$& Confidence weighted learning~\cite{crammer2009adaptive}\\\cline{3-5}
+            Classification &&AROW-TG &$\ell_1$& Confidence weighted truncated gradient\\\cline{3-5}
+            & &AROW-DA &$\ell_1$& Confidence weighted dual averaging\\\cline{3-5}
+            & &SCW &$\ell_1$& Soft confidence weighted learning~\cite{wang2012exact}\\\cline{3-5}
+            & &SCW-RDA &$\ell_1$& Soft confidence weighted dual averaging\\\cline{3-5}
+            & &SOFS &$\ell_0$& Second Order Online feature selection\\\cline{3-5}
             \hline
         \end{tabular}
 %\end{center}
@@ -185,22 +193,20 @@ Table~\ref{tab:summary-algorithms} gives a summary of the family of implemented 
     \item \textbf{Scalability:}
         The library can handle million and even billion scale dataset on a
         single PC.
-    \item \textbf{Usability:}
-        It is easy to use the main functions to evaluate one algorithm by comparing with all the algorithms;
+    \item \textbf{Usability:} It is easy to use and to evaluate performance of various algorithms;
 \end{itemize}
 
 
 
 \section{Installation}
-SOL features a very simple installation procedure. No third-party dependencies
-are required. The project is managed by \emph{CMake}. There
-exists a \emph{CMakeLists.txt} in the root directory of SOL. Note that all the
-following are tested on \emph{CMake 2.8}. Lower versions of cmake may work, but
-are not ensured. 
+SOL features a very simple installation procedure. The project is managed by
+\emph{CMake}. There exists a \emph{CMakeLists.txt} in the root directory of
+SOL. Note that all the following are tested on \emph{CMake 2.8}. Lower versions
+of cmake may work, but are not ensured. 
 
 \subsection{Installation on Linux}
-The following steps have been tested for Ubuntu 12.04 but should work with
-other distros as well.
+The following steps have been tested for Ubuntu 12.04 and Fedora 19 but should
+work with other distros as well.
 
 \vspace{2mm}\hspace{-5mm}\textbf{Required Packages}
 
@@ -212,7 +218,7 @@ other distros as well.
         sudo apt-get install build-essential
         \end{lstlisting}
     \item CMake 2.8 or higher
-    \item Python 2.7 
+    \item Python 2.7 (required for scripts of experiments, otherwise optional)
 \end{itemize}
 
 
@@ -226,7 +232,7 @@ other distros as well.
             framexleftmargin=-1.5cm,
         }
         \begin{lstlisting}
-        cmake [<some optional parameters>] <path to SOL source directory>
+        cmake [<some optional parameters>] <path to source of SOL>
         \end{lstlisting}
 
         For example
@@ -237,6 +243,12 @@ other distros as well.
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PATH=/usr/local/ ..
+        \end{lstlisting}
+
+        If you want to build \textbf{64-bit binaries}, specify the compilers as follows:
+        \lstset{language=bash}
+        \begin{lstlisting}
+        cmake -DCMAKE_CXX_FLAGS=-m64 [<other options>] <path to source of SOL>
         \end{lstlisting}
 
     \item Enter the created temporary directory ($<$\emph{cmake\_binary\_dir}$>$) and proceed with: 
@@ -251,22 +263,23 @@ By default, SOL is installed in the directory \emph{$<$cmake\_source\_dir$>$/ins
 
 
 \subsection{Install on Windows}
-The following steps have been tested on Visual Studio 2010 and Visual Studio
-2012 on Windows 7 SP1. Nevertheless but should work with any other modern
-versions of Visual Studio and Windows OS.
+The following steps have been tested on Visual Studio 2010 (Windows 7 SP1), Visual Studio 2012 (Windows 7 SP1, Windows 8.1), Visual Studio 2013(Windows 8.1).
+Nevertheless, it should work with any other modern versions of Visual Studio and Windows.
 
 \vspace{2mm}\hspace{-5mm}\textbf{Required Packages}
 \begin{itemize}
     \item Visual Studio 2010, 2012, or higher
     \item CMake 2.8 or higher
-    \item Python 2.7 
+    \item Python 2.7 (required for scripts of experiments, otherwise optional)
+    \item Cygwin or MSYS\footnote{make sure binaries are in the system
+        environment path} (required for scripts of experiments, otherwise optional)
 \end{itemize}
 
 \hspace{-5mm}\textbf{Build from source}
 \begin{enumerate}
     \item Create a temporary directory, which we denote as
         ($<$\emph{cmake\_binary\_dir}$>$), where you want to put the generated
-        project files as well the object files and output binaries.
+        project files, object files and output binaries.
     \item Install with CMake GUI.
         \begin{enumerate}
             \item Open \emph{cmake-gui.exe}, set where is the
@@ -292,8 +305,8 @@ versions of Visual Studio and Windows OS.
                     \label{fig:config}
                 \end{figure}
 
-            \item Open \emph{SOL.sln}, Rebuild all the \emph{ALL\_BUILD} project
-                and then build \emph{INSTALL} project.
+            \item Open \textbf{SOL.sln}, Rebuild \textbf{ALL\_BUILD} project and
+                then build \textbf{INSTALL} project.
                 \begin{figure}[!h]
                     \centering
                     \subfigure{\includegraphics[width=0.4\textwidth]{figs/rebuild.png}}
@@ -310,7 +323,7 @@ versions of Visual Studio and Windows OS.
         \begin{enumerate}
             \item Search \emph{cmd} in {Start Menu} and open it
             \item enter ($<$\emph{cmake\_binary\_dir}$>$)
-            \item Add cmake to your environment path by typing:
+            \item If cmake is not in environment path, add by typing:
                 \lstset{language=bash,
                     framexleftmargin=-3cm,
                     xleftmargin=-3cm,
@@ -319,14 +332,18 @@ versions of Visual Studio and Windows OS.
                 set path=%path%;<path_to_cmake>
                 \end{lstlisting}
             \item generate Visual Studio Projects. Example code for Visual Studio
-                2010 and 2012 are as the following shows:
+                2010, 2012 and there \textbf{64-bit} versions are as the following shows:
                 \lstset{language=bash,
                 }
                 \begin{lstlisting}
                 #Generate Visual Studio 2010 Projects
                 cmake  -G ``Visual Studio 10'' <path to SOL source directory>
+                #Generate 64-bit Visual Studio 2010 Projects
+                cmake  -G ``Visual Studio 10 Win64'' <path to SOL source directory>
                 #Generate Visual Studio 2012 Projects
                 cmake  -G ``Visual Studio 11'' <path to SOL source directory>
+                #Generate 64-bit Visual Studio 2012 Projects
+                cmake  -G ``Visual Studio 11 Win64'' <path to SOL source directory>
                 \end{lstlisting}
 
                 \begin{figure}[!h]
@@ -334,8 +351,8 @@ versions of Visual Studio and Windows OS.
                     \includegraphics[width=0.8\textwidth]{figs/cmd.png}
                     \label{fig:cmd}
                 \end{figure}
-            \item Open \emph{SOL.sln}, Rebuild all the \emph{ALL\_BUILD} project
-                and then build \emph{INSTALL} project.
+            \item Open \textbf{SOL.sln}, Rebuild \textbf{ALL\_BUILD} project
+                and then build \textbf{INSTALL} project.
         \end{enumerate}
 
 \end{enumerate}
@@ -344,13 +361,14 @@ versions of Visual Studio and Windows OS.
 \section{How to Use the SOL Package}
 The current version of SOL package are written in C++, with some python
 scripts. The library is packed into an executable, a dynamic library, and a
-static library. Some test cases are provided as examples.  
+static library. Some tools (dataset analysis, dataset format converter, etc)
+are provided. Test cases are also provided as examples.  
 
 \subsection{Data Formats and Folders}
 
 Types of data formats supported by this software package  are ``libsvm'' data
-format (commonly used in LIBSVM and SVM-light), and a binary format defined by
-ourselves. Features in the ``libsvm'' data files should all be numeric and labels are restricted to $+1, -1, 1$ for binary
+format (commonly used in LIBSVM and SVM-light), ``csv'' format, and a binary format defined by
+ourselves. Features in the ``libsvm'' data files should all be numeric. Labels are restricted to $+1, -1$ for binary
 classification.
 
 \begin{itemize}
@@ -362,8 +380,8 @@ classification.
         items in sequence:
         \begin{itemize}
             \item \textbf{label}: sizeof(char)
-            \item \textbf{feature number}: sizeof(char)
-            \item \textbf{max index}: sizeof(int32\_t)
+            \item \textbf{feature number}: sizeof(size\_t)
+            \item \textbf{max index}: sizeof(uint32\_t)
             \item \textbf{length of compressed index}: sizeoof(unsigned int) 
             \item \textbf{compressed index}: dynamic 
             \item \textbf{features}: feature number * sizeof(float)
@@ -372,21 +390,22 @@ classification.
 
 %\hspace{-5mm}\textbf{Contents of the library}:
     \item \textbf{Contents of the library}:
-
         \begin{itemize}
             \item   \textbf{data}: example datasets 
             \item   \textbf{doc}: documentation of the library
-            \item   \textbf{exp}: python and matlab scripts for experiments, including cross validation and performance evaluation
+            \item   \textbf{exp\_sol}: python and matlab scripts used in our
+                sparse online learning ($\ell_1$ regularized) experiments, including cross validation and performance evaluation
+            \item   \textbf{exp\_ofs}: python and matlab scripts used in our
+                online feature selection ($\ell_0$ regularized) experiments, including cross validation and performance evaluation
             \item   \textbf{src}: source code of the library
             \item   \textbf{test}: test code and example use of the library
             \item   \textbf{tools}: python scripts to pre-process datasets
             \item   CMakeLists.txt
         \end{itemize}
-
 \end{itemize}
 
 \subsection{Command Line}
-Running SOL without any arguments or with '-help/-h' will produce a message which briefly explains each argument. Below arguments are grouped according to their function.
+Running SOL without any arguments or with '- -help/-h' will produce a message which briefly explains each argument. Below arguments are grouped according to their function.
 
 \begin{enumerate}
     \item \textbf{Input Options}
@@ -396,6 +415,7 @@ Running SOL without any arguments or with '-help/-h' will produce a message whic
             -t  arg :    test file name
             -tc arg :    cached test file name
             -or arg :    output readable model
+            -m  arg :    input model of selected feature index(for mRMR_OGD)
             -dt arg :    dataset type format, by default is libsvm 
             -bs arg :    number of chunks for buffering, default is 2
         \end{lstlisting}
@@ -429,8 +449,10 @@ Running SOL without any arguments or with '-help/-h' will produce a message whic
     \item \textbf{Algorithms and parameters}
         \begin{lstlisting}
         -opt    arg :   optimization method: 
-                        SGD, STG, RDA, RDA_E, FOBOS Ada-RDA, Ada-FOBOS, AROW, 
-                        AROW-TG, AROW-DA AROW-FS,SCW, SCW-RDA, OFSGD, SGD-FS
+                        SGD, STG, FOBOS, RDA, RDA_E, 
+                        Ada-RDA, Ada-FOBOS, 
+                        AROW, AROW-TG, AROW-DA, SCW, SCW-RDA, SOSOL,
+                        PET,FOFS,SOFS 
         -l1     arg :   L1 regularization parameter
         -norm       :   whether normalize the data, default is false
         -passes arg :   number of passes 
@@ -444,66 +466,7 @@ Running SOL without any arguments or with '-help/-h' will produce a message whic
 
         Table~\ref{tbl:param_illustrate} shows the algorithms and their
         correspondent parameters.  
-        \begin{table}[!ht]
-% increase table row spacing, adjust to taste
-            \renewcommand{\arraystretch}{1.3}
- %\extrarowheight 
-            \caption{Comparison of sparse online learning algorithms}
-            \label{tbl:param_illustrate}
-            \centering
-            \begin{tabular}{|c|c|p{9cm}|}
-                \hline
-                Algorithm & Parameters & Meaning\\
-                \hline
-                SGD & -eta & learning rate \\
-                \hline
-                FOBOS & -eta & learning rate \\
-                \hline
-                \multirow{2}{*}{STG}& -eta & learning rate \\
-                \cline{2-3}
-                &-k & truncate the weight vector every k steps \\
-                \hline
-                \multirow{2}{*}{Ada-FOBOS}& -eta & learning rate \\
-                \cline{2-3}
-                & -delta & parameter to ensure positive-definite property of the adaptive weighting matrix \\
-                \hline
-                AROW-TG& -r &  parameter of passive-aggressive update trade-off\\
-                \hline
-                \multirow{2}{*}{RDA}&  -eat &  learning rate \\
-                \cline{2-3}
-                &-grou & decreased L1 regularization parameter \\
-                \hline
-                RDA\_E&  -eta & learning rate \\
-                \hline
-                \multirow{2}{*}{Ada-RDA}& -eta & learning rate \\
-                \cline{2-3}
-                & -delta & parameter to ensure positive-definite property of the adaptive weighting matrix \\
-                \hline
-                AROW-DA& -r  &parameter of passive-aggressive update trade-off\\
-                \hline
-                AROW-FS & -k & no default\\
-                \hline
-                \multirow{2}{*}{SGD-fS}& -eta & learning rate\\
-                \cline{2-3}
-                & -k& no default\\
-                \hline
-                \multirow{3}{*}{OFSGD}& -eta & learning rate\\
-                \cline{2-3}
-                & -delta & shrinkage parameter\\
-                \cline{2-3}
-                & -k& no default\\
-                \hline
-                \multirow{2}{*}{SCW}& -phi & probability parameter in SCW\\
-                \cline{2-3}
-                & -r & parameter of passive-aggressive update trade-off\\
-                \hline
-                \multirow{2}{*}{SCW-RDA}& -phi & probability parameter in SCW\\
-                \cline{2-3}
-                & -r & parameter of passive-aggressive update trade-off\\
-                \hline
-            \end{tabular}
-        \end{table}
-\end{enumerate}
+        \end{enumerate}
 
 \subsection{Use Command Line}
 In this section, we show how to use the command line from terminals. We provide
@@ -590,6 +553,65 @@ The command line is:
       -t data/rcv1/rcv1_test  -tc data/rcv1/rcv1_test_cache 
       -opt STG -l1 lambda
 \end{lstlisting}
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+            \renewcommand{\arraystretch}{1.3}
+ %\extrarowheight 
+            \caption{Comparison of sparse online learning algorithms}
+            \label{tbl:param_illustrate}
+            \centering
+            \begin{tabular}{|c|c|p{9cm}|}
+                \hline
+                Algorithm & Parameters & Meaning\\
+                \hline
+                SGD & -eta & learning rate \\
+                \hline
+                FOBOS & -eta & learning rate \\
+                \hline
+                \multirow{2}{*}{STG}& -eta & learning rate \\
+                \cline{2-3}
+                &-k & truncate the weight vector every k steps \\
+                \hline
+                \multirow{2}{*}{Ada-FOBOS}& -eta & learning rate \\
+                \cline{2-3}
+                & -delta & parameter to ensure positive-definite property of the adaptive weighting matrix \\
+                \hline
+                AROW-TG& -r &  parameter of passive-aggressive update trade-off\\
+                \hline
+                \multirow{2}{*}{RDA}&  -eat &  learning rate \\
+                \cline{2-3}
+                &-grou & decreased L1 regularization parameter \\
+                \hline
+                RDA\_E&  -eta & learning rate \\
+                \hline
+                \multirow{2}{*}{Ada-RDA}& -eta & learning rate \\
+                \cline{2-3}
+                & -delta & parameter to ensure positive-definite property of the adaptive weighting matrix \\
+                \hline
+                AROW-DA& -r  &parameter of passive-aggressive update trade-off\\
+                \hline
+                \multirow{2}{*}{SCW}& -phi & probability parameter in SCW\\
+                \cline{2-3}
+                & -r & parameter of passive-aggressive update trade-off\\
+                \hline
+                \multirow{2}{*}{SCW-RDA}& -phi & probability parameter in SCW\\
+                \cline{2-3}
+                & -r & parameter of passive-aggressive update trade-off\\
+                \hline
+                \multirow{2}{*}{PET}& -eta & learning rate\\
+                \cline{2-3}
+                & -k& no default\\
+                \hline
+                \multirow{3}{*}{FOFS}& -eta & learning rate\\
+                \cline{2-3}
+                & -delta & shrinkage parameter\\
+                \cline{2-3}
+                & -k& no default\\
+                \hline
+                SOFS & -k & no default\\ \hline
+
+            \end{tabular}
+        \end{table}
 
 \begin{table}[!h]
     \label{tbl:lambda_effect}
@@ -1067,7 +1089,7 @@ comprehensive experimental platform for conducting sparse online learning resear
 Figure~\ref{fig:framework} shows the framework of the system.
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.9\textwidth]{figs/framework.pdf}
+    \includegraphics[clip=true, viewport=280 290 1340 1050, width=0.9\textwidth]{figs/framework.pdf}
     \caption{Framework of SOL}
     \label{fig:framework}
 \end{figure}
@@ -1463,7 +1485,7 @@ online learning algorithms for sparse online classification. SOL is still being 
 
 \subsection*{Revision History}
 \begin{itemize}
-    \item{Version 0.1.0} was released on January 10th, 2014. This version
+    \item{Version 0.2.0} was released on March 1st, 2014. This version
         mainly includes C++ implementation for binary classification. 
 \end{itemize}
 

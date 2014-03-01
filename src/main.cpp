@@ -57,7 +57,7 @@ int main(int argc, const char** args) {
 		return -1;
 	}
 
-	if (pDataset->Load(param.fileName, param.cache_fileName) == false){
+	if (pDataset->Load(param.fileName, param.cache_fileName,param.str_data_type) == false){
 		cerr<<"ERROR: Load dataset "<<param.fileName<<" failed!"<<endl;
 		delete pDataset;
 		delete lossFunc;

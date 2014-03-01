@@ -2,7 +2,7 @@
 SOL - A Large Scale Sparse Online Learning Library
 ================================================ 
 
-                    V0.1.0                    
+                    V0.2.0                    
 
 Available at 
 
@@ -22,13 +22,16 @@ Specifically, SOL consists of a family of first order sparse online learning alg
 - FOBOS: Forward backward splitting (Duchi et al., 2009);
 - RDA: Regularized dual averaging(Xiao, 2010);
 - RDA_E: Regularized dual averaging(Xiao, 2010);
-and a family of second order sparse online learning algorithms as follows
+,a family of second order sparse online learning algorithms as follows
 - Ada-FOBOS : adaptive FOBOS (Duchi et al., 2011);
 - Ada-RDA: adaptive RDA(Duchi et al., 2011);
 - AROW:  adaptive regularization of weight vectors (Crammer et al., 2009);
 - AROW-TG: adaptive regularization of weight vectors  with trunated gradient
 - AROW-DA: adaptive regularization of weight vectors  with dual averaging
-- AROW-FS: adaptive regularization of weight vectors  for feature selection
+and a family of online feature selection algorithms:
+- PET: Perceptron with truncation
+- FOFS: first order online feature selection (Jialei et al. 2012) 
+- SOFS: second online feature selection with adaptive regularization of weight vectors  for
 
 This document briefly explains the usage of SOL. A more detailed manual can be
 found from tutorail of SOL.
@@ -48,8 +51,10 @@ Structure of folders
     example datasets
 ---doc
     documentation of the library
----exp
-    python and matlab scripts for experiments, including cross validation and performance evaluation
+---exp_sol
+    python and matlab scripts for l1-regularized sparse online learning experiments, including cross validation and performance evaluation
+---exp_ofs
+    python and matlab scripts for online feature selection experiments, including cross validation and performance evaluation
 ---src
     source code of the library
 ---test
@@ -132,4 +137,4 @@ Additional Information
 For any questions and comments, please send your email to
 chhoi@ntu.edu.sg
 
-Released date: 5 Janurary, 2014.
+Released date: 1 March, 2014.
