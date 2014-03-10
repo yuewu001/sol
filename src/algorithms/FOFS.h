@@ -112,7 +112,6 @@ namespace SOL {
 			w_norm = 0;
 			for (size_t i = 0; i < this->weightDim; i++)
 				w_norm += this->weightVec[i] * this->weightVec[i];
-			w_norm = sqrtf(w_norm);
 			//shrinkage
 			float coeff = this->norm_coeff / sqrtf(w_norm);
 			if (coeff < 1){

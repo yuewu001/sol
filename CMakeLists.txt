@@ -52,6 +52,7 @@ set(loss_files
 set(algo_files
     src/algorithms/sol_algorithms.h
     src/algorithms/SOFS.h
+    src/algorithms/NSOFS.h
     src/algorithms/AROW_AdaFS.h
     src/algorithms/Ada_FOBOS.h
     src/algorithms/Ada_RDA.h

@@ -16,3 +16,4 @@ build/
 data/
 install
 extern
+/build*

@@ -9,6 +9,7 @@
 #include "Ada_RDA.h"
 #include "DAROW.h"
 #include "SOFS.h"
+#include "NSOFS.h"
 #include "AROW_TG.h"
 #include "AROW_DA.h"
 #include "SCW.h"

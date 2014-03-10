@@ -210,11 +210,6 @@ Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, L
 		opti->SetParameterEx(param.r);
 		return opti;
 	}
-	else if (str_opt == "SOFS") {
-		SOFS<T1, T2> *opti = new SOFS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K, param.r);
-		return opti;
-	}
 	else if (str_opt == "AROW-DA") {
 		CW_RDA<T1, T2> *opti = new CW_RDA<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.r);
@@ -230,14 +225,24 @@ Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, L
 		opti->SetParameterEx(param.phi, param.r);
 		return opti;
 	}
+	else if (str_opt == "PET"){
+		PET<T1, T2> *opti = new PET<T1, T2>(dataset, lossFunc);
+		opti->SetParameterEx(param.K);
+		return opti;
+	}
 	else if (str_opt == "FOFS"){
 		FOFS<T1, T2> *opti = new FOFS<T1, T2>(dataset, lossFunc);
 		opti->SetParameterEx(param.K, param.delta);
 		return opti;
 	}
-	else if (str_opt == "PET"){
-		PET<T1, T2> *opti = new PET<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K);
+	else if (str_opt == "SOFS") {
+		SOFS<T1, T2> *opti = new SOFS<T1, T2>(dataset, lossFunc);
+		opti->SetParameterEx(param.K, param.r);
+		return opti;
+	}
+	else if (str_opt == "NSOFS") {
+		NSOFS<T1, T2> *opti = new NSOFS<T1, T2>(dataset, lossFunc);
+		opti->SetParameterEx(param.K, param.delta, param.r);
 		return opti;
 	}
 	else if (str_opt == "SOSOL"){
