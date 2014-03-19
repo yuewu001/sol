@@ -120,7 +120,7 @@ namespace SOL {
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 
 				float w_norm = this->weightVec[0];
-				for (size_t j = 0; j < this->K; j++){
+				for (IndexType j = 0; j < this->K; j++){
 					index_i = this->heap.get_id(j);
 					w_norm += this->weightVec[index_i] * this->weightVec[index_i];
 				}
@@ -128,7 +128,7 @@ namespace SOL {
 				float coeff = this->norm_coeff / sqrtf(w_norm);
 				if (coeff < 1){
 					this->weightVec[0] *= coeff;
-					for (size_t j = 0; j < this->K; j++){
+					for (IndexType j = 0; j < this->K; j++){
 						index_i = this->heap.get_id(j);
 						this->weightVec[index_i] *= coeff;
 					}
