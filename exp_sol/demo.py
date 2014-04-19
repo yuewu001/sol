@@ -11,12 +11,14 @@ import run_liblinear
 
 #algorithm list
 opt_list = ['STG','FOBOS','Ada-FOBOS','RDA','Ada-RDA','AROW-TG','AROW-DA']
+opt_list = ['AROW-DA','Ada-RDA']
+opt_list = ['AROW-DA']
 
 #dataset list
-ds_list = ['pcmac']
+ds_list = ['synthetic']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 5
+rand_num = 1
 #extra command sent to SOL
 extra_cmd = ' -loss Hinge -norm '
 

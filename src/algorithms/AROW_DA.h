@@ -81,6 +81,7 @@ namespace SOL {
 			//obtain w_t
 			while(p_index != x.indexes.end){
 				//lazy update
+				//this->weightVec[*p_index] = -sqrtf(this->sigma_w[*p_index]) *
 				this->weightVec[*p_index] = -sqrtf(this->sigma_w[*p_index]) *
 					trunc_weight(u_t[*p_index], gravity);
 				p_index++;
@@ -118,6 +119,8 @@ namespace SOL {
 				this->u_t[0] += gt;
 				this->weightVec[0] = -u_t[0] * sqrtf(this->sigma_w[0]); 
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
+
+				this->update_times++;
 			}
 			return y;
 	}

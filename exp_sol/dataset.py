@@ -8,7 +8,7 @@ import exe_path
 
 # windows
 if platform.system() == 'Windows':
-    rootDir = 'D:/Coding/SOL/data/'
+    rootDir = 'D:/Data/libsvm/'
 elif platform.system() == 'Linux':
     rootDir = '/home/matthew/work/Data/'
 else:
@@ -26,8 +26,8 @@ def analyze(file_name):
 
 def get_file_name(dataset, task = 'train'):
     if dataset == 'rcv1':
-        train_file = 'rcv1/rcv1.train' 
-        test_file = 'rcv1/rcv1.test'
+        train_file = 'rcv1/rcv1_train' 
+        test_file = 'rcv1/rcv1_test'
     elif dataset == 'news':
         train_file = 'news/news_train'
         test_file = 'news/news_test' 

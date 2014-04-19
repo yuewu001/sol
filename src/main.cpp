@@ -119,6 +119,7 @@ int main(int argc, const char** args) {
 		printf("Learning time: %.3f s\n", (float)(time2 - time1));
 		if (is_test)
 			printf("Test time: %.3f s\n", (float)(time3 - time2));
+		printf("Update Times: %u\n", opti->GetUpdateTimes());
 	}
 
 	delete lossFunc;

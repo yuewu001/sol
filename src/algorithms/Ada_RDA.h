@@ -86,7 +86,7 @@ namespace SOL {
 				index_i = x.indexes[i];
 				//lazy update
 				//update s[i]
-				float Htii = this->delta + s[index_i];
+				float Htii = this->delta + sqrtf(s[index_i]);
 				this->weightVec[index_i] = -this->eta0 / Htii *
 					trunc_weight(u_t[index_i], this->lambda * (this->curIterNum - 1));
 			}
@@ -94,22 +94,24 @@ namespace SOL {
 			//predict 
 			float y = this->Predict(x);
 			//get gradient
-			float gt = this->lossFunc->GetGradient(x.label,y);
+			float gt = this->lossFunc->GetGradient(x.label, y);
+			if (gt != 0){
+				float gt_i = 0;
+				//update
+				for (size_t i = 0; i < featDim; i++) {
+					index_i = x.indexes[i];
+					gt_i = gt * x.features[i];
 
-			float gt_i = 0;
-			//update
-			for (size_t i = 0; i < featDim; i++) {
-				index_i = x.indexes[i];
-				gt_i = gt * x.features[i];
-
-				this->s[index_i] = sqrt(this->s[index_i] * this->s[index_i] + gt_i * gt_i);
-				this->u_t[index_i] += gt_i;
+					this->s[index_i] += gt_i * gt_i;
+					this->u_t[index_i] += gt_i;
+				}
+				//bias term
+				this->s[0] += gt * gt;
+				this->u_t[0] += gt;
+				float Htii = this->delta + sqrtf(s[0]);
+				this->weightVec[0] = -u_t[0] * this->eta0 / Htii;
+				this->update_times++;
 			}
-			//bias term
-			this->s[0] = sqrt(s[0] * s[0] + gt * gt);
-			this->u_t[0] += gt;
-			float Htii = this->delta + s[0];
-			this->weightVec[0] = -u_t[0] * this->eta0 / Htii; 
 			return y;
 	}
 
@@ -123,14 +125,14 @@ namespace SOL {
 	//called when a train ends
 	template <typename FeatType, typename LabelType>
 	void Ada_RDA<FeatType, LabelType>::EndTrain() {
-		Optimizer<FeatType,LabelType>::EndTrain();
+		Optimizer<FeatType, LabelType>::EndTrain();
 	}
 
 	//get the best model parameter
 	template <typename FeatType, typename LabelType>
 	void Ada_RDA<FeatType, LabelType>::BestParameter() {
 		//first learn the best learning rate
-		Optimizer<FeatType,LabelType>::BestParameter();
+		Optimizer<FeatType, LabelType>::BestParameter();
 		float prevLambda = this->lambda;
 		this->lambda = 0;
 
@@ -139,7 +141,7 @@ namespace SOL {
 		float bestDelta = 1;
 
 		for (float delt = init_delta_min; delt <= init_delta_max; delt *= init_delta_step) {
-			cout<<"delta= "<<delt<<"\n";
+			cout << "delta= " << delt << "\n";
 			this->delta = delt;
 			float errorRate(0);
 			errorRate = this->Train();
@@ -148,12 +150,12 @@ namespace SOL {
 				bestDelta = delt;
 				min_errorRate = errorRate;
 			}
-			cout<<" mistake rate: "<<errorRate * 100<<" %\n";
+			cout << " mistake rate: " << errorRate * 100 << " %\n";
 		}
 
 		this->delta = bestDelta;
 		this->lambda = prevLambda;
-		cout<<"Best Parameter:\tdelta = "<<this->delta<<"\n\n";
+		cout << "Best Parameter:\tdelta = " << this->delta << "\n\n";
 	}
 
 	//set parameters for specific optimizers
@@ -180,7 +182,7 @@ namespace SOL {
 			this->u_t.zeros(this->u_t.begin + this->weightDim,
 				this->u_t.end);
 
-			Optimizer<FeatType,LabelType>::UpdateWeightSize(newDim);
+			Optimizer<FeatType, LabelType>::UpdateWeightSize(newDim);
 		}
 	}
 }

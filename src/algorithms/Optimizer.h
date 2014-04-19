@@ -35,6 +35,8 @@ namespace SOL {
 
 		bool is_normalize;
 
+		size_t update_times;
+
 		//weight vector
 	protected:
 		//the first element is zero
@@ -64,6 +66,8 @@ namespace SOL {
 			printf("Power t : %g\n", this->power_t);
 			printf("lambda	: %g\n\n", this->lambda);
 		}
+
+		inline size_t GetUpdateTimes() const { return this->update_times; }
 
 	public:
 		Optimizer(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
@@ -156,6 +160,7 @@ namespace SOL {
 		//reset weight vector
 		this->weightVec.set_value(0);
 		this->curIterNum = this->initial_t;
+		this->update_times = 0;
 	}
 
 	//called when a train ends
