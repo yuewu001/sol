@@ -4,18 +4,21 @@
 > Created Time: Thu 24 Oct 2013 03:33:10 PM
 > Descriptions: thread function definitions
 ************************************************************************/
-#pragma once
+#ifndef HEADER_DATASET_HELPER
+#define HEADER_DATASET_HELPER
 
 
 #include "libsvm_binary.h"
 #include "../utils/thread_primitive.h"
+
+#include "DataChunk.h"
 
 namespace SOL{
 	template <typename T1, typename T2> class OnlineDataSet;
 
 	//load a chunk of data, return if file ended
 	template <typename T1, typename T2>
-	bool load_chunk(DataReader<T1, T2>* reader, DataChunk<T1,T2>&chunk){
+	bool load_chunk(DataReader<T1, T2>* reader, FixSizeDataChunk<T1,T2>&chunk){
 		bool not_file_end = true;
 		chunk.erase();
 		while(chunk.dataNum <  chunk.chunk_size && not_file_end == true){
@@ -40,7 +43,7 @@ namespace SOL{
      * @Returns  true if saved successfully
      */
 	template <typename T1, typename T2>
-	bool save_chunk(libsvm_binary_<T1, T2> *writer, DataChunk<T1, T2>&chunk){
+	bool save_chunk(libsvm_binary_<T1, T2> *writer, FixSizeDataChunk<T1, T2>&chunk){
 		size_t w_num = 0;
 		while(w_num < chunk.dataNum){
 			if (writer->WriteData(chunk.data[w_num]) == true)
@@ -117,7 +120,7 @@ namespace SOL{
 		//load data
 		bool not_file_end = false;
 		do {
-			DataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
+			FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
 			not_file_end = load_chunk(reader, chunk);
 			if (save_chunk(writer, chunk) == false){
 				dataset->EndWriteChunk();
@@ -183,7 +186,7 @@ namespace SOL{
 			if (reader->Good()) {
 				bool not_file_end = false;
 				do {
-					DataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
+					FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
 					not_file_end = load_chunk(reader, chunk);
 					dataset->EndWriteChunk();
 				}while(not_file_end == true);
@@ -201,3 +204,4 @@ namespace SOL{
 		return NULL;
 	}
 }
+#endif

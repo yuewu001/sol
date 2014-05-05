@@ -13,7 +13,7 @@
 #include "SOL_interface.h"
 #include "utils/util.h"
 
-#include "io/DataSet.h"
+#include "io/OnlineDataSet.h"
 #include "io/sol_io.h"
 #include "loss/sol_loss.h"
 #include "algorithms/sol_algorithms.h"
@@ -32,7 +32,7 @@ using namespace SOL;
 
 //to be defined in sol_interface.cpp
 template <typename T1, typename T2>
-Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFun);
+Optimizer<T1, T2>* GetOptimizer(const Params &param, OnlineDataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFun);
 
 extern "C"{
 	/**
@@ -171,7 +171,7 @@ extern "C"{
 	}
 }
 template <typename T1, typename T2>
-Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFunc) {
+Optimizer<T1, T2>* GetOptimizer(const Params &param, OnlineDataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFunc) {
 	string str_opt = param.str_opt;
 	ToUpperCase(str_opt);
 	if (str_opt == "SGD")

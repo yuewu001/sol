@@ -15,17 +15,22 @@ using std::vector;
 
 namespace SOL {
 	template <typename FeatType, typename LabelType> 
-	struct FixSizeDataChunk{
+    struct DataChunk{
 		vector<DataPoint<FeatType, LabelType> > data;
 		size_t dataNum;
+
+        DataChunk():dataNum(0){}
+        };
+
+	template <typename FeatType, typename LabelType> 
+	struct FixSizeDataChunk: public DataChunk<FeatType, LabelType> {
 		size_t chunk_size;
 		FixSizeDataChunk *next;
 		bool is_inuse;
 		bool is_parsed;
-		bool is_inherited; //judge if the class is inherited from DataChunk
 
-		FixSizeDataChunk(size_t chunkSize) :dataNum(0), chunk_size(chunkSize),
-			next(NULL), is_inuse(false), is_parsed(false), is_inherited(false){
+		FixSizeDataChunk(size_t chunkSize) : chunk_size(chunkSize),
+			next(NULL), is_inuse(false), is_parsed(false){
 			if (this->chunk_size == 0){
 				std::cerr << "error occured at file: " << __FILE__ << ": line" << __LINE__ <<
 					"\nERROR: chunk size for multi-pass should be a positive!" << std::endl;
@@ -51,8 +56,8 @@ namespace SOL {
          */
 		void erase() {
 			for (size_t i = 0; i < this->chunk_size; i++)
-				data[i].erase();
-			dataNum = 0;
+				this->data[i].erase();
+			this->dataNum = 0;
 		}
 	};
 }

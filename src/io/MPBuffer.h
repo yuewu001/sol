@@ -9,6 +9,7 @@
 #define HEADER_MP_BUFFER
 
 #include "DataPoint.h"
+#include "DataChunk.h"
 
 #include "../algorithms/MaxHeap.h"
 
@@ -25,11 +26,10 @@ namespace SOL{
 	};
 
     template <typename FeatType, typename LabelType> 
-        struct MPBuffer:public DataChunk<FeatType,LabelType>{
+        struct MPBuffer:public FixSizeDataChunk<FeatType,LabelType>{
             size_t insert_pos;
 
-            MPBuffer(size_t bufSize = init_mp_buf_size):DataChunk<FeatType, LabelType>(bufSize),insert_pos(0){
-				this->is_inherited = true;
+            MPBuffer(size_t bufSize = init_mp_buf_size):FixSizeDataChunk<FeatType, LabelType>(bufSize),insert_pos(0){
             }
 
 			virtual void Push(DataPoint<FeatType, LabelType> &srcPt) = 0;

@@ -26,7 +26,8 @@ set(io_files
     src/io/DataHandler.h
     src/io/DataSet.h
     src/io/MPDataSet.h
-    src/io/DataSetHelper.h
+    src/io/BatchDataSet.h
+    src/io/OnlineDataSetHelper.h
     src/io/basic_io.cpp
     src/io/basic_io.h
     src/io/comp.h

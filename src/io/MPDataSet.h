@@ -50,7 +50,7 @@ namespace SOL {
 
 
 			//get the data to read
-			virtual DataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) {
+			virtual FixSizeDataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) {
 				mutex_lock(&this->data_lock);
 				//check if there is available data
 				if (this->rd_ptr->is_parsed == true){

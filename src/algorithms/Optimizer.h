@@ -196,38 +196,36 @@ namespace SOL {
 				break;
 			}
 
-			for (size_t i = 0; i < chunk.dataNum; i++) {
-				DataPoint<FeatType, LabelType> &data = chunk.data[i];
+            for (size_t i = 0; i < chunk.dataNum; i++) {
+                DataPoint<FeatType, LabelType> &data = chunk.data[i];
 
-				IndexType* p_index = data.indexes.begin;
-				float* p_feat = data.features.begin;
-				if (is_normalize){
-					if (data.sum_sq != 1){
-						float norm = sqrtf(data.sum_sq);
-						while (p_index != data.indexes.end){
-							*p_feat /= norm;
-							p_index++; p_feat++;
-						}
-					}
-				}
+                IndexType* p_index = data.indexes.begin;
+                float* p_feat = data.features.begin;
+                if (is_normalize){
+                    if (data.sum_sq != 1){
+                        float norm = sqrtf(data.sum_sq);
+                        while (p_index != data.indexes.end){
+                            *p_feat /= norm;
+                            p_index++; p_feat++;
+                        }
+                    }
+                }
 
-				this->UpdateWeightSize(data.dim());
-				float y = this->UpdateWeightVec(data);
-				//loss
-				if (chunk.is_inherited == false){
-					if (this->lossFunc->IsCorrect(data.label, y) == false){
-						errorNum++;
-						data.margin = y * data.label;
-					}
-					data_count++;
-					if (show_count == data_count){
-						printf("%lu\t\t\t%.6f\t\t\n", data_count,
-							errorNum / (float)(data_count));
-						show_count = (size_t(1) << ++show_step);
-					}
-					this->curIterNum++;
-				}
-			}
+                this->UpdateWeightSize(data.dim());
+                float y = this->UpdateWeightVec(data);
+                //loss
+                if (this->lossFunc->IsCorrect(data.label, y) == false){
+                    errorNum++;
+                    data.margin = y * data.label;
+                }
+                data_count++;
+                if (show_count == data_count){
+                    printf("%lu\t\t\t%.6f\t\t\n", data_count,
+                            errorNum / (float)(data_count));
+                    show_count = (size_t(1) << ++show_step);
+                }
+                this->curIterNum++;
+            }
 			//double time2 = get_current_time();
 			//train_time += time2 - time1;
 			dataSet.FinishRead();

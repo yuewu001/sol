@@ -88,10 +88,10 @@ namespace SOL {
                 if (this->bufSize <= 0)
                     return true;
 
-                this->head = new DataChunk<FeatType,LabelType>;
-                DataChunk<FeatType,LabelType> *p = this->head;
+                this->head = new FixSizeDataChunk<FeatType,LabelType>(init_chunk_size);
+                FixSizeDataChunk<FeatType,LabelType> *p = this->head;
                 for (int i = 1; i < this->bufSize; i++) {
-                    p->next = new DataChunk<FeatType,LabelType>;
+                    p->next = new FixSizeDataChunk<FeatType,LabelType>(init_chunk_size);
                     p = p->next;
                 }
                 p->next = this->head;
@@ -103,7 +103,7 @@ namespace SOL {
 
         protected:
             void ClearBuffer() {
-                DataChunk<FeatType,LabelType> *p = this->head;
+                FixSizeDataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
                 p = p->next;
@@ -119,10 +119,10 @@ namespace SOL {
             }
 
             void ReleaseBuffer() {
-                DataChunk<FeatType,LabelType> *p = this->head;
+                FixSizeDataChunk<FeatType,LabelType> *p = this->head;
                 if (p == NULL)
                     return;
-                DataChunk<FeatType,LabelType> *q = p->next;
+                FixSizeDataChunk<FeatType,LabelType> *q = p->next;
                 while (q != this->head) {
                     p = q->next;
                     delete q;
@@ -220,11 +220,11 @@ namespace SOL {
 		public:
 
 			//get the next write chunk
-			inline DataChunk<FeatType, LabelType> &GetWriteChunk(){
+			inline FixSizeDataChunk<FeatType, LabelType> &GetWriteChunk(){
 				mutex_lock(&this->data_lock); 
 				if (this->wt_ptr->is_inuse == false){
 					this->wt_ptr->is_inuse = true;
-					DataChunk<FeatType, LabelType>* p = this->wt_ptr;
+					FixSizeDataChunk<FeatType, LabelType>* p = this->wt_ptr;
 					mutex_unlock(&this->data_lock);
 					//this->time1 = get_current_time();
 					return *p;

@@ -51,7 +51,7 @@ namespace SOL {
             /////////////Data Access/////////////////////
         public:
             //get the data to read
-            virtual FixSizeDataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) = 0;
+            virtual DataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) = 0;
 
             virtual void FinishRead() = 0;
 

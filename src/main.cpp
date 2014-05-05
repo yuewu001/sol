@@ -8,7 +8,7 @@
 
 #include "utils/util.h"
 
-#include "io/DataSet.h"
+#include "io/OnlineDataSet.h"
 #include "io/MPDataSet.h"
 #include "io/sol_io.h"
 #include "loss/sol_loss.h"
