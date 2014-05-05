@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <cmath>
 
-namespace SOL{
+namespace BOC{
 
     inline bool is_space(char* p){
         return (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r');

@@ -11,12 +11,12 @@
 #include "DataPoint.h"
 #include "DataChunk.h"
 
-#include "../algorithms/MaxHeap.h"
+#include "../utils/MaxHeap.h"
 
 #include <ctime>
 #include <limits>
 
-namespace SOL{
+namespace BOC{
 
 	enum MPBufferType{
 		MPBufferType_None = 0, //no buffer

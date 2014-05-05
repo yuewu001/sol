@@ -21,7 +21,7 @@ using namespace std;
 /**
  *  namespace: Sparse Online Learning
  */
-namespace SOL {
+namespace BOC {
     //data set, can work in both read-and-write mode and read-once mode
     template <typename FeatType, typename LabelType> class OnlineDataSet : public DataSet<FeatType, LabelType> {		
         protected:

@@ -14,7 +14,7 @@
 /**
  *  namespace: Sparse Online Learning
  */
-namespace SOL {
+namespace BOC {
     //data set, can work in both read-and-write mode and read-once mode
     template <typename FeatType, typename LabelType> class MPDataSet : public OnlineDataSet<FeatType, LabelType>{		
         protected:
@@ -26,16 +26,16 @@ namespace SOL {
 				OnlineDataSet<FeatType, LabelType>(passes, buf_size){
 				switch (buf_type)
 				{
-				case SOL::MPBufferType_None:
+				case BOC::MPBufferType_None:
 					this->pMp_Buffer = NULL;
 					break;
-				case SOL::MPBufferType_ALL:
+				case BOC::MPBufferType_ALL:
 					this->pMp_Buffer = new MPBuffer_ALL<FeatType, LabelType>(mp_buf_size);
 					break;
-				case SOL::MPBufferType_MARGIN:
+				case BOC::MPBufferType_MARGIN:
 					this->pMp_Buffer = new MPBuffer_LARGE_MARGIN<FeatType, LabelType>(mp_buf_size);
 					break;
-				case SOL::MPBufferType_RESERVIOR:
+				case BOC::MPBufferType_RESERVIOR:
 					this->pMp_Buffer = new MPBuffer_RESERVIOR<FeatType, LabelType>(mp_buf_size);
 					break;
 				default:

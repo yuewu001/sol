@@ -5,10 +5,11 @@
 	> Functions: Logistic loss for binary classification
  ************************************************************************/
 
-#pragma once
+#ifndef HEADER_LOGISTIC_FUNCTIONS
+#define HEADER_LOGISTIC_FUNCTIONS
 #include "LossFunction.h"
 
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class LogisticLoss: public LossFunction<FeatType, LabelType> {
 		public:
@@ -32,3 +33,5 @@ namespace SOL {
 			}
  	};
 }
+
+#endif

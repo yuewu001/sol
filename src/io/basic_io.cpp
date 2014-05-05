@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace SOL{
+namespace BOC{
     bool basic_io::open_file(const char* filename, const char* mode){
         this->close_file();
 #if _WIN32

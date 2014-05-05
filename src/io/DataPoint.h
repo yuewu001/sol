@@ -8,10 +8,10 @@
 #ifndef HEADER_DATA_POINT
 #define HEADER_DATA_POINT
 
-#include "s_array.h"
-#include "../utils/init_param.h"
+#include "../utils/s_array.h"
+#include "../utils/config.h"
 
-namespace SOL {
+namespace BOC {
 	/**
 	*  Definitions of DataPoint: one lable, and DataPoints
 	*

@@ -5,11 +5,10 @@
 > Functions: base class for loss function
 ************************************************************************/
 
-#pragma once
-#include <cmath>
-#include "../utils/util.h"
+#ifndef HEADER_LOSS_FUNCTIONS
+#define HEADER_LOSS_FUNCTIONS
 
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class LossFunction {
         inline char Sign(float x) {
@@ -31,3 +30,4 @@ namespace SOL {
 		virtual ~LossFunction(){}
     };
 }
+#endif

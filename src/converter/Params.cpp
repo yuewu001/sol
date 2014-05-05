@@ -27,43 +27,68 @@ namespace SOL {
 	}
 	void Params::Init(){
 		//initialize params
-		opt.overview = "Dataset Converter of Sparse Online Learning Library";
-		opt.syntax	= "SOL -i input_file -o output_file [options]" ;
-		opt.example = "SOL -i input_file -o output_file";
+		opt.overview = "Sparse Online Learning Library";
+		opt.syntax	= "SOL [options] -i train_file" ;
+		opt.example = "SOL -i train_file -opt SGD";
 
 		opt.add("",0,0,',',"help message","-h","--help");
 
-		this->add_option("",true,1,"input file","-i", &this->in_fileName);
-		this->add_option("",true,1,"output file name","-o",&this->out_fileName);
+		this->add_option("", 0, 1, "training file name", "-i");
+		this->add_option("", 0, 1, "test file name", "-t");
+		this->add_option("", 0, 1, "cached training file name", "-c");
+		this->add_option("", 0, 1, "cached test file name", "-tc");
 
-		this->add_option(init_data_type,0,1,"source dataset type format","-sdt",&this->src_data_type);
-		this->add_option("cache",0,1,"dstination dataset type format","-ddt",&this->dst_data_type);
+		this->add_option(init_data_type, 0, 1, "dataset type format", "-dt");
+		this->add_option(init_buf_size,0,1,"number of chunks for buffering","-bs");
+		this->add_option(init_mp_buf_size,0,1,"size of buffer for multi-pass","-mbs");
+
+		this->add_option(init_loss_type,0,1,"loss function type:\nHinge, Logit, Square, SquareHinge","-loss");
+
+		this->add_option(init_opti_method,0,1,
+			"optimization method:\nSGD, STG, FOBOS, RDA, RDA_E,\nAda-RDA, Ada-FOBOS, \nAROW, AROW-TG, AROW-DA, SCW, SCW-RDA, \nSOSOL,PET,FOFS,SOFS","-opt");
+		this->add_option(init_mp_type,0,1,"multi-pass type: none, \n\tall, false_predict","-mpt");
+		this->add_option(init_is_learn_best_param,0,0,"learn best parameter", 
+			"-lbp");
+		this->add_option(init_normalize,0,0,"whether normalize the data","-norm");
+		this->add_option(-1,0,1,"learning rate", "-eta"); 
+		this->add_option(-1,0,1,"power t of decaying learning rate","-power_t"); 
+		this->add_option(-1,0,1,"initial iteration number","-t0");
+		this->add_option(-1,0,1,"l1 regularization","-l1");
+		this->add_option(1,0,1,"number of passes","-passes");
+		this->add_option(-1,0,1,
+			"number of k in truncated gradient descent or feature selection","-k",&this->K);
+		this->add_option(-1,0,1,"gamma times rou in enhanced RDA (RDA_E)", "-grou"); 
+		this->add_option(-1,0,1,"delta in Adaptive algorithms(Ada-)","-delta");
+		this->add_option(-1,0,1,"r in Confidence weighted algorithms and SOSOL","-r");
+		this->add_option(-1,0,1,"phi in SCW","-phi"); 
+		this->add_option("",false,1,"output readable model","-or");
+		this->add_option("",false,1,"input model","-m");
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs, 
-		const char* descr, const char* flag, float *storage){
-			*storage = default_val;
+		const char* descr, const char* flag){
 			this->opt.add("",is_required,expectArgs,0,descr,flag,this->vfloat);
-			this->flag2storage_float[flag] = storage;
+			this->float_storage.push_back(default_val);
+			this->flag2storage_float[flag] = &(this->float_storage.last());
 	}
 	void Params::add_option(int default_val, bool is_required, int expectArgs, 
-		const char* descr, const char* flag, int *storage){
-			*storage = default_val;
+		const char* descr, const char* flag){
+			int storage = default_val;
 			this->opt.add("",is_required,expectArgs,0,descr,flag,this->vint);
-			this->flag2storage_int[flag] = storage;
+			this->flag2storage_int[flag] = &storage;
 	}
 	void Params::add_option(bool default_val, bool is_required, int expectArgs, 
-		const char* descr, const char* flag, bool *storage){
-			*storage = default_val;
+		const char* descr, const char* flag){
+			bool storage = default_val;
 			this->opt.add("",is_required,expectArgs,0,descr,flag, this->vbool);
-			this->flag2storage_bool[flag] = storage;
+			this->flag2storage_bool[flag] = &storage;
 	}
 
 	void Params::add_option(const char* default_val, bool is_required, int expectArgs, 
-		const char* descr, const char* flag, string *storage){
-			*storage = default_val;
+		const char* descr, const char* flag){
+			string storage = default_val;
 			this->opt.add("",is_required,expectArgs,0,descr,flag);
-			this->flag2storage_str[flag] = storage;
+			this->flag2storage_str[flag] = &storage;
 	}
 
 	bool Params::Parse(int argc, const char** args) {

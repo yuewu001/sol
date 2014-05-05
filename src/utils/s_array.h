@@ -12,8 +12,7 @@
 #include <stdexcept>
 #include <cstring>
 
-
-namespace SOL {
+namespace BOC{
     //the difference of s_array with vector is that vector copies the data, while
     //s_array only copies the pointer and increase counter
     template <typename T> class s_array {

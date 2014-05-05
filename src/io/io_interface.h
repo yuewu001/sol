@@ -9,7 +9,7 @@
 
 #include <cstdio>
 
-namespace SOL{
+namespace BOC{
     class io_interface{
         public:
             virtual bool open_file(const char* filename, const char* mode) = 0;

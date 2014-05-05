@@ -9,7 +9,7 @@
 #include <cstring>
 using std::string;
 
-namespace SOL{
+namespace BOC{
 	template <typename T1, typename T2>
 	LossFunction<T1,T2>* GetLossFunc(string loss_type) {
 		ToLowerCase(loss_type);

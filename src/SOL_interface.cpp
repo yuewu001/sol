@@ -16,7 +16,7 @@
 #include "io/OnlineDataSet.h"
 #include "io/sol_io.h"
 #include "loss/sol_loss.h"
-#include "algorithms/sol_algorithms.h"
+#include "algorithms/om/olm/solm/sol_algorithms.h"
 
 #include <string>
 #include <iostream>
@@ -168,104 +168,5 @@ extern "C"{
 		Optimizer<FeatType, LabelType> *opti = (Optimizer<FeatType, LabelType> *)optimizer;
 		if (opti != NULL)
 			delete opti;
-	}
-}
-template <typename T1, typename T2>
-Optimizer<T1, T2>* GetOptimizer(const Params &param, DataSet<T1, T2> &dataset, LossFunction<T1, T2> &lossFunc) {
-	string str_opt = param.str_opt;
-	ToUpperCase(str_opt);
-	if (str_opt == "SGD")
-		return new SGD<T1, T2>(dataset, lossFunc);
-	else if (str_opt == "STG") {
-		STG<T1, T2> *opti = new STG<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K);
-		return opti;
-	}
-	else if (str_opt == "RDA")
-		return new RDA_L1<T1, T2>(dataset, lossFunc, false);
-	else if (str_opt == "RDA_E") {
-		RDA_L1<T1, T2> *opti = new RDA_L1<T1, T2>(dataset, lossFunc, true);
-		opti->SetParameterEx(param.gamma_rou);
-		return opti;
-	}
-	else if (str_opt == "FOBOS")
-		return new FOBOS<T1, T2>(dataset, lossFunc);
-	else if (str_opt == "ADA-RDA") {
-		Ada_RDA<T1, T2> *opti = new Ada_RDA<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.delta);
-		return opti;
-	}
-	else if (str_opt == "ADA-FOBOS") {
-		Ada_FOBOS<T1, T2> *opti = new Ada_FOBOS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.delta);
-		return opti;
-	}
-	else if (str_opt == "AROW") {
-		DAROW<T1, T2> *opti = new DAROW<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (str_opt == "AROW-TG") {
-		SSAROW<T1, T2> *opti = new SSAROW<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (str_opt == "AROW-DA") {
-		CW_RDA<T1, T2> *opti = new CW_RDA<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (str_opt == "SCW"){
-		SCW<T1, T2> *opti = new SCW<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.phi, param.r);
-		return opti;
-	}
-	else if (str_opt == "SCW-RDA") {
-		SCW_RDA<T1, T2> *opti = new SCW_RDA<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.phi, param.r);
-		return opti;
-	}
-	else if (str_opt == "PET"){
-		PET<T1, T2> *opti = new PET<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K);
-		return opti;
-	}
-	else if (str_opt == "FOFS"){
-		FOFS<T1, T2> *opti = new FOFS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K, param.delta);
-		return opti;
-	}
-	else if (str_opt == "SOFS") {
-		SOFS<T1, T2> *opti = new SOFS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K, param.r);
-		return opti;
-	}
-	else if (str_opt == "NSOFS") {
-		NSOFS<T1, T2> *opti = new NSOFS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K, param.delta, param.r);
-		return opti;
-	}
-	else if (str_opt == "SOSOL"){
-		SOSOL<T1, T2> *opti = new SOSOL<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.r);
-		return opti;
-	}
-	else if (str_opt == "AROW-ADAFS"){
-		AROW_AdaFS<T1, T2> *opti = new AROW_AdaFS<T1, T2>(dataset, lossFunc);
-		opti->SetParameterEx(param.K, param.r);
-		return opti;
-	}
-	else if (str_opt == "MRMR_OGD"){
-		mRMR_OGD<T1, T2> *opti = new mRMR_OGD<T1, T2>(dataset, lossFunc);
-		if (opti->LoadFSResult(param.in_model_filename, param.K) == false){
-			delete opti;
-			return NULL;
-		}
-		return opti;
-	}
-
-	else{
-		cerr << "ERROR: unrecognized optimization method " << param.str_opt << endl;
-		return NULL;
 	}
 }

@@ -10,12 +10,12 @@
 
 #include "LossFunction.h"
 
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class HingeLoss: public LossFunction<FeatType, LabelType> {
 		public:
 			virtual  float GetLoss(LabelType label, float predict) {
-                return (std::max)(0.0f, 1.f - predict * label);
+                return max(0.0f, 1.f - predict * label);
 			}
 
             virtual  float GetGradient(LabelType label, float predict) {

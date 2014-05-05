@@ -12,7 +12,7 @@
 #include "DataPoint.h"
 #include <vector>
 
-namespace SOL {
+namespace BOC {
 	
 	template <typename FeatType, typename LabelType>
 	class DataReader {

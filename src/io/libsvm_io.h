@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace SOL {
+namespace BOC {
     template <typename FeatType, typename LabelType>
         class libsvm_io_: public DataHandler<FeatType, LabelType> { 
             private:

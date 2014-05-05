@@ -9,7 +9,7 @@
 #define HEADER_DATA_HANDLER
 
 #include "DataReader.h"
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class DataHandler: public DataReader<FeatType,LabelType> {
 	public:

@@ -21,7 +21,7 @@
 
 using namespace std;
 
-namespace SOL {
+namespace BOC {
     template <typename FeatType, typename LabelType>
         class csv_io_: public DataHandler<FeatType, LabelType> { 
             private:

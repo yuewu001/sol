@@ -2,104 +2,38 @@
 > File Name: Optimizer.h
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 > Created Time: 2013/8/18 Sunday 16:04:18
-> Functions: Base class for different algorithms to do online learning
+> Functions: Base class for different algorithms to do machine learning
 ************************************************************************/
 
-#pragma once
+#ifndef HEADER_OPTIMIZER
+#define HEADER_OPTIMIZER
+
 #include "../io/DataSet.h"
-#include "../loss/LossFunction.h"
-#include "../utils/init_param.h"
 
-#include <stdio.h>
-#include <math.h>
-
-#include <fstream>
 
 /**
-*  namespace: Sparse Online Learning
+*  namespace: Machine Learning
 */
-namespace SOL {
+namespace ML{
 	template <typename FeatType, typename LabelType> class Optimizer {
-		//Iteration 
 	protected:
-		//iteration number
-		size_t curIterNum;
-		size_t initial_t;
-		float power_t;
-		//parameters
-		float lambda;
-		float eta0; //learning rate
-		float eta;
-
+        //input dataset
 		DataSet<FeatType, LabelType> &dataSet;
-
-		bool is_normalize;
-
+        //number of iterations
 		size_t update_times;
 
-		//weight vector
-	protected:
-		//the first element is zero
-		s_array<float> weightVec;
-		//weight dimenstion: can be the same to feature, or with an extra bias
-		IndexType weightDim;
-
-		//For sparse
-	protected:
-		float sparse_soft_thresh;
-
-	protected:
-		LossFunction<FeatType, LabelType> *lossFunc;
-
-	protected:
-		string id_str;
+        inline size_t GetUpdateTimes() const { return this->update_times; }
 
 	public:
-		/**
-		 * PrintOptInfo print the info of optimization algorithm
-		 */
-		virtual void PrintOptInfo() const {
-			printf("--------------------------------------------------\n");
-			printf("Algorithm: %s\n\n", this->Id_Str().c_str());
-			printf("Learning Rate: %g\n", this->eta0);
-			printf("Initial t  : %lu\n", this->initial_t);
-			printf("Power t : %g\n", this->power_t);
-			printf("lambda	: %g\n\n", this->lambda);
-		}
-
-		inline size_t GetUpdateTimes() const { return this->update_times; }
-
-	public:
-		Optimizer(DataSet<FeatType, LabelType> &dataset, LossFunction<FeatType, LabelType> &lossFunc);
+		Optimizer(DataSet<FeatType, LabelType> &dataset);
 
 		virtual ~Optimizer() {
 		}
-		const string& Id_Str() const { return this->id_str; }
 
 	protected:
-		//Reset the optimizer to the initialization status of training
-		virtual void BeginTrain();
-		//called when a train ends
-		virtual void EndTrain();
 		//train the data
 		float Train();
-		//predict a new feature
-		float Predict(const DataPoint<FeatType, LabelType> &data);
-		//predict function for test, as we are using sparse learning,dimension of the test data
-		//may be larger than the model
-		float Test_Predict(const DataPoint<FeatType, LabelType> &data);
 
-		//this is the core of different updating algorithms
-		//return the predict
-		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x) = 0;
-
-	public:
-		void SetNormalize(bool is_norm){
-			this->is_normalize = is_norm;
-		}
-
-		void SetParameter(float lambda = -1, float eta0 = -1,
-			float power_t = -1, int t0 = -1);
 		//try and get the best parameter
 		virtual void BestParameter();
 
@@ -111,35 +45,11 @@ namespace SOL {
 		//test the performance on the given set
 		float Test(DataSet<FeatType, LabelType> &testSet);
 
-		float GetSparseRate(IndexType total_len = 0);
-		IndexType GetNonZeroNum();
-
-	protected:
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(IndexType newDim);
-
-	public:
-		void SaveModel(const string& filename);
 	};
 
-	//calculate learning rate
-	inline float pEta_general(size_t t, float pt){
-		return powf((float)t, pt);
-	}
-	inline float pEta_sqrt(size_t t, float pt){
-		return sqrtf((float)t);
-	}
-	inline float pEta_linear(size_t t, float pt){
-		return (float)t;
-	}
-	inline float pEta_const(size_t t, float pt){
-		return 1;
-	}
-
-	template <typename FeatType, typename LabelType>
+    template <typename FeatType, typename LabelType>
 	Optimizer<FeatType, LabelType>::Optimizer(DataSet<FeatType, LabelType> &dataset,
 		LossFunction<FeatType, LabelType> &lossFunc) : dataSet(dataset) {
-		this->lossFunc = &lossFunc;
 		this->weightDim = 1;
 		//weight vector
 		this->weightVec.resize(this->weightDim);
@@ -419,3 +329,4 @@ namespace SOL {
 		outfile.close();
 	}
 }
+#endif

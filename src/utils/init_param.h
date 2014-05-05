@@ -10,8 +10,7 @@
 
 #include <stdint.h>
 #include <string>
-namespace SOL {
-#define IndexType uint32_t
+namespace BOC {
 
 	//compress cache
 #define BASIC_IO 0
@@ -31,7 +30,7 @@ namespace SOL {
     //pow decaying learing rate
     static const float init_power_t = 0.5;
     //initial t
-    static const int init_initial_t = 1;
+    static const int init_initial_t = 0;
     //l1 regularization
     static const float init_lambda = 0.0;
     //sparse soft threshold when counting zero-weights
@@ -72,12 +71,12 @@ namespace SOL {
 
 
     ////////////////////Data Set Reader Parameters///////////////////////////
-    static const size_t init_chunk_size = 256;
-    static const size_t init_buf_size = 2;
-    static const size_t init_mp_buf_size = 1024;
+    static const int init_chunk_size = 256;
+    static const int init_buf_size = 2;
+    static const int init_mp_buf_size = 1024;
 
     //////////////////////Zlib Parameters/////////////////////////////
     static const int zlib_deflate_level = -1; // use default deflate level
-    static const size_t zlib_buf_size = 16348; //default buffer size of zlib
+    static const int zlib_buf_size = 16348; //default buffer size of zlib
 }
 #endif

@@ -13,7 +13,7 @@
 #include <vector>
 using std::vector;
 
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType> 
     struct DataChunk{
 		vector<DataPoint<FeatType, LabelType> > data;

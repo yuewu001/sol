@@ -11,7 +11,7 @@
 #include "io_interface.h"
 #include <cstdio>
 
-namespace SOL{
+namespace BOC{
     class basic_io: public io_interface {
         private:
             FILE* file;

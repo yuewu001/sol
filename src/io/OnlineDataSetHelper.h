@@ -13,7 +13,7 @@
 
 #include "DataChunk.h"
 
-namespace SOL{
+namespace BOC{
 	template <typename T1, typename T2> class OnlineDataSet;
 
 	//load a chunk of data, return if file ended

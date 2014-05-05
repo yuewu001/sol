@@ -9,8 +9,7 @@
 #define HEADER_THREAD_PRIMITIVE
 using namespace std;
 
-namespace SOL
-{
+namespace BOC {
 #ifdef _WIN32
 #include <Windows.h>
 	typedef CRITICAL_SECTION MUTEX;
@@ -20,8 +19,7 @@ namespace SOL
 	typedef pthread_cond_t CV;
 #endif
 
-	inline void initialize_mutex(MUTEX *pm)
-	{
+	inline void initialize_mutex(MUTEX *pm) {
 #ifdef _WIN32
 		::InitializeCriticalSection(pm);
 #else
@@ -29,8 +27,7 @@ namespace SOL
 #endif
 	}
 
-	inline void delete_mutex(MUTEX *pm)
-	{
+	inline void delete_mutex(MUTEX *pm) {
 #ifdef _WIN32 
 		::DeleteCriticalSection(pm);
 #else
@@ -47,8 +44,7 @@ namespace SOL
 #endif
 	}
 
-	inline void mutex_lock(MUTEX *pm)
-	{
+	inline void mutex_lock(MUTEX *pm) {
 		//cout<<"obtain lock"<<endl;
 #ifdef _WIN32
 		::EnterCriticalSection(pm);
@@ -56,8 +52,8 @@ namespace SOL
 		pthread_mutex_lock(pm);
 #endif
 	}
-	inline void mutex_unlock(MUTEX *pm)
-	{
+
+	inline void mutex_unlock(MUTEX *pm) {
 		//cout<<"release lock"<<endl;
 #ifdef _WIN32
 		::LeaveCriticalSection(pm);
@@ -66,24 +62,23 @@ namespace SOL
 #endif
 	}
 
-	inline void condition_variable_wait(CV* pcv, MUTEX *pm)
-	{
+	inline void condition_variable_wait(CV* pcv, MUTEX *pm) {
 #ifdef _WIN32
 		::SleepConditionVariableCS(pcv,pm,INFINITE);
 #else
 		pthread_cond_wait(pcv,pm);
 #endif
 	}
-	inline void condition_variable_signal(CV *pcv)
-	{
+
+	inline void condition_variable_signal(CV *pcv) {
 #ifdef _WIN32
 		::WakeConditionVariable(pcv);
 #else
 		pthread_cond_signal(pcv);
 #endif
 	}
-	inline void condition_variable_signal_all(CV *pcv)
-	{
+
+	inline void condition_variable_signal_all(CV *pcv) {
 #ifdef _WIN32
 		::WakeAllConditionVariable(pcv);
 #else

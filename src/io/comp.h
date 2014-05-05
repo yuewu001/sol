@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-namespace SOL{
+namespace BOC{
 
     inline uint32_t ZigZagEncode(int32_t n) { 
         uint32_t ret = (n << 1) ^ (n >> 31);

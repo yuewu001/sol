@@ -1393,9 +1393,11 @@ void ezOptionParser::reset() {
         delete lastArgs[i];
     lastArgs.clear();
 
+	/*
     ValidatorMap::iterator it;
     for(it = validators.begin(); it != validators.end(); ++it)
         delete it->second;
+        */
 
     validators.clear();
     optionGroupIds.clear();

@@ -5,10 +5,12 @@
 	> Functions: Square Loss
  ************************************************************************/
 
-#pragma once
+#ifndef HEADER_SQUARE_LOSS
+#define HEADER_SQUARE_LOSS
+
 #include "LossFunction.h"
 
-namespace SOL {
+namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class SquareLoss: public LossFunction<FeatType, LabelType> {
         public:
@@ -21,3 +23,5 @@ namespace SOL {
             }
     };
 }
+
+#endif 
