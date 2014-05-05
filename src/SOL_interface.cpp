@@ -48,7 +48,7 @@ extern "C"{
 			cerr << "no input is specified!" << endl;
 			return 0;
 		}
-		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum, buf_size);
+		OnlineDataSet<FeatType, LabelType> *dataset = new OnlineDataSet<FeatType, LabelType>(passNum, buf_size);
 		if (dataset->Load(filename, cache_filename, dt_type) == false){
 			cerr << "ERROR: Load dataset " << filename << " failed!" << endl;
 			delete dataset;
@@ -66,7 +66,7 @@ extern "C"{
 			cerr << "no reader is specified!" << endl;
 			return 0;
 		}
-		DataSet<FeatType, LabelType> *dataset = new DataSet<FeatType, LabelType>(passNum, buf_size);
+		OnlineDataSet<FeatType, LabelType> *dataset = new OnlineDataSet<FeatType, LabelType>(passNum, buf_size);
 		if (dataset->Load((DataReader<FeatType, LabelType>*)dt_reader, cache_filename) == false){
 			cerr << "ERROR: Load dataset failed!" << endl;
 			delete dataset;

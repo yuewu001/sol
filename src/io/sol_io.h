@@ -3,7 +3,7 @@
 
 #include "io_helper.h"
 
-#include "DataSet.h"
+#include "OnlineDataSet.h"
 #include "MPDataSet.h"
 
 namespace SOL{
@@ -11,7 +11,7 @@ namespace SOL{
         DataSet<FeatType, LabelType>* getDataSet(int passNum, int buf_size, string dt_type, int mp_buf_size){
             ToLowerCase(dt_type);
             if (dt_type == "none")
-                return new SOL::DataSet<FeatType, LabelType>(passNum, buf_size);
+                return new SOL::OnlineDataSet<FeatType, LabelType>(passNum, buf_size);
             else if (dt_type == "all")
                 return new SOL::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL,mp_buf_size);
             else if (dt_type == "margin")

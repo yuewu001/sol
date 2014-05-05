@@ -20,6 +20,7 @@ set (CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/cmake)
 
 set(io_files 
     src/io/DataPoint.h
+    src/io/DataChunk.h
     src/io/MPBuffer.h
     src/io/DataReader.h
     src/io/DataHandler.h

@@ -47,7 +47,7 @@ int main(int argc, const char** args){
 void Cache(const Params &param){
 	cout<<"Caching file..."<<endl;
 	
-	DataSet<float, char> dt;
+	OnlineDataSet<float, char> dt;
 	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.src_data_type);
 	if (reader == NULL){
 		return;

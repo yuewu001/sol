@@ -102,7 +102,7 @@ int main(int argc, const char** args) {
 		//test the model
 		bool is_test = param.test_cache_fileName.length() > 0 || param.test_fileName.length() > 0;
 		if ( is_test) {
-			DataSet<FeatType, LabelType> testset(1,param.buf_size);
+			OnlineDataSet<FeatType, LabelType> testset(1,param.buf_size);
 			if (testset.Load(param.test_fileName, param.test_cache_fileName) == true) {
 				float t_errRate(0);	//test error rate
 				t_errRate = opti->Test(testset);

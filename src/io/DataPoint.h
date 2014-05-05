@@ -11,8 +11,6 @@
 #include "s_array.h"
 #include "../utils/init_param.h"
 
-#include <cstring>
-
 namespace SOL {
 	/**
 	*  Definitions of DataPoint: one lable, and DataPoints
@@ -147,44 +145,5 @@ namespace SOL {
 		}
 
 	};
-	template <typename FeatType, typename LabelType> 
-	struct DataChunk{
-		DataPoint<FeatType, LabelType> *data;
-		size_t dataNum;
-		size_t chunk_size;
-		DataChunk *next;
-		bool is_inuse;
-		bool is_parsed;
-		bool is_inherited; //judge if the class is inherited from DataChunk
-
-		DataChunk(size_t chunkSize = init_chunk_size) :dataNum(0), chunk_size(chunkSize),
-			next(NULL), is_inuse(false), is_parsed(false), is_inherited(false){
-			if (this->chunk_size == 0){
-				std::cerr << "error occured at file: " << __FILE__ << ": line" << __LINE__ <<
-					"\nERROR: chunk size for multi-pass should be a positive!" << std::endl;
-				exit(2);
-			}
-			try{
-				this->data = new DataPoint<FeatType, LabelType>[this->chunk_size];
-			}
-			catch (std::bad_alloc &ex){
-				std::cerr << ex.what();
-				std::cerr << " allocate of " << this->chunk_size
-					<< " failed in constructing DataChunk. out of memory? in file "
-					<< __FILE__ << " line " << __LINE__ << std::endl;
-				exit(1);
-			}
-		}
-		virtual ~DataChunk(){
-			if (this->data != NULL)
-				delete[]this->data;
-		}
-		void erase() {
-			for (size_t i = 0; i < this->chunk_size; i++)
-				data[i].erase();
-			dataNum = 0;
-		}
-	};
-
 }
 #endif

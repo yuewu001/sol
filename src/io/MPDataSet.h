@@ -8,7 +8,7 @@
 #ifndef HEADER_MP_DATASET
 #define HEADER_MP_DATASET
 
-#include "DataSet.h"
+#include "OnlineDataSet.h"
 #include "MPBuffer.h"
 
 /**
@@ -16,14 +16,14 @@
  */
 namespace SOL {
     //data set, can work in both read-and-write mode and read-once mode
-    template <typename FeatType, typename LabelType> class MPDataSet : public DataSet<FeatType, LabelType>{		
+    template <typename FeatType, typename LabelType> class MPDataSet : public OnlineDataSet<FeatType, LabelType>{		
         protected:
 			//added by yuewu, for multi-pass
 			MPBuffer<FeatType, LabelType> *pMp_Buffer;
 
         public:
             MPDataSet(int passes = 1, int buf_size = -1, MPBufferType buf_type = MPBufferType_None, int mp_buf_size = init_mp_buf_size):
-				DataSet<FeatType, LabelType>(passes, buf_size){
+				OnlineDataSet<FeatType, LabelType>(passes, buf_size){
 				switch (buf_type)
 				{
 				case SOL::MPBufferType_None:
@@ -81,9 +81,9 @@ namespace SOL {
 				}
 			}
 
-			void FinishRead() {
+			virtual void FinishRead() {
 				if (this->pMp_Buffer == NULL){
-					DataSet<FeatType, LabelType>::FinishRead();
+					OnlineDataSet<FeatType, LabelType>::FinishRead();
 					return;
 				}
 				else{
@@ -105,7 +105,7 @@ namespace SOL {
 						condition_variable_signal_all(&this->buffer_full);
 					}
 					//else
-						this->pMp_Buffer->is_inuse = false;
+					this->pMp_Buffer->is_inuse = false;
 
 					mutex_unlock(&this->data_lock);
 				}
