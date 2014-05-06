@@ -10,7 +10,6 @@
 
 #include "libsvm_binary.h"
 #include "../utils/thread_primitive.h"
-
 #include "DataChunk.h"
 
 namespace BOC{
@@ -163,45 +162,45 @@ namespace BOC{
 				dataset->FinishParse();
 				return NULL;
 			}
-			if (dataset->is_reader_self_alloc == true){
-				dataset->reader->Close();
-				delete dataset->reader;
-                dataset->reader = NULL;
-			}
-			//setup the new cache-file reader
-			dataset->reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
-			dataset->is_reader_self_alloc = true;
-			if (dataset->reader->OpenReading() == false){
-				cerr<<"load cache data failed!"<<endl;
-				dataset->FinishParse();
-				return NULL;
-			}
-			reader = dataset->reader;
-			dataset->is_cache = false;
-			pass++;
-		}
+            pass++;
+            //multi-pass
+            if (pass< dataset->passNum){
+                //setup the new cache-file reader
+                dataset->delete_reader();
+                dataset->self_reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
+                dataset->reader = dataset->self_reader;
+                dataset->is_cache = false;
+                if (dataset->reader->OpenReading() == false){
+                    cerr<<"load cache data failed!"<<endl;
+					dataset->FinishParse();
+                    return NULL;
+                }
+                reader = dataset->reader;
+            }
+        }
+
         //online algorithms will run multiple times
-		for (;pass < dataset->passNum; pass++) {
-			reader->Rewind();
-			if (reader->Good()) {
-				bool not_file_end = false;
-				do {
-					FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
-					not_file_end = load_chunk(reader, chunk);
-					dataset->EndWriteChunk();
-				}while(not_file_end == true);
-				if (reader->Good() == false) {
-					cerr<<"Load cached dataset failed!"<<endl;
-					break;
-				}
-			}
-			else {
-				cerr<<"reader is incorrect!"<<endl;
-				break;
-			}
-		}
-		dataset->FinishParse();
-		return NULL;
-	}
+        for (;pass < dataset->passNum; pass++) {
+            reader->Rewind();
+            if (reader->Good()) {
+                bool not_file_end = false;
+                do {
+                    FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
+                    not_file_end = load_chunk(reader, chunk);
+                    dataset->EndWriteChunk();
+                }while(not_file_end == true);
+                if (reader->Good() == false) {
+                    cerr<<"Load cached dataset failed!"<<endl;
+                    break;
+                }
+            }
+            else {
+                cerr<<"reader is incorrect!"<<endl;
+                break;
+            }
+        }
+        dataset->FinishParse();
+        return NULL;
+    }
 }
 #endif

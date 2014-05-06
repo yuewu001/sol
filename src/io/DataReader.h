@@ -8,7 +8,6 @@
 #ifndef HEADER_DATAREADER
 #define HEADER_DATAREADER
 
-
 #include "DataPoint.h"
 #include <vector>
 

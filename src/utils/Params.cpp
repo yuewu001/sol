@@ -77,6 +77,7 @@ namespace BOC {
 
 		this->add_option(init_data_type, 0, 1, "dataset type format", "-dt");
 		this->add_option(init_buf_size, 0, 1, "number of chunks for buffering", "-bs");
+		this->add_option(init_chunk_size, 0, 1, "number of examples in a chunk", "-cs");
 		this->add_option(init_mp_buf_size, 0, 1, "size of buffer for multi-pass", "-mbs");
 
 		this->add_option(init_loss_type, 0, 1, "loss function type:\nHinge, Logit, Square, SquareHinge", "-loss");
