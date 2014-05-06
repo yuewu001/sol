@@ -47,6 +47,19 @@ namespace BOC {
 
 	public:
 		/**
+		 * @Synopsis Load load data from an text data file or the cached file,
+		 * cache the reader if cache file not exists or multipass is specified
+		 *
+		 * @Param filename
+		 * @Param cache_filename
+		 *
+		 * @Returns true if succeed
+		 */
+		virtual bool Load(const std::string& fileName, const std::string& cache_fileName, const std::string &dt_type) {
+			return DataSet<FeatType, LabelType>::Load(fileName, cache_fileName, dt_type);
+		}
+
+		/**
 		 * @Synopsis Load load data from an extern reader or the cached file,
 		 * cache the reader if cache file not exists or multipass is specified
 		 *
@@ -60,7 +73,7 @@ namespace BOC {
 			if (SOL_ACCESS(cache_fileName.c_str()) == 0) {
 				this->delete_reader();
 				this->cache_filename = cache_fileName;
-				this->self_reader =  getReader<FeatType, LabelType>(cache_fileName, "cache");
+				this->self_reader = getReader<FeatType, LabelType>(cache_fileName, "cache");
 
 				return this->Load(this->self_reader);
 			}

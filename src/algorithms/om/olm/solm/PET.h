@@ -8,16 +8,15 @@
 #ifndef HEADER_OPTIMISER_PET
 #define HEADER_OPTIMISER_PET
 
-#include "../utils/util.h"
-#include "Optimizer.h"
-#include "MinHeap.h"
-#include <algorithm>
-#include <math.h>
-#include <queue>
+#include "SparseOnlineLinearModel.h"
+#include "../../../../utils/MinHeap.h"
 
-namespace SOL {
+/**
+*  namespace: Batch and Online Classification
+*/
+namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class PET: public Optimizer<FeatType, LabelType> {
+	class PET: public SparseOnlineLinearModel<FeatType, LabelType> {
 	protected:
 		IndexType K; //keep top K elemetns
 
@@ -27,144 +26,122 @@ namespace SOL {
 
 		float (*pEta_time)(size_t t, float pt);
 	public:
-		PET(DataSet<FeatType, LabelType> &dataset, 
-			LossFunction<FeatType, LabelType> &lossFunc);
-		virtual ~PET();
+		PET(LossFunction<FeatType, LabelType> &lossFunc) :
+            SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+                this->id_str = "Perceptron with Truncation";
+                this->K = 0;
 
-	public:
-		void SetParameterEx(int k);
-		/**
-		* PrintOptInfo print the info of optimization algorithm
-		*/
-		virtual void PrintOptInfo() const {
-			Optimizer<FeatType,LabelType>::PrintOptInfo();
-			printf("K:\t%d\n\n", this->K);
-		}
-	protected:
-		//this is the core of different updating algorithms
-		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-		//reset the optimizer to this initialization
-		virtual void BeginTrain();
-		//called when a train ends
-		virtual void EndTrain();
+                this->abs_weightVec.resize(this->weightDim);
+            }
 
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(IndexType newDim);
-	};
+        virtual ~PET() {
+        }
 
-	template <typename FeatType, typename LabelType>
-	PET<FeatType, LabelType>::PET(DataSet<FeatType, LabelType> &dataset, 
-		LossFunction<FeatType, LabelType> &lossFunc):
-	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "Perceptron with Truncation";
-		this->K = 0;
+        /**
+         * @Synopsis inherited functions
+         */
+    public:
+        /**
+         * PrintOptInfo print the info of optimization algorithm
+         */
+        virtual void PrintOptInfo() const {
+            SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+            printf("\tK:\t%d\n", this->K);
+        }
 
-		this->abs_weightVec.resize(this->weightDim);
-	}
+        /**
+         * @Synopsis SetParameter set parameters for the learning model
+         *
+         * @Param param
+         */
+        virtual void SetParameter(BOC::Params &param){
+            OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+            this->K = param.IntValue("-k");
+        }
 
-	template <typename FeatType, typename LabelType>
-	PET<FeatType, LabelType>::~PET() {
-	}
+        /**
+         * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+         */
+        virtual void BeginTrain() {
+            SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
-	//this is the core of different updating algorithms
-	//return the predict
-	template <typename FeatType, typename LabelType>
-	float PET<FeatType,LabelType>::UpdateWeightVec(
-		const DataPoint<FeatType, LabelType> &x) {
-			//we use the oposite of w
-			float y = this->Predict(x);
-			size_t featDim = x.indexes.size();
-			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
+            if (this->power_t == 0.5)
+                this->pEta_time = pEta_sqrt;
+            else if (this->power_t == 0)
+                this->pEta_time = pEta_const;
+            else if (this->power_t == 1)
+                this->pEta_time = pEta_linear;
+            else
+                this->pEta_time = pEta_general;
 
-			float gt_i = this->lossFunc->GetGradient(x.label,y);
-			if (gt_i == 0){
-				return y;
-			}
+            if (this->K > 0){
+                if (this->weightDim < this->K + 1)
+                    this->UpdateModelDimention(this->K);
+                this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
+            }
+        }
 
-			IndexType index_i = 0;
-			//update with sgd
-			for (size_t i = 0; i < featDim; i++) {
+        /**
+         * @Synopsis Iterate Iteration of online learning
+         *
+         * @Param x current input data example
+         *
+         * @Returns  prediction of the current example
+         */
+        virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
+            this->curIterNum++;
+            float y = this->Predict(x);
+            size_t featDim = x.indexes.size();
+            this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
+
+            float gt_i = this->lossFunc->GetGradient(x.label,y);
+            if (gt_i == 0){
+                return y;
+            }
+
+            IndexType index_i = 0;
+            //update with sgd
+            for (size_t i = 0; i < featDim; i++) {
                 index_i = x.indexes[i];
-				this->weightVec[index_i] -= this->eta * gt_i * x.features[i];
-				this->abs_weightVec[index_i] = fabsf(this->weightVec[index_i]);
-			}
-			//update bias 
-			this->weightVec[0] -= this->eta * gt_i;
-			if (this->K > 0){
-				this->minHeap.BuildHeap();
-				//truncate
-				IndexType ret_id;
-				for (IndexType i = 0; i < this->weightDim - 1; i++){
-					if (this->minHeap.UpdateHeap(i, ret_id) == true){
-						this->weightVec[ret_id + 1] = 0;
-						this->abs_weightVec[ret_id + 1] = 0;
-					}
-				}
-				/*
-				//test if top K is in
-				float min_top = 100000;
-				float max_not_top = -10000;
-				for (IndexType i = 1; i < this->weightDim ; i++){
-					if (this->minHeap.is_topK(i - 1) == true){
-						min_top = min_top > this->abs_weightVec[i] ? this->abs_weightVec[i] : min_top;
-					}
-					else{
-						max_not_top = max_not_top < this->abs_weightVec[i] ? this->abs_weightVec[i] : max_not_top;
-						this->weightVec[i] = 0;
-						this->abs_weightVec[i] = 0;
-					}
-				}
-				*/
-			}
-			return y;
-	}
+                this->weightVec[index_i] -= this->eta * gt_i * x.features[i];
+                this->abs_weightVec[index_i] = fabsf(this->weightVec[index_i]);
+            }
+            //update bias 
+            this->weightVec[0] -= this->eta * gt_i;
+            if (this->K > 0){
+                this->minHeap.BuildHeap();
+                //truncate
+                IndexType ret_id;
+                for (IndexType i = 0; i < this->weightDim - 1; i++){
+                    if (this->minHeap.UpdateHeap(i, ret_id) == true){
+                        this->weightVec[ret_id + 1] = 0;
+                        this->abs_weightVec[ret_id + 1] = 0;
+                    }
+                }
+            }
+            return y;
+        }
 
-	//reset the optimizer to this initialization
-	template <typename FeatType, typename LabelType>
-	void PET<FeatType, LabelType>::BeginTrain() {
-		Optimizer<FeatType, LabelType>::BeginTrain();
-		if (this->power_t == 0.5)
-			this->pEta_time = pEta_sqrt;
-		else if (this->power_t == 0)
-			this->pEta_time = pEta_const;
-		else if (this->power_t == 1)
-			this->pEta_time = pEta_linear;
-		else
-			this->pEta_time = pEta_general;
+        /**
+         * @Synopsis UpdateModelDimention update dimension of the model,
+         * often caused by the increased dimension of data
+         *
+         * @Param new_dim new dimension
+         */
+        virtual void UpdateModelDimention(IndexType new_dim) {
+            if (new_dim < this->weightDim)
+                return;
+            else {
+                this->abs_weightVec.reserve(new_dim + 1);
+                this->abs_weightVec.resize(new_dim + 1);
+                this->abs_weightVec.zeros(this->abs_weightVec.begin + this->weightDim, this->abs_weightVec.end);
 
-		if (this->K > 0){
-			if (this->weightDim < this->K + 1)
-				this->UpdateWeightSize(this->K);
-			this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
-		}
-	}
+                this->minHeap.UpdateDataNum(new_dim, this->abs_weightVec.begin + 1);
 
-	//called when a train ends
-	template <typename FeatType, typename LabelType>
-	void PET<FeatType, LabelType>::EndTrain() {
-		Optimizer<FeatType, LabelType>::EndTrain();
-	}
-
-	template <typename FeatType, typename LabelType>
-	void PET<FeatType, LabelType>::SetParameterEx(int k) {
-		this->K = k > 0 ? k : this->K;
-	}
-
-	//Change the dimension of weights
-	template <typename FeatType, typename LabelType>
-	void PET<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-		if (newDim < this->weightDim)
-			return;
-		else {
-			this->abs_weightVec.reserve(newDim + 1);
-			this->abs_weightVec.resize(newDim + 1);
-			this->abs_weightVec.zeros(this->abs_weightVec.begin + this->weightDim, this->abs_weightVec.end);
-
-			this->minHeap.UpdateDataNum(newDim, this->abs_weightVec.begin + 1);
-
-			Optimizer<FeatType, LabelType>::UpdateWeightSize(newDim);
-		}
-	}
+                SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
+            }
+        }
+    };
 }
 
 #endif

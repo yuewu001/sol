@@ -41,7 +41,7 @@ namespace BOC {
 				this->id_str = "Adaptive FOBOS";
 			}
 
-		~Ada_FOBOS() {
+		virtual ~Ada_FOBOS() {
 		}
 
 		/**
@@ -53,7 +53,7 @@ namespace BOC {
 		 */
 		virtual void PrintOptInfo() const {
 			SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
-			printf("delta : %g\n", this->delta);
+			printf("\tdelta : %g\n", this->delta);
 		}
 
 		/**

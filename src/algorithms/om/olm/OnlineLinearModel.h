@@ -61,8 +61,7 @@ namespace BOC {
             /**
              * @Synopsis EndTrain called when a train ends
              */
-            virtual void EndTrain() {
-            }
+            virtual void EndTrain() { }
 
             /**
              * @Synopsis UpdateModelDimention update dimension of the model,
@@ -100,7 +99,7 @@ namespace BOC {
 			 * @Returns predicted value
 			 */
 			virtual float Test_Predict(const DataPoint<FeatType, LabelType> &data) {
-				float predict = this->weightVec[0];
+				float predict = 0;
 				size_t dim = data.indexes.size();
 				IndexType index_i;
 				for (size_t i = 0; i < dim; i++){
@@ -108,6 +107,7 @@ namespace BOC {
 					if (index_i < this->weightDim && this->weightVec[index_i] != 0)
 						predict += this->weightVec[index_i] * data.features[i];
 				}
+				predict += this->weightVec[0];
 				return predict;
 			}
 
@@ -119,11 +119,12 @@ namespace BOC {
 			 * @Returns predicted value
 			 */
 			virtual float Predict(const DataPoint<FeatType, LabelType> &data) {
-				float predict = this->weightVec[0];
+				float predict = 0;
 				size_t dim = data.indexes.size();
 				for (size_t i = 0; i < dim; i++){
 					predict += this->weightVec[data.indexes[i]] * data.features[i];
 				}
+				predict += this->weightVec[0];
 				return predict;
 			}
 
@@ -235,7 +236,9 @@ namespace BOC {
 			os << "weight dimension: " << this->weightDim << "\n";
 			//weights
 			for (IndexType i = 0; i < this->weightDim; i++){
-				os << this->weightVec[i] << "\n";
+				if (this->weightVec[i] != 0){
+					os << i << ":" << this->weightVec[i] << "\n";
+				}
 			}
 
 			return true;

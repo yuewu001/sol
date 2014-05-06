@@ -26,8 +26,8 @@ namespace BOC {
 		ez::ezOptionValidator* vbool;
 
 		ezOption(){
-			this->vfloat = new ezOptionValidator("f");
-			this->vint = new ezOptionValidator("u4");
+			this->vfloat = new ezOptionValidator("f","ge","0");
+			this->vint = new ezOptionValidator("u4","ge","0");
 			this->vbool = new ezOptionValidator("t", "in", "true,false", false);
 		}
 		~ezOption(){
@@ -164,14 +164,20 @@ namespace BOC {
 		vector<string> badOptions;
 		if (!option->opt.gotRequired(badOptions)){
 			for (size_t i = 0; i < badOptions.size(); i++)
-				cerr << "ERROR: Missing required option " << badOptions[i] << ".\n\n";
+				cerr << "ERROR: Missing required option " << badOptions[i] << ".\n";
 			this->Help();
 			return false;
 		}
 		if (!option->opt.gotExpected(badOptions)){
 			for (size_t i = 0; i < badOptions.size(); i++)
-				cerr << "ERROR: Got unexpected number of arguments for option " << badOptions[i] << ".\n\n";
+				cerr << "ERROR: Got unexpected number of arguments for option " << badOptions[i] << ".\n";
 			this->Help();
+			return false;
+		}
+		vector<string> badArgs;
+		if (!option->opt.gotValid(badOptions, badArgs)) {
+			for (size_t i = 0; i < badOptions.size(); ++i)
+				std::cerr << "ERROR: Got invalid argument \"" << badArgs[i] << "\" for option " << badOptions[i] << ".\n";
 			return false;
 		}
 		for (map_float_iter iter = this->flag2storage_float.begin();

@@ -24,7 +24,7 @@ using namespace BOC;
 #define FeatType float
 #define LabelType char
 
-#define ALGO Ada_FOBOS
+#define ALGO FOFS
 
 int main(int argc, const char** args) {
 	//check memory leak in VC++
@@ -84,13 +84,11 @@ int main(int argc, const char** args) {
 
 	model->PrintOptInfo();
 
-	float l_errRate(0), l_varErr(0);	//learning error rate
-	float sparseRate(0);
-
 	//learning the model
 	double time1 = get_current_time();
 
-	l_errRate = opti->Train();
+	float l_errRate = opti->Train();
+	float sparseRate = model->GetSparseRate();
 
 	if (param.StringValue("-or").length() > 0){
 		model->SaveModel(param.StringValue("-or"));
@@ -99,14 +97,14 @@ int main(int argc, const char** args) {
 	double time2 = get_current_time();
 
 	printf("data number: %lu\n", pDataset->size());
-	printf("Learn error rate: %.2f +/- %.2f %%\n", l_errRate * 100, l_varErr * 100);
+	printf("Learn error rate: %.2f %%\n", l_errRate * 100);
 
 	double time3 = 0;
 	//test the model
 	bool is_test = param.StringValue("-tc").length() > 0 || param.StringValue("-t").length() > 0;
 	if (is_test) {
 		OnlineDataSet<FeatType, LabelType> testset(1, param.IntValue("-bs"), param.IntValue("-cs"));
-		if (testset.Load( param.StringValue("-i"), param.StringValue("-c"), param.StringValue("-dt")) == true) {
+		if (testset.Load( param.StringValue("-t"), param.StringValue("-tc"), param.StringValue("-dt")) == true) {
 			float t_errRate(0);	//test error rate
 			t_errRate = opti->Test(testset);
 			time3 = get_current_time();

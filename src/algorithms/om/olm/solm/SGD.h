@@ -23,7 +23,8 @@ namespace BOC {
          * @Synopsis Constructors
          */
     public:
-        SGD(LossFunction<FeatType, LabelType> &lossFunc) : SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+        SGD(LossFunction<FeatType, LabelType> &lossFunc) : 
+            SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
             this->id_str = "SGD";
         }
 

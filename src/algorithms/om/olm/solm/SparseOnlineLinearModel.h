@@ -57,92 +57,92 @@ namespace BOC {
              * @Synopsis EndTrain called when a train ends
              */
             virtual void EndTrain() {
-                OnlineLinearModel<FeatType, LabelType>::EndTrain();
-
                 //eliminate weights smaller than sparse_soft_thresh
-                for (IndexType i = 1; i < this->weightDim; i++){
-                    if (this->weightVec[i] < this->sparse_soft_thresh &&
-                            this->weightVec[i] > -this->sparse_soft_thresh){
-                        this->weightVec[i] = 0;
-                    }
-                }
-            }
+				for (IndexType i = 1; i < this->weightDim; i++){
+					if (this->weightVec[i] < this->sparse_soft_thresh &&
+						this->weightVec[i] > -this->sparse_soft_thresh){
+						this->weightVec[i] = 0;
+					}
+				}
 
-        protected:
-            /**
-             * @Synopsis SaveModelConfig save configuration of model to disk
-             *
-             * @Param os ostream object to which config are saved
-             *
-             * @Returns true if saved successfully
-             */
-            virtual bool SaveModelConfig(std::ofstream &os) {
-                OnlineLinearModel<FeatType, LabelType>::SaveModelConfig(os);
+				OnlineLinearModel<FeatType, LabelType>::EndTrain();
+			}
 
-                //l1 regularization
-                os << "lambda: "<< this->lambda<< "\n";
+	protected:
+		/**
+		 * @Synopsis SaveModelConfig save configuration of model to disk
+		 *
+		 * @Param os ostream object to which config are saved
+		 *
+		 * @Returns true if saved successfully
+		 */
+		virtual bool SaveModelConfig(std::ofstream &os) {
+			OnlineLinearModel<FeatType, LabelType>::SaveModelConfig(os);
 
-                return true;
-            }
+			//l1 regularization
+			os << "lambda: " << this->lambda << "\n";
 
-            /**
-             * @Synopsis LoadModelConfig load configuration of model from disk
-             *
-             * @Param is istream object from which config are loaded
-             *
-             * @Returns true if load successfully
-             */
-            virtual bool LoadModelConfig(std::ifstream &is) {
-                OnlineLinearModel<FeatType, LabelType>::LoadModelConfig(is);
+			return true;
+		}
 
-                string line;
-                //l1 regularization
-                getline(is,line, ':');
-                is >> this->lambda;
-                getline(is,line);
+		/**
+		 * @Synopsis LoadModelConfig load configuration of model from disk
+		 *
+		 * @Param is istream object from which config are loaded
+		 *
+		 * @Returns true if load successfully
+		 */
+		virtual bool LoadModelConfig(std::ifstream &is) {
+			OnlineLinearModel<FeatType, LabelType>::LoadModelConfig(is);
 
-                return true;
-            }
+			string line;
+			//l1 regularization
+			getline(is, line, ':');
+			is >> this->lambda;
+			getline(is, line);
 
-            /**
-             * @Synopsis newly defined functions
-             */
-        public:
-            /**
-             * @Synopsis GetSparseRate get the sparse rate of linear model
-             *
-             * @Param total_len users specified dimension of weights
-             *
-             * @Returns sparse rate
-             */
-            float GetSparseRate(IndexType total_len = 0) {
-                if (this->weightDim == 1)
-                    return 1;
-                IndexType zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
+			return true;
+		}
 
-                if (total_len > 0)
-                    return zeroNum / (float)total_len;
-                else
-                    return zeroNum / (float)(this->weightDim - 1);
-            }
+		/**
+		 * @Synopsis newly defined functions
+		 */
+	public:
+		/**
+		 * @Synopsis GetSparseRate get the sparse rate of linear model
+		 *
+		 * @Param total_len users specified dimension of weights
+		 *
+		 * @Returns sparse rate
+		 */
+		float GetSparseRate(IndexType total_len = 0) {
+			if (this->weightDim == 1)
+				return 1;
+			IndexType zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
 
-            /**
-             * @Synopsis GetNonZeroNum get the number of nonzero weights
-             *
-             * @Returns number of nonzero weights
-             */
-            IndexType GetNonZeroNum() {
-                IndexType non_zeroNum(0);
-                if (this->weightDim == 1)
-                    return 0;
+			if (total_len > 0)
+				return zeroNum / (float)total_len;
+			else
+				return zeroNum / (float)(this->weightDim - 1);
+		}
 
-                for (IndexType i = 1; i < this->weightDim; i++) {
-                    if (this->weightVec[i] != 0)
-                        non_zeroNum++;
-                }
-                return non_zeroNum;
-            }
-    };
+		/**
+		 * @Synopsis GetNonZeroNum get the number of nonzero weights
+		 *
+		 * @Returns number of nonzero weights
+		 */
+		IndexType GetNonZeroNum() {
+			IndexType non_zeroNum(0);
+			if (this->weightDim == 1)
+				return 0;
+
+			for (IndexType i = 1; i < this->weightDim; i++) {
+				if (this->weightVec[i] != 0)
+					non_zeroNum++;
+			}
+			return non_zeroNum;
+		}
+	};
 
 }
 

@@ -8,78 +8,93 @@
 #ifndef HEADER_SOFS
 #define HEADER_SOFS
 
+#include "SparseOnlineLinearModel.h"
+#include "../../../../utils/MaxHeap.h"
 
-#include "../utils/util.h"
-#include "Optimizer.h"
-#include "MaxHeap.h"
-#include <algorithm>
-#include <math.h>
-#include <vector>
-
-namespace SOL {
+/**
+*  namespace: Batch and Online Classification
+*/
+namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class SOFS: public Optimizer<FeatType, LabelType> {
+	class SOFS : public SparseOnlineLinearModel<FeatType, LabelType> {
 	protected:
 		float r;
 		s_array<float> sigma_w;
-
 		MaxHeap<float> heap;
-
 		IndexType K; //keep top K elemetns
 
 	public:
-		SOFS(DataSet<FeatType, LabelType> &dataset, 
-			LossFunction<FeatType, LabelType> &lossFunc);
-		virtual ~SOFS();
+		SOFS(LossFunction<FeatType, LabelType> &lossFunc) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+				this->id_str = "Second Order Online Feature Selection";
+				this->r = 0;
+				this->K = 0;
+				this->sigma_w.resize(this->weightDim);
 
-	public:
-		void SetParameterEx(int k, float r = -1);
-		//select the best parameters for the model
-		virtual void BestParameter();
+			}
+		virtual ~SOFS(){
+		}
+
 		/**
-		* PrintOptInfo print the info of optimization algorithm
-		*/
+		 * @Synopsis inherited functions
+		 */
+	public:
+		/**
+		 * PrintOptInfo print the info of optimization algorithm
+		 */
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
-			printf("Algorithm: %s\n\n",this->Id_Str().c_str());
-			printf("k:\t%d\n", this->K);
-			printf("r:\t%g\n\n", this->r);
+			printf("Algorithm: %s\n\n", this->Id_Str().c_str());
+			printf("\tk:\t%d\n", this->K);
+			printf("\tr:\t%g\n", this->r);
 		}
-	protected:
-		//this is the core of different updating algorithms
-		virtual float UpdateWeightVec(const DataPoint<FeatType, LabelType> &x);
-		//reset the optimizer to this initialization
-		virtual void BeginTrain();
-		//called when a train ends
-		virtual void EndTrain();
 
-		//Change the dimension of weights
-		virtual void UpdateWeightSize(IndexType newDim);
-	};
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param) {
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			this->K = param.IntValue("-k");
+			this->r = param.FloatValue("-r");
+			if (this->K < 1) {
+				cerr << "Please specify a valid number of weights to keep!\n";
+				cerr << "current number: " << this->K << endl;
+				exit(0);
+			}
+		}
 
-	template <typename FeatType, typename LabelType>
-	SOFS<FeatType, LabelType>::SOFS(DataSet<FeatType, LabelType> &dataset, 
-		LossFunction<FeatType, LabelType> &lossFunc):
-	Optimizer<FeatType, LabelType>(dataset, lossFunc){
-		this->id_str = "Second Order Online Feature Selection";
-		this->r = init_r;
-		this->K = 0;
-		this->sigma_w.resize(this->weightDim);
-	}
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
-	template <typename FeatType, typename LabelType>
-	SOFS<FeatType, LabelType>::~SOFS() {
-	}
+			if (this->K < 1){
+				cerr << "Please specify a valid number of weights to keep!\n";
+				cerr << "current number: " << this->K << endl;
+				exit(0);
+			}
+			if (this->weightDim < this->K + 1){
+				this->UpdateModelDimention(this->K); //remove the bais term
+			}
+			this->sigma_w.set_value(1);
+			heap.Init(this->weightDim - 1, this->K, this->sigma_w.begin + 1);
+		}
 
-	//this is the core of different updating algorithms
-	//return the predict
-	template <typename FeatType, typename LabelType>
-	float SOFS<FeatType,LabelType>::UpdateWeightVec(
-		const DataPoint<FeatType, LabelType> &x) {
+		/**
+		 * @Synopsis Iterate Iteration of online learning
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  prediction of the current example
+		 */
+		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
 			float y = this->Predict(x);
 			//y /= this->curIterNum;
 			float alpha_t = 1 - x.label * y;
-			if(alpha_t > 0){
+			if (alpha_t > 0){
 				IndexType index_i = 0;
 				size_t featDim = x.indexes.size();
 				//calculate beta_t
@@ -113,87 +128,29 @@ namespace SOL {
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 			}
 			return y;
-	}
-
-	//reset the optimizer to this initialization
-	template <typename FeatType, typename LabelType>
-	void SOFS<FeatType, LabelType>::BeginTrain() {
-		Optimizer<FeatType, LabelType>::BeginTrain();
-		if (this->K < 1){
-			cerr << "Please specify a valid number of weights to keep!\n";
-			cerr << "current number: " << this->K << endl;
-			exit(0);
 		}
-		if (this->weightDim < this->K + 1){
-			this->UpdateWeightSize(this->K); //remove the bais term
-		}
-		this->sigma_w.set_value(1);
-		heap.Init(this->weightDim - 1, this->K, this->sigma_w.begin + 1);
-		//this->is_normalize = true; //AROW requires normalization
-	}
 
-	//called when a train ends
-	template <typename FeatType, typename LabelType>
-	void SOFS<FeatType, LabelType>::EndTrain() {
-		Optimizer<FeatType, LabelType>::EndTrain();
-	}
+		/**
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) {
+			if (new_dim < this->weightDim)
+				return;
+			else {
+				this->sigma_w.reserve(new_dim + 1);
+				this->sigma_w.resize(new_dim + 1);  //reserve the 0-th
+				//set the rest to 1
+				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
+					this->sigma_w.end, 1);
+				heap.UpdateDataNum(new_dim, this->sigma_w.begin + 1);
 
-	template <typename FeatType, typename LabelType>
-	void SOFS<FeatType, LabelType>::SetParameterEx(int k, float r) {
-		if (k < 1){
-			cerr << "Please specify a valid number of weights to keep!\n";
-			cerr << "current number: " << this->K << endl;
-			exit(0);
-		}
-		else
-			this->K = k;
-		this->r = r > 0 ? r : this->r;
-	}
-
-	//Change the dimension of weights
-	template <typename FeatType, typename LabelType>
-	void SOFS<FeatType, LabelType>::UpdateWeightSize(IndexType newDim) {
-		if (newDim < this->weightDim)
-			return;
-		else {
-			this->sigma_w.reserve(newDim + 1);
-			this->sigma_w.resize(newDim + 1);  //reserve the 0-th
-			//set the rest to 1
-			this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
-				this->sigma_w.end, 1);
-
-			heap.UpdateDataNum(newDim, this->sigma_w.begin + 1);
-			Optimizer<FeatType, LabelType>::UpdateWeightSize(newDim);
-		}
-	}
-
-	//get the best model parameter
-	template <typename FeatType, typename LabelType>
-	void SOFS<FeatType, LabelType>::BestParameter() {
-		//first learn the best learning rate
-		float prevLambda = this->lambda;
-		this->lambda = 0;
-
-		//Select the best eta0
-		float min_errorRate = 1;
-		float bestr = 1;
-
-		for (float r_temp = init_r_min; r_temp <= init_r_max; r_temp *= init_r_step) {
-			cout << "r = " << r_temp << "\n";
-			this->r = r_temp;
-			float errorRate(0);
-			errorRate = this->Train();
-
-			if (errorRate < min_errorRate) {
-				bestr = r_temp;
-				min_errorRate = errorRate;
+				SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
 			}
-			cout << " mistake rate: " << errorRate * 100 << " %\n";
 		}
 
-		this->r = bestr;
-		this->lambda = prevLambda;
-		cout << "Best Parameter:\tr = " << this->r << "\n\n";
-	}
+	};
 }
 #endif
