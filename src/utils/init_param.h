@@ -33,8 +33,6 @@ namespace BOC {
     static const int init_initial_t = 0;
     //l1 regularization
     static const float init_lambda = 0.0;
-    //sparse soft threshold when counting zero-weights
-    static const float init_sparse_soft_thresh = (float)(1e-5);
     //truncate gradients every K steps
     static const int init_k = 10;
     //gammarou in enchanced RDA

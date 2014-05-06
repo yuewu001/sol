@@ -9,7 +9,7 @@
 #define HEADER_BASIC_IO
 
 #include "io_interface.h"
-#include <cstdio>
+#include <stdio.h>
 
 namespace BOC{
     class basic_io: public io_interface {

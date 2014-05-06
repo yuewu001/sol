@@ -16,11 +16,9 @@
 #include "parser.h"
 
 #include <stdio.h>
-#include <vector>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <cmath>
 
 using namespace std;
 

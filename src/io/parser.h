@@ -7,8 +7,9 @@
 
 #ifndef HEADER_PARSER
 #define HEADER_PARSER
-#include <cstdio>
-#include <cmath>
+
+#include <stdio.h>
+#include <math.h>
 
 namespace BOC{
 

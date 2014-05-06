@@ -7,7 +7,7 @@
 #ifndef HEADER_IO_INTERFACE_
 #define HEADER_IO_INTERFACE_
 
-#include <cstdio>
+#include <stdio.h>
 
 namespace BOC{
     class io_interface{

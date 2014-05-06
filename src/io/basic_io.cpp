@@ -7,8 +7,8 @@
 
 #include "basic_io.h"
 
-#include <cstring>
-#include <cstdlib>
+#include <string>
+#include <stdlib.h>
 
 using namespace std;
 

@@ -8,8 +8,6 @@
 
 #include "utils/util.h"
 
-#include "io/OnlineDataSet.h"
-#include "io/MPDataSet.h"
 #include "io/sol_io.h"
 #include "loss/sol_loss.h"
 
@@ -19,13 +17,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <cmath>
 
 using namespace std;
 using namespace BOC;
 
 #define FeatType float
 #define LabelType char
+
+#define ALGO Ada_FOBOS
 
 int main(int argc, const char** args) {
 	//check memory leak in VC++
@@ -74,7 +73,7 @@ int main(int argc, const char** args) {
 		return -1;
 	}
 
-	SGD<FeatType, LabelType> *model = new SGD<FeatType, LabelType>(*lossFunc);
+	ALGO<FeatType, LabelType> *model = new ALGO<FeatType, LabelType>(*lossFunc);
 	OnlineOptimizer<FeatType, LabelType> *opti = new OnlineOptimizer<FeatType, LabelType>(*model, *pDataset);
 	if (opti == NULL) {
 		delete lossFunc;
@@ -105,11 +104,9 @@ int main(int argc, const char** args) {
 	double time3 = 0;
 	//test the model
 	bool is_test = param.StringValue("-tc").length() > 0 || param.StringValue("-t").length() > 0;
-	is_test = false;
-	/*
 	if (is_test) {
 		OnlineDataSet<FeatType, LabelType> testset(1, param.IntValue("-bs"), param.IntValue("-cs"));
-		if (testset.Load(param.StringValue("-t"), param.StringValue("-tc"), param.StringValue("-dt")) == true) {
+		if (testset.Load( param.StringValue("-i"), param.StringValue("-c"), param.StringValue("-dt")) == true) {
 			float t_errRate(0);	//test error rate
 			t_errRate = opti->Test(testset);
 			time3 = get_current_time();
@@ -119,7 +116,6 @@ int main(int argc, const char** args) {
 		else
 			cout << "load test set failed!" << endl;
 	}
-    */
 
 	printf("Non-Zero weight number: %u\n", model->GetNonZeroNum());
 	printf("Sparsification Rate: %g %%\n", sparseRate * 100);

@@ -46,7 +46,7 @@ namespace BOC {
             /**
              * @Synopsis SetParameter set parameters for the learning model
              *
-             * @Param param_map
+             * @Param param
              */
 			virtual void SetParameter(BOC::Params &param){
                 OnlineLinearModel<FeatType, LabelType>::SetParameter(param);

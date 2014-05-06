@@ -7,7 +7,6 @@
 
 #ifndef HEADER_THREAD_PRIMITIVE
 #define HEADER_THREAD_PRIMITIVE
-using namespace std;
 
 namespace BOC {
 #ifdef _WIN32

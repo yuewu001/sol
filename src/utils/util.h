@@ -7,8 +7,6 @@
 #ifndef HEADER_UTIL
 #define HEADER_UTIL
 
-#include "init_param.h"
-
 #include <cstring>
 #include <numeric>
 #include <math.h>

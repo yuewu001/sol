@@ -5,12 +5,13 @@
   > Functions: customized array
  ************************************************************************/
 
-#pragma once 
+#ifndef HEADER_S_ARRAY
+#define HEADER_S_ARRAY
 
 #include <iostream>
-#include <cstdlib>
+#include <string>
 #include <stdexcept>
-#include <cstring>
+#include <stdlib.h>
 
 namespace BOC{
     //the difference of s_array with vector is that vector copies the data, while
@@ -162,3 +163,5 @@ namespace BOC{
 		~s_array() { this->release(); }
 	};
 }
+
+#endif

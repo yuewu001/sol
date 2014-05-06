@@ -11,7 +11,7 @@ namespace BOC{
         DataSet<FeatType, LabelType>* getDataSet(int passNum, int buf_size, string dt_type, int mp_buf_size){
             ToLowerCase(dt_type);
             if (dt_type == "none")
-                return new BOC::OnlineDataSet<FeatType, LabelType>(passNum, buf_size, init_chunk_size);
+                return new BOC::OnlineDataSet<FeatType, LabelType>(passNum, buf_size, 256);
 			/*
             else if (dt_type == "all")
                 return new BOC::MPDataSet<FeatType, LabelType>(passNum, buf_size, MPBufferType_ALL,mp_buf_size);

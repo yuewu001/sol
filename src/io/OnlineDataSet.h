@@ -7,10 +7,11 @@
 #ifndef HEADER_ONLINE_DATASET
 #define HEADER_ONLINE_DATASET
 
-#include "DataSet.h"
 
 #include "OnlineBuffer.h"
 #include "OnlineDataSetHelper.h"
+
+#include "DataSet.h"
 
 #include <sstream>
 
@@ -31,7 +32,8 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineDataSet(int passes, int buf_size, int chunk_size) : online_buf(buf_size, chunk_size) {
+		OnlineDataSet(int passes, int buf_size, int chunk_size) : 
+			online_buf(buf_size, chunk_size), DataSet<FeatType, LabelType>() {
 			if (passes < 1) {
 				std::ostringstream oss;
 				oss << "number of passes should be no less than 1, while " << passes << " is specified!";

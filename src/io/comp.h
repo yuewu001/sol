@@ -8,6 +8,8 @@
 #ifndef HEADER_COMP_ALGO
 #define HEADER_COMP_ALGO
 
+#include "../utils/s_array.h"
+
 #include <stdint.h>
 
 #if defined(_MSC_VER) && defined(_DEBUG)

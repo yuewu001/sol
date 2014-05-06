@@ -9,8 +9,8 @@
 #include "util.h"
 #include "init_param.h"
 
+#include <stdlib.h>
 #include <iostream>
-#include <cstdlib>
 #include <stdexcept>
 
 using namespace std;

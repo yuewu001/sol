@@ -13,8 +13,7 @@
 
 #include "../utils/MaxHeap.h"
 
-#include <ctime>
-#include <limits>
+#include <time.h>
 
 namespace BOC{
 
