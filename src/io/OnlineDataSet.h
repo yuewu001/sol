@@ -53,27 +53,27 @@ namespace BOC {
 		 *
 		 * @Returns
 		 */
-		virtual bool Load(DataReader<FeatType, LabelType> *ext_reader, const string& cache_filename) {
+		virtual bool Load(DataReader<FeatType, LabelType> *ext_reader, const string& cache_fileName) {
 			//already cached
-			if (SOL_ACCESS(cache_filename.c_str()) == 0) {
+			if (SOL_ACCESS(cache_fileName.c_str()) == 0) {
 				this->delete_reader();
-				this->cache_fileName = cache_filename;
-				this->self_reader = getReader<FeatType, LabelType>(cache_fiename, "cache");
+				this->cache_filename = cache_fileName;
+				this->self_reader =  getReader<FeatType, LabelType>(cache_fileName, "cache");
 
 				return this->Load(this->self_reader);
 			}
 			//not cached, but ext_reader is ok
 			else if (ext_reader != NULL) {
-				if (cache_filename.length() > 0){
-					this->cache_fileName = cache_filename;
+				if (cache_fileName.length() > 0){
+					this->cache_filename = cache_fileName;
 					return this->Load(ext_reader, true);
 				}
 				else if (this->pass_num > 1){
-					this->cache_fileName = "cache_file";
+					this->cache_filename = "cache_file";
 					return this->Load(ext_reader, true);
 				}
 				else{
-					this->cache_fileName.clear();
+					this->cache_filename.clear();
 					return this->Load(ext_reader, false);
 				}
 			}
@@ -131,7 +131,7 @@ namespace BOC {
 		 *
 		 * @Returns reference to a chunk of data
 		 */
-		inline virtual DataChunk<FeatType, LabelType>& GetChunk() {
+		virtual DataChunk<FeatType, LabelType>& GetChunk() {
 			return this->online_buf.GetChunk();
 		}
 
@@ -153,7 +153,7 @@ namespace BOC {
 		 * @Synopsis Rewind Reset the reader to the beginning
 		 */
 		virtual void Rewind() {
-			if (this->online_buf.Rewind() == true){
+			if (this->online_buf.BeginWriteChunk() == true){
 				this->reader->Rewind();
 				this->threadLoad();
 			}
@@ -165,7 +165,7 @@ namespace BOC {
 			HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType, LabelType>), this, NULL, NULL);
 #else
 			pthread_t thread;
-			pthread_create(&thread,NULL,thread_LoadData<FeatType,LabelType>,this);
+			pthread_create(&thread, NULL, thread_LoadData<FeatType, LabelType>, this);
 #endif
 		}
 	};

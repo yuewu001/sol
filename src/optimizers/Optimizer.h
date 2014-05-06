@@ -52,13 +52,12 @@ namespace BOC{
 		 * @Returns
 		 */
 		float Test(DataSet<FeatType, LabelType> &testSet) {
-			if (testSet.Rewind() == false)
-				return 1.f;
+			testSet.Rewind();
 			float errorRate(0);
 			//double test_time = 0;
 			//test
 			while (1) {
-				const DataChunk<FeatType, LabelType> &chunk = testSet.GetChunk(true);
+				const DataChunk<FeatType, LabelType> &chunk = testSet.GetChunk();
 				//double time1 = get_current_time();
 				if (chunk.dataNum == 0) //"all the data has been processed!"
 					break;
@@ -93,7 +92,8 @@ namespace BOC{
 		 */
 		bool Reset() {
 			this->update_times = 0;
-			return this->dataSet.Rewind();
+			this->dataSet.Rewind();
+			return true;
 		}
 	};
 }

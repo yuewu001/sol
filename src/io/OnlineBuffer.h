@@ -132,7 +132,7 @@ namespace BOC {
                 this->chunk_size = 0;
 
                 mutex_unlock(&this->data_lock);
-                return this->true;
+                return true;
             } 
 
             /**
@@ -223,7 +223,7 @@ namespace BOC {
              *
              * @Returns reference to a chunk of data
              */
-			inline virtual const ElemType& GetChunk() {
+			inline virtual ElemType& GetChunk() {
 				mutex_lock(&this->data_lock);
 				//check if there is available data
 				if (this->rd_ptr->is_parsed == true){

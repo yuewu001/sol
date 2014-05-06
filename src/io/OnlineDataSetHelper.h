@@ -81,17 +81,17 @@ namespace BOC{
      * @tparam T1
      * @tparam T2
      * @Param cacher
-     * @Param cache_fileName
+     * @Param cache_filename
      *
      * @Returns 
      */
 	template <typename T1, typename T2>
-	bool end_cache(libsvm_binary_<T1, T2>**cacher, const std::string& cache_fileName){
+	bool end_cache(libsvm_binary_<T1, T2>**cacher, const std::string& cache_filename){
 		string tmpFileName = (*cacher)->get_filename();
 		(*cacher)->Close();
 		delete *cacher;
 		*cacher = NULL;	
-		return rename_file(tmpFileName, cache_fileName);
+		return rename_file(tmpFileName, cache_filename);
 	}
 
     /**
@@ -112,7 +112,7 @@ namespace BOC{
 			return false;
 		}
 
-		libsvm_binary_<T1,T2>* writer = get_cacher<T1,T2>(dataset->cache_fileName);
+		libsvm_binary_<T1,T2>* writer = get_cacher<T1,T2>(dataset->cache_filename);
 		if (writer == NULL)
 			return false;
 
@@ -122,13 +122,13 @@ namespace BOC{
 			FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
 			not_file_end = load_chunk(reader, chunk);
 			if (save_chunk(writer, chunk) == false){
-				dataset->EndWriteChunk();
+				dataset->EndWriteChunk(chunk);
 				break;
 			}
-			dataset->EndWriteChunk();
+			dataset->EndWriteChunk(chunk);
 		}while(not_file_end == true);
 		if (reader->Good() && writer->Good()) 
-			return end_cache(&writer, dataset->cache_fileName);
+			return end_cache(&writer, dataset->cache_filename);
 		else
 			return false;
 	}
@@ -164,10 +164,10 @@ namespace BOC{
 			}
             pass++;
             //multi-pass
-            if (pass< dataset->passNum){
+            if (pass< dataset->pass_num){
                 //setup the new cache-file reader
                 dataset->delete_reader();
-                dataset->self_reader = new libsvm_binary_<T1,T2>(dataset->cache_fileName);
+                dataset->self_reader = new libsvm_binary_<T1,T2>(dataset->cache_filename);
                 dataset->reader = dataset->self_reader;
                 dataset->is_cache = false;
                 if (dataset->reader->OpenReading() == false){
@@ -180,14 +180,14 @@ namespace BOC{
         }
 
         //online algorithms will run multiple times
-        for (;pass < dataset->passNum; pass++) {
+        for (;pass < dataset->pass_num; pass++) {
             reader->Rewind();
             if (reader->Good()) {
                 bool not_file_end = false;
                 do {
                     FixSizeDataChunk<T1,T2> &chunk = dataset->GetWriteChunk();
                     not_file_end = load_chunk(reader, chunk);
-                    dataset->EndWriteChunk();
+                    dataset->EndWriteChunk(chunk);
                 }while(not_file_end == true);
                 if (reader->Good() == false) {
                     cerr<<"Load cached dataset failed!"<<endl;

@@ -13,174 +13,152 @@
 
 #include <stdexcept>
 #include <string>
-#include <map>
 using std::string;
-using std::map;
 
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
-    template <typename FeatType, typename LabelType> 
-    class LearnModel {
-        protected:
-            LossFunction<FeatType, LabelType> *lossFunc;
-        protected:
-            string id_str; //identification string
+	template <typename FeatType, typename LabelType>
+	class LearnModel {
+	protected:
+		LossFunction<FeatType, LabelType> *lossFunc;
+	protected:
+		string id_str; //identification string
 
-        public:
-            LearnModel(LossFunction<FeatType, LabelType> &lossFunc){
-                this->lossFunc = &lossFunc;
-            }
+	public:
+		LearnModel(LossFunction<FeatType, LabelType> &lossFunc){
+			this->lossFunc = &lossFunc;
+		}
 
-            virtual ~LearnModel() {
-            }
+		virtual ~LearnModel() {
+		}
 
-            /**
-             * @Synopsis Id_Str get the identification string of the learning model
-             *
-             * @Returns name of the learning model
-             */
-            const string& Id_Str() const { return this->id_str; }
+		/**
+		 * @Synopsis Id_Str get the identification string of the learning model
+		 *
+		 * @Returns name of the learning model
+		 */
+		const string& Id_Str() const { return this->id_str; }
 
-            /**
-             * PrintOptInfo print the info of optimization algorithm
-             */
-            virtual void PrintOptInfo() const {
-                if (this->id_str.length() == 0){
-                    throw runtime_error("algorithm name must be specified!");
-                }
-                printf("--------------------------------------------------\n");
-            }
+		/**
+		 * PrintOptInfo print the info of optimization algorithm
+		 */
+		virtual void PrintOptInfo() const {
+			if (this->id_str.length() == 0){
+				throw runtime_error("algorithm name must be specified!");
+			}
+			printf("--------------------------------------------------\n");
+		}
 
-        public:
-            /**
-             * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-             */
-            virtual void BeginTrain() = 0;
+	public:
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() = 0;
 
-            /**
-             * @Synopsis EndTrain called when a train ends
-             */
-            virtual void EndTrain() = 0;
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() = 0;
 
-			/**
-			 * @Synopsis UpdateModelDimention update dimension of the model,
-			 * often caused by the increased dimension of data
-			 *
-			 * @Param new_dim new dimension
-			 */
-			virtual void UpdateModelDimention(IndexType new_dim) = 0;
+		/**
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) = 0;
 
-            /**
-             * @Synopsis Test_Predict prediction function for test
-             *
-             * @Param data input data sample
-             *
-             * @Returns predicted value
-             */
-            virtual float Test_Predict(const DataPoint<FeatType, LabelType> &data)  = 0;
+		/**
+		 * @Synopsis Test_Predict prediction function for test
+		 *
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value
+		 */
+		virtual float Test_Predict(const DataPoint<FeatType, LabelType> &data) = 0;
 
-            /**
-             * @Synopsis Predict prediction function for training
-             *
-             * @Param data input data sample
-             *
-             * @Returns predicted value
-             */
-            virtual float Predict(const DataPoint<FeatType, LabelType> &data) = 0;
+		/**
+		 * @Synopsis Predict prediction function for training
+		 *
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value
+		 */
+		virtual float Predict(const DataPoint<FeatType, LabelType> &data) = 0;
 
-            /**
-             * @Synopsis SaveModel save model to disk
-             *
-             * @Param filename  name to the saved file
-             *
-             * @Returns true if saved successfully
-             */
-            virtual bool SaveModel(const string& filename) = 0;
+		/**
+		 * @Synopsis SaveModel save model to disk
+		 *
+		 * @Param filename  name to the saved file
+		 *
+		 * @Returns true if saved successfully
+		 */
+		virtual bool SaveModel(const string& filename) = 0;
 
-            /**
-             * @Synopsis LoadModel load model from disk
-             *
-             * @Param filename path name of the model on disk
-             *
-             * @Returns true if load successfully
-             */
-            virtual bool LoadModel(const string& filename) = 0;
+		/**
+		 * @Synopsis LoadModel load model from disk
+		 *
+		 * @Param filename path name of the model on disk
+		 *
+		 * @Returns true if load successfully
+		 */
+		virtual bool LoadModel(const string& filename) = 0;
 
-        protected:
-            /**
-             * @Synopsis SaveModelConfig save configuration of model to disk
-             *
-             * @Param os ostream object to which config are saved
-             *
-             * @Returns true if saved successfully
-             */
-            virtual bool SaveModelConfig(std::ofstream &os) = 0;
+	protected:
+		/**
+		 * @Synopsis SaveModelConfig save configuration of model to disk
+		 *
+		 * @Param os ostream object to which config are saved
+		 *
+		 * @Returns true if saved successfully
+		 */
+		virtual bool SaveModelConfig(std::ofstream &os) = 0;
 
-            /**
-             * @Synopsis LoadModelConfig load configuration of model from disk
-             *
-             * @Param is istream object from which config are loaded
-             *
-             * @Returns true if load successfully
-             */
-            virtual bool LoadModelConfig(std::ifstream &is) = 0;
+		/**
+		 * @Synopsis LoadModelConfig load configuration of model from disk
+		 *
+		 * @Param is istream object from which config are loaded
+		 *
+		 * @Returns true if load successfully
+		 */
+		virtual bool LoadModelConfig(std::ifstream &is) = 0;
 
-            /**
-             * @Synopsis  SaveModelValue save model value to disk
-             *
-             * @Param os ostream object to which values are saved
-             *
-             * @Returns true if saved successfully
-             */
-            virtual bool SaveModelValue(std::ofstream &os) = 0;
+		/**
+		 * @Synopsis  SaveModelValue save model value to disk
+		 *
+		 * @Param os ostream object to which values are saved
+		 *
+		 * @Returns true if saved successfully
+		 */
+		virtual bool SaveModelValue(std::ofstream &os) = 0;
 
-            /**
-             * @Synopsis LoadModelConfig load values of model from disk
-             *
-             * @Param is istream object from which values are loaded
-             *
-             * @Returns true if load successfully
-             */
-            virtual bool LoadModelValue(std::ifstream &is) = 0;
+		/**
+		 * @Synopsis LoadModelConfig load values of model from disk
+		 *
+		 * @Param is istream object from which values are loaded
+		 *
+		 * @Returns true if load successfully
+		 */
+		virtual bool LoadModelValue(std::ifstream &is) = 0;
 
-            /**
-             * @Synopsis common functions
-             */
-        public:
-            /**
-             * @Synopsis IsCorrect Judge if the predict is correct
-             *
-             * @Param label true label
-             * @Param predict predicted label
-             *
-             * @Returns true if correctly predicted
-             */
-            virtual inline bool IsCorrect(LabelType label, float predict) {
-                return this->lossFunc->IsCorrect(label,predict);
-            }
-
-        protected:
-            /**
-             * @Synopsis ParseParam parse param from a config map
-             *
-             * @tparam NumericType type of the value to be parsed
-             * @Param param_map configuration map
-             * @Param param_name name of the parameter
-             *
-             * @Returns true if param found in the config and parsed correctly
-             */
-            template <typename NumericType>
-            bool ParseParam(std::map<std::string, char*> param_map, const std::string & param_name, NumericType &val){
-                std::map<std::string, char*>::iterator iter = param_map.find(param_name);
-                if (iter != param_map.end()){
-                    val = static_cast<NumericType>(*(iter->second));
-                    return true;
-                }
-                return false;
-            }
-    };
+		/**
+		 * @Synopsis common functions
+		 */
+	public:
+		/**
+		 * @Synopsis IsCorrect Judge if the predict is correct
+		 *
+		 * @Param label true label
+		 * @Param predict predicted label
+		 *
+		 * @Returns true if correctly predicted
+		 */
+		virtual inline bool IsCorrect(LabelType label, float predict) {
+			return this->lossFunc->IsCorrect(label, predict);
+		}
+	};
 }
 
 #endif

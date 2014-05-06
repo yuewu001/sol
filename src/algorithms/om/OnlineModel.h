@@ -10,8 +10,6 @@
 #include "../LearnModel.h"
 #include "../../utils/Params.h"
 
-#include <map>
-
 /**
 *  namespace: Batch and Online Classification
 */

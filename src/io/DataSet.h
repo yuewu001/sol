@@ -12,7 +12,7 @@
 #include "DataChunk.h"
 #include "io_helper.h"
 
-using namespace std;
+#include <string>
 
 /**
  *  namespace: Sparse Online Learning
@@ -22,8 +22,8 @@ namespace BOC {
     template <typename FeatType, typename LabelType> 
 	class DataSet {		
         protected:
-            string fileName;
-            string cache_fileName;
+            std::string filename;
+            std::string cache_filename;
             bool is_cache;
 
             size_t data_num; //total data number
@@ -47,8 +47,8 @@ namespace BOC {
             void delete_reader() {
                 if (this->self_reader != NULL){
                     delete this->self_reader;
+					this->self_reader = NULL;
                 }
-                this->self_reader = NULL;
             }
 
         public:
@@ -61,18 +61,18 @@ namespace BOC {
              *
              * @Returns true if succeed
              */
-            virtual bool Load(const string& filename,  const string& cache_filename, const string &dt_type) {
+            virtual bool Load(const std::string& fileName,  const std::string& cache_fileName, const std::string &dt_type) {
                 //load from file
-                if (SOL_ACCESS(filename.c_str()) == 0) {
+                if (SOL_ACCESS(fileName.c_str()) == 0) {
                     this->delete_reader();
-                    //this->filename = filename;
-                    //this->self_reader = getReader<FeatType, LabelType>(filename, dt_type);
+                    this->filename = fileName;
+                    this->self_reader = getReader<FeatType, LabelType>(this->filename, dt_type);
 
-                    return this->Load(this->self_reader, cache_filename);
+                    return this->Load(this->self_reader, cache_fileName);
                 }
                 //not exist 
                 else {
-                    return this->Load(NULL, cache_filename);
+                    return this->Load(NULL, cache_fileName);
                 }
             }
 
@@ -85,23 +85,23 @@ namespace BOC {
              *
              * @Returns true if succeed
              */
-            virtual bool Load(DataReader<FeatType, LabelType> *ext_reader, const string& Cache_filename) {
+            virtual bool Load(DataReader<FeatType, LabelType> *ext_reader, const std::string& cache_filename) {
                 //already cached
                 if (SOL_ACCESS(cache_filename.c_str()) == 0) {
                     this->delete_reader();
-                    this->cache_fileName = Cache_filename;
-                    this->self_reader = getReader<FeatType, LabelType>(this->cache_fiename, "cache");
+                    this->cache_filename = cache_filename;
+					this->self_reader = NULL;// getReader<FeatType, LabelType>(Cache_fiename, "cache");
 
                     return this->Load(this->self_reader);
                 }
                 //not cached, but ext_reader is ok
                 else if(ext_reader != NULL) {
-                    if (cache_filename.length() > 0){
-                        this->cache_fileName = Cache_filename;
+                    if (this->cache_filename.length() > 0){
+                        this->cache_filename = cache_filename;
                         return this->Load(ext_reader, true);
                     }
                     else{
-                        this->cache_fileName.clear();
+                        this->cache_filename.clear();
                         return this->Load(ext_reader,false);
                     }                 
                 }
@@ -129,7 +129,6 @@ namespace BOC {
                 }
                 return true;
             }
-
 
             /**
              * @Synopsis Data Access

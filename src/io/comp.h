@@ -8,9 +8,11 @@
 #ifndef HEADER_COMP_ALGO
 #define HEADER_COMP_ALGO
 
-#include "DataPoint.h"
-#include <assert.h>
 #include <stdint.h>
+
+#if defined(_MSC_VER) && defined(_DEBUG)
+#include <assert.h>
+#endif
 
 namespace BOC{
 
@@ -77,7 +79,9 @@ namespace BOC{
             last = index;
             indexes.push_back(index);
         }
+#if defined(_MSC_VER) && defined(_DEBUG)
         assert(p == codes.end );
+#endif
     }
 }
 #endif

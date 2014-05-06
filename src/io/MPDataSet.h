@@ -23,7 +23,7 @@ namespace BOC {
 
         public:
             MPDataSet(int passes = 1, int buf_size = -1, MPBufferType buf_type = MPBufferType_None, int mp_buf_size = init_mp_buf_size):
-				OnlineDataSet<FeatType, LabelType>(passes, buf_size){
+				OnlineDataSet<FeatType, LabelType>(passes, buf_size, 256){
 				switch (buf_type)
 				{
 				case BOC::MPBufferType_None:
@@ -50,7 +50,7 @@ namespace BOC {
 
 
 			//get the data to read
-			virtual FixSizeDataChunk<FeatType, LabelType>& GetChunk(bool is_test = false) {
+			virtual ChunkType& GetChunk(bool is_test = false) {
 				mutex_lock(&this->data_lock);
 				//check if there is available data
 				if (this->rd_ptr->is_parsed == true){

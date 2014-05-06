@@ -102,10 +102,11 @@ int main(int argc, const char** args) {
 	printf("data number: %lu\n", pDataset->size());
 	printf("Learn error rate: %.2f +/- %.2f %%\n", l_errRate * 100, l_varErr * 100);
 
-	/*
 	double time3 = 0;
 	//test the model
 	bool is_test = param.StringValue("-tc").length() > 0 || param.StringValue("-t").length() > 0;
+	is_test = false;
+	/*
 	if (is_test) {
 		OnlineDataSet<FeatType, LabelType> testset(1, param.IntValue("-bs"), param.IntValue("-cs"));
 		if (testset.Load(param.StringValue("-t"), param.StringValue("-tc"), param.StringValue("-dt")) == true) {
@@ -118,15 +119,14 @@ int main(int argc, const char** args) {
 		else
 			cout << "load test set failed!" << endl;
 	}
+    */
 
 	printf("Non-Zero weight number: %u\n", model->GetNonZeroNum());
 	printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 	printf("Learning time: %.3f s\n", (float)(time2 - time1));
 	if (is_test)
 		printf("Test time: %.3f s\n", (float)(time3 - time2));
-<<<<<<< HEAD
 	printf("Update Times: %u\n", opti->GetUpdateTimes());
-    */
 
 	delete lossFunc;
 	delete opti;
