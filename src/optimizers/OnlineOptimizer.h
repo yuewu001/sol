@@ -22,7 +22,7 @@ namespace BOC {
 		 */
 	public:
 		OnlineOptimizer(OnlineModel<FeatType, LabelType> &model, DataSet<FeatType, LabelType> &dataset): 
-			Optimizer(model, dataset){
+			Optimizer<FeatType, LabelType>(model, dataset){
 		}
 
 		virtual ~OnlineOptimizer() {
@@ -51,7 +51,7 @@ namespace BOC {
 				//double time1 = get_current_time();
 				//all the data has been processed!
 				if (chunk.dataNum == 0) {
-					dataSet.FinishRead();
+					this->dataSet.FinishRead();
 					break;
 				}
 

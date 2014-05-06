@@ -27,6 +27,7 @@
 #define SOL_ACCESS(x) access(x,F_OK)
 #endif
 
+#include <cstdlib>
 #include <iostream>
 
 template <typename T>
@@ -157,40 +158,6 @@ inline double get_current_time(){
     gettimeofday(&tim, NULL);
     return tim.tv_sec + tim.tv_usec / 1000000.0;
 #endif
-}
-
-/**
- * @Synopsis str2long parse a C-string to long value
- *
- * @Param c_str input C-String
- * @Param pEnd  point to the next character in str after the numerical value, set by the function.
- * @Param val parsed value
- *
- * @Returns true if successfully
- */
-inline bool str2long(const char* c_str, char** pEnd, long& val){
-    val = std::strtol(c_str, pEnd, 10);
-    if (*pEnd == c_str || errno != 0){
-        fprintf(stderr,"parse %s to long failed!", c_str);
-        return false;
-    }
-}
-
-/**
- * @Synopsis str2double parse a C-string to double value
- *
- * @Param c_str input C-String
- * @Param pEnd  point to the next character in str after the numerical value, set by the function.
- * @Param val parsed value
- *
- * @Returns true if successfully
- */
-inline bool str2double(const char* c_str, char** pEnd, double& val){
-    val = std::strtod(c_str, pEnd);
-    if (*pEnd == c_str || errno != 0){
-        fprintf(stderr,"parse %s to double failed!", c_str);
-        return false;
-    }
 }
 
 template <typename T1, typename T2>
