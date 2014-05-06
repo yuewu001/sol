@@ -7,10 +7,9 @@
 
 #include "basic_io.h"
 
-#include <string>
+#include <cstring>
 #include <stdlib.h>
-
-using namespace std;
+#include <cstdio>
 
 namespace BOC{
     bool basic_io::open_file(const char* filename, const char* mode){
