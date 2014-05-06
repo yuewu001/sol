@@ -18,7 +18,7 @@ namespace BOC {
 				if (tmp > 100.f) return tmp; 
 				else if (tmp < -100.f) return 0.f;
 				else
-					return std::log(1.f + std::exp(tmp));
+					return log(1.f + exp(tmp));
 			}
 
             //aggressive learning 
@@ -29,7 +29,7 @@ namespace BOC {
 				else if (tmp  < -100.f)
 					return (float)(-label); 
 				else
-					return -label / (1.f + std::exp(tmp)); 
+					return -label / (1.f + exp(tmp)); 
 			}
  	};
 }
