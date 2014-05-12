@@ -17,6 +17,7 @@
 namespace BOC {
     template <typename FeatType, typename LabelType>
     class FOFS: public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
         protected:
             IndexType K; //keep top K elemetns
 
@@ -30,7 +31,7 @@ namespace BOC {
             MinHeap<float> minHeap;
 
         public:
-            FOFS(LossFunction<FeatType, LabelType> &lossFunc) :
+            FOFS(LossFunction<FeatType, LabelType> *lossFunc) :
                 SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
                     this->id_str = "First Order Online Feature Selection";
                     this->K = 0;
@@ -157,6 +158,7 @@ namespace BOC {
                 }
             }
     };
+	IMPLEMENT_CLASS(FOFS)
 }
 
 #endif

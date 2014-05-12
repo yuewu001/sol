@@ -19,13 +19,14 @@
 namespace BOC {
     template <typename FeatType, typename LabelType>
     class DAROW : public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
         protected:
             float r;
             s_array<float> sigma_w;
             s_array<size_t> timeStamp;
 
         public:
-            DAROW(LossFunction<FeatType, LabelType> &lossFunc) :
+            DAROW(LossFunction<FeatType, LabelType> *lossFunc) :
                 SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
                     this->id_str = "DAROW";
                     this->r = 0;
@@ -169,6 +170,7 @@ namespace BOC {
             }
 
     };
+	IMPLEMENT_CLASS(DAROW)
 }
 
 #endif

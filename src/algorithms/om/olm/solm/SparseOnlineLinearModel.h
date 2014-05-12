@@ -22,7 +22,7 @@ namespace BOC {
             float sparse_soft_thresh;
 
         public:
-            SparseOnlineLinearModel(LossFunction<FeatType, LabelType> &lossFunc) : 
+            SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) : 
                 OnlineLinearModel<FeatType, LabelType>(lossFunc) {
                     this->lambda = 0;
                     this->sparse_soft_thresh = init_sparse_soft_thresh;

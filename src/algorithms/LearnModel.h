@@ -10,25 +10,30 @@
 
 #include "../loss/LossFunction.h"
 #include "../utils/config.h"
+#include "../utils/reflector.h"
 
 #include <stdexcept>
 #include <string>
+#include <map>
+#include <stdio.h>
 using std::string;
 
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
+
 	template <typename FeatType, typename LabelType>
-	class LearnModel {
+//	class LearnModel : public Registry<FeatType, LabelType> {
+	class LearnModel : public Registry {
 	protected:
 		LossFunction<FeatType, LabelType> *lossFunc;
 	protected:
 		string id_str; //identification string
 
 	public:
-		LearnModel(LossFunction<FeatType, LabelType> &lossFunc){
-			this->lossFunc = &lossFunc;
+		LearnModel(LossFunction<FeatType, LabelType> *lossFunc){
+			this->lossFunc = lossFunc;
 		}
 
 		virtual ~LearnModel() {

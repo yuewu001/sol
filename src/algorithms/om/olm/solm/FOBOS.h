@@ -24,12 +24,13 @@
 namespace BOC {
     template <typename FeatType, typename LabelType>
     class FOBOS: public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
         protected:
             s_array<size_t> timeStamp;
             float (*pEta_time)(size_t t, float pt);
 
         public:
-            FOBOS(LossFunction<FeatType, LabelType> &lossFunc) : 
+            FOBOS(LossFunction<FeatType, LabelType> *lossFunc) : 
                 SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
                     this->id_str = "FOBOS: Forward-Backward Splitting";
                     this->timeStamp.resize(this->weightDim);
@@ -129,6 +130,7 @@ namespace BOC {
                 }
             }
     };
+	IMPLEMENT_CLASS(FOBOS)
 }
 
 #endif

@@ -17,6 +17,7 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class PET: public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
 	protected:
 		IndexType K; //keep top K elemetns
 
@@ -26,7 +27,7 @@ namespace BOC {
 
 		float (*pEta_time)(size_t t, float pt);
 	public:
-		PET(LossFunction<FeatType, LabelType> &lossFunc) :
+		PET(LossFunction<FeatType, LabelType> *lossFunc) :
             SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
                 this->id_str = "Perceptron with Truncation";
                 this->K = 0;
@@ -142,6 +143,7 @@ namespace BOC {
             }
         }
     };
+	IMPLEMENT_CLASS(PET)
 }
 
 #endif

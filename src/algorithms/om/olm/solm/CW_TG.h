@@ -19,6 +19,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 namespace BOC {
     template <typename FeatType, typename LabelType>
     class CW_TG: public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
         protected:
             float r;
             s_array<float> sigma_w;
@@ -28,7 +29,7 @@ namespace BOC {
             size_t iter_num;
 
         public:
-            CW_TG(LossFunction<FeatType, LabelType> &lossFunc) :
+            CW_TG(LossFunction<FeatType, LabelType> *lossFunc) :
                 SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
                     this->id_str = "truncated gradient AROW";
                     this->r = 0;
@@ -185,5 +186,6 @@ namespace BOC {
                 }
             }
     };
+	IMPLEMENT_CLASS(CW_TG)
 }
 #endif

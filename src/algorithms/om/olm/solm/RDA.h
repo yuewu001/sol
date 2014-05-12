@@ -20,6 +20,7 @@ and online optimization[J]. The Journal of Machine Learning Research,
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class RDA: public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
         protected:
             float gamma_rou;
             s_array<float> gtVec; //average gradient vector
@@ -28,7 +29,7 @@ namespace BOC {
              * @Synopsis Constructors
              */
         public:
-            RDA(LossFunction<FeatType, LabelType> &lossFunc) :
+            RDA(LossFunction<FeatType, LabelType> *lossFunc) :
                 SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
                     this->id_str = "enhanced RDA";
                     this->gamma_rou = 0;
@@ -131,6 +132,8 @@ namespace BOC {
             }
 
     };
+
+	IMPLEMENT_CLASS(RDA)
 }
 
 #endif

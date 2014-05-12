@@ -24,7 +24,7 @@ using namespace BOC;
 #define FeatType float
 #define LabelType char
 
-#define ALGO FOFS
+#define ALGO SGD
 
 int main(int argc, const char** args) {
 	//check memory leak in VC++
@@ -34,6 +34,8 @@ int main(int argc, const char** args) {
 	_CrtSetDbgFlag(tmpFlag);
 	//_CrtSetBreakAlloc(170);
 #endif
+
+	InitAlgorithms<FeatType,LabelType>();
 
 	Params param;
 	if (param.Parse(argc, args) == false){
@@ -73,7 +75,10 @@ int main(int argc, const char** args) {
 		return -1;
 	}
 
-	ALGO<FeatType, LabelType> *model = new ALGO<FeatType, LabelType>(*lossFunc);
+//	SGD<FeatType, LabelType> * model = (SGD<FeatType, LabelType>*)Registry<FeatType, LabelType>::CreateObject("SGD",lossFunc);
+	SparseOnlineLinearModel<FeatType, LabelType> * model = (SparseOnlineLinearModel<FeatType, LabelType>*)Registry::CreateObject("Ada_FOBOS",lossFunc);
+	//ALGO<FeatType, LabelType> *model = new ALGO<FeatType, LabelType>(lossFunc);
+
 	OnlineOptimizer<FeatType, LabelType> *opti = new OnlineOptimizer<FeatType, LabelType>(*model, *pDataset);
 	if (opti == NULL) {
 		delete lossFunc;

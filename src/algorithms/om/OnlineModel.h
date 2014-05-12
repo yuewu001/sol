@@ -30,7 +30,7 @@ namespace BOC {
             float eta; 
 
         public:
-            OnlineModel(LossFunction<FeatType, LabelType> &lossFunc) : LearnModel<FeatType, LabelType>(lossFunc){
+            OnlineModel(LossFunction<FeatType, LabelType> *lossFunc) : LearnModel<FeatType, LabelType>(lossFunc){
                 this->curIterNum = 0;
 
 				this->initial_t = 0;

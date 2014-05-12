@@ -21,6 +21,7 @@ This file implements the L1 regularization
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class Ada_FOBOS : public SparseOnlineLinearModel<FeatType, LabelType> {
+		DECLARE_CLASS
 	protected:
 		float delta;
 		s_array<size_t> timeStamp;
@@ -31,7 +32,7 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		Ada_FOBOS(LossFunction<FeatType, LabelType> &lossFunc) :
+		Ada_FOBOS(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
 				this->delta = 0;
 				this->timeStamp.resize(this->weightDim);
@@ -174,6 +175,7 @@ namespace BOC {
 		}
 	};
 
+	IMPLEMENT_CLASS(Ada_FOBOS)
 }
 
 #endif

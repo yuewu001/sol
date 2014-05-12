@@ -26,7 +26,7 @@ namespace BOC {
             IndexType weightDim;
 
         public:
-            OnlineLinearModel(LossFunction<FeatType, LabelType> &lossFunc) : OnlineModel<FeatType, LabelType>(lossFunc) {
+            OnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) : OnlineModel<FeatType, LabelType>(lossFunc) {
                 this->weightDim = 1;
                 //weight vector
                 this->weightVec.resize(this->weightDim);
