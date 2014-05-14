@@ -26,16 +26,22 @@ namespace BOC{
 	inline bool Register(ClassInfo* classInfo);
 
 	class ClassInfo {
-	public:
-		std::string Type;
-		CreateFunction Func;
+	protected:
+		std::string type;
+		std::string description;
+		CreateFunction func;
 
-		ClassInfo(std::string type, CreateFunction func) : Type(type), Func(func){
+	public:
+		const std::string GetType() const { return this->type; }
+		const std::string GetDescr() const { return this->description; }
+	public:
+		ClassInfo(std::string type, std::string descr,  CreateFunction func) :
+			type(type), description(descr), func(func){
 			Register(this);
 		}
 
 		void* CreateObject(void* lossFunc) const {
-			return Func ? (*Func)(lossFunc) : NULL;
+			return func ? (*func)(lossFunc) : NULL;
 		}
 	};
 
@@ -43,8 +49,8 @@ namespace BOC{
 	public:
 		static bool Register(ClassInfo* classInfo){
 		if (classInfo != NULL){
-			if (mapClassInfo.find(classInfo->Type) == mapClassInfo.end()){
-				mapClassInfo[classInfo->Type] = classInfo;
+			if (mapClassInfo.find(classInfo->GetType()) == mapClassInfo.end()){
+				mapClassInfo[classInfo->GetType()] = classInfo;
 				return true;
 			}
 		}
@@ -66,15 +72,21 @@ namespace BOC{
 public: \
 	static ClassInfo classInfo; \
 public:\
-	static void* CreateObject(void *param1);
+	static void* CreateObject(void *param1); \
+	static ClassInfo& GetClassMsg() { return classInfo; }
 
 #define IMPLEMENT_CLASS(name) \
 	template <typename FeatType, typename LabelType> \
-	ClassInfo name<FeatType, LabelType>::classInfo(#name, name<FeatType, LabelType>::CreateObject); \
-    \
+	ClassInfo name<FeatType, LabelType>::classInfo(#name, "", name<FeatType, LabelType>::CreateObject); \
+	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc) \
-	{ return new name<FeatType, LabelType>((LossFunction<FeatType,LabelType>*)lossFunc); }
+	{ return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
+
+#define APPEND_INFO(info,name,T1,T2) \
+	info.append("\n\t"); \
+	info.append(name<T1,T2>::Id_Str());
+	//info.append(name<T1,T2>::GetClassMsg().GetDescr());
 }
 
 #endif

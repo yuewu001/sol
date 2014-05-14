@@ -63,7 +63,8 @@ namespace BOC {
 		if (this->string_storage != NULL) delete[]this->string_storage;
 	}
 
-	void Params::Init(){
+	//void Params::Init(const std::map<std::string, std::vector<std::string> > &algoLossList){
+	void Params::Init() {
 		//initialize params
 		this->option->opt.overview = "Sparse Online Learning Library";
 		option->opt.syntax = "SOL [options] -i train_file";

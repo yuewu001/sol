@@ -43,6 +43,24 @@ namespace BOC {
                 printf("\tl1 regularization: %g\n", this->lambda);
             }
 
+		/**
+		 * PrintOptInfo print the info of trained model
+		 */
+			virtual void PrintModelInfo() const {
+				OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
+
+				IndexType zeroNum = 0;
+				if (this->weightDim == 1){
+					zeroNum = 1;
+				}
+				else{
+					zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
+				}
+
+				double sparseRate = zeroNum / (double)(this->weightDim - 1);
+				printf("Sparsification Rate: %g %%\n", sparseRate * 100);
+			}
+
             /**
              * @Synopsis SetParameter set parameters for the learning model
              *
@@ -108,30 +126,13 @@ namespace BOC {
 		 * @Synopsis newly defined functions
 		 */
 	public:
-		/**
-		 * @Synopsis GetSparseRate get the sparse rate of linear model
-		 *
-		 * @Param total_len users specified dimension of weights
-		 *
-		 * @Returns sparse rate
-		 */
-		float GetSparseRate(IndexType total_len = 0) {
-			if (this->weightDim == 1)
-				return 1;
-			IndexType zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
-
-			if (total_len > 0)
-				return zeroNum / (float)total_len;
-			else
-				return zeroNum / (float)(this->weightDim - 1);
-		}
 
 		/**
 		 * @Synopsis GetNonZeroNum get the number of nonzero weights
 		 *
 		 * @Returns number of nonzero weights
 		 */
-		IndexType GetNonZeroNum() {
+		IndexType GetNonZeroNum()  const {
 			IndexType non_zeroNum(0);
 			if (this->weightDim == 1)
 				return 0;

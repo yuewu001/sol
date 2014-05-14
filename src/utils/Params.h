@@ -10,6 +10,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 using std::string;
 using std::map;
@@ -57,6 +58,7 @@ namespace BOC {
 		const std::string& StringValue(const std::string& param_name);
 
 	private:
+		//void Init(const std::map<std::string, std::vector<std::string> > &algoLossList);
 		void Init();
 
 		void add_option(float default_val, bool is_required, int expectArgs,

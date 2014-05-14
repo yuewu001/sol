@@ -21,7 +21,7 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineOptimizer(OnlineModel<FeatType, LabelType> &model, DataSet<FeatType, LabelType> &dataset): 
+		OnlineOptimizer(OnlineModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset): 
 			Optimizer<FeatType, LabelType>(model, dataset){
 		}
 
@@ -47,11 +47,11 @@ namespace BOC {
 			//double train_time  = 0;
 			printf("\nIterate No.\t\tError Rate\t\t\n");
 			while (1) {
-				DataChunk<FeatType, LabelType> &chunk = this->dataSet.GetChunk();
+				DataChunk<FeatType, LabelType> &chunk = this->dataSet->GetChunk();
 				//double time1 = get_current_time();
 				//all the data has been processed!
 				if (chunk.dataNum == 0) {
-					this->dataSet.FinishRead();
+					this->dataSet->FinishRead();
 					break;
 				}
 
@@ -75,7 +75,7 @@ namespace BOC {
 				}
 				//double time2 = get_current_time();
 				//train_time += time2 - time1;
-				this->dataSet.FinishRead();
+				this->dataSet->FinishRead();
 			}
 			p_onlineModel->EndTrain();
 			//cout<<"Purely Training Time: "<<train_time<<" s"<<endl;

@@ -21,7 +21,7 @@ namespace BOC{
 			//learning model
 			LearnModel<FeatType, LabelType> *learnModel;
 			//input dataset
-			DataSet<FeatType, LabelType> &dataSet;
+			DataSet<FeatType, LabelType> *dataSet;
 			//number of iterations
 			size_t update_times;
 
@@ -29,8 +29,8 @@ namespace BOC{
 			 * @Synopsis Constructors
 			 */
 	public:
-		Optimizer(LearnModel<FeatType, LabelType> &model, DataSet<FeatType, LabelType> &dataset) :
-			learnModel(&model), dataSet(dataset) {
+		Optimizer(LearnModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
+			learnModel(model), dataSet(dataset) {
 			this->update_times = 0;
 		}
 
@@ -92,7 +92,7 @@ namespace BOC{
 		 */
 		bool Reset() {
 			this->update_times = 0;
-			this->dataSet.Rewind();
+			this->dataSet->Rewind();
 			return true;
 		}
 	};

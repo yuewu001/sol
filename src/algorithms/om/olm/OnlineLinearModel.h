@@ -48,42 +48,49 @@ namespace BOC {
                 printf("Linear Model: y = w * x + b \n");
             }
 
-            /**
-             * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-             */
-            virtual void BeginTrain() {
-                OnlineModel<FeatType, LabelType>::BeginTrain();
+			/**
+			 * PrintOptInfo print the info of trained model
+			 */
+			virtual void PrintModelInfo() const {
+				printf("number of weights: %lu\n", this->weightDim);
+			}
 
-                //reset weight vector
-                this->weightVec.set_value(0);
-            }
+			/**
+			 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+			 */
+			virtual void BeginTrain() {
+				OnlineModel<FeatType, LabelType>::BeginTrain();
 
-            /**
-             * @Synopsis EndTrain called when a train ends
-             */
-            virtual void EndTrain() { }
+				//reset weight vector
+				this->weightVec.set_value(0);
+			}
 
-            /**
-             * @Synopsis UpdateModelDimention update dimension of the model,
-             * often caused by the increased dimension of data 
-             *
-             * @Param new_dim new dimension 
-             */
-            virtual void UpdateModelDimention(IndexType new_dim) {
-                if (new_dim < this->weightDim)
-                    return;
-                else {
-                    new_dim++; //reserve the 0-th
-                    this->weightVec.reserve(new_dim);
-                    this->weightVec.resize(new_dim);
-                    //set the new value to zero
-                    this->weightVec.zeros(this->weightVec.begin + this->weightDim,
-                            this->weightVec.end);
-                    this->weightDim = new_dim;
-                }
-            }
+			/**
+			 * @Synopsis EndTrain called when a train ends
+			 */
+			virtual void EndTrain() { }
 
-            /**
+			/**
+			 * @Synopsis UpdateModelDimention update dimension of the model,
+			 * often caused by the increased dimension of data
+			 *
+			 * @Param new_dim new dimension
+			 */
+			virtual void UpdateModelDimention(IndexType new_dim) {
+				if (new_dim < this->weightDim)
+					return;
+				else {
+					new_dim++; //reserve the 0-th
+					this->weightVec.reserve(new_dim);
+					this->weightVec.resize(new_dim);
+					//set the new value to zero
+					this->weightVec.zeros(this->weightVec.begin + this->weightDim,
+						this->weightVec.end);
+					this->weightDim = new_dim;
+				}
+			}
+
+			/**
 			 * @Synopsis SetParameter set parameters for the learning model
 			 *
 			 */

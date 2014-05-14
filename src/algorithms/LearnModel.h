@@ -11,6 +11,7 @@
 #include "../loss/LossFunction.h"
 #include "../utils/config.h"
 #include "../utils/reflector.h"
+#include "../io/DataPoint.h"
 
 #include <stdexcept>
 #include <string>
@@ -29,7 +30,7 @@ namespace BOC {
 	protected:
 		LossFunction<FeatType, LabelType> *lossFunc;
 	protected:
-		string id_str; //identification string
+		static string id_str; //identification string
 
 	public:
 		LearnModel(LossFunction<FeatType, LabelType> *lossFunc){
@@ -44,7 +45,7 @@ namespace BOC {
 		 *
 		 * @Returns name of the learning model
 		 */
-		const string& Id_Str() const { return this->id_str; }
+		static string& Id_Str() { return id_str; }
 
 		/**
 		 * PrintOptInfo print the info of optimization algorithm
@@ -55,6 +56,11 @@ namespace BOC {
 			}
 			printf("--------------------------------------------------\n");
 		}
+
+		/**
+		 * PrintOptInfo print the info of trained model
+		 */
+		virtual void PrintModelInfo() const = 0;
 
 	public:
 		/**
@@ -164,6 +170,9 @@ namespace BOC {
 			return this->lossFunc->IsCorrect(label, predict);
 		}
 	};
+
+	template <typename FeatType, typename LabelType>
+	std::string LearnModel<FeatType,LabelType>::id_str;
 }
 
 #endif

@@ -11,7 +11,14 @@
 #define DLL_HEADER
 #endif
 
+
 extern "C"{
+
+/**
+ * @Synopsis boc_init initialize the toolbox
+ */
+DLL_HEADER void boc_init();
+
 DLL_HEADER long sol_init_dataset(const char* filename, const char* cache_filename, const char* dt_type, int passNum, int buf_size);
 DLL_HEADER long sol_init_dataset2(long dt_reader, int passNum, int buf_size);
 DLL_HEADER long sol_init_dataset3(long dt_reader, const char* cache_filename, int passNum, int buf_size);
