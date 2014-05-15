@@ -9,27 +9,15 @@
 
 #include "utils/Params.h"
 #include "utils/util.h"
-#include "io/sol_io.h"
-#include "algorithms/ModelInfo.h"
-#include "loss/sol_loss.h"
-#include "optimizers/OnlineOptimizer.h"
+#include "io/io_header.h"
+#include "algorithms/algo_header.h"
+#include "loss/loss_header.h"
+#include "optimizers/opt_header.h"
 
 #include <string>
 #include <stdio.h>
 
 namespace BOC{
-#define DELETE_ARRAY(pointer) \
-    if (pointer != NULL){\
-        delete [](pointer);\
-    }\
-    pointer = NULL;
-
-#define DELETE_POINTER(pointer) \
-    if (pointer != NULL){\
-        delete (pointer);\
-    }\
-    pointer = NULL;
-
 template <typename FeatType, typename LabelType>
 class LibBOC {
     protected:
@@ -37,13 +25,20 @@ class LibBOC {
         std::string algoInfo;
         //information of loss functions
         std::string lossInfo;
+        //information of dataset
+		std::string datasetInfo;
+        //informationi of io
+		std::string ioInfo;
+        //information of optimizers
+		std::string optInfo;
+
         //loss function
         LossFunction<FeatType, LabelType> *pLossFunc;
         //dataset
         DataSet<FeatType, LabelType>* pDataset;
         //training model
         OnlineModel<FeatType, LabelType> * pOnlineModel;
-        OnlineModel<FeatType, LabelType> * pModel;
+        LearnModel<FeatType, LabelType> * pModel;
         //optimizer
         Optimizer<FeatType, LabelType> * pOpti;
 
@@ -57,8 +52,13 @@ class LibBOC {
             this->pOnlineModel    = NULL;
             this->pOpti = NULL;
             this->pParam = NULL;
-            ModelInfo<FeatType, LabelType>::GetModelInfo(algoInfo);
+            ModelInfo<FeatType, LabelType>::GetModelInfo(this->algoInfo);
+			LossInfo<FeatType, LabelType>::GetLossInfo(this->lossInfo);
+			DataSetInfo<FeatType, LabelType>::GetDataSetInfo(this->datasetInfo);
+			IOInfo<FeatType, LabelType>::GetIOInfo(this->ioInfo);
+			OptInfo<FeatType, LabelType>::GetOptInfo(this->optInfo);
         }
+
         ~LibBOC(){
             this->Release();
         }
@@ -68,8 +68,8 @@ class LibBOC {
             DELETE_POINTER(this->pLossFunc);
             DELETE_POINTER(this->pDataset);
             DELETE_POINTER(this->pModel);
-            DELETE_POINTER(this->pOnlineModel);
             DELETE_POINTER(this->pOpti);
+			this->pOnlineModel = NULL;
             this->pParam = NULL;
         }
 
@@ -86,112 +86,117 @@ class LibBOC {
 
     protected:
         inline int InitLoss(Params &param){
-            this->pLossFunc = GetLossFunc<FeatType, LabelType>(param.StringValue("-loss"));
-            if (this->pLossFunc == NULL)
-                return -1;
-            return 0;
-        }
+			this->pLossFunc = (LossFunction<FeatType, LabelType>*)
+				Registry::CreateObject(param.StringValue("-loss"));
+			if (this->pLossFunc == NULL)
+				return -1;
+			return 0;
+		}
 
-        inline int InitDataSet(Params &param){
-            this->pDataset = getDataSet<FeatType, LabelType>(param.IntValue("-passes"), param.IntValue("-bs"),
-                    param.StringValue("-mpt"), param.IntValue("-mbs"));
-            if (this->pDataset == NULL){
-                return -2;
-            }
+		inline int InitDataSet(Params &param){
+			this->pDataset = (DataSet<FeatType, LabelType>*)Registry::CreateObject(
+				param.StringValue("-dt"), (void*)param.IntValue("-passes"),
+				(void*)param.IntValue("-bs"), (void*)param.IntValue("-cs"));
+			if (this->pDataset == NULL){
+				return -2;
+			}
 
-            if (this->pDataset->Load(param.StringValue("-i"), param.StringValue("-c"), param.StringValue("-dt")) == false){
-                cerr << "ERROR: Load dataset " << param.StringValue("-i") << " failed!" << endl;
-                return -3;
-            }
-            return 0;
-        }
+			if (this->pDataset->Load(param.StringValue("-i"), param.StringValue("-c"),
+				param.StringValue("-df")) == false){
+				cerr << "ERROR: Load dataset " << param.StringValue("-i") << " failed!" << endl;
+				return -3;
+			}
+			return 0;
+		}
 
-        inline int InitModel(Params &param){
-            //check model type
-            string modelType = param.StringValue("-mt");
-            ToLowerCase(modelType);
-            if (modelType == "online"){
-                this->pOnlineModel = (OnlineModel<FeatType, LabelType>*)Registry::CreateObject(
-					param.StringValue("-algo"),this->pLossFunc);
-            }
-            else{
-                fprintf(stderr,"Error: unsupported model type %s!", modelType.c_str());
-                return -4;
-            }
-            if (this->pOnlineModel == NULL){
-                return -4;
-            }
+		inline int InitModel(Params &param){
+			//check model type
+			string algo = param.StringValue("-algo");
+			ToUpperCase(algo);
+			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(algo, this->pLossFunc);
+			const string& modelType = this->pModel->GetModelType();
+			if (modelType == "online"){
+				this->pOnlineModel = (OnlineModel<FeatType, LabelType>*)this->pModel;
+				if (this->pOnlineModel == NULL){
+					return -4;
+				}
+			}
+			else{
+				fprintf(stderr, "Error: unsupported model type %s!", modelType.c_str());
+				return -4;
+			}
 
-            this->pOnlineModel->SetParameter(param);
-            return 0;
-        }
+			this->pModel->SetParameter(param);
 
-        inline int InitOptimizer(Params &param){
-            string optType = param.StringValue("-opt");
-            ToLowerCase(optType);
-            if (optType == "online"){
-                this->pOpti = new OnlineOptimizer<FeatType, LabelType>(this->pOnlineModel, this->pDataset);
-            }
+			return 0;
+		}
 
-            if (this->pOpti == NULL) {
-                return -5;
-            }
-            this->pParam = &param;
-            return 0;
-        }
+		inline int InitOptimizer(Params &param){
+			string optType = param.StringValue("-opt");
+			ToLowerCase(optType);
+			this->pOpti = (Optimizer<FeatType, LabelType>*)
+				Registry::CreateObject(optType, this->pOnlineModel, this->pDataset);
 
-    public:
-        int Initialize(Params &param){
-            this->Release();
-            int errCode = 0;
-            errCode = this->InitDataSet(param);
-            errCode = this->InitLoss(param);
-            errCode = this->InitModel(param);
-            errCode = this->InitOptimizer(param);
-            if (errCode != 0){
-                return errCode;
-            }
-            this->pParam = &param;
-            return errCode;
-        }
+			if (this->pOpti == NULL) {
+				return -5;
+			}
+			return 0;
+		}
 
-        int Run(){
-            //learning the model
-            double time1 = get_current_time();
+public:
+	int Initialize(Params &param){
+		this->Release();
+		int errCode = 0;
+		errCode = this->InitDataSet(param);
+		errCode = this->InitLoss(param);
+		errCode = this->InitModel(param);
+		errCode = this->InitOptimizer(param);
+		if (errCode != 0){
+			return errCode;
+		}
+		this->pParam = &param;
+		return errCode;
+	}
 
-            float l_errRate = this->pOpti->Train();
+	int Run(){
+		//learning the model
+		double time1 = get_current_time();
 
-            if (param.StringValue("-or").length() > 0){
-                model->SaveModel(param.StringValue("-or"));
-            }
+		float l_errRate = this->pOpti->Train();
 
-            double time2 = get_current_time();
-            printf("data number: %lu\n", this->pDataset->size());
-            printf("Learn error rate: %.2f %%\n", l_errRate * 100);
-            printf("Learning time: %.3f s\n", (float)(time2 - time1));
-            this->pModel->PrintModelInfo();
-            
-            //test
-            double time3 = 0;
-            //test the model
-            bool is_test = param.StringValue("-tc").length() > 0 || param.StringValue("-t").length() > 0;
-            if (is_test) {
-                OnlineDataSet<FeatType, LabelType> testset(1, param.IntValue("-bs"), param.IntValue("-cs"));
-                if (testset.Load( param.StringValue("-t"), param.StringValue("-tc"), param.StringValue("-dt")) == true) {
-                    float t_errRate(0);	//test error rate
-                    t_errRate = this->pOpti->Test(testset);
-                    time3 = get_current_time();
+		if (this->pParam->StringValue("-or").length() > 0){
+			this->pModel->SaveModel(this->pParam->StringValue("-or"));
+		}
 
-                    printf("Test error rate: %.2f %%\n", t_errRate * 100);
-                }
-                else{
-                    fprintf(stderr, "load test set failed!");
-                }
-                printf("Test time: %.3f s\n", (float)(time3 - time2));
-            }
+		double time2 = get_current_time();
+		printf("data number: %lu\n", this->pDataset->size());
+		printf("Learn error rate: %.2f %%\n", l_errRate * 100);
+		printf("Learning time: %.3f s\n", (float)(time2 - time1));
+		this->pModel->PrintModelInfo();
 
-            return 0;
-        }
+		//test
+		double time3 = 0;
+		//test the model
+		bool is_test = this->pParam->StringValue("-tc").length() > 0 ||
+			this->pParam->StringValue("-t").length() > 0;
+		if (is_test) {
+			OnlineDataSet<FeatType, LabelType> testset(1, this->pParam->IntValue("-bs"), this->pParam->IntValue("-cs"));
+			if (testset.Load(this->pParam->StringValue("-t"), this->pParam->StringValue("-tc"),
+				this->pParam->StringValue("-df")) == true) {
+				float t_errRate(0);	//test error rate
+				t_errRate = this->pOpti->Test(testset);
+				time3 = get_current_time();
+
+				printf("Test error rate: %.2f %%\n", t_errRate * 100);
+			}
+			else{
+				fprintf(stderr, "load test set failed!");
+			}
+			printf("Test time: %.3f s\n", (float)(time3 - time2));
+		}
+
+		return 0;
+	}
 };
 
 }

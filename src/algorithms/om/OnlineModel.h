@@ -8,7 +8,6 @@
 #define HEADER_ONLINE_MODEL
 
 #include "../LearnModel.h"
-#include "../../utils/Params.h"
 
 /**
 *  namespace: Batch and Online Classification
@@ -16,6 +15,7 @@
 namespace BOC {
     template <typename FeatType, typename LabelType> 
     class OnlineModel : public LearnModel<FeatType, LabelType> {
+	
         protected:
             //iteration number
             size_t curIterNum;
@@ -31,6 +31,8 @@ namespace BOC {
 
         public:
             OnlineModel(LossFunction<FeatType, LabelType> *lossFunc) : LearnModel<FeatType, LabelType>(lossFunc){
+				this->modelType = "online";
+
                 this->curIterNum = 0;
 
 				this->initial_t = 0;
@@ -52,7 +54,6 @@ namespace BOC {
                 LearnModel<FeatType, LabelType>::PrintOptInfo();
 
                 printf("Online Learning\n");
-                printf("\tAlgorithm: %s\n", this->Id_Str().c_str());
                 printf("\tLearning Rate: %g\n", this->eta0);
                 printf("\tInitial t  : %lu\n", this->initial_t);
                 printf("\tPower t : %g\n", this->power_t);

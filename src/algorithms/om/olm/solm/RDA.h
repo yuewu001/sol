@@ -133,7 +133,7 @@ namespace BOC {
 
     };
 
-	IMPLEMENT_CLASS(RDA)
+	IMPLEMENT_MODEL_CLASS(RDA)
 }
 
 #endif

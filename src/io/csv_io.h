@@ -20,9 +20,10 @@
 
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class csv_io_ : public DataHandler<FeatType, LabelType> {
+	class csv_io : public DataHandler<FeatType, LabelType> {
+        //dynamic binding
+        DECLARE_CLASS
 	private:
-		std::string fileName;
 		basic_io io_hander;
 		FILE* writer_handler;
 
@@ -34,15 +35,14 @@ namespace BOC {
 		IndexType featDim;
 
 	public:
-		csv_io_(const std::string &fileName) {
+		csv_io(const std::string &fileName) : DataHandler<FeatType, LabelType>(fileName){
 			this->max_line_len = 4096;
-			this->fileName = fileName;
 			line = (char *)malloc(max_line_len*sizeof(char));
 			this->is_good = true;
 			this->writer_handler = NULL;
 			this->featDim = 0;
 		}
-		virtual ~csv_io_() {
+		virtual ~csv_io() {
 			this->Close();
 			if (line != NULL)
 				free(line);
@@ -191,8 +191,8 @@ namespace BOC {
 		}
 	};
 
-	//for special definition
-	typedef csv_io_<float, char> csv_io;
+    //dynamic binding
+	IMPLEMENT_DATA_CLASS(csv_io, "csv", "io class for csv data");
 }
 
 

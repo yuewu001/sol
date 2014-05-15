@@ -158,7 +158,7 @@ namespace BOC {
                 }
             }
     };
-	IMPLEMENT_CLASS(FOFS)
+	IMPLEMENT_MODEL_CLASS(FOFS)
 }
 
 #endif

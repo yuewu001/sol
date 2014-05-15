@@ -175,7 +175,7 @@ namespace BOC {
 		}
 	};
 
-	IMPLEMENT_CLASS(Ada_FOBOS)
+	IMPLEMENT_MODEL_CLASS(Ada_FOBOS)
 }
 
 #endif

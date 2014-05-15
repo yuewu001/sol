@@ -9,13 +9,32 @@
 #define HEADER_DATAREADER
 
 #include "DataPoint.h"
-#include <vector>
+#include "../utils/reflector.h"
+
+#include <string>
 
 namespace BOC {
-	
+
+	#define IMPLEMENT_DATA_CLASS(className, name, descr) \
+	template <typename FeatType, typename LabelType> \
+	ClassInfo className<FeatType, LabelType>::classInfo(name, descr, className<FeatType, LabelType>::CreateObject); \
+	\
+	template <typename FeatType, typename LabelType> \
+	void* className<FeatType, LabelType>::CreateObject(void* filename, void* param2, void* param3) \
+	{ return new className<FeatType, LabelType>(*(std::string*)filename); }
+
+
+
 	template <typename FeatType, typename LabelType>
-	class DataReader {
+	class DataReader : public Registry {
+	protected:
+		std::string fileName;
+
 	public:
+		DataReader(const std::string &fileName) {
+			this->fileName = fileName;
+		}
+
 		virtual ~DataReader(){}
 	public:
 		/**

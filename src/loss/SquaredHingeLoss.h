@@ -12,6 +12,8 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class SquaredHingeLoss: public LossFunction<FeatType, LabelType> {
+		//for dynamic binding
+        DECLARE_CLASS
 		public:
 			virtual  float GetLoss(LabelType label, float predict) {
                 float loss = max(0.0f, 1.f - predict * label);
@@ -26,6 +28,9 @@ namespace BOC {
 					return 0;
 			}
 	};
+
+	//for dynamic binding
+	IMPLEMENT_LOSS_CLASS(SquaredHingeLoss,squareHinge)
 }
 
 #endif

@@ -146,6 +146,6 @@ namespace BOC {
             }
         }
     };
-	IMPLEMENT_CLASS(STG)
+	IMPLEMENT_MODEL_CLASS(STG)
 }
 #endif

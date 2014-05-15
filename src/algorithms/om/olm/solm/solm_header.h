@@ -24,7 +24,8 @@ namespace BOC{
                 static void GetModelInfo(std::string & info){
                     info.append("Sparse Online Learning Algorithms:");
 					info.append("\n\t"); 
-					info.append(SGD<FeatType, LabelType>::classInfo.GetType());
+					APPEND_INFO(info, SGD, FeatType, LabelType);
+					//info.append(SGD<FeatType, LabelType>::classInfo.GetType());
                     //APPEND_INFO(info, SGD,FeatType, LabelType);
                     //algoList.push_back(Ada_FOBOS<FeatType, LabelType>::classInfo.Type);
                     //algoList.push_back(Ada_RDA<FeatType, LabelType>::classInfo.Type);

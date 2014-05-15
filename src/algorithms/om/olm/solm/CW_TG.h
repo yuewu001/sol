@@ -186,6 +186,6 @@ namespace BOC {
                 }
             }
     };
-	IMPLEMENT_CLASS(CW_TG)
+	IMPLEMENT_MODEL_CLASS(CW_TG)
 }
 #endif

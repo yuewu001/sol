@@ -154,6 +154,6 @@ namespace BOC {
 
 	};
 
-	IMPLEMENT_CLASS(SOFS)
+	IMPLEMENT_MODEL_CLASS(SOFS)
 }
 #endif

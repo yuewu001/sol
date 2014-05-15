@@ -69,6 +69,9 @@ namespace BOC {
              * @Returns true if succeed
              */
             bool CreateBuffer(int buf_size, int chunk_size) {
+				if(this->ReleaseBuffer() == false)
+					return false;
+
 				mutex_lock(&this->data_lock); 
                 if (this->ReleaseBuffer() == false){
                     mutex_unlock(&this->data_lock);
@@ -82,7 +85,6 @@ namespace BOC {
 
                 this->buf_size = buf_size; 
                 this->chunk_size = chunk_size;
-                this->is_on_loading = true;
 
                 this->head = new ElemType(chunk_size);
                 ElemType *p = this->head;
@@ -130,6 +132,8 @@ namespace BOC {
 
                 this->buf_size = 0;
                 this->chunk_size = 0;
+
+				this->is_on_loading = false;
 
                 mutex_unlock(&this->data_lock);
                 return true;

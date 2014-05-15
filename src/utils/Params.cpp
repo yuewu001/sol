@@ -61,6 +61,10 @@ namespace BOC {
 		if (this->int_storage != NULL) delete[]this->int_storage;
 		if (this->bool_storage != NULL) delete[]this->bool_storage;
 		if (this->string_storage != NULL) delete[]this->string_storage;
+		if (this->option != NULL) {
+			delete this->option;
+			this->option = NULL;
+		}
 	}
 
 	//void Params::Init(const std::map<std::string, std::vector<std::string> > &algoLossList){
@@ -68,40 +72,50 @@ namespace BOC {
 		//initialize params
 		this->option->opt.overview = "Sparse Online Learning Library";
 		option->opt.syntax = "SOL [options] -i train_file";
-		option->opt.example = "SOL -i train_file -opt SGD";
+		option->opt.example = "SOL -i train_file -algo SGD";
 
 		option->opt.add("", 0, 0, ',', "help message", "-h", "--help");
 
+        //input & output
 		this->add_option("", 0, 1, "training file name", "-i");
 		this->add_option("", 0, 1, "test file name", "-t");
 		this->add_option("", 0, 1, "cached training file name", "-c");
 		this->add_option("", 0, 1, "cached test file name", "-tc");
 
-		this->add_option(init_data_type, 0, 1, "dataset type format", "-dt");
+		this->add_option(init_data_format, 0, 1, "dataset type format", "-df");
 		this->add_option(init_buf_size, 0, 1, "number of chunks for buffering", "-bs");
 		this->add_option(init_chunk_size, 0, 1, "number of examples in a chunk", "-cs");
 		this->add_option(init_mp_buf_size, 0, 1, "size of buffer for multi-pass", "-mbs");
 
-		this->add_option(init_loss_type, 0, 1, "loss function type:\nHinge, Logit, Square, SquareHinge", "-loss");
 
-		this->add_option(init_opti_method, 0, 1,
-			"optimization method:\nSGD, STG, FOBOS, RDA, RDA_E,\nAda-RDA, Ada-FOBOS, \nAROW, AROW-TG, AROW-DA, SCW, SCW-RDA, \nSOSOL,PET,FOFS,SOFS", "-opt");
-		this->add_option(init_mp_type, 0, 1, "multi-pass type: none, \n\tall, false_predict", "-mpt");
-		this->add_option(init_is_learn_best_param, 0, 0, "learn best parameter", "-lbp");
+		this->add_option("", false, 1, "input model", "-m");
+		this->add_option("", false, 1, "output readable model", "-or");
+
+		//model setting
+		this->add_option(init_dataset_type, 0, 1, "dataset type: none, \n\tall, false_predict", "-dt");
+		this->add_option(1, 0, 1, "number of passes", "-passes");
+
 		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm");
+
+		//loss function
+		this->add_option(init_loss_type, 0, 1, "loss function type", "-loss");
+
+		//training model
+		this->add_option(init_algo_method, 0, 1, "learning algorithm:", "-algo");
+
 		this->add_option(init_eta, 0, 1, "learning rate", "-eta");
 		this->add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t");
 		this->add_option(init_initial_t, 0, 1, "initial iteration number", "-t0");
 		this->add_option(init_lambda, 0, 1, "l1 regularization", "-l1");
-		this->add_option(1, 0, 1, "number of passes", "-passes");
+
 		this->add_option(init_k, 0, 1,
 			"number of k in truncated gradient descent or feature selection", "-k");
 		this->add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou");
 		this->add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta");
 		this->add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r");
-		this->add_option(init_phi, 0, 1, "phi in SCW", "-phi");
-		this->add_option("", false, 1, "output readable model", "-or");
-		this->add_option("", false, 1, "input model", "-m");
+
+        //optimizer
+		this->add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt");
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs,

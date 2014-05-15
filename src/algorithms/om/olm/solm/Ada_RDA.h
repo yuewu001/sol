@@ -143,6 +143,6 @@ namespace BOC {
 			}
 		}
 	};
-	IMPLEMENT_CLASS(Ada_RDA)
+	IMPLEMENT_MODEL_CLASS(Ada_RDA)
 }
 #endif

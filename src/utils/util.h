@@ -28,6 +28,19 @@
 #include <cstdlib>
 #include <iostream>
 
+#define DELETE_ARRAY(pointer) \
+    if (pointer != NULL){\
+        delete [](pointer);\
+		pointer = NULL; \
+    }
+
+#define DELETE_POINTER(pointer) \
+    if (pointer != NULL){\
+        delete (pointer);\
+		pointer = NULL; \
+    }
+
+
 template <typename T>
 inline char Sgn(T x) {
 	if (x > 0) return 1;

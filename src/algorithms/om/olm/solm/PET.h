@@ -143,7 +143,7 @@ namespace BOC {
             }
         }
     };
-	IMPLEMENT_CLASS(PET)
+	IMPLEMENT_MODEL_CLASS(PET)
 }
 
 #endif

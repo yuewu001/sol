@@ -130,7 +130,7 @@ namespace BOC {
                 }
             }
     };
-	IMPLEMENT_CLASS(FOBOS)
+	IMPLEMENT_MODEL_CLASS(FOBOS)
 }
 
 #endif

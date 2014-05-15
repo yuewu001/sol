@@ -12,6 +12,9 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class LogisticLoss: public LossFunction<FeatType, LabelType> {
+		//for dynamic binding
+		DECLARE_CLASS
+
 		public:
 			virtual float GetLoss(LabelType label, float predict) {
 				float tmp = -predict * label;
@@ -32,6 +35,8 @@ namespace BOC {
 					return -label / (1.f + exp(tmp)); 
 			}
  	};
+	//for dynamic binding
+	IMPLEMENT_LOSS_CLASS(LogisticLoss,logistic)
 }
 
 #endif

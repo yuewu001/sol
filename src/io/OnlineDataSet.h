@@ -22,25 +22,33 @@ namespace BOC {
 	//data set, can work in both read-and-write mode and read-once mode
 	template <typename FeatType, typename LabelType>
 	class OnlineDataSet : public DataSet<FeatType, LabelType> {
+		//for dynamic binding
+		DECLARE_CLASS
+
 	protected:
 		typedef FixSizeDataChunk<FeatType, LabelType> ChunkType;
 
 		int pass_num; //number of passes
 		OnlineBuffer<ChunkType> online_buf;
 
+#if WIN32
+		HANDLE thread;
+#else
+		pthread_t thread;
+#endif
 		/**
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineDataSet(int passes, int buf_size, int chunk_size) : 
+		OnlineDataSet(int passes, int buf_size, int chunk_size) :
 			online_buf(buf_size, chunk_size), DataSet<FeatType, LabelType>() {
-			if (passes < 1) {
-				std::ostringstream oss;
-				oss << "number of passes should be no less than 1, while " << passes << " is specified!";
-				throw std::runtime_error(oss.str());
+				if (passes < 1) {
+					std::ostringstream oss;
+					oss << "number of passes should be no less than 1, while " << passes << " is specified!";
+					throw std::runtime_error(oss.str());
+				}
+				this->pass_num = passes;
 			}
-			this->pass_num = passes;
-		}
 
 		virtual ~OnlineDataSet() {
 		}
@@ -55,8 +63,8 @@ namespace BOC {
 		 *
 		 * @Returns true if succeed
 		 */
-		virtual bool Load(const std::string& fileName, const std::string& cache_fileName, const std::string &dt_type) {
-			return DataSet<FeatType, LabelType>::Load(fileName, cache_fileName, dt_type);
+		virtual bool Load(const std::string& fileName, const std::string& cache_fileName, const std::string &dt_format) {
+			return DataSet<FeatType, LabelType>::Load(fileName, cache_fileName, dt_format);
 		}
 
 		/**
@@ -73,7 +81,8 @@ namespace BOC {
 			if (SOL_ACCESS(cache_fileName.c_str()) == 0) {
 				this->delete_reader();
 				this->cache_filename = cache_fileName;
-				this->self_reader = getReader<FeatType, LabelType>(cache_fileName, "cache");
+				this->self_reader = (DataReader<FeatType, LabelType>*)
+					Registry::CreateObject("binary", &this->cache_filename);
 
 				return this->Load(this->self_reader);
 			}
@@ -106,11 +115,7 @@ namespace BOC {
 		 * @Returns true if succeed
 		 */
 		virtual bool Load(DataReader<FeatType, LabelType> *ext_reader, bool Is_cache = false) {
-			if (DataSet<FeatType, LabelType>::Load(ext_reader, Is_cache) == true){
-				this->threadLoad();
-				return true;
-			}
-			return false;
+			return DataSet<FeatType, LabelType>::Load(ext_reader, Is_cache);
 		}
 
 		/**
@@ -177,13 +182,24 @@ namespace BOC {
 	protected:
 		void threadLoad(){
 #if WIN32
-			HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType, LabelType>), this, NULL, NULL);
+			create_thread(thread, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType, LabelType>), this);
+			//HANDLE thread = ::CreateThread(NULL, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_LoadData<FeatType, LabelType>), this, NULL, NULL);
 #else
-			pthread_t thread;
-			pthread_create(&thread, NULL, thread_LoadData<FeatType, LabelType>, this);
+			create_thread(thread, thread_LoadData<FeatType, LabelType>, this);
+			//pthread_create(&thread, NULL, thread_LoadData<FeatType, LabelType>, this);
 #endif
 		}
 	};
+
+	//for dynamic binding
+	template <typename FeatType, typename LabelType> 
+	ClassInfo OnlineDataSet<FeatType, LabelType>::classInfo("dt_online", 
+		"parallel loading dataset", OnlineDataSet<FeatType, LabelType>::CreateObject); 
+
+	template <typename FeatType, typename LabelType>
+	void*  OnlineDataSet<FeatType, LabelType>::CreateObject(void *param1, void* param2, void* param3) {
+		return new OnlineDataSet<FeatType, LabelType>(int(param1), int(param2), int(param3));
+	}
 }
 
 

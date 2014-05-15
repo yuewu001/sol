@@ -14,6 +14,7 @@ namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class DataHandler: public DataReader<FeatType,LabelType> {
 	public:
+		DataHandler(const std::string &fileName) : DataReader<FeatType, LabelType>(fileName){}
 		virtual ~DataHandler(){}
 	public:
         /**

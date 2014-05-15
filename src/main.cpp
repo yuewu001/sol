@@ -22,7 +22,7 @@ int main(int argc, const char** args) {
 	int tmpFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag(tmpFlag);
-	//_CrtSetBreakAlloc(170);
+	//_CrtSetBreakAlloc(968);
 #endif
 
 	Params param;
@@ -41,6 +41,7 @@ int main(int argc, const char** args) {
 
 	LibBOC<FeatType, LabelType> libBoc;
 	libBoc.Initialize(param);
+	libBoc.Run();
 
 	return 0;
 }

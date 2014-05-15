@@ -11,6 +11,7 @@
 #include "../loss/LossFunction.h"
 #include "../utils/config.h"
 #include "../utils/reflector.h"
+#include "../utils/Params.h"
 #include "../io/DataPoint.h"
 
 #include <stdexcept>
@@ -24,13 +25,28 @@ using std::string;
 */
 namespace BOC {
 
+#define IMPLEMENT_MODEL_CLASS(name) \
+	template <typename FeatType, typename LabelType> \
+	ClassInfo name<FeatType, LabelType>::classInfo(#name, "", name<FeatType, LabelType>::CreateObject); \
+	\
+	template <typename FeatType, typename LabelType> \
+	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
+	{ return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
+
+
+
+
 	template <typename FeatType, typename LabelType>
-//	class LearnModel : public Registry<FeatType, LabelType> {
+	//	class LearnModel : public Registry<FeatType, LabelType> {
 	class LearnModel : public Registry {
 	protected:
-		LossFunction<FeatType, LabelType> *lossFunc;
+		//type of the model: online
+		std::string modelType;
+	public:
+		const std::string& GetModelType() const { return modelType; }
+
 	protected:
-		static string id_str; //identification string
+		LossFunction<FeatType, LabelType> *lossFunc;
 
 	public:
 		LearnModel(LossFunction<FeatType, LabelType> *lossFunc){
@@ -41,19 +57,9 @@ namespace BOC {
 		}
 
 		/**
-		 * @Synopsis Id_Str get the identification string of the learning model
-		 *
-		 * @Returns name of the learning model
-		 */
-		static string& Id_Str() { return id_str; }
-
-		/**
 		 * PrintOptInfo print the info of optimization algorithm
 		 */
 		virtual void PrintOptInfo() const {
-			if (this->id_str.length() == 0){
-				throw runtime_error("algorithm name must be specified!");
-			}
 			printf("--------------------------------------------------\n");
 		}
 
@@ -80,6 +86,12 @@ namespace BOC {
 		 * @Param new_dim new dimension
 		 */
 		virtual void UpdateModelDimention(IndexType new_dim) = 0;
+
+		/**
+		 * @Synopsis SetParameter set the basic online learning parameters
+		 *
+		 */
+		virtual void SetParameter(BOC::Params &param) = 0;
 
 		/**
 		 * @Synopsis Test_Predict prediction function for test
@@ -170,9 +182,6 @@ namespace BOC {
 			return this->lossFunc->IsCorrect(label, predict);
 		}
 	};
-
-	template <typename FeatType, typename LabelType>
-	std::string LearnModel<FeatType,LabelType>::id_str;
 }
 
 #endif

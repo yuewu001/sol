@@ -59,15 +59,13 @@ namespace BOC {
     static const float init_ofs_delta = 0.01f;
     static const float init_ofs_eta = 0.2f;
 
-    static const char* const init_loss_type = "Hinge";
-    static const char* const init_data_type = "LibSVM";
-    static const char* const init_opti_method = "SGD";
-    static const char* const init_mp_type = "none"; //init multi-pass type
+    static const char* const init_loss_type = "hinge";
+    static const char* const init_data_format = "libsvm";
+    static const char* const init_algo_method = "SGD";
+    static const char* const init_dataset_type = "dt_online"; //init multi-pass type
+    static const char* const init_opt_type = "opt_online"; //init multi-pass type
 
     //trying the optimal parameters
-
-
-
     ////////////////////Data Set Reader Parameters///////////////////////////
     static const int init_chunk_size = 256;
     static const int init_buf_size = 2;

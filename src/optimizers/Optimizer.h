@@ -11,23 +11,26 @@
 #include "../io/DataSet.h"
 #include "../algorithms/LearnModel.h"
 
+#include "../utils/reflector.h"
+
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC{
-	template <typename FeatType, typename LabelType> 
-    class Optimizer {
-        protected:
-			//learning model
-			LearnModel<FeatType, LabelType> *learnModel;
-			//input dataset
-			DataSet<FeatType, LabelType> *dataSet;
-			//number of iterations
-			size_t update_times;
 
-			/**
-			 * @Synopsis Constructors
-			 */
+	template <typename FeatType, typename LabelType>
+	class Optimizer : public Registry {
+	protected:
+		//learning model
+		LearnModel<FeatType, LabelType> *learnModel;
+		//input dataset
+		DataSet<FeatType, LabelType> *dataSet;
+		//number of iterations
+		size_t update_times;
+
+		/**
+		 * @Synopsis Constructors
+		 */
 	public:
 		Optimizer(LearnModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
 			learnModel(model), dataSet(dataset) {

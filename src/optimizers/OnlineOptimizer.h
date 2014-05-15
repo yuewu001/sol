@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 5/5/2014 6:24:15 PM
 	> Functions: optimizer for online learning
- ************************************************************************/
+	************************************************************************/
 #ifndef HEADER_ONLINE_OPTIMIZER
 #define HEADER_ONLINE_OPTIMIZER
 
@@ -14,16 +14,19 @@
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
-	template <typename FeatType, typename LabelType> 
-    class OnlineOptimizer : public Optimizer<FeatType, LabelType> {
+	template <typename FeatType, typename LabelType>
+	class OnlineOptimizer : public Optimizer<FeatType, LabelType> {
+		//dynamic bindings
+		DECLARE_CLASS
+
 	protected:
 		/**
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineOptimizer(OnlineModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset): 
+		OnlineOptimizer(OnlineModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
 			Optimizer<FeatType, LabelType>(model, dataset){
-		}
+			}
 
 		virtual ~OnlineOptimizer() {
 		}
@@ -82,6 +85,16 @@ namespace BOC {
 			return errorNum / this->update_times;
 		}
 	};
+
+	template <typename FeatType, typename LabelType> 
+	ClassInfo OnlineOptimizer<FeatType, LabelType>::classInfo("opt_online", 
+		"optimizer for online learning models", OnlineOptimizer<FeatType, LabelType>::CreateObject); 
+	
+	template <typename FeatType, typename LabelType>
+	void* OnlineOptimizer<FeatType, LabelType>::CreateObject(void* model, void* dataset, void* param3) {
+		return new OnlineOptimizer<FeatType, LabelType>((OnlineModel<FeatType, LabelType>*)model,
+			(DataSet<FeatType, LabelType>*)dataset);
+	}
 }
 
 #endif

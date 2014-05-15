@@ -170,7 +170,7 @@ namespace BOC {
             }
 
     };
-	IMPLEMENT_CLASS(DAROW)
+	IMPLEMENT_MODEL_CLASS(DAROW)
 }
 
 #endif

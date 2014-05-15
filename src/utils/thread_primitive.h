@@ -18,6 +18,26 @@ namespace BOC {
 	typedef pthread_cond_t CV;
 #endif
 
+#ifdef _WIN32
+	inline void create_thread(HANDLE& thread, LPTHREAD_START_ROUTINE startAddress, LPVOID pParam){
+		thread = ::CreateThread(NULL, 0, startAddress, pParam, NULL, NULL);
+	}
+#else
+	inline void create_thread(pthread_t& thread, void *(*start_routine)(void*), void* pParam){
+		pthread_create(&thread, NULL, start_routine, pParam);
+	}
+#endif
+
+#ifdef _WIN32 
+	inline void close_thread(HANDLE& thread){
+		::TerminateThread(thread, 0);
+		::CloseHandle(thread);
+	}
+#else
+	inline void close_thread(pthread_t& thread){
+	}
+#endif
+
 	inline void initialize_mutex(MUTEX *pm) {
 #ifdef _WIN32
 		::InitializeCriticalSection(pm);
@@ -84,6 +104,7 @@ namespace BOC {
 		pthread_cond_broadcast(pcv);
 #endif
 	}
+
 	/*
 	#ifdef _WIN32
 	void WaitThread(HANDLE &thread){

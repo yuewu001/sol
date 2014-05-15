@@ -26,7 +26,6 @@ namespace BOC {
 	public:
 		SGD(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->id_str = SGD::classInfo.GetType();
 			}
 
 		virtual ~SGD() {
@@ -76,6 +75,6 @@ namespace BOC {
 		}
 	};
 
-	IMPLEMENT_CLASS(SGD)
+	IMPLEMENT_MODEL_CLASS(SGD)
 }
 #endif

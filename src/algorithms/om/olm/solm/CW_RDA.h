@@ -152,7 +152,7 @@ namespace BOC {
             }
         }
     };
-	IMPLEMENT_CLASS(CW_RDA)
+	IMPLEMENT_MODEL_CLASS(CW_RDA)
 }
 
 #endif
