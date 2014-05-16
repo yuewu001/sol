@@ -28,7 +28,7 @@ namespace BOC{
 
 	public:
 		MaxHeap() :K(0), data_num(0), value_list(NULL){}
-		index_type GetK() const { return this->K;}
+		index_type GetK() const { return this->K; }
 
 	public:
 		inline index_type get_id(index_type pos) const {
@@ -67,7 +67,7 @@ namespace BOC{
 		bool Init(index_type dataNum, index_type topK, const value_type* init_value){
 			//assert(topK > 0 && init_value != NULL);
 			if (topK < 1){
-				std::cerr << "ERROR: topK should be no less than 1, current value " <<topK<< std::endl;
+				std::cerr << "ERROR: topK should be no less than 1, current value " << topK << std::endl;
 				exit(-1);
 			}
 
@@ -140,7 +140,7 @@ namespace BOC{
 		**/
 		void EnlargeHeap(index_type newK){
 			if (newK < this->K){
-				cerr << "new K(" << newK << ") must be no less than original K(" << this->K<< ") in EnlargeHeap!" << endl;
+				cerr << "new K(" << newK << ") must be no less than original K(" << this->K << ") in EnlargeHeap!" << endl;
 			}
 			else if (newK == this->K)
 				return;
@@ -173,7 +173,7 @@ namespace BOC{
 
 		void ShrinkHeap(index_type newK){
 			if (newK > this->K)
-				cerr << "new K(" << newK << ") must be no larger than original K(" << this->K<< ") in ShrinkHeap!" << endl;
+				cerr << "new K(" << newK << ") must be no larger than original K(" << this->K << ") in ShrinkHeap!" << endl;
 			else if (newK == this->K)
 				return;
 			else{

@@ -4,7 +4,7 @@
   > Created Time: Tue 17 Dec 2013 04:59:06 AM EST
   > Descriptions: Online Feature Selection
   > Reference: Online Feature Selection and its applications
- ************************************************************************/
+  ************************************************************************/
 #ifndef HEADER_OPTIMISER_FOFS
 #define HEADER_OPTIMISER_FOFS
 
@@ -15,150 +15,152 @@
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
-    template <typename FeatType, typename LabelType>
-    class FOFS: public SparseOnlineLinearModel<FeatType, LabelType> {
+	template <typename FeatType, typename LabelType>
+	class FOFS : public SparseOnlineLinearModel<FeatType, LabelType> {
+
 		DECLARE_CLASS
-        protected:
-            IndexType K; //keep top K elemetns
 
-            float w_norm;
-            float norm_coeff;
+	protected:
+		IndexType K; //keep top K elemetns
 
-            float shrinkage;
-            float delta;
-            s_array<float> abs_weightVec;
+		float w_norm;
+		float norm_coeff;
 
-            MinHeap<float> minHeap;
+		float shrinkage;
+		float delta;
+		s_array<float> abs_weightVec;
 
-        public:
-            FOFS(LossFunction<FeatType, LabelType> *lossFunc) :
-                SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-                    this->id_str = "First Order Online Feature Selection";
-                    this->K = 0;
-                    this->delta = 0;
+		MinHeap<float> minHeap;
 
-                    this->abs_weightVec.resize(this->weightDim);
-                }
+	public:
+		FOFS(LossFunction<FeatType, LabelType> *lossFunc) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+				this->K = 0;
+				this->delta = 0;
 
-			virtual ~FOFS(){
+				this->abs_weightVec.resize(this->weightDim);
 			}
 
-            /**
-             * @Synopsis inherited functions
-             */
-        public:
-            /**
-             * PrintOptInfo print the info of optimization algorithm
-             */
-            virtual void PrintOptInfo() const {
-                SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
-                printf("\tdelta:\t%.2f\n", this->delta);
-                printf("\tK:\t%d\n", this->K);
-            }
+		virtual ~FOFS(){
+		}
 
-            /**
-             * @Synopsis SetParameter set parameters for the learning model
-             *
-             * @Param param
-             */
-            virtual void SetParameter(BOC::Params &param){
-                OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-                this->K = param.IntValue("-k");
-                this->delta = param.FloatValue("-delta");
-            }
+		/**
+		 * @Synopsis inherited functions
+		 */
+	public:
+		/**
+		 * PrintOptInfo print the info of optimization algorithm
+		 */
+		virtual void PrintOptInfo() const {
+			SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+			printf("\tdelta:\t%.2f\n", this->delta);
+			printf("\tK:\t%d\n", this->K);
+		}
 
-            /**
-             * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-             */
-            virtual void BeginTrain() {
-                SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			this->K = param.IntValue("-k");
+			this->delta = param.FloatValue("-delta");
+		}
 
-                this->w_norm = 0;
-                this->norm_coeff = 1.f / sqrtf(this->delta);
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
-                this->shrinkage = 1.f - this->delta * this->eta0;
-                this->power_t = 0;
+			this->w_norm = 0;
+			this->norm_coeff = 1.f / sqrtf(this->delta);
 
-                if (this->K > 0){
-                    if (this->weightDim < this->K + 1)
-                        this->UpdateModelDimention(this->K);
-                    this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
-                }
-            }
+			this->shrinkage = 1.f - this->delta * this->eta0;
+			this->power_t = 0;
 
-            /**
-             * @Synopsis Iterate Iteration of online learning
-             *
-             * @Param x current input data example
-             *
-             * @Returns  prediction of the current example
-             */
-            virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-                //we use the oposite of w
-                float y = this->Predict(x);
-                size_t featDim = x.indexes.size();
+			if (this->K > 0){
+				if (this->weightDim < this->K + 1)
+					this->UpdateModelDimention(this->K);
+				this->minHeap.Init(this->weightDim - 1, this->K, this->abs_weightVec.begin + 1);
+			}
+		}
 
-                float gt_i = this->lossFunc->GetGradient(x.label,y);
-                if (gt_i == 0){
-                    return y;
-                }
+		/**
+		 * @Synopsis Iterate Iteration of online learning
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  prediction of the current example
+		 */
+		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
+			//we use the oposite of w
+			float y = this->Predict(x);
+			size_t featDim = x.indexes.size();
 
-                //update with sgd
-                for (size_t i = 0; i < featDim; i++) {
-                    this->weightVec[x.indexes[i]] -= this->eta0 * gt_i * x.features[i];
-                }
-                //update bias 
-                this->weightVec[0] -= this->eta0 * gt_i;
+			float gt_i = this->lossFunc->GetGradient(x.label, y);
+			if (gt_i == 0){
+				return y;
+			}
 
-                w_norm = 0;
-                for (size_t i = 0; i < this->weightDim; i++)
-                    w_norm += this->weightVec[i] * this->weightVec[i];
-                //shrinkage
-                float coeff = this->norm_coeff / sqrtf(w_norm);
-                if (coeff < 1){
-                    for (IndexType i = 0; i < this->weightDim; i++){
-                        this->weightVec[i] *= coeff;
-                    }
-                }
-                if (this->K > 0){
-                    //truncate
-                    for (IndexType i = 0; i < this->weightDim; i++)
-                        this->abs_weightVec[i] = fabs(this->weightVec[i]);
+			//update with sgd
+			for (size_t i = 0; i < featDim; i++) {
+				this->weightVec[x.indexes[i]] -= this->eta0 * gt_i * x.features[i];
+			}
+			//update bias 
+			this->weightVec[0] -= this->eta0 * gt_i;
 
-                    this->minHeap.BuildHeap();
-                    //truncate
-                    IndexType ret_id;
-                    for (IndexType i = 0; i < this->weightDim - 1; i++){
-                        if (this->minHeap.UpdateHeap(i, ret_id) == true){
-                            this->weightVec[ret_id + 1] = 0;
-                            this->abs_weightVec[ret_id + 1] = 0;
-                        }
-                    }
-                }
-                return y;
-            }
+			w_norm = 0;
+			for (size_t i = 0; i < this->weightDim; i++)
+				w_norm += this->weightVec[i] * this->weightVec[i];
+			//shrinkage
+			float coeff = this->norm_coeff / sqrtf(w_norm);
+			if (coeff < 1){
+				for (IndexType i = 0; i < this->weightDim; i++){
+					this->weightVec[i] *= coeff;
+				}
+			}
+			if (this->K > 0){
+				//truncate
+				for (IndexType i = 0; i < this->weightDim; i++)
+					this->abs_weightVec[i] = fabs(this->weightVec[i]);
 
-            /**
-             * @Synopsis UpdateModelDimention update dimension of the model,
-             * often caused by the increased dimension of data
-             *
-             * @Param new_dim new dimension
-             */
-            virtual void UpdateModelDimention(IndexType new_dim) {
-                if (new_dim < this->weightDim)
-                    return;
-                else {
-                    this->abs_weightVec.reserve(new_dim + 1);
-                    this->abs_weightVec.resize(new_dim + 1);
-                    this->abs_weightVec.zeros(this->abs_weightVec.begin + this->weightDim, this->abs_weightVec.end);
+				this->minHeap.BuildHeap();
+				//truncate
+				IndexType ret_id;
+				for (IndexType i = 0; i < this->weightDim - 1; i++){
+					if (this->minHeap.UpdateHeap(i, ret_id) == true){
+						this->weightVec[ret_id + 1] = 0;
+						this->abs_weightVec[ret_id + 1] = 0;
+					}
+				}
+			}
+			return y;
+		}
 
-                    this->minHeap.UpdateDataNum(new_dim, this->abs_weightVec.begin + 1);
+		/**
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) {
+			if (new_dim < this->weightDim)
+				return;
+			else {
+				this->abs_weightVec.reserve(new_dim + 1);
+				this->abs_weightVec.resize(new_dim + 1);
+				this->abs_weightVec.zeros(this->abs_weightVec.begin + this->weightDim, this->abs_weightVec.end);
 
-                    SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
-                }
-            }
-    };
-	IMPLEMENT_MODEL_CLASS(FOFS)
+				this->minHeap.UpdateDataNum(new_dim, this->abs_weightVec.begin + 1);
+
+				SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
+			}
+		}
+	};
+
+	IMPLEMENT_MODEL_CLASS(FOFS, "First Order Online Feature Selection")
 }
 
 #endif

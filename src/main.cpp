@@ -30,15 +30,6 @@ int main(int argc, const char** args) {
 		return -1;
 	}
 
-	try{
-		cout << param.StringValue("-i") << endl;
-		cout << param.StringValue("-t") << endl;
-		cout << param.IntValue("-passes") << endl;
-	}
-	catch (exception &ex){
-		cerr << ex.what();
-	}
-
 	LibBOC<FeatType, LabelType> libBoc;
 	libBoc.Initialize(param);
 	libBoc.Run();

@@ -3,7 +3,7 @@
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: 8/21/2013 Wednesday 4:48:28 PM
   > Functions: Interface for data reader
- ************************************************************************/
+  ************************************************************************/
 
 #ifndef HEADER_DATAREADER
 #define HEADER_DATAREADER
@@ -15,7 +15,7 @@
 
 namespace BOC {
 
-	#define IMPLEMENT_DATA_CLASS(className, name, descr) \
+#define IMPLEMENT_DATA_CLASS(className, name, descr) \
 	template <typename FeatType, typename LabelType> \
 	ClassInfo className<FeatType, LabelType>::classInfo(name, descr, className<FeatType, LabelType>::CreateObject); \
 	\
@@ -52,7 +52,7 @@ namespace BOC {
 		*/
 		virtual bool GetNextData(DataPoint<FeatType, LabelType> &data) = 0;
 		/**
-		* Rewind: Rewind the dataset to the beginning of the file 
+		* Rewind: Rewind the dataset to the beginning of the file
 		*/
 		virtual void Rewind() = 0;
 

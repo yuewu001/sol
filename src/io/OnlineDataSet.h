@@ -9,9 +9,11 @@
 
 
 #include "OnlineBuffer.h"
+#include "OnlineMPBuffer.h"
 #include "OnlineDataSetHelper.h"
 
 #include "DataSet.h"
+#include "../utils/Params.h"
 
 #include <sstream>
 
@@ -22,14 +24,11 @@ namespace BOC {
 	//data set, can work in both read-and-write mode and read-once mode
 	template <typename FeatType, typename LabelType>
 	class OnlineDataSet : public DataSet<FeatType, LabelType> {
-		//for dynamic binding
-		DECLARE_CLASS
-
 	protected:
-		typedef FixSizeDataChunk<FeatType, LabelType> ChunkType;
+		typedef FixSizeDataChunk<PointType> ChunkType;
 
 		int pass_num; //number of passes
-		OnlineBuffer<ChunkType> online_buf;
+		OnlineBuffer<PointType> *online_buf;
 
 #if WIN32
 		HANDLE thread;
@@ -40,17 +39,32 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineDataSet(int passes, int buf_size, int chunk_size) :
-			online_buf(buf_size, chunk_size), DataSet<FeatType, LabelType>() {
+		OnlineDataSet(int passes, int buf_size = -1, int chunk_size = -1) :
+			online_buf(NULL), DataSet<FeatType, LabelType>() {
 				if (passes < 1) {
 					std::ostringstream oss;
 					oss << "number of passes should be no less than 1, while " << passes << " is specified!";
 					throw std::runtime_error(oss.str());
 				}
 				this->pass_num = passes;
+				if (buf_size > 0 && chunk_size > 0){
+					this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
+				}
 			}
 
 		virtual ~OnlineDataSet() {
+			DELETE_POINTER(this->online_buf);
+		}
+
+		void ConfiBuffer(int buf_size, int chunk_size, const string& mp_buf_type, int mp_buf_size){
+			DELETE_POINTER(this->online_buf);
+			if (mp_buf_type == "none"){
+				this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
+			}
+			else {
+				this->online_buf = new OnlineMPBuffer<PointType>(buf_size, chunk_size);
+				((OnlineMPBuffer<PointType>*)this->online_buf)->ConfigMPBuffer(mp_buf_type, mp_buf_size);
+			}
 		}
 
 	public:
@@ -128,7 +142,7 @@ namespace BOC {
 		 * @Returns reference to the chunk
 		 */
 		inline ChunkType& GetWriteChunk(){
-			return this->online_buf.GetWriteChunk();
+			return this->online_buf->GetWriteChunk();
 		}
 
 		/**
@@ -136,14 +150,14 @@ namespace BOC {
 		 */
 		inline void EndWriteChunk(const ChunkType& chunk){
 			this->data_num += chunk.dataNum;
-			this->online_buf.EndWriteChunk();
+			this->online_buf->EndWriteChunk();
 		}
 
 		/**
 		 * @Synopsis FinishParse Finish loading the data
 		 */
 		inline void FinishParse(){
-			return this->online_buf.FinishParse();
+			return this->online_buf->FinishParse();
 		}
 
 		/**
@@ -151,15 +165,15 @@ namespace BOC {
 		 *
 		 * @Returns reference to a chunk of data
 		 */
-		virtual DataChunk<FeatType, LabelType>& GetChunk() {
-			return this->online_buf.GetChunk();
+		virtual DataChunk<PointType>& GetChunk() {
+			return this->online_buf->GetChunk();
 		}
 
 		/**
 		 * @Synopsis FinishRead finished processing the read chunk
 		 */
 		inline virtual void FinishRead() {
-			return this->online_buf.FinishRead();
+			return this->online_buf->FinishRead();
 		}
 
 		template <typename T1, typename T2> friend bool CacheLoad(OnlineDataSet<T1, T2> *dataset);
@@ -173,7 +187,7 @@ namespace BOC {
 		 * @Synopsis Rewind Reset the reader to the beginning
 		 */
 		virtual void Rewind() {
-			if (this->online_buf.BeginWriteChunk() == true){
+			if (this->online_buf->BeginWriteChunk() == true){
 				this->reader->Rewind();
 				this->threadLoad();
 			}
@@ -190,18 +204,6 @@ namespace BOC {
 #endif
 		}
 	};
-
-	//for dynamic binding
-	template <typename FeatType, typename LabelType> 
-	ClassInfo OnlineDataSet<FeatType, LabelType>::classInfo("dt_online", 
-		"parallel loading dataset", OnlineDataSet<FeatType, LabelType>::CreateObject); 
-
-	template <typename FeatType, typename LabelType>
-	void*  OnlineDataSet<FeatType, LabelType>::CreateObject(void *param1, void* param2, void* param3) {
-		return new OnlineDataSet<FeatType, LabelType>(int(param1), int(param2), int(param3));
-	}
 }
 
-
 #endif
-

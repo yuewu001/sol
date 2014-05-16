@@ -13,11 +13,14 @@
 #include "DataChunk.h"
 
 namespace BOC{
+    //point type
+#define PtType DataPoint<T1, T2>
+
 	template <typename T1, typename T2> class OnlineDataSet;
 
 	//load a chunk of data, return if file ended
 	template <typename T1, typename T2>
-	bool load_chunk(DataReader<T1, T2>* reader, FixSizeDataChunk<T1, T2>&chunk){
+	bool load_chunk(DataReader<T1, T2>* reader, FixSizeDataChunk<PtType >&chunk){
 		bool not_file_end = true;
 		chunk.erase();
 		while (chunk.dataNum < chunk.chunk_size && not_file_end == true){
@@ -42,7 +45,7 @@ namespace BOC{
 	 * @Returns  true if saved successfully
 	 */
 	template <typename T1, typename T2>
-	bool save_chunk(binary_io<T1, T2> *writer, FixSizeDataChunk<T1, T2>&chunk){
+	bool save_chunk(binary_io<T1, T2> *writer, FixSizeDataChunk<PtType>&chunk){
 		size_t w_num = 0;
 		while (w_num < chunk.dataNum){
 			if (writer->WriteData(chunk.data[w_num]) == true)
@@ -119,7 +122,7 @@ namespace BOC{
 		//load data
 		bool not_file_end = false;
 		do {
-			FixSizeDataChunk<T1, T2> &chunk = dataset->GetWriteChunk();
+			FixSizeDataChunk<PtType> &chunk = dataset->GetWriteChunk();
 			not_file_end = load_chunk(reader, chunk);
 			if (save_chunk(writer, chunk) == false){
 				dataset->EndWriteChunk(chunk);
@@ -185,7 +188,7 @@ namespace BOC{
 			if (reader->Good()) {
 				bool not_file_end = false;
 				do {
-					FixSizeDataChunk<T1, T2> &chunk = dataset->GetWriteChunk();
+					FixSizeDataChunk<PtType> &chunk = dataset->GetWriteChunk();
 					not_file_end = load_chunk(reader, chunk);
 					dataset->EndWriteChunk(chunk);
 				} while (not_file_end == true);

@@ -3,20 +3,22 @@
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: 8/19/2013 Monday 10:37:08 AM
   > Functions: Stochastic Gradient Descent
- ************************************************************************/
+  ************************************************************************/
 
 #ifndef HEADER_SOLM_SGD
 #define HEADER_SOLM_SGD
 
-#include "SparseOnlineLinearModel.h"
+#include "OnlineLinearModel.h"
 
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class SGD: public SparseOnlineLinearModel<FeatType, LabelType> {
+	class SGD : public OnlineLinearModel<FeatType, LabelType> {
+
 		DECLARE_CLASS
+
 	protected:
 		float(*pEta_time)(size_t t, float pt);
 
@@ -25,7 +27,7 @@ namespace BOC {
 		 */
 	public:
 		SGD(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
 			}
 
 		virtual ~SGD() {
@@ -39,7 +41,7 @@ namespace BOC {
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
-			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
+			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			if (this->power_t == 0.5)
 				this->pEta_time = pEta_sqrt;
@@ -75,6 +77,6 @@ namespace BOC {
 		}
 	};
 
-	IMPLEMENT_MODEL_CLASS(SGD)
+	IMPLEMENT_MODEL_CLASS(SGD, "Stochasitic Gradient Descent")
 }
 #endif

@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 5/5/2014 3:29:56 PM
 	> Functions: Interface for learning model
- ************************************************************************/
+	************************************************************************/
 
 #ifndef HEADER_LEARN_MODEL
 #define HEADER_LEARN_MODEL
@@ -25,14 +25,13 @@ using std::string;
 */
 namespace BOC {
 
-#define IMPLEMENT_MODEL_CLASS(name) \
+#define IMPLEMENT_MODEL_CLASS(name, descr) \
 	template <typename FeatType, typename LabelType> \
-	ClassInfo name<FeatType, LabelType>::classInfo(#name, "", name<FeatType, LabelType>::CreateObject); \
+	ClassInfo name<FeatType, LabelType>::classInfo(#name, descr, name<FeatType, LabelType>::CreateObject); \
 	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
 	{ return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
-
 
 
 
@@ -60,7 +59,11 @@ namespace BOC {
 		 * PrintOptInfo print the info of optimization algorithm
 		 */
 		virtual void PrintOptInfo() const {
-			printf("--------------------------------------------------\n");
+			printf("-----------------------------------------\n");
+			printf("-----------------------------------------\n");
+			printf("             Model Settings              \n");
+			printf("-----------------------------------------\n");
+			printf("-----------------------------------------\n");
 		}
 
 		/**

@@ -83,7 +83,7 @@ namespace BOC {
 
 	inline void condition_variable_wait(CV* pcv, MUTEX *pm) {
 #ifdef _WIN32
-		::SleepConditionVariableCS(pcv,pm,INFINITE);
+		::SleepConditionVariableCS(pcv, pm, INFINITE);
 #else
 		pthread_cond_wait(pcv,pm);
 #endif

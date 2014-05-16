@@ -3,7 +3,7 @@
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: Sat 21 Sep 2013 10:52:41 PM SGT
   > Functions:  io for binary libsvm dataset
- ************************************************************************/
+  ************************************************************************/
 
 #ifndef HEADER_BINARY_IO
 #define HEADER_BINARY_IO
@@ -22,7 +22,7 @@ using namespace std;
 
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class binary_io: public DataHandler<FeatType, LabelType> {
+	class binary_io : public DataHandler<FeatType, LabelType> {
 		//dynamic binding
 		DECLARE_CLASS
 	private:

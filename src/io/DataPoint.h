@@ -17,7 +17,7 @@ namespace BOC {
 	*
 	* @tparam DataType
 	*/
-	template <typename FeatType, typename LabelType> 
+	template <typename FeatType, typename LabelType>
 	class DataPoint {
 	public:
 		//////////////Member Variables
@@ -38,7 +38,7 @@ namespace BOC {
 			this->max_index = 0;
 			this->label = 0;
 			this->sum_sq = 0;
-			this->margin= 0;
+			this->margin = 0;
 		}
 
 		//copy constructor
@@ -49,40 +49,40 @@ namespace BOC {
 			this->count = point.count;
 			this->max_index = point.max_index;
 			this->sum_sq = point.sum_sq;
-			this->margin= point.margin;
+			this->margin = point.margin;
 			++(*count);
 		}
 
 		~DataPoint(){
 			this->release();
-		} 
+		}
 
 		//assignment
-		DataPoint<FeatType, LabelType>& operator= 
+		DataPoint<FeatType, LabelType>& operator=
 			(const DataPoint<FeatType, LabelType> &data) {
-				if (data.count == this->count)
-					return *this;
-				this->release();
-
-				this->indexes = data.indexes;
-				this->features = data.features;
-				this->label = data.label;
-				this->max_index = data.max_index;
-				this->sum_sq = data.sum_sq;
-				this->margin = data.margin;
-				this->count = data.count;
-				++(*count);
+			if (data.count == this->count)
 				return *this;
+			this->release();
+
+			this->indexes = data.indexes;
+			this->features = data.features;
+			this->label = data.label;
+			this->max_index = data.max_index;
+			this->sum_sq = data.sum_sq;
+			this->margin = data.margin;
+			this->count = data.count;
+			++(*count);
+			return *this;
 		}
 		//set new index-value pair
-		void AddNewFeat(const IndexType &index, 
+		void AddNewFeat(const IndexType &index,
 			const FeatType &feat) {
-				this->indexes.push_back(index);
-				this->features.push_back(feat);
-				if(this->max_index < index){
-					this->max_index = index;
-				}
-				this->sum_sq += feat * feat;
+			this->indexes.push_back(index);
+			this->features.push_back(feat);
+			if (this->max_index < index){
+				this->max_index = index;
+			}
+			this->sum_sq += feat * feat;
 		}
 
 		void erase() {
@@ -104,25 +104,25 @@ namespace BOC {
 		}
 
 		DataPoint<FeatType, LabelType> clone() const{
-			DataPoint<FeatType, LabelType> newPt; 
+			DataPoint<FeatType, LabelType> newPt;
 			newPt.label = this->label;
 			newPt.max_index = this->max_index;
 			newPt.sum_sq = this->sum_sq;
 			newPt.margin = this->margin;
 			newPt.indexes.resize(this->indexes.size());
-			memcpy(newPt.indexes.begin,this->indexes.begin, this->indexes.size() * sizeof(IndexType) );
+			memcpy(newPt.indexes.begin, this->indexes.begin, this->indexes.size() * sizeof(IndexType));
 			newPt.features.resize(this->features.size());
 			memcpy(newPt.features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
-			return newPt;				
+			return newPt;
 		}
 
-		IndexType dim() const {return this->max_index;}
+		IndexType dim() const { return this->max_index; }
 
 		bool is_sorted() const {
 			bool sorted = true;
 			if (this->indexes.size() <= 1)
 				return true;
-			for (IndexType *iter = this->indexes.begin + 1, *iter0 = this->indexes.begin; iter != this->indexes.end; iter0++,iter++){
+			for (IndexType *iter = this->indexes.begin + 1, *iter0 = this->indexes.begin; iter != this->indexes.end; iter0++, iter++){
 				if (*iter0 > *iter){
 					sorted = false;
 					break;
@@ -133,12 +133,12 @@ namespace BOC {
 		void Sort() {
 			if (this->is_sorted() == true)
 				return;
-			QuickSort(this->indexes.begin,this->features.begin, 0,this->indexes.size() -1 );
+			QuickSort(this->indexes.begin, this->features.begin, 0, this->indexes.size() - 1);
 		}
 
 	private:
 		void release() {
-			--(*count); 
+			--(*count);
 			if (*count == 0)
 				delete count;
 			this->count = NULL;

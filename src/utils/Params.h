@@ -20,7 +20,7 @@ using std::map;
 namespace BOC {
 	class Params {
 	private:
-        //separate ezOption definition, due to the error of ezOptionParser
+		//separate ezOption definition, due to the error of ezOptionParser
 		struct ezOption;
 		struct ezOption *option;
 

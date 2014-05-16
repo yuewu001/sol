@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 5/5/2014 4:54:43 PM
 	> Functions: interfaces for sparse linear online model
- ************************************************************************/
+	************************************************************************/
 #ifndef HEADER_SPARSE_LINEAR_ONLINE_MODEL
 #define HEADER_SPARSE_LINEAR_ONLINE_MODEL
 
@@ -13,78 +13,78 @@
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
-	template <typename FeatType, typename LabelType> 
-    class SparseOnlineLinearModel : public OnlineLinearModel<FeatType, LabelType> {
-        protected:
-            //L1 regularization parameter
-            float lambda;
-            //weights below this threshold will eliminated at the end of training
-            float sparse_soft_thresh;
+	template <typename FeatType, typename LabelType>
+	class SparseOnlineLinearModel : public OnlineLinearModel<FeatType, LabelType> {
+	protected:
+		//L1 regularization parameter
+		float lambda;
+		//weights below this threshold will eliminated at the end of training
+		float sparse_soft_thresh;
 
-        public:
-            SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) : 
-                OnlineLinearModel<FeatType, LabelType>(lossFunc) {
-                    this->lambda = 0;
-                    this->sparse_soft_thresh = init_sparse_soft_thresh;
-                }
+	public:
+		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) :
+			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
+				this->lambda = 0;
+				this->sparse_soft_thresh = init_sparse_soft_thresh;
+			}
 
-            virtual ~SparseOnlineLinearModel() {
-            }
+		virtual ~SparseOnlineLinearModel() {
+		}
 
-            //inherited functions
-        public:
-            /**
-             * PrintOptInfo print the info of optimization algorithm
-             */
-            virtual void PrintOptInfo() const {
-                OnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+		//inherited functions
+	public:
+		/**
+		 * PrintOptInfo print the info of optimization algorithm
+		 */
+		virtual void PrintOptInfo() const {
+			OnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
 
-                printf("Sparse Online Linear Model\n");
-                printf("\tl1 regularization: %g\n", this->lambda);
-            }
+			printf("Linear Sparse Online Learning:\n");
+			printf("\tl1 regularization: %g\n", this->lambda);
+		}
 
 		/**
 		 * PrintOptInfo print the info of trained model
 		 */
-			virtual void PrintModelInfo() const {
-				OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
+		virtual void PrintModelInfo() const {
+			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
 
-				IndexType zeroNum = 0;
-				if (this->weightDim == 1){
-					zeroNum = 1;
-				}
-				else{
-					zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
-				}
-
-				double sparseRate = zeroNum / (double)(this->weightDim - 1);
-				printf("Sparsification Rate: %g %%\n", sparseRate * 100);
+			IndexType zeroNum = 0;
+			if (this->weightDim == 1){
+				zeroNum = 1;
+			}
+			else{
+				zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
 			}
 
-            /**
-             * @Synopsis SetParameter set parameters for the learning model
-             *
-             * @Param param
-             */
-			virtual void SetParameter(BOC::Params &param){
-                OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-				this->lambda = param.FloatValue("-l1");
-            }
+			double sparseRate = zeroNum / (double)(this->weightDim - 1);
+			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
+		}
 
-            /**
-             * @Synopsis EndTrain called when a train ends
-             */
-            virtual void EndTrain() {
-                //eliminate weights smaller than sparse_soft_thresh
-				for (IndexType i = 1; i < this->weightDim; i++){
-					if (this->weightVec[i] < this->sparse_soft_thresh &&
-						this->weightVec[i] > -this->sparse_soft_thresh){
-						this->weightVec[i] = 0;
-					}
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			this->lambda = param.FloatValue("-l1");
+		}
+
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() {
+			//eliminate weights smaller than sparse_soft_thresh
+			for (IndexType i = 1; i < this->weightDim; i++){
+				if (this->weightVec[i] < this->sparse_soft_thresh &&
+					this->weightVec[i] > -this->sparse_soft_thresh){
+					this->weightVec[i] = 0;
 				}
-
-				OnlineLinearModel<FeatType, LabelType>::EndTrain();
 			}
+
+			OnlineLinearModel<FeatType, LabelType>::EndTrain();
+		}
 
 	protected:
 		/**

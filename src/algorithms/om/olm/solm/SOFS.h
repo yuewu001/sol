@@ -17,7 +17,9 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class SOFS : public SparseOnlineLinearModel<FeatType, LabelType> {
+
 		DECLARE_CLASS
+
 	protected:
 		float r;
 		s_array<float> sigma_w;
@@ -27,7 +29,6 @@ namespace BOC {
 	public:
 		SOFS(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->id_str = "Second Order Online Feature Selection";
 				this->r = 0;
 				this->K = 0;
 				this->sigma_w.resize(this->weightDim);
@@ -45,7 +46,6 @@ namespace BOC {
 		 */
 		virtual void PrintOptInfo() const {
 			printf("--------------------------------------------------\n");
-			printf("Algorithm: %s\n\n", this->Id_Str().c_str());
 			printf("\tk:\t%d\n", this->K);
 			printf("\tr:\t%g\n", this->r);
 		}
@@ -154,6 +154,6 @@ namespace BOC {
 
 	};
 
-	IMPLEMENT_MODEL_CLASS(SOFS)
+	IMPLEMENT_MODEL_CLASS(SOFS,"Second Order Online Feature Selection")
 }
 #endif

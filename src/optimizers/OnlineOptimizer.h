@@ -48,9 +48,10 @@ namespace BOC {
 			size_t data_count = 0;
 
 			//double train_time  = 0;
+			printf("\nIterations:\n");
 			printf("\nIterate No.\t\tError Rate\t\t\n");
 			while (1) {
-				DataChunk<FeatType, LabelType> &chunk = this->dataSet->GetChunk();
+				DataChunk<PointType> &chunk = this->dataSet->GetChunk();
 				//double time1 = get_current_time();
 				//all the data has been processed!
 				if (chunk.dataNum == 0) {
@@ -59,7 +60,7 @@ namespace BOC {
 				}
 
 				for (size_t i = 0; i < chunk.dataNum; i++) {
-					DataPoint<FeatType, LabelType> &data = chunk.data[i];
+					PointType &data = chunk.data[i];
 
 					p_onlineModel->UpdateModelDimention(data.dim());
 					float y = p_onlineModel->Iterate(data);
@@ -86,10 +87,10 @@ namespace BOC {
 		}
 	};
 
-	template <typename FeatType, typename LabelType> 
-	ClassInfo OnlineOptimizer<FeatType, LabelType>::classInfo("opt_online", 
-		"optimizer for online learning models", OnlineOptimizer<FeatType, LabelType>::CreateObject); 
-	
+	template <typename FeatType, typename LabelType>
+	ClassInfo OnlineOptimizer<FeatType, LabelType>::classInfo("opt_online",
+		"optimizer for online learning models", OnlineOptimizer<FeatType, LabelType>::CreateObject);
+
 	template <typename FeatType, typename LabelType>
 	void* OnlineOptimizer<FeatType, LabelType>::CreateObject(void* model, void* dataset, void* param3) {
 		return new OnlineOptimizer<FeatType, LabelType>((OnlineModel<FeatType, LabelType>*)model,

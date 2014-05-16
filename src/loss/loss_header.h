@@ -7,15 +7,16 @@
 #include "SquaredHingeLoss.h"
 
 namespace BOC{
-    template <typename FeatType, typename LabelType>
-        class LossInfo{
-		public:
-            static void GetLossInfo(std::string & info){
-				APPEND_INFO(info, HingeLoss, FeatType, LabelType);
-				APPEND_INFO(info, LogisticLoss, FeatType, LabelType);
-				APPEND_INFO(info, SquareLoss, FeatType, LabelType);
-				APPEND_INFO(info, SquaredHingeLoss, FeatType, LabelType);
-            }
-        };
+	template <typename FeatType, typename LabelType>
+	class LossInfo{
+	public:
+		static void GetLossInfo(std::string & info){
+			info.append("\nLoss Functions:");
+			APPEND_INFO(info, HingeLoss, FeatType, LabelType);
+			APPEND_INFO(info, LogisticLoss, FeatType, LabelType);
+			APPEND_INFO(info, SquareLoss, FeatType, LabelType);
+			APPEND_INFO(info, SquaredHingeLoss, FeatType, LabelType);
+		}
+	};
 }
 #endif

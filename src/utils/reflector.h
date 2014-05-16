@@ -59,11 +59,14 @@ namespace BOC{
 			return false;
 		}
 
-		static void* CreateObject(const std::string &name, void *param1 = NULL, 
+		static void* CreateObject(const std::string &name, void *param1 = NULL,
 			void* param2 = NULL, void* param3 = NULL){
 			std::map<std::string, ClassInfo* >::iterator iter = mapClassInfo.find(name);
 			if (iter != mapClassInfo.end()){
 				return ((ClassInfo*)(iter->second))->CreateObject(param1, param2, param3);
+			}
+			else{
+				fprintf(stderr, "Error: unrecognized class name %s!\n", name.c_str());
 			}
 			return NULL;
 		}
@@ -101,9 +104,9 @@ public:\
 
 #define APPEND_INFO(info,name,T1,T2) \
 	info.append("\n\t"); \
-	info.append(name<T1,T2>::GetClassMsg().GetType()); \
+	info.append(name<T1, T2>::GetClassMsg().GetType()); \
 	info.append(":\t"); \
-	info.append(name<T1,T2>::GetClassMsg().GetDescr()); 
+	info.append(name<T1, T2>::GetClassMsg().GetDescr());
 }
 
 #endif

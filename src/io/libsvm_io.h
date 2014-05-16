@@ -3,7 +3,7 @@
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: 2013/8/18 Sunday 20:25:28
   > Functions: libsvm io_hander
- ************************************************************************/
+  ************************************************************************/
 #ifndef HEADER_LIBSVM_READ
 #define HEADER_LIBSVM_READ
 
@@ -146,8 +146,8 @@ namespace BOC {
 		}
 	};
 
-    //dynamic binding
-	IMPLEMENT_DATA_CLASS(libsvm_io,"libsvm", "io class for libsvm data")
+	//dynamic binding
+	IMPLEMENT_DATA_CLASS(libsvm_io, "libsvm", "io class for libsvm data")
 }
 
 #endif

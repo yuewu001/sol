@@ -26,8 +26,8 @@ namespace BOC {
 		ez::ezOptionValidator* vbool;
 
 		ezOption(){
-			this->vfloat = new ezOptionValidator("f","ge","0");
-			this->vint = new ezOptionValidator("u4","ge","0");
+			this->vfloat = new ezOptionValidator("f", "ge", "0");
+			this->vint = new ezOptionValidator("u4", "ge", "0");
 			this->vbool = new ezOptionValidator("t", "in", "true,false", false);
 		}
 		~ezOption(){
@@ -76,7 +76,7 @@ namespace BOC {
 
 		option->opt.add("", 0, 0, ',', "help message", "-h", "--help");
 
-        //input & output
+		//input & output
 		this->add_option("", 0, 1, "training file name", "-i");
 		this->add_option("", 0, 1, "test file name", "-t");
 		this->add_option("", 0, 1, "cached training file name", "-c");
@@ -85,6 +85,7 @@ namespace BOC {
 		this->add_option(init_data_format, 0, 1, "dataset type format", "-df");
 		this->add_option(init_buf_size, 0, 1, "number of chunks for buffering", "-bs");
 		this->add_option(init_chunk_size, 0, 1, "number of examples in a chunk", "-cs");
+		this->add_option(init_mp_buf_type, 0, 1, "type of buffer for multi-pass", "-mbt");
 		this->add_option(init_mp_buf_size, 0, 1, "size of buffer for multi-pass", "-mbs");
 
 
@@ -114,7 +115,7 @@ namespace BOC {
 		this->add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta");
 		this->add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r");
 
-        //optimizer
+		//optimizer
 		this->add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt");
 	}
 

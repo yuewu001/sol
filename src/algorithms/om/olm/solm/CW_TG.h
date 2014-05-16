@@ -3,8 +3,8 @@
 > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 > Created Time: 2013/8/18 Sunday 17:25:54
 > Functions: Diagonal Adaptive Regularization of Weight Vectors
-> Reference: 
-Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization 
+> Reference:
+Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization
 of weight vectors." Machine Learning (2009): 1-33.
 ************************************************************************/
 
@@ -17,175 +17,177 @@ of weight vectors." Machine Learning (2009): 1-33.
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
-    template <typename FeatType, typename LabelType>
-    class CW_TG: public SparseOnlineLinearModel<FeatType, LabelType> {
+	template <typename FeatType, typename LabelType>
+	class CW_TG : public SparseOnlineLinearModel<FeatType, LabelType> {
+
 		DECLARE_CLASS
-        protected:
-            float r;
-            s_array<float> sigma_w;
-            s_array<size_t> timeStamp;
-            s_array<float> sum_rate;
 
-            size_t iter_num;
+	protected:
+		float r;
+		s_array<float> sigma_w;
+		s_array<size_t> timeStamp;
+		s_array<float> sum_rate;
 
-        public:
-            CW_TG(LossFunction<FeatType, LabelType> *lossFunc) :
-                SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-                    this->id_str = "truncated gradient AROW";
-                    this->r = 0;
-                    this->sigma_w.resize(this->weightDim);
-                    this->timeStamp.resize(this->weightDim);
-                    this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-                }
-            virtual ~CW_TG(){
-                if (this->lossFunc != NULL){
-                    delete this->lossFunc;
-                    this->lossFunc = NULL;
-                }
-            }
+		size_t iter_num;
 
-            /**
-             * @Synopsis inherited functions
-             */
-        public:
-            /**
-             * PrintOptInfo print the info of optimization algorithm
-             */
-            virtual void PrintOptInfo() const {
-                SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
-                printf("\tr:\t%g\n", this->r);
-            }
+	public:
+		CW_TG(LossFunction<FeatType, LabelType> *lossFunc) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+				this->r = 0;
+				this->sigma_w.resize(this->weightDim);
+				this->timeStamp.resize(this->weightDim);
+				this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
+			}
+		virtual ~CW_TG(){
+			if (this->lossFunc != NULL){
+				delete this->lossFunc;
+				this->lossFunc = NULL;
+			}
+		}
 
-            /**
-             * @Synopsis SetParameter set parameters for the learning model
-             *
-             * @Param param
-             */
-            virtual void SetParameter(BOC::Params &param){
-                OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-                this->r = param.FloatValue("-r");
-            }
+		/**
+		 * @Synopsis inherited functions
+		 */
+	public:
+		/**
+		 * PrintOptInfo print the info of optimization algorithm
+		 */
+		virtual void PrintOptInfo() const {
+			SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+			printf("\tr:\t%g\n", this->r);
+		}
 
-            /**
-             * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-             */
-            virtual void BeginTrain() {
-                SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			this->r = param.FloatValue("-r");
+		}
 
-                this->timeStamp.zeros();
-                this->sigma_w.set_value(1);
-                this->sum_rate.push_back(0);
-                this->iter_num = 1; //force to begin from 1, as sum_rate depends on this value
-            }
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
-            /**
-             * @Synopsis EndTrain called when a train ends
-             */
-            virtual void EndTrain() {
-                float gravity = 0;
-                //this->beta_t = 1.f / this->r;
-                for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
-                    //L1 lazy update
-                    gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
-                    //size_t stepK = this->curIterNum - this->timeStamp[index_i];
-                    //gravity = stepK * this->lambda * this->beta_t / 2.f;
+			this->timeStamp.zeros();
+			this->sigma_w.set_value(1);
+			this->sum_rate.push_back(0);
+			this->iter_num = 1; //force to begin from 1, as sum_rate depends on this value
+		}
 
-                    //this->timeStamp[index_i] = this->curIterNum;
-                    this->weightVec[index_i] = trunc_weight(this->weightVec[index_i], 
-                            gravity *(this->sigma_w[index_i]));
-                }
-                SparseOnlineLinearModel<FeatType, LabelType>::EndTrain();
-            }
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() {
+			float gravity = 0;
+			//this->beta_t = 1.f / this->r;
+			for (IndexType index_i = 1; index_i < this->weightDim; index_i++) {
+				//L1 lazy update
+				gravity = this->sum_rate.last() - this->sum_rate[this->timeStamp[index_i]];
+				//size_t stepK = this->curIterNum - this->timeStamp[index_i];
+				//gravity = stepK * this->lambda * this->beta_t / 2.f;
 
-            /**
-             * @Synopsis Iterate Iteration of online learning
-             *
-             * @Param x current input data example
-             *
-             * @Returns  prediction of the current example
-             */
-            virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-                IndexType* p_index = x.indexes.begin;
-                float* p_feat = x.features.begin;
+				//this->timeStamp[index_i] = this->curIterNum;
+				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+					gravity *(this->sigma_w[index_i]));
+			}
+			SparseOnlineLinearModel<FeatType, LabelType>::EndTrain();
+		}
 
-                //obtain w_t
-                float y = this->Predict(x); 
-                float gt_i = this->lossFunc->GetGradient(x.label,y);
-                //update w_t
-                if(gt_i != 0){
-                    //calculate learning rate
-                    this->eta = this->r;
-                    while(p_index != x.indexes.end){
-                        this->eta += (*p_feat) * (*p_feat) * this->sigma_w[*p_index];
-                        p_index++;p_feat++;
-                    }
+		/**
+		 * @Synopsis Iterate Iteration of online learning
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  prediction of the current example
+		 */
+		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
+			IndexType* p_index = x.indexes.begin;
+			float* p_feat = x.features.begin;
 
-                    this->eta = 0.5f / this->eta;
-                    this->sum_rate.push_back(this->sum_rate.last() + 
-                            this->eta * this->lambda);
-                    gt_i *= this->eta;
+			//obtain w_t
+			float y = this->Predict(x);
+			float gt_i = this->lossFunc->GetGradient(x.label, y);
+			//update w_t
+			if (gt_i != 0){
+				//calculate learning rate
+				this->eta = this->r;
+				while (p_index != x.indexes.end){
+					this->eta += (*p_feat) * (*p_feat) * this->sigma_w[*p_index];
+					p_index++; p_feat++;
+				}
 
-                    float last_g_sum = this->sum_rate.last();
-                    p_index = x.indexes.begin;
-                    p_feat = x.features.begin;
-                    while(p_index != x.indexes.end){
-                        //update u_t
-                        this->weightVec[*p_index] -= gt_i *
-                            (*p_feat) * this->sigma_w[*p_index];  
+				this->eta = 0.5f / this->eta;
+				this->sum_rate.push_back(this->sum_rate.last() +
+					this->eta * this->lambda);
+				gt_i *= this->eta;
 
-                        //L1 lazy update
-                        //size_t stepK = this->iter_num - this->timeStamp[*p_index];
-                        float gravity = last_g_sum - 
-                            this->sum_rate[this->timeStamp[*p_index]];
-                        //float gravity = stepK * this->lambda * this->beta_t / 2.f;
-                        this->timeStamp[*p_index] = this->iter_num;
+				float last_g_sum = this->sum_rate.last();
+				p_index = x.indexes.begin;
+				p_feat = x.features.begin;
+				while (p_index != x.indexes.end){
+					//update u_t
+					this->weightVec[*p_index] -= gt_i *
+						(*p_feat) * this->sigma_w[*p_index];
 
-                        this->weightVec[*p_index]= 
-                            trunc_weight(this->weightVec[*p_index],
-                                    gravity *(this->sigma_w[*p_index])); 
+					//L1 lazy update
+					//size_t stepK = this->iter_num - this->timeStamp[*p_index];
+					float gravity = last_g_sum -
+						this->sum_rate[this->timeStamp[*p_index]];
+					//float gravity = stepK * this->lambda * this->beta_t / 2.f;
+					this->timeStamp[*p_index] = this->iter_num;
 
-                        //update sigma_w
-                        this->sigma_w[*p_index] *= this->r / (this->r + 
-                                this->sigma_w[*p_index] * (*p_feat) * (*p_feat));
-                        p_index++;p_feat++;
-                    }
+					this->weightVec[*p_index] =
+						trunc_weight(this->weightVec[*p_index],
+						gravity *(this->sigma_w[*p_index]));
 
-                    //bias term
-                    this->weightVec[0] -= gt_i * this->sigma_w[0];
-                    this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
-                    this->timeStamp[0] = this->iter_num;
+					//update sigma_w
+					this->sigma_w[*p_index] *= this->r / (this->r +
+						this->sigma_w[*p_index] * (*p_feat) * (*p_feat));
+					p_index++; p_feat++;
+				}
 
-                    this->iter_num++;
-                }
-                return y;
-            }
+				//bias term
+				this->weightVec[0] -= gt_i * this->sigma_w[0];
+				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
+				this->timeStamp[0] = this->iter_num;
 
-            /**
-             * @Synopsis UpdateModelDimention update dimension of the model,
-             * often caused by the increased dimension of data
-             *
-             * @Param new_dim new dimension
-             */
-            virtual void UpdateModelDimention(IndexType new_dim) {
-                if (new_dim < this->weightDim)
-                    return;
-                else {
-                    this->sigma_w.reserve(new_dim + 1);
-                    this->sigma_w.resize(new_dim + 1);
-                    //set the rest to one
-                    this->sigma_w.set_value(this->sigma_w.begin + this->weightDim, 
-                            this->sigma_w.end,1);
+				this->iter_num++;
+			}
+			return y;
+		}
 
-                    this->timeStamp.reserve(new_dim + 1);
-                    this->timeStamp.resize(new_dim + 1);
-                    //set the rest to zero
-                    this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
-                            this->timeStamp.end);
+		/**
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) {
+			if (new_dim < this->weightDim)
+				return;
+			else {
+				this->sigma_w.reserve(new_dim + 1);
+				this->sigma_w.resize(new_dim + 1);
+				//set the rest to one
+				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
+					this->sigma_w.end, 1);
 
-                    SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
-                }
-            }
-    };
-	IMPLEMENT_MODEL_CLASS(CW_TG)
+				this->timeStamp.reserve(new_dim + 1);
+				this->timeStamp.resize(new_dim + 1);
+				//set the rest to zero
+				this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,
+					this->timeStamp.end);
+
+				SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
+			}
+		}
+	};
+
+	IMPLEMENT_MODEL_CLASS(CW_TG, "Confidence Weighted Truncated Gradient")
 }
 #endif

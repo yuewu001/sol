@@ -27,7 +27,7 @@ namespace BOC{
 
 	public:
 		MinHeap() :K(0), data_num(0), value_list(NULL){}
-		index_type GetK() const { return this->K;}
+		index_type GetK() const { return this->K; }
 
 	public:
 		inline index_type get_pos(index_type id) const {
@@ -128,7 +128,7 @@ namespace BOC{
 		**/
 		void EnlargeHeap(index_type newK){
 			if (newK < this->K){
-				cerr << "new K(" << newK << ") must be no less than original K(" << this->K<< ") in EnlargeHeap!" << endl;
+				cerr << "new K(" << newK << ") must be no less than original K(" << this->K << ") in EnlargeHeap!" << endl;
 			}
 			else if (newK == this->K)
 				return;
@@ -160,7 +160,7 @@ namespace BOC{
 
 		void ShrinkHeap(index_type newK){
 			if (newK > this->K)
-				cerr << "new K(" << newK << ") must be no larger than original K(" << this->K<< ") in ShrinkHeap!" << endl;
+				cerr << "new K(" << newK << ") must be no larger than original K(" << this->K << ") in ShrinkHeap!" << endl;
 			else if (newK == this->K)
 				return;
 			else{
@@ -195,7 +195,7 @@ namespace BOC{
 				if (cur_pos == 0)
 					par_pos = 0;
 				//the current value decreases
-				if (this->value_list[this->pos2id_map[cur_pos]] < 
+				if (this->value_list[this->pos2id_map[cur_pos]] <
 					this->value_list[this->pos2id_map[par_pos]]){
 					do{
 						//swap parent and itself
@@ -248,7 +248,7 @@ namespace BOC{
 				this->pos2id_map[i] = top_id;
 				this->id2pos_map[top_id] = i;
 
-				cout << this->value_list[top_id]<<" ";
+				cout << this->value_list[top_id] << " ";
 				this->HeapAdjust(0, i - 1);
 			}
 			cout << endl;
@@ -291,7 +291,7 @@ namespace BOC{
 			index_type i = s;
 			for (i = 2 * s + 1; i <= m; i = 2 * i + 1){
 				if (i < m &&
-					this->value_list[this->pos2id_map[i]] > 
+					this->value_list[this->pos2id_map[i]] >
 					this->value_list[this->pos2id_map[i + 1]])
 					i++; //i is the smaller child
 

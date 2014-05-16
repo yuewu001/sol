@@ -32,6 +32,7 @@ namespace BOC {
 
 		DataReader<FeatType, LabelType> *reader;
 		DataReader<FeatType, LabelType> *self_reader;
+		typedef DataPoint<FeatType, LabelType> PointType;
 
 	public:
 		DataSet() {
@@ -143,7 +144,7 @@ namespace BOC {
 		 *
 		 * @Returns reference to a chunk of data
 		 */
-		virtual DataChunk<FeatType, LabelType>& GetChunk() = 0;
+		virtual DataChunk<PointType>& GetChunk() = 0;
 
 		/**
 		 * @Synopsis FinishRead finished processing the read chunk

@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 5/5/2014 11:25:18 AM
 	> Functions: chunk of data
- ************************************************************************/
+	************************************************************************/
 
 #ifndef HEADER_DATA_CHUNK
 #define HEADER_DATA_CHUNK
@@ -14,16 +14,16 @@
 using std::vector;
 
 namespace BOC {
-	template <typename FeatType, typename LabelType> 
-    struct DataChunk{
-		vector<DataPoint<FeatType, LabelType> > data;
+	template <typename ElemType> 
+	struct DataChunk{
+		vector<ElemType> data;
 		size_t dataNum;
 
-        DataChunk():dataNum(0){}
-        };
+		DataChunk() :dataNum(0){}
+	};
 
-	template <typename FeatType, typename LabelType> 
-	struct FixSizeDataChunk: public DataChunk<FeatType, LabelType> {
+	template <typename ElemType>
+	struct FixSizeDataChunk : public DataChunk<ElemType> {
 		size_t chunk_size;
 		FixSizeDataChunk *next;
 		bool is_inuse;
@@ -51,9 +51,9 @@ namespace BOC {
 		virtual ~FixSizeDataChunk(){
 		}
 
-        /**
-         * @Synopsis erase Erase all the data in chunk
-         */
+		/**
+		 * @Synopsis erase Erase all the data in chunk
+		 */
 		void erase() {
 			for (size_t i = 0; i < this->chunk_size; i++)
 				this->data[i].erase();

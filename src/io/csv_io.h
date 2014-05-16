@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 2/17/2014 4:40:34 PM
 	> Functions: csv file io handler
- ************************************************************************/
+	************************************************************************/
 
 #ifndef HEADER_CSV_IO_HANDLER
 #define HEADER_CSV_IO_HANDLER
@@ -21,8 +21,8 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class csv_io : public DataHandler<FeatType, LabelType> {
-        //dynamic binding
-        DECLARE_CLASS
+		//dynamic binding
+		DECLARE_CLASS
 	private:
 		basic_io io_hander;
 		FILE* writer_handler;
@@ -191,7 +191,7 @@ namespace BOC {
 		}
 	};
 
-    //dynamic binding
+	//dynamic binding
 	IMPLEMENT_DATA_CLASS(csv_io, "csv", "io class for csv data");
 }
 

@@ -3,7 +3,7 @@
   > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
   > Created Time: 2013/9/19 15:14:53
   > Functions: customized array
- ************************************************************************/
+  ************************************************************************/
 
 #ifndef HEADER_S_ARRAY
 #define HEADER_S_ARRAY
@@ -14,9 +14,9 @@
 #include <stdlib.h>
 
 namespace BOC{
-    //the difference of s_array with vector is that vector copies the data, while
-    //s_array only copies the pointer and increase counter
-    template <typename T> class s_array {
+	//the difference of s_array with vector is that vector copies the data, while
+	//s_array only copies the pointer and increase counter
+	template <typename T> class s_array {
 	public:
 		typedef T* iterator;
 	public:

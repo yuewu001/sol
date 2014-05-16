@@ -20,6 +20,10 @@ namespace BOC{
 
 	template <typename FeatType, typename LabelType>
 	class Optimizer : public Registry {
+
+	protected:
+		typedef DataPoint<FeatType, LabelType> PointType;
+
 	protected:
 		//learning model
 		LearnModel<FeatType, LabelType> *learnModel;
@@ -27,7 +31,6 @@ namespace BOC{
 		DataSet<FeatType, LabelType> *dataSet;
 		//number of iterations
 		size_t update_times;
-
 		/**
 		 * @Synopsis Constructors
 		 */
@@ -60,12 +63,12 @@ namespace BOC{
 			//double test_time = 0;
 			//test
 			while (1) {
-				const DataChunk<FeatType, LabelType> &chunk = testSet.GetChunk();
+				const DataChunk<PointType> &chunk = testSet.GetChunk();
 				//double time1 = get_current_time();
 				if (chunk.dataNum == 0) //"all the data has been processed!"
 					break;
 				for (size_t i = 0; i < chunk.dataNum; i++) {
-					const DataPoint<FeatType, LabelType> &data = chunk.data[i];
+					const PointType &data = chunk.data[i];
 					//predict
 					float predict = this->learnModel->Test_Predict(data);
 					if (this->learnModel->IsCorrect(data.label, predict) == false)
