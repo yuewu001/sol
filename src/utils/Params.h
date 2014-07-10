@@ -62,13 +62,13 @@ namespace BOC {
 		void Init();
 
 		void add_option(float default_val, bool is_required, int expectArgs,
-			const char* descr, const char* flag);
+			const char* descr, const char* flag, const char* category = " ");
 		void add_option(int default_val, bool is_required, int expectArgs,
-			const char* descr, const char* flag);
+			const char* descr, const char* flag, const char* category = " ");
 		void add_option(bool default_val, bool is_required, int expectArgs,
-			const char* descr, const char* flag);
+			const char* descr, const char* flag, const char* category = " ");
 		void add_option(const char* default_val, bool is_required, int expectArgs,
-			const char* descr, const char* flag);
+			const char* descr, const char* flag, const char* category = " ");
 	};
 }
 #endif

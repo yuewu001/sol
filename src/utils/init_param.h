@@ -62,7 +62,7 @@ namespace BOC {
 	static const char* const init_loss_type = "hinge";
 	static const char* const init_data_format = "libsvm";
 	static const char* const init_algo_method = "SGD";
-	static const char* const init_dataset_type = "online"; //init multi-pass type
+	static const char* const init_data_reader_type = "online"; //init data reader type
 	static const char* const init_opt_type = "opt_online"; //init multi-pass type
 
 	//trying the optimal parameters

@@ -74,54 +74,49 @@ namespace BOC {
 		option->opt.syntax = "SOL [options] -i train_file";
 		option->opt.example = "SOL -i train_file -algo SGD";
 
-		option->opt.add("", 0, 0, ',', "help message", "-h", "--help");
+		option->opt.add("", " ", 0, 0, ',', "help message", "-h", "--help");
 
 		//input & output
-		this->add_option("", 0, 1, "training file name", "-i");
-		this->add_option("", 0, 1, "test file name", "-t");
-		this->add_option("", 0, 1, "cached training file name", "-c");
-		this->add_option("", 0, 1, "cached test file name", "-tc");
+		this->add_option("", 0, 1, "training file", "-i", "Input Output");
+		this->add_option("", 0, 1, "test file", "-t", "Input Output");
+		this->add_option("", 0, 1, "cached training file", "-c", "Input Output");
+		this->add_option("", 0, 1, "cached test file", "-tc", "Input Output");
 
-		this->add_option(init_data_format, 0, 1, "dataset type format", "-df");
-		this->add_option(init_buf_size, 0, 1, "number of chunks for buffering", "-bs");
-		this->add_option(init_chunk_size, 0, 1, "number of examples in a chunk", "-cs");
-		this->add_option(init_mp_buf_type, 0, 1, "type of buffer for multi-pass", "-mbt");
-		this->add_option(init_mp_buf_size, 0, 1, "size of buffer for multi-pass", "-mbs");
+		this->add_option(init_data_format, 0, 1, "Dataset Format", "-df", "Input Output");
+		this->add_option(init_data_reader_type, 0, 1, "data reader type: ", "-drt", "Input Output");
+		this->add_option(init_buf_size, 0, 1, "Buffer Size: number of chunks for buffering", "-bs", "Input Output");
+		this->add_option(init_chunk_size, 0, 1, "Chunk Size: number of examples in a chunk", "-cs", "Input Output");
+		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm", "Input Output");
 
-
-		this->add_option("", false, 1, "input model", "-m");
-		this->add_option("", false, 1, "output readable model", "-or");
-
-		//model setting
-		this->add_option(init_dataset_type, 0, 1, "dataset type: none, \n\tall, false_predict", "-dt");
-		this->add_option(1, 0, 1, "number of passes", "-passes");
-
-		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm");
+		//Training Settings
+		this->add_option("", false, 1, "input existing model", "-m", "Training Settings");
+		this->add_option("", false, 1, "output readable model", "-or", "Training Settings");
+		this->add_option(1, 0, 1, "number of passes", "-passes", "Training Settings");
+		this->add_option(init_mp_buf_type, 0, 1, "Multipass Buffer Type", "-mbt", "Training Settings");
+		this->add_option(init_mp_buf_size, 0, 1, "Multipass Buffer Size", "-mbs", "Training Settings");
 
 		//loss function
-		this->add_option(init_loss_type, 0, 1, "loss function type", "-loss");
+		this->add_option(init_loss_type, 0, 1, "loss function type", "-loss", "Loss Functions");
 
-		//training model
-		this->add_option(init_algo_method, 0, 1, "learning algorithm:", "-algo");
-
-		this->add_option(init_eta, 0, 1, "learning rate", "-eta");
-		this->add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t");
-		this->add_option(init_initial_t, 0, 1, "initial iteration number", "-t0");
-		this->add_option(init_lambda, 0, 1, "l1 regularization", "-l1");
-
+		//model setting
+		this->add_option(init_algo_method, 0, 1, "learning algorithm:", "-algo", "Model Settings");
+		this->add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
+		this->add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
+		this->add_option(init_initial_t, 0, 1, "initial iteration number", "-t0", "Model Settings");
+		this->add_option(init_lambda, 0, 1, "l1 regularization", "-l1", "Model Settings");
 		this->add_option(init_k, 0, 1,
-			"number of k in truncated gradient descent or feature selection", "-k");
-		this->add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou");
-		this->add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta");
-		this->add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r");
+			"number of k in truncated gradient descent or feature selection", "-k", "Model Settings");
+		this->add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou", "Model Settings");
+		this->add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta", "Model Settings");
+		this->add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r", "Model Settings");
 
 		//optimizer
-		this->add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt");
+		this->add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt", "Optimizer");
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs,
-		const char* descr, const char* flag){
-		this->option->opt.add("", is_required, expectArgs, 0, descr, flag, this->option->vfloat);
+		const char* descr, const char* flag, const char* category){
+		this->option->opt.add("", category, is_required, expectArgs, 0, descr, flag, this->option->vfloat);
 		if (this->float_param_num < max_param_num){
 			this->float_storage[this->float_param_num] = default_val;
 			this->flag2storage_float[flag] = this->float_storage + this->float_param_num;
@@ -133,8 +128,8 @@ namespace BOC {
 	}
 
 	void Params::add_option(int default_val, bool is_required, int expectArgs,
-		const char* descr, const char* flag){
-		this->option->opt.add("", is_required, expectArgs, 0, descr, flag, this->option->vint);
+		const char* descr, const char* flag, const char* category){
+		this->option->opt.add("", category, is_required, expectArgs, 0, descr, flag, this->option->vint);
 		if (this->int_param_num < max_param_num){
 			this->int_storage[this->int_param_num] = default_val;
 			this->flag2storage_int[flag] = this->int_storage + this->int_param_num;
@@ -146,8 +141,8 @@ namespace BOC {
 	}
 
 	void Params::add_option(bool default_val, bool is_required, int expectArgs,
-		const char* descr, const char* flag){
-		this->option->opt.add("", is_required, expectArgs, 0, descr, flag, this->option->vbool);
+		const char* descr, const char* flag,const char* category){
+		this->option->opt.add("", category, is_required, expectArgs, 0, descr, flag, this->option->vbool);
 		if (this->bool_param_num < max_param_num){
 			this->bool_storage[this->bool_param_num] = default_val;
 			this->flag2storage_bool[flag] = this->bool_storage + this->bool_param_num;
@@ -159,8 +154,8 @@ namespace BOC {
 	}
 
 	void Params::add_option(const char* default_val, bool is_required, int expectArgs,
-		const char* descr, const char* flag){
-		this->option->opt.add("", is_required, expectArgs, 0, descr, flag);
+		const char* descr, const char* flag, const char* category){
+		this->option->opt.add("", category, is_required, expectArgs, 0, descr, flag);
 		if (this->string_param_num < max_param_num){
 			this->string_storage[this->string_param_num] = default_val;
 			this->flag2storage_str[flag] = this->string_storage + this->string_param_num;
@@ -172,11 +167,11 @@ namespace BOC {
 	}
 
 	bool Params::Parse(int argc, const char** args) {
-		if (option->opt.isSet("-h")){
+		option->opt.parse(argc, args);
+		if (option->opt.isSet("-h") || argc == 1){
 			this->Help();
 			return false;
 		}
-		option->opt.parse(argc, args);
 		vector<string> badOptions;
 		if (!option->opt.gotRequired(badOptions)){
 			for (size_t i = 0; i < badOptions.size(); i++)
@@ -281,7 +276,7 @@ namespace BOC {
 
 	void Params::Help() {
 		string usage;
-		option->opt.getUsage(usage);
+		option->opt.getUsageByCategory(usage);
 		cout << usage << endl;
 	}
 

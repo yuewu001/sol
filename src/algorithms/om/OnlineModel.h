@@ -48,10 +48,10 @@ namespace BOC {
 		 */
 	public:
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
-			LearnModel<FeatType, LabelType>::PrintOptInfo();
+		virtual void PrintModelSettings() const {
+			LearnModel<FeatType, LabelType>::PrintModelSettings();
 
 			printf("Online Learning\n");
 			printf("\tLearning Rate: %g\n", this->eta0);

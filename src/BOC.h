@@ -9,6 +9,7 @@
 
 #include "utils/Params.h"
 #include "utils/util.h"
+#include "utils/error.h"
 #include "io/io_header.h"
 #include "algorithms/algo_header.h"
 #include "loss/loss_header.h"
@@ -55,13 +56,6 @@ namespace BOC{
 			LossInfo<FeatType, LabelType>::GetLossInfo(lossInfo);
 			IOInfo<FeatType, LabelType>::GetIOInfo(ioInfo);
 			OptInfo<FeatType, LabelType>::GetOptInfo(optInfo);
-
-			/*
-			printf("%s", algoInfo.c_str());
-			printf("%s", lossInfo.c_str());
-			printf("%s", ioInfo.c_str());
-			printf("%s", optInfo.c_str());
-            */
 		}
 
 		~LibBOC(){
@@ -93,36 +87,50 @@ namespace BOC{
 		inline int InitLoss(Params &param){
 			this->pLossFunc = (LossFunction<FeatType, LabelType>*)
 				Registry::CreateObject(param.StringValue("-loss"));
-			if (this->pLossFunc == NULL)
-				return -1;
-			return 0;
+			if (this->pLossFunc == NULL) {
+				fprintf(stderr, "Error %d: Init loss function failed (%s)", STATUS_INIT_FAIL, param.StringValue("-loss"));
+				return STATUS_INIT_FAIL;
+			}
+			return STATUS_OK;
 		}
 
 		inline int InitDataSet(Params &param){
-			string dt_type = param.StringValue("-dt");
-			ToLowerCase(dt_type);
-			if (dt_type  == "online"){
+			string drt_type = param.StringValue("-drt");
+			ToLowerCase(drt_type);
+			if (drt_type == "online"){
 				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"));
+
+				if (this->pDataset == NULL){
+					fprintf(stderr, "Error %d: init dataset failed! (%s)", STATUS_INIT_FAIL, drt_type);
+					return STATUS_INIT_FAIL;
+				}
 
 				int buf_size = param.IntValue("-bs");
 				int chunk_size = param.IntValue("-cs");
 				const string& mp_buf_type = param.StringValue("-mbt");
 				int mp_buf_size = param.IntValue("-mbs");
-				((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfiBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
+				try{
+					((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfiBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
+				}
+				catch (std::invalid_argument& ex){
+					fprintf(stderr, "%s\n", ex.what());
+					return STATUS_INVALID_ARGUMENT;
+				}
 			}
-			else if (dt_type == "batch"){
+			else if (drt_type == "batch"){
 				this->pDataset = NULL;
 			}
-			if (this->pDataset == NULL){
-				return -2;
+			else{
+				fprintf(stderr, "Error %d: Unrecognized data reader type (%s)", STATUS_INVALID_ARGUMENT, drt_type);
+				return STATUS_INVALID_ARGUMENT;
 			}
 
 			if (this->pDataset->Load(param.StringValue("-i"), param.StringValue("-c"),
 				param.StringValue("-df")) == false){
-				cerr << "ERROR: Load dataset " << param.StringValue("-i") << " failed!" << endl;
-				return -3;
+				fprintf(stderr, "Error %d: Load dataset failed", STATUS_IO_ERROR);
+				return STATUS_IO_ERROR;
 			}
-			return 0;
+			return STATUS_OK;;
 		}
 
 		inline int InitModel(Params &param){
@@ -134,17 +142,18 @@ namespace BOC{
 			if (modelType == "online"){
 				this->pOnlineModel = (OnlineModel<FeatType, LabelType>*)this->pModel;
 				if (this->pOnlineModel == NULL){
-					return -4;
+					fprintf(stderr, "Error %d: init online model failed! (%s)", STATUS_INIT_FAIL, algo);
+					return STATUS_INIT_FAIL;
 				}
 			}
 			else{
 				fprintf(stderr, "Error: unsupported model type %s!", modelType.c_str());
-				return -4;
+				return STATUS_INVALID_ARGUMENT;
 			}
 
 			this->pModel->SetParameter(param);
 
-			return 0;
+			return STATUS_OK;
 		}
 
 		inline int InitOptimizer(Params &param){
@@ -154,20 +163,27 @@ namespace BOC{
 				Registry::CreateObject(optType, this->pOnlineModel, this->pDataset);
 
 			if (this->pOpti == NULL) {
-				return -5;
+				fprintf(stderr, "Error %d: init optimizer failed! (%s)", STATUS_INIT_FAIL, optType);
+				return STATUS_INIT_FAIL;
 			}
-			return 0;
+			return STATUS_OK;
 		}
 
 	public:
 		int Initialize(Params &param){
 			this->Release();
-			int errCode = 0;
+			int errCode = STATUS_OK;
 			errCode = this->InitDataSet(param);
-			errCode = this->InitLoss(param);
-			errCode = this->InitModel(param);
-			errCode = this->InitOptimizer(param);
-			if (errCode != 0){
+			if (errCode == STATUS_OK){
+				errCode = this->InitLoss(param);
+			}
+			if (errCode == STATUS_OK){
+				errCode = this->InitModel(param);
+			}
+			if (errCode == STATUS_OK){
+				errCode = this->InitOptimizer(param);
+			}
+			if (errCode != STATUS_OK){
 				return errCode;
 			}
 			this->pParam = &param;
@@ -175,7 +191,7 @@ namespace BOC{
 		}
 
 		int Run(){
-			this->pModel->PrintOptInfo();
+			this->pModel->PrintModelSettings();
 			//learning the model
 			double time1 = get_current_time();
 
@@ -212,7 +228,7 @@ namespace BOC{
 				printf("Test time: %.3f s\n", (float)(time3 - time2));
 			}
 
-			return 0;
+			return STATUS_OK;
 		}
 	};
 

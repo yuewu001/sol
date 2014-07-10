@@ -31,8 +31,12 @@ int main(int argc, const char** args) {
 	}
 
 	LibBOC<FeatType, LabelType> libBoc;
-	libBoc.Initialize(param);
-	libBoc.Run();
+	if (libBoc.Initialize(param) != 0){
+		cerr << "Initialize the library failed!" << endl;
+	}
+	else{
+		libBoc.Run();
+	}
 
 	return 0;
 }

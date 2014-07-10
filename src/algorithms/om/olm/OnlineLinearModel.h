@@ -40,16 +40,16 @@ namespace BOC {
 		 */
 	public:
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
-			OnlineModel<FeatType, LabelType>::PrintOptInfo();
+		virtual void PrintModelSettings() const {
+			OnlineModel<FeatType, LabelType>::PrintModelSettings();
 
 			printf("Linear Model: y = w * x + b \n");
 		}
 
 		/**
-		 * PrintOptInfo print the info of trained model
+		 * PrintModelInfo print the info of trained model
 		 */
 		virtual void PrintModelInfo() const {
 			printf("number of weights: %lu\n", this->weightDim);

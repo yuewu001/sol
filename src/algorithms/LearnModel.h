@@ -25,6 +25,7 @@ using std::string;
 */
 namespace BOC {
 
+    //TO return the class infomation and create a new instance of the algorithm
 #define IMPLEMENT_MODEL_CLASS(name, descr) \
 	template <typename FeatType, typename LabelType> \
 	ClassInfo name<FeatType, LabelType>::classInfo(#name, descr, name<FeatType, LabelType>::CreateObject); \
@@ -56,9 +57,9 @@ namespace BOC {
 		}
 
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
+		virtual void PrintModelSettings() const {
 			printf("-----------------------------------------\n");
 			printf("-----------------------------------------\n");
 			printf("             Model Settings              \n");
@@ -67,7 +68,7 @@ namespace BOC {
 		}
 
 		/**
-		 * PrintOptInfo print the info of trained model
+		 * PrintModelInfo print the info of trained model
 		 */
 		virtual void PrintModelInfo() const = 0;
 

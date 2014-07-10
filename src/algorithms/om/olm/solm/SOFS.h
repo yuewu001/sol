@@ -42,9 +42,9 @@ namespace BOC {
 		 */
 	public:
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
+		virtual void PrintModelSettings() const {
 			printf("--------------------------------------------------\n");
 			printf("\tk:\t%d\n", this->K);
 			printf("\tr:\t%g\n", this->r);

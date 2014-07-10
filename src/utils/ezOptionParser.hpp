@@ -962,6 +962,7 @@ class OptionGroup {
         inline void getMultiDoubles(std::vector< std::vector<double> >&);
         inline void getMultiStrings(std::vector< std::vector<std::string> >&);
 
+		std::string category;
         // defaults value regardless of being set by user.
         std::string defaults;
         // If expects arguments, this will delimit arg list.
@@ -1322,14 +1323,17 @@ class ezOptionParser {
         }
         inline ~ezOptionParser();
 
-        inline void add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, ezOptionValidator* validator=0);
-        inline void add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, ezOptionValidator* validator=0);
-        inline void add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, ezOptionValidator* validator=0);
-        inline void add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, const char * flag4, ezOptionValidator* validator=0);
+        inline void add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, const char * flag1, ezOptionValidator* validator=0);
+		inline void add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, ezOptionValidator* validator = 0);
+        inline void add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, ezOptionValidator* validator = 0);
+        inline void add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, const char * flag4, ezOptionValidator* validator=0);
+
         inline bool exportFile(const char * filename, bool all=false);
         inline OptionGroup * get(const char * name);
         inline void getUsage(std::string & usage, int width=80, Layout layout=ALIGN);
+        inline void getUsageByCategory(std::string & usage, int width=80, Layout layout=ALIGN);
         inline void getUsageDescriptions(std::string & usage, int width=80, Layout layout=STAGGER);
+        inline void getUsageDescriptionsByCategory(std::string & usage, int width=80, Layout layout=STAGGER);
         inline bool gotExpected(std::vector<std::string> & badOptions);
         inline bool gotRequired(std::vector<std::string> & badOptions);
         inline bool gotValid(std::vector<std::string> & badOptions, std::vector<std::string> & badArgs);
@@ -1357,6 +1361,7 @@ class ezOptionParser {
         std::map< std::string, int > optionGroupIds;
         // Unordered collection of the option groups.
         std::vector< OptionGroup* > groups;
+		std::map<std::string, std::vector<int>> optionCategory2GroupIds;
         // Store unexpected args in input.
         std::vector< std::string* > unknownArgs;
         // List of args that occur left-most before first option flag.
@@ -1422,30 +1427,37 @@ void ezOptionParser::resetArgs() {
     lastArgs.clear();  
 };
 /* ################################################################### */
-void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, ezOptionValidator* validator) {
-    int id = (int)this->groups.size();
-    OptionGroup * g = new OptionGroup;
-    g->defaults = defaults;
-    g->isRequired = required;
-    g->expectArgs = expectArgs;
-    g->delim = delim;
-    g->isSet = 0;
-    g->help = help;
-    std::string *f1 = new std::string(flag1);
-    g->flags.push_back( f1 );
-    this->optionGroupIds[flag1] = id;
-    this->groups.push_back(g);
+void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help,
+	const char * flag1, ezOptionValidator* validator) {
+	int id = (int)this->groups.size();
+	OptionGroup * g = new OptionGroup;
+	g->defaults = defaults;
+	g->isRequired = required;
+	g->expectArgs = expectArgs;
+	g->delim = delim;
+	g->isSet = 0;
+	g->help = help;
+	std::string *f1 = new std::string(flag1);
+	g->flags.push_back(f1);
+	this->optionGroupIds[flag1] = id;
+	this->groups.push_back(g);
 
-    if (validator) {
-        int vid = validator->id;
-        validators[vid] = validator;
-        groupValidators[id] = vid;
-    } else {
-        groupValidators[id] = -1;
-    }
-};
+	if (validator) {
+		int vid = validator->id;
+		validators[vid] = validator;
+		groupValidators[id] = vid;
+	}
+	else {
+		groupValidators[id] = -1;
+	}
+
+	g->category = category;
+	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
+}
+
 /* ################################################################### */
-void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, ezOptionValidator* validator) {
+void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, 
+	const char * flag1, const char * flag2, ezOptionValidator* validator) {
     int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
@@ -1470,9 +1482,12 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
     } else {
         groupValidators[id] = -1;
     }
+	g->category = category;
+	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
 };
 /* ################################################################### */
-void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, ezOptionValidator* validator) {
+void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, 
+	const char * flag1, const char * flag2, const char * flag3, ezOptionValidator* validator) {
     int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
@@ -1500,9 +1515,12 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
     } else {
         groupValidators[id] = -1;
     }
+	g->category = category;
+	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
 };
 /* ################################################################### */
-void ezOptionParser::add(const char * defaults, bool required, int expectArgs, char delim, const char * help, const char * flag1, const char * flag2, const char * flag3, const char * flag4, ezOptionValidator* validator) {
+void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help,
+	const char * flag1, const char * flag2, const char * flag3, const char * flag4, ezOptionValidator* validator ) {
     int id = (int)this->groups.size();
     OptionGroup * g = new OptionGroup;
     g->defaults = defaults;
@@ -1533,6 +1551,8 @@ void ezOptionParser::add(const char * defaults, bool required, int expectArgs, c
     } else {
         groupValidators[id] = -1;
     }
+	g->category = category;
+	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
 };
 /* ################################################################### */
 bool ezOptionParser::exportFile(const char * filename, bool all) {
@@ -1799,6 +1819,30 @@ void ezOptionParser::getUsage(std::string & usage, int width, Layout layout) {
        }
        */
 };
+
+
+void ezOptionParser::getUsageByCategory(std::string & usage, int width, Layout layout) {
+
+    usage.append(overview);
+    usage.append("\n\n");
+    usage.append("USAGE: ");
+    usage.append(syntax);
+    usage.append("\n\nOPTIONS:\n\n");
+    getUsageDescriptionsByCategory(usage, width, layout);
+
+    if (!example.empty()) {
+        usage.append("\nEXAMPLES:\n\n");
+        usage.append(example);
+        usage.append("\n");
+    }
+
+    /*
+       if (!footer.empty()) {
+       usage.append(footer);
+       }
+       */
+};
+
 /* ################################################################### */
 // Creates 2 column formatted help descriptions for each option flag.
 void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout layout) {
@@ -1941,6 +1985,162 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
             desc.clear();
         }
     }  
+};
+
+void ezOptionParser::getUsageDescriptionsByCategory(std::string & usage, int width, Layout layout) {
+	for (std::map<std::string, std::vector<int> >::iterator cateIter = this->optionCategory2GroupIds.begin();
+		cateIter != this->optionCategory2GroupIds.end(); ++cateIter){
+		std::vector<ez::OptionGroup*> curGroup;
+		for (size_t k = 0; k < cateIter->second.size(); ++k){
+			curGroup.push_back(groups[cateIter->second[k]]);
+		}
+		if (cateIter->first != " "){
+			usage.append("\n");
+			usage.append(cateIter->first);
+			usage.append("\n");
+		}
+
+		// Sort each flag list amongst each group.
+		size_t i;
+		// Store index of flag groups before sort for easy lookup later.
+		std::map<std::string*, int> stringPtrToIndexMap;
+		std::vector<std::string* > stringPtrs(curGroup.size());
+
+		for (i = 0; i < curGroup.size(); ++i) {
+			std::sort(curGroup[i]->flags.begin(), curGroup[i]->flags.end(), CmpOptStringPtr);
+			stringPtrToIndexMap[curGroup[i]->flags[0]] = (int)i;
+			stringPtrs[i] = curGroup[i]->flags[0];
+		}
+
+		size_t j, k;
+		std::string opts;
+		std::vector<std::string> sortedOpts;
+		// Sort first flag of each group with other groups.
+		//std::sort(stringPtrs.begin(), stringPtrs.end(), CmpOptStringPtr);
+		for (i = 0; i < curGroup.size(); ++i) {
+			//printf("DEBUG:%d: %d %d %s\n", __LINE__, i, stringPtrToIndexMap[stringPtrs[i]], stringPtrs[i]->c_str());
+			k = stringPtrToIndexMap[stringPtrs[i]];
+			opts.clear();
+			for (j = 0; j < curGroup[k]->flags.size() - 1; ++j) {
+				opts.append(*curGroup[k]->flags[j]);
+				opts.append(", ");
+
+				if (opts.size() > (size_t)width)
+					opts.append("\n");
+			}
+			// The last flag. No need to append comma anymore.
+			opts.append(*curGroup[k]->flags[j]);
+
+			if (curGroup[k]->expectArgs) {
+				opts.append(" arg");
+
+				if (curGroup[k]->delim) {
+					opts.append("1[");
+					opts.append(1, curGroup[k]->delim);
+					opts.append("args]");
+				}
+			}
+
+			sortedOpts.push_back(opts);
+		}
+
+		// Each option group will use this to build multiline help description.
+		std::list<std::string*> desc;
+		// Number of whitespaces from start of line to description (interleave layout) or
+		// gap between flag names and description (align, stagger layouts).
+		int gutter = 3;
+
+		// Find longest opt flag string to set column start for help usage descriptions.
+		size_t maxlen = 0;
+		if (layout == ALIGN) {
+			for (i = 0; i < curGroup.size(); ++i) {
+				if (maxlen < sortedOpts[i].size())
+					maxlen = sortedOpts[i].size();
+			}
+		}
+
+		// The amount of space remaining on a line for help text after flags.
+		int helpwidth;
+		std::list<std::string*>::iterator cIter, insertionIter;
+		size_t pos;
+		for (i = 0; i < curGroup.size(); ++i) {
+			k = stringPtrToIndexMap[stringPtrs[i]];
+
+			if (layout == STAGGER)
+				maxlen = sortedOpts[i].size();
+
+			int pad = (int)(gutter + maxlen);
+			helpwidth = width - pad;
+
+			// All the following split-fu could be optimized by just using substring (offset, length) tuples, but just to get it done, we'll do some not-too expensive string copying.
+			SplitDelim(curGroup[k]->help, '\n', desc);
+			// Split lines longer than allowable help width.
+			for (insertionIter = desc.begin(), cIter = insertionIter++;
+				cIter != desc.end();) {
+				if ((*cIter)->size() > (size_t)helpwidth) {
+					// Get pointer to next string to insert new strings before it.
+					std::string *rem = *cIter;
+					// Remove this line and add back in pieces.
+					desc.erase(cIter);
+					// Loop until remaining string is short enough.
+					while (rem->size() > (size_t)helpwidth) {
+						// Find whitespace to split before helpwidth.
+						if (rem->at(helpwidth) == ' ') {
+							// If word ends exactly at helpwidth, then split after it.
+							pos = helpwidth;
+						}
+						else {
+							// Otherwise, split occurs midword, so find whitespace before this word.
+							pos = rem->rfind(" ", helpwidth);
+						}
+						// Insert split string.
+						desc.insert(insertionIter, new std::string(*rem, 0, pos));
+						// Now skip any whitespace to start new line.
+						pos = rem->find_first_not_of(' ', pos);
+						rem->erase(0, pos);
+					}
+
+					if (rem->size())
+						desc.insert(insertionIter, rem);
+					else
+						delete rem;
+				}
+				if (insertionIter == desc.end())
+					break;
+				else
+					cIter = insertionIter++;
+			}
+
+			usage.append(sortedOpts[i]);
+			if (layout != INTERLEAVE)
+				// Add whitespace between option names and description.
+				usage.append(pad - sortedOpts[i].size(), ' ');
+			else {
+				usage.append("\n");
+				usage.append(gutter, ' ');
+			}
+
+			// First line already padded above (before calling SplitDelim) after option flag names.
+			cIter = desc.begin();
+			usage.append(**cIter);
+			usage.append("\n");
+			// Now inject the pad for each line.
+			for (++cIter; cIter != desc.end(); ++cIter) {
+				usage.append(pad, ' ');
+				usage.append(**cIter);
+				usage.append("\n");
+			}
+
+			if (this->doublespace) usage.append("\n");
+
+			if (desc.size()) {
+				for (cIter = desc.begin(); cIter != desc.end(); ++cIter)
+					delete *cIter;
+
+				desc.clear();
+			}
+		}
+	}
 };
 /* ################################################################### */
 bool ezOptionParser::gotExpected(std::vector<std::string> & badOptions) {

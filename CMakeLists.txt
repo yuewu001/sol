@@ -18,70 +18,39 @@ set (CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/cmake)
 #SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}")
 #SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-FILE (GLOB io_files_h src/io/*.h)
-FILE (GLOB io_files_cpp src/io/*.cpp)
-LIST(APPEND io_files ${io_files_h} ${io_files_cpp})
-set (io_remove_files zlib_io.h zlib_io.cpp gzip_io.h gzip_io.cpp)
-LIST(REMOVE_ITEM io_files ${io_remove_files})
+add_subdirectory(src)
+LIST(APPEND all_algo_files ${solm_files} ${olm_files} ${om_files} ${algo_files})
 
-FILE(GLOB loss_files src/loss/*.h)
+#grouping the files
+if (WIN32)
+    source_group("io" FILES ${io_files})
+    source_group("loss" FILES ${loss_files})
+    source_group("utils" FILES ${util_files})
+    source_group("optimizers" FILES ${opti_files})
 
-set(algo_files
-    src/algorithms/LearnModel.h
-    src/algorithms/om/OnlineModel.h
-    src/algorithms/om/olm/OnlineLinearModel.h
-    src/algorithms/om/olm/solm/SparseOnlineLinearModel.h
-    src/algorithms/om/olm/solm/sol_algorithms.h
-    src/algorithms/om/olm/solm/SGD.h
-    )
-
-set (opti_files 
-    src/optimizers/Optimizer.h
-    src/optimizers/OnlineOptimizer.h
-    )
-
-set(util_files 
-    src/utils/ezOptionParser.hpp
-    src/utils/init_param.h
-    src/utils/md5.h
-    src/utils/thread_primitive.h
-    src/utils/util.h
-    src/utils/s_array.h
-    src/utils/MaxHeap.h
-    src/utils/MinHeap.h
-    src/utils/Params.h
-    src/utils/Params.cpp
-    )
-
-set(converter_files 
-    src/converter/Converter.cpp
-    src/converter/Converter.h
-    src/converter/Params.cpp
-    src/converter/Params.h)
-
-source_group("io" FILES ${io_files})
-source_group("loss" FILES ${loss_files})
-source_group("algorithms" FILES ${algo_files})
-source_group("optimizers" FILES ${opti_files})
-source_group("utils" FILES ${util_files})
+    source_group("algorithms" FILES ${algo_files})
+    source_group("algorithms\\om" FILES ${om_files})
+    source_group("algorithms\\om\\olm" FILES ${olm_files})
+    source_group("algorithms\\om\\olm\\solm" FILES ${solm_files})
+ENDIF(WIN32)
 
 set (SRC_LIST
-    ${io_files} ${loss_files} ${algo_files} ${opti_files} ${util_files}
+    ${io_files} ${loss_files} ${all_algo_files} ${opti_files} ${util_files}
     )
-	
+
 
 IF (WIN32 AND MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
-	set (CMAKE_BUILD_TYPE "Debug|Release")	
+    set (CMAKE_BUILD_TYPE "Debug|Release")	
 ENDIF()
 
 IF (CMAKE_COMPILER_IS_GNUCXX AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
-	set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ")
-	
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ")
+
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -90,10 +59,10 @@ IF(WIN32)
 ENDIF()
 
 IF(DCMTK_WITH_DEBUG_POSTFIX)
-  SET(CMAKE_DEBUG_POSTFIX  "d")  
+    SET(CMAKE_DEBUG_POSTFIX  "d")  
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
-add_executable(SOL src/main.cpp ${SRC_LIST})
+add_executable(SOL src/BOC.h src/main.cpp ${SRC_LIST})
 IF(UNIX)
     target_link_libraries(SOL pthread)
 ENDIF(UNIX)
@@ -120,10 +89,10 @@ ENDIF(UNIX)
 
 
 IF(DCMTK_WITH_DEBUG_POSTFIX)  
-  set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
-  #set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
-  #set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
-  #set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
+    set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
+    #set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
+    #set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
+    #set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 #Organize projects into folders
@@ -164,19 +133,19 @@ message(STATUS "")
 message(STATUS "  Platform:")
 message(STATUS "    Host:"             ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_VERSION} ${CMAKE_HOST_SYSTEM_PROCESSOR})
 if(CMAKE_CROSSCOMPILING)
-  message(STATUS "    Target:"         ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION} ${CMAKE_SYSTEM_PROCESSOR})
+    message(STATUS "    Target:"         ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_VERSION} ${CMAKE_SYSTEM_PROCESSOR})
 endif()
 message(STATUS "    CMake:"            ${CMAKE_VERSION})
 message(STATUS "    CMake generator:"  ${CMAKE_GENERATOR})
 message(STATUS "    CMake build tool:" ${CMAKE_BUILD_TOOL})
 if(MSVC)
-  message(STATUS "    MSVC:"           ${MSVC_VERSION})
+    message(STATUS "    MSVC:"           ${MSVC_VERSION})
 endif()
 if(CMAKE_GENERATOR MATCHES Xcode)
-  message(STATUS "    Xcode:"          ${XCODE_VERSION})
+    message(STATUS "    Xcode:"          ${XCODE_VERSION})
 endif()
 if(NOT CMAKE_GENERATOR MATCHES "Xcode")
-  message(STATUS "    Configuration:"  ${CMAKE_BUILD_TYPE})
+    message(STATUS "    Configuration:"  ${CMAKE_BUILD_TYPE})
 endif()
 
 message(STATUS "")

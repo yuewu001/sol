@@ -34,17 +34,17 @@ namespace BOC {
 		//inherited functions
 	public:
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
-			OnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+		virtual void PrintModelSettings() const {
+			OnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
 
 			printf("Linear Sparse Online Learning:\n");
 			printf("\tl1 regularization: %g\n", this->lambda);
 		}
 
 		/**
-		 * PrintOptInfo print the info of trained model
+		 * PrintModelInfo print the info of trained model
 		 */
 		virtual void PrintModelInfo() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();

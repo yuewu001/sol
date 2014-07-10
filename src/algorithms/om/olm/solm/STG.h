@@ -43,10 +43,10 @@ namespace BOC {
 		 */
 	public:
 		/**
-		 * PrintOptInfo print the info of optimization algorithm
+		 * PrintModelSettings print the info of optimization algorithm
 		 */
-		virtual void PrintOptInfo() const {
-			SparseOnlineLinearModel<FeatType, LabelType>::PrintOptInfo();
+		virtual void PrintModelSettings() const {
+			SparseOnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
 			printf("\tModel : %s\n", STG<FeatType, LabelType>::classInfo.GetType().c_str());
 			printf("\t\tk	: %d\n", this->K);
 		}
