@@ -19,7 +19,7 @@ and online optimization[J]. The Journal of Machine Learning Research,
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class RDA : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class RDA : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -33,11 +33,12 @@ namespace BOC {
 	public:
 		RDA(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->gamma_rou = 0;
-				this->gtVec.resize(this->weightDim);
-				//initail_t should be no less than 1,for the safety of update at the first step
-				this->initial_t = 1;
-			}
+			this->modelName = "RDA";
+			this->gamma_rou = 0;
+			this->gtVec.resize(this->weightDim);
+			//initail_t should be no less than 1,for the safety of update at the first step
+			this->initial_t = 1;
+		}
 
 		~RDA(){
 		}
@@ -135,7 +136,7 @@ namespace BOC {
 
 	};
 
-	IMPLEMENT_MODEL_CLASS(RDA,"Regularized Dual Averaging")
+	IMPLEMENT_MODEL_CLASS(RDA, "Regularized Dual Averaging")
 }
 
 #endif

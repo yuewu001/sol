@@ -16,7 +16,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class FOFS : public OnlineFeatureSelection<FeatType, LabelType> {
+	class FOFS : public OnlineFeatureSelection < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -33,10 +33,11 @@ namespace BOC {
 	public:
 		FOFS(LossFunction<FeatType, LabelType> *lossFunc) :
 			OnlineFeatureSelection<FeatType, LabelType>(lossFunc) {
-				this->delta = 0;
+			this->modelName = "FOFS";
+			this->delta = 0;
 
-				this->abs_weightVec.resize(this->weightDim);
-			}
+			this->abs_weightVec.resize(this->weightDim);
+		}
 
 		virtual ~FOFS(){
 		}
@@ -61,7 +62,7 @@ namespace BOC {
 		virtual void SetParameter(BOC::Params &param){
 			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
 			this->delta = param.FloatValue("-delta");
-            INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
+			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 		}
 
 		/**

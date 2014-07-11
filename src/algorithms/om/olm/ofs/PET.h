@@ -16,7 +16,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class PET : public OnlineFeatureSelection<FeatType, LabelType> {
+	class PET : public OnlineFeatureSelection < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -30,8 +30,9 @@ namespace BOC {
 	public:
 		PET(LossFunction<FeatType, LabelType> *lossFunc) :
 			OnlineFeatureSelection<FeatType, LabelType>(lossFunc) {
-				this->abs_weightVec.resize(this->weightDim);
-			}
+			this->modelName = "PET";
+			this->abs_weightVec.resize(this->weightDim);
+		}
 
 		virtual ~PET() {
 		}
@@ -124,7 +125,7 @@ namespace BOC {
 		}
 	};
 
-	IMPLEMENT_MODEL_CLASS(PET,"Perceptron with Truncation")
+	IMPLEMENT_MODEL_CLASS(PET, "Perceptron with Truncation")
 }
 
 #endif

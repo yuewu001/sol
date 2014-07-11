@@ -4,8 +4,8 @@
 > Created Time: Sat 26 Oct 2013 12:17:04 PM SGT
 > Descriptions: adaptive fobos algorithm
 > Reference:
-Duchi J, Hazan E, Singer Y. Adaptive subgradient methods for 
-online learning and stochastic optimization[J]. The Journal of 
+Duchi J, Hazan E, Singer Y. Adaptive subgradient methods for
+online learning and stochastic optimization[J]. The Journal of
 Machine Learning Research, 2011, 999999: 2121-2159.
 
 This file implements the L1 regularization
@@ -20,7 +20,7 @@ This file implements the L1 regularization
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class Ada_FOBOS : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class Ada_FOBOS : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -36,11 +36,12 @@ namespace BOC {
 	public:
 		Ada_FOBOS(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->delta = 0;
-				this->timeStamp.resize(this->weightDim);
-				this->s.resize(this->weightDim);
-				this->u_t.resize(this->weightDim);
-			}
+			this->modelName = "Ada-FOBOS";
+			this->delta = 0;
+			this->timeStamp.resize(this->weightDim);
+			this->s.resize(this->weightDim);
+			this->u_t.resize(this->weightDim);
+		}
 
 		virtual ~Ada_FOBOS() {
 		}

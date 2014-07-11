@@ -14,7 +14,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class CW_RDA : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class CW_RDA : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -27,11 +27,12 @@ namespace BOC {
 	public:
 		CW_RDA(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->r = 0;
-				this->u_t.resize(this->weightDim);
-				this->sigma_w.resize(this->weightDim);
-				this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-			}
+			this->modelName = "CW-RDA";
+			this->r = 0;
+			this->u_t.resize(this->weightDim);
+			this->sigma_w.resize(this->weightDim);
+			this->lossFunc = new SquaredHingeLoss < FeatType, LabelType > ;
+		}
 
 		virtual ~CW_RDA(){
 			if (this->lossFunc != NULL){

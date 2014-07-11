@@ -21,7 +21,7 @@ This file implements the L1 regularization
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class Ada_RDA : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class Ada_RDA : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -32,10 +32,11 @@ namespace BOC {
 	public:
 		Ada_RDA(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->delta = 0;;
-				this->s.resize(this->weightDim);
-				this->u_t.resize(this->weightDim);
-			}
+			this->modelName = "Ada-RDA";
+			this->delta = 0;;
+			this->s.resize(this->weightDim);
+			this->u_t.resize(this->weightDim);
+		}
 
 		virtual ~Ada_RDA() {
 		}

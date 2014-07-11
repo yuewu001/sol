@@ -18,7 +18,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class CW_TG : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class CW_TG : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -33,11 +33,12 @@ namespace BOC {
 	public:
 		CW_TG(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->r = 0;
-				this->sigma_w.resize(this->weightDim);
-				this->timeStamp.resize(this->weightDim);
-				this->lossFunc = new SquaredHingeLoss<FeatType, LabelType>;
-			}
+			this->modelName = "Cw-TG";
+			this->r = 0;
+			this->sigma_w.resize(this->weightDim);
+			this->timeStamp.resize(this->weightDim);
+			this->lossFunc = new SquaredHingeLoss < FeatType, LabelType > ;
+		}
 		virtual ~CW_TG(){
 			if (this->lossFunc != NULL){
 				delete this->lossFunc;

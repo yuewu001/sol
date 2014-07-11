@@ -19,7 +19,7 @@ gradient[J]. The Journal of Machine Learning Research, 2009, 10:
  */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class STG : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class STG : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -31,9 +31,10 @@ namespace BOC {
 	public:
 		STG(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->K = 10;
-				this->timeStamp.resize(this->weightDim);
-			}
+			this->modelName = "STG";
+			this->K = 10;
+			this->timeStamp.resize(this->weightDim);
+		}
 
 		virtual ~STG(){
 		}

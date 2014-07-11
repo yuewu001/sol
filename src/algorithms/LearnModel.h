@@ -39,6 +39,8 @@ namespace BOC {
 	//	class LearnModel : public Registry<FeatType, LabelType> {
 	class LearnModel : public Registry {
 	protected:
+        //name of the model
+		std::string modelName;
 		//type of the model: online
 		std::string modelType;
 	public:
@@ -60,9 +62,9 @@ namespace BOC {
 		 */
 		virtual void PrintModelSettings() const {
 			printf("-----------------------------------------\n");
+			printf("             Algorithm:\t%s\n", this->modelName.c_str());
 			printf("-----------------------------------------\n");
 			printf("             Model Settings              \n");
-			printf("-----------------------------------------\n");
 			printf("-----------------------------------------\n");
 		}
 

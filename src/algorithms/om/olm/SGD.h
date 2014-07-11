@@ -15,7 +15,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class SGD : public OnlineLinearModel<FeatType, LabelType> {
+	class SGD : public OnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -28,7 +28,8 @@ namespace BOC {
 	public:
 		SGD(LossFunction<FeatType, LabelType> *lossFunc) :
 			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
-			}
+			this->modelName = "SGD";
+		}
 
 		virtual ~SGD() {
 		}

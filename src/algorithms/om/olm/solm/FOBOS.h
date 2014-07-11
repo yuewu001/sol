@@ -23,7 +23,7 @@
  */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class FOBOS : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class FOBOS : public SparseOnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
@@ -34,8 +34,9 @@ namespace BOC {
 	public:
 		FOBOS(LossFunction<FeatType, LabelType> *lossFunc) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
-				this->timeStamp.resize(this->weightDim);
-			}
+			this->modelName = "FOBOS";
+			this->timeStamp.resize(this->weightDim);
+		}
 
 		virtual ~FOBOS() {
 		}
