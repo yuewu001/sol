@@ -27,6 +27,8 @@ namespace BOC {
 		std::string filename;
 		std::string cache_filename;
 		bool is_cache;
+		//whether normalize data
+		bool is_norm;
 
 		size_t data_num; //total data number
 
@@ -35,13 +37,10 @@ namespace BOC {
 		typedef DataPoint<FeatType, LabelType> PointType;
 
 	public:
-		DataSet() {
-			this->data_num = 0;
-			this->is_cache = false;
+		DataSet()
+			: data_num(0), is_cache(false), is_norm(NULL), reader(NULL), self_reader(NULL)
+		{ }
 
-			this->reader = NULL;
-			this->self_reader = NULL;
-		}
 		virtual ~DataSet(){
 			this->delete_reader();
 		}

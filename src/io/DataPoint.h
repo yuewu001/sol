@@ -136,6 +136,15 @@ namespace BOC {
 			QuickSort(this->indexes.begin, this->features.begin, 0, this->indexes.size() - 1);
 		}
 
+		void Normalize(){
+			if (this->sum_sq != 0){
+				size_t featNum = this->indexes.size();
+				for (int i = 0; i < featNum; ++i){
+					this->features[i] /= this->sum_sq;
+				}
+			}
+		}
+
 	private:
 		void release() {
 			--(*count);

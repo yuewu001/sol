@@ -7,7 +7,6 @@
 #include "BOC.h"
 
 #include <string>
-#include <iostream>
 #include <fstream>
 
 using namespace std;
@@ -31,8 +30,11 @@ int main(int argc, const char** args) {
 	}
 
 	LibBOC<FeatType, LabelType> libBoc;
-	if (libBoc.Initialize(param) != 0){
-		cerr << "Initialize the library failed!" << endl;
+	libBoc.ShowHelpInfo(param);
+	int errCode = libBoc.Initialize(param);
+	if ( errCode != 0){
+		fprintf(stderr, "Initialization failed, error code %d\n", errCode);
+		return errCode;
 	}
 	else{
 		libBoc.Run();

@@ -23,7 +23,7 @@
 namespace BOC {
 	//data set, can work in both read-and-write mode and read-once mode
 	template <typename FeatType, typename LabelType>
-	class OnlineDataSet : public DataSet<FeatType, LabelType> {
+	class OnlineDataSet : public DataSet < FeatType, LabelType > {
 	protected:
 		typedef FixSizeDataChunk<PointType> ChunkType;
 
@@ -39,18 +39,19 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineDataSet(int passes, int buf_size = -1, int chunk_size = -1) :
+		OnlineDataSet(int passes, bool is_norm = false, int buf_size = -1, int chunk_size = -1) :
 			online_buf(NULL), DataSet<FeatType, LabelType>() {
-				if (passes < 1) {
-					std::ostringstream oss;
-					oss << "number of passes should be no less than 1, while " << passes << " is specified!";
-					throw std::runtime_error(oss.str());
-				}
-				this->pass_num = passes;
-				if (buf_size > 0 && chunk_size > 0){
-					this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
-				}
+			if (passes < 1) {
+				std::ostringstream oss;
+				oss << "number of passes should be no less than 1, while " << passes << " is specified!";
+				throw std::runtime_error(oss.str());
 			}
+			this->pass_num = passes;
+			this->is_norm = is_norm;
+			if (buf_size > 0 && chunk_size > 0){
+				this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
+			}
+		}
 
 		virtual ~OnlineDataSet() {
 			DELETE_POINTER(this->online_buf);
@@ -148,7 +149,13 @@ namespace BOC {
 		/**
 		 * @Synopsis EndWriteChunk Finish writing a chunk
 		 */
-		inline void EndWriteChunk(const ChunkType& chunk){
+		inline void EndWriteChunk(ChunkType& chunk){
+            //normalize the data
+			if (this->is_norm == true){
+				for (int i = 0; i < chunk.dataNum; ++i){
+					chunk.data[i].Normalize();
+				}
+			}
 			this->data_num += chunk.dataNum;
 			this->online_buf->EndWriteChunk();
 		}

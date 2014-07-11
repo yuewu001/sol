@@ -20,7 +20,7 @@
 
 namespace BOC{
 //information of algorithms
-	static std::string algoInfo;
+	static std::string modelInfo;
 	//information of loss functions
 	static std::string lossInfo;
 	//informationi of io
@@ -52,7 +52,7 @@ namespace BOC{
 			this->pOnlineModel = NULL;
 			this->pOpti = NULL;
 			this->pParam = NULL;
-			ModelInfo<FeatType, LabelType>::GetModelInfo(algoInfo);
+			ModelInfo<FeatType, LabelType>::GetModelInfo(modelInfo);
 			LossInfo<FeatType, LabelType>::GetLossInfo(lossInfo);
 			IOInfo<FeatType, LabelType>::GetIOInfo(ioInfo);
 			OptInfo<FeatType, LabelType>::GetOptInfo(optInfo);
@@ -76,11 +76,35 @@ namespace BOC{
 		 * @Synopsis Show information of the toolbox
 		 */
 	public:
-		inline void ShowAlgoInfo() const {
-			printf("Algorithms:\n%s", algoInfo.c_str());
+		void ShowHelpInfo(Params& param){
+			string helpItem = param.StringValue("-help");
+			ToLowerCase(helpItem);
+			if (helpItem == "model"){
+				this->ShowModelInfo();
+			}
+			else if (helpItem == "optimizer"){
+				this->ShowOptimizers();
+			}
+			else if (helpItem == "loss"){
+				this->ShowLossInfo();
+			}
+			else if (helpItem == "io"){
+				this->ShowIoInfo();
+			}
+		}
+
+		inline void ShowModelInfo() const {
+			printf("Models:\n%s\n", modelInfo.c_str());
 		}
 		inline void ShowLossInfo() const {
-			printf("Loss Functions:\n%s", lossInfo.c_str());
+			printf("Loss Functions:\n%s\n", lossInfo.c_str());
+		}
+
+		inline void ShowOptimizers() const{
+			printf("Optimizers: \n%s\n", optInfo.c_str());
+		}
+		inline void ShowIoInfo() const {
+			printf("IO: \n%s\n", ioInfo.c_str());
 		}
 
 	protected:
@@ -88,7 +112,7 @@ namespace BOC{
 			this->pLossFunc = (LossFunction<FeatType, LabelType>*)
 				Registry::CreateObject(param.StringValue("-loss"));
 			if (this->pLossFunc == NULL) {
-				fprintf(stderr, "Error %d: Init loss function failed (%s)", STATUS_INIT_FAIL, param.StringValue("-loss"));
+				fprintf(stderr, "Error %d: Init loss function failed (%s)\n", STATUS_INIT_FAIL, param.StringValue("-loss").c_str());
 				return STATUS_INIT_FAIL;
 			}
 			return STATUS_OK;
@@ -98,10 +122,10 @@ namespace BOC{
 			string drt_type = param.StringValue("-drt");
 			ToLowerCase(drt_type);
 			if (drt_type == "online"){
-				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"));
+				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"), param.BoolValue("-norm"));
 
 				if (this->pDataset == NULL){
-					fprintf(stderr, "Error %d: init dataset failed! (%s)", STATUS_INIT_FAIL, drt_type);
+					fprintf(stderr, "Error %d: init dataset failed! (%s)\n", STATUS_INIT_FAIL, drt_type.c_str());
 					return STATUS_INIT_FAIL;
 				}
 
@@ -118,37 +142,36 @@ namespace BOC{
 				}
 			}
 			else if (drt_type == "batch"){
-				fprintf(stderr, "Error %d: batch dataset is not supported yet", STATUS_INVALID_ARGUMENT);
+				fprintf(stderr, "Error %d: batch dataset is not supported yet\n", STATUS_INVALID_ARGUMENT);
 				return STATUS_INVALID_ARGUMENT;
 			}
 			else{
-				fprintf(stderr, "Error %d: Unrecognized data reader type (%s)", STATUS_INVALID_ARGUMENT, drt_type);
+				fprintf(stderr, "Error %d: Unrecognized data reader type (%s)\n", STATUS_INVALID_ARGUMENT, drt_type.c_str());
 				return STATUS_INVALID_ARGUMENT;
 			}
 
-			if (this->pDataset->Load(param.StringValue("-i"), param.StringValue("-c"),
-				param.StringValue("-df")) == false){
-				fprintf(stderr, "Error %d: Load dataset failed", STATUS_IO_ERROR);
-				return STATUS_IO_ERROR;
-			}
+
 			return STATUS_OK;;
 		}
 
 		inline int InitModel(Params &param){
 			//check model type
-			string algo = param.StringValue("-algo");
-			ToUpperCase(algo);
-			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(algo, this->pLossFunc);
+			string model = param.StringValue("-m");
+			ToUpperCase(model);
+			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc);
+			if (this->pModel == NULL){
+				fprintf(stderr, "Error %d: init online model failed! (%s)\n", STATUS_INIT_FAIL, model.c_str());
+				return STATUS_INIT_FAIL;
+			}
+
 			const string& modelType = this->pModel->GetModelType();
 			if (modelType == "online"){
 				this->pOnlineModel = (OnlineModel<FeatType, LabelType>*)this->pModel;
 				if (this->pOnlineModel == NULL){
-					fprintf(stderr, "Error %d: init online model failed! (%s)", STATUS_INIT_FAIL, algo);
-					return STATUS_INIT_FAIL;
 				}
 			}
 			else{
-				fprintf(stderr, "Error: unsupported model type %s!", modelType.c_str());
+				fprintf(stderr, "Error: unsupported model type %s!\n", modelType.c_str());
 				return STATUS_INVALID_ARGUMENT;
 			}
 
@@ -170,7 +193,7 @@ namespace BOC{
 				Registry::CreateObject(optType, this->pOnlineModel, this->pDataset);
 
 			if (this->pOpti == NULL) {
-				fprintf(stderr, "Error %d: init optimizer failed! (%s)", STATUS_INIT_FAIL, optType);
+				fprintf(stderr, "Error %d: init optimizer failed! (%s)\n", STATUS_INIT_FAIL, optType.c_str());
 				return STATUS_INIT_FAIL;
 			}
 			return STATUS_OK;
@@ -198,14 +221,20 @@ namespace BOC{
 		}
 
 		int Run(){
+			if (this->pDataset->Load(this->pParam->StringValue("-i"), this->pParam->StringValue("-c"),
+				this->pParam->StringValue("-df")) == false){
+				fprintf(stderr, "Error %d: Load dataset failed\n", STATUS_IO_ERROR);
+				return STATUS_IO_ERROR;
+			}
+
 			this->pModel->PrintModelSettings();
 			//learning the model
 			double time1 = get_current_time();
 
 			float l_errRate = this->pOpti->Train();
 
-			if (this->pParam->StringValue("-or").length() > 0){
-				this->pModel->SaveModel(this->pParam->StringValue("-or"));
+			if (this->pParam->StringValue("-om").length() > 0){
+				this->pModel->SaveModel(this->pParam->StringValue("-om"));
 			}
 
 			double time2 = get_current_time();
@@ -220,7 +249,8 @@ namespace BOC{
 			bool is_test = this->pParam->StringValue("-tc").length() > 0 ||
 				this->pParam->StringValue("-t").length() > 0;
 			if (is_test) {
-				OnlineDataSet<FeatType, LabelType> testset(1, this->pParam->IntValue("-bs"), this->pParam->IntValue("-cs"));
+				OnlineDataSet<FeatType, LabelType> testset(1, this->pParam->BoolValue("-norm"),
+					this->pParam->IntValue("-bs"), this->pParam->IntValue("-cs"));
 				if (testset.Load(this->pParam->StringValue("-t"), this->pParam->StringValue("-tc"),
 					this->pParam->StringValue("-df")) == true) {
 					float t_errRate(0);	//test error rate
@@ -228,18 +258,18 @@ namespace BOC{
 					time3 = get_current_time();
 
 					printf("Test error rate: %.2f %%\n", t_errRate * 100);
+					printf("Test time: %.3f s\n", (float)(time3 - time2));
 				}
 				else{
-					fprintf(stderr, "load test set failed!");
+					fprintf(stderr, "load test set failed!\n");
 				}
-				printf("Test time: %.3f s\n", (float)(time3 - time2));
 			}
 
 			return STATUS_OK;
 		}
 	};
 
-	
+
 }
 
 #endif

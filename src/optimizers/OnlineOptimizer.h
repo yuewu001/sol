@@ -15,7 +15,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class OnlineOptimizer : public Optimizer<FeatType, LabelType> {
+	class OnlineOptimizer : public Optimizer < FeatType, LabelType > {
 		//dynamic bindings
 		DECLARE_CLASS
 
@@ -26,7 +26,7 @@ namespace BOC {
 	public:
 		OnlineOptimizer(OnlineModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
 			Optimizer<FeatType, LabelType>(model, dataset){
-			}
+		}
 
 		virtual ~OnlineOptimizer() {
 		}

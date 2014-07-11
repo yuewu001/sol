@@ -72,9 +72,10 @@ namespace BOC {
 		//initialize params
 		this->option->opt.overview = "Sparse Online Learning Library";
 		option->opt.syntax = "SOL [options] -i train_file";
-		option->opt.example = "SOL -i train_file -algo SGD";
+		option->opt.example = "SOL -i train_file -m SGD";
 
 		option->opt.add("", " ", 0, 0, ',', "help message", "-h", "--help");
+		this->add_option("", 0, 1, "help message (model, optimizer, loss, io)", "-help", " ");
 
 		//input & output
 		this->add_option("", 0, 1, "training file", "-i", "Input Output");
@@ -89,8 +90,8 @@ namespace BOC {
 		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm", "Input Output");
 
 		//Training Settings
-		this->add_option("", false, 1, "input existing model", "-m", "Training Settings");
-		this->add_option("", false, 1, "output readable model", "-or", "Training Settings");
+		this->add_option("", false, 1, "input existing model", "-im", "Training Settings");
+		this->add_option("", false, 1, "output readable model", "-om", "Training Settings");
 		this->add_option(1, 0, 1, "number of passes", "-passes", "Training Settings");
 		this->add_option(init_mp_buf_type, 0, 1, "Multipass Buffer Type", "-mbt", "Training Settings");
 		this->add_option(init_mp_buf_size, 0, 1, "Multipass Buffer Size", "-mbs", "Training Settings");
@@ -99,7 +100,7 @@ namespace BOC {
 		this->add_option(init_loss_type, 0, 1, "loss function type", "-loss", "Loss Functions");
 
 		//model setting
-		this->add_option(init_algo_method, 0, 1, "learning algorithm:", "-algo", "Model Settings");
+		this->add_option(init_algo_method, 0, 1, "learning model:", "-m", "Model Settings");
 		this->add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
 		this->add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
 		this->add_option(init_initial_t, 0, 1, "initial iteration number", "-t0", "Model Settings");
