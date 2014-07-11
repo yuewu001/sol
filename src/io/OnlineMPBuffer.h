@@ -20,6 +20,8 @@ namespace BOC {
 	template <typename PointType>
 	class OnlineMPBuffer : public OnlineBuffer < PointType > {
 	protected:
+		typedef typename OnlineBuffer<PointType>::ChunkType ChunkType;
+	protected:
 		MPChunk<PointType> *p_MPChunk;
 		/**
 		 * @Synopsis Constructors

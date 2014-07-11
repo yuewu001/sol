@@ -8,6 +8,7 @@
 #define HEADER_CW_RDA
 
 #include "SparseOnlineLinearModel.h"
+#include "../../../../loss/SquaredHingeLoss.h"
 
 /**
 *  namespace: Batch and Online Classification

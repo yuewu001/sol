@@ -12,6 +12,7 @@ of weight vectors." Machine Learning (2009): 1-33.
 #define HEADER_CW_TG
 
 #include "SparseOnlineLinearModel.h"
+#include "../../../../loss/SquaredHingeLoss.h"
 
 /**
 *  namespace: Batch and Online Classification

@@ -25,6 +25,7 @@ namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class OnlineDataSet : public DataSet < FeatType, LabelType > {
 	protected:
+		typedef typename DataSet<FeatType, LabelType>::PointType PointType;
 		typedef FixSizeDataChunk<PointType> ChunkType;
 
 		int pass_num; //number of passes

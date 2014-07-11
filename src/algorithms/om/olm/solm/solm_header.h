@@ -31,10 +31,7 @@ namespace BOC{
 			APPEND_INFO(info,CW_TG,FeatType, LabelType);
 			APPEND_INFO(info,DAROW,FeatType, LabelType);
 			APPEND_INFO(info,FOBOS,FeatType, LabelType);
-			APPEND_INFO(info,FOFS,FeatType, LabelType);
-			APPEND_INFO(info,PET,FeatType, LabelType);
 			APPEND_INFO(info,RDA,FeatType, LabelType);
-			APPEND_INFO(info,SOFS,FeatType, LabelType);
 			APPEND_INFO(info,STG,FeatType, LabelType);
 		}
 	};

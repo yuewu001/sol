@@ -9,6 +9,7 @@
 
 #include <map>
 #include <string>
+#include <cstdio>
 
 namespace BOC{
 
@@ -66,7 +67,7 @@ namespace BOC{
 				return ((ClassInfo*)(iter->second))->CreateObject(param1, param2, param3);
 			}
 			else{
-				fprintf(stderr, "Error: unrecognized class name %s!\n", name.c_str());
+                std::fprintf(stderr, "Error: unrecognized class name %s!\n", name.c_str());
 			}
 			return NULL;
 		}

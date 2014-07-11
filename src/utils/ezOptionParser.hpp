@@ -1361,7 +1361,7 @@ class ezOptionParser {
         std::map< std::string, int > optionGroupIds;
         // Unordered collection of the option groups.
         std::vector< OptionGroup* > groups;
-		std::map<std::string, std::vector<int>> optionCategory2GroupIds;
+		std::map<std::string, std::vector<int> > optionCategory2GroupIds;
         // Store unexpected args in input.
         std::vector< std::string* > unknownArgs;
         // List of args that occur left-most before first option flag.

@@ -12,8 +12,11 @@
 #include "DataChunk.h"
 
 #include "../utils/MaxHeap.h"
+#include "../utils/init_param.h"
 
 #include <time.h>
+#include <limits>
+#include <cmath>
 
 namespace BOC{
 

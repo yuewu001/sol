@@ -20,6 +20,8 @@ namespace BOC {
 		DECLARE_CLASS
 
 	protected:
+		typedef typename Optimizer<FeatType, LabelType>::PointType PointType;
+	protected:
 		/**
 		 * @Synopsis Constructors
 		 */
