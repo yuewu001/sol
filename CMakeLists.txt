@@ -83,17 +83,17 @@ ENDIF(UNIX)
 #
 #add_executable(analysis src/analysis/data_analysis.cpp ${io_files})
 #add_executable(dtcleaner src/dtcleaner/dtcleaner.cpp ${io_files} ${util_files})
-#add_executable(Converter ${converter_files} ${io_files} ${util_files})
-#IF(UNIX)
-#    target_link_libraries(Converter pthread)
-#ENDIF(UNIX)
+add_executable(Converter ${converter_files} ${io_files} ${util_files})
+IF(UNIX)
+    target_link_libraries(Converter pthread)
+ENDIF(UNIX)
 
 
 IF(DCMTK_WITH_DEBUG_POSTFIX)  
     set_target_properties(SOL PROPERTIES DEBUG_POSTFIX "d")
     #set_target_properties(SyntheticData PROPERTIES DEBUG_POSTFIX "d")
     #set_target_properties(analysis PROPERTIES DEBUG_POSTFIX "d")
-    #set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
+    set_target_properties(Converter PROPERTIES DEBUG_POSTFIX "d")
 ENDIF(DCMTK_WITH_DEBUG_POSTFIX)
 
 #Organize projects into folders
@@ -103,13 +103,13 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #SET_PROPERTY(TARGET analysis PROPERTY FOLDER "Tools")
 #SET_PROPERTY(TARGET dtcleaner PROPERTY FOLDER "Tools")
-#SET_PROPERTY(TARGET Converter PROPERTY FOLDER "Tools")
+SET_PROPERTY(TARGET Converter PROPERTY FOLDER "Tools")
 #SET_PROPERTY(TARGET testDll PROPERTY FOLDER "TestCases")
 #SET_PROPERTY(TARGET testStatic PROPERTY FOLDER "TestCases")
 #SET_PROPERTY(TARGET testMNIST PROPERTY FOLDER "TestCases")
 
 #install(TARGETS SOL analysis dtcleaner Converter SOLdll SOLstatic
-install(TARGETS SOL 
+install(TARGETS SOL  Converter
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION bin
     ARCHIVE DESTINATION lib)

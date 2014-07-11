@@ -122,19 +122,20 @@ namespace BOC{
 			string drt_type = param.StringValue("-drt");
 			ToLowerCase(drt_type);
 			if (drt_type == "online"){
-				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"), param.BoolValue("-norm"));
+				int buf_size = param.IntValue("-bs");
+				int chunk_size = param.IntValue("-cs");
+				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"),
+					param.BoolValue("-norm"), buf_size, chunk_size);
 
 				if (this->pDataset == NULL){
 					fprintf(stderr, "Error %d: init dataset failed! (%s)\n", STATUS_INIT_FAIL, drt_type.c_str());
 					return STATUS_INIT_FAIL;
 				}
 
-				int buf_size = param.IntValue("-bs");
-				int chunk_size = param.IntValue("-cs");
 				const string& mp_buf_type = param.StringValue("-mbt");
 				int mp_buf_size = param.IntValue("-mbs");
 				try{
-					((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfiBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
+					((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfigBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
 				}
 				catch (std::invalid_argument& ex){
 					fprintf(stderr, "%s\n", ex.what());

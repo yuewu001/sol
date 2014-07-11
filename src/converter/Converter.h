@@ -7,9 +7,6 @@
 #ifndef HEADER_CONVERTER
 #define HEADER_CONVERTER
 
-#include "Params.h"
 
-void Convert(const SOL::Params &param);
-void Cache(const SOL::Params &param);
 
 #endif

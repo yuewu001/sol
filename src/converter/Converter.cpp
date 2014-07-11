@@ -10,17 +10,19 @@
 #include <crtdbg.h>
 #endif
 
-#include "Params.h"
+#include "ConverterParams.h"
 
-#include "Converter.h"
-
-#include "../io/sol_io.h"
+#include "../io/io_header.h"
+#include "../utils/init_param.h"
 
 #include <fstream>
 #include <cstdio>
 #include <vector>
 
-using namespace SOL;
+using namespace BOC;
+
+void Convert(BOC::ConverterParams &param);
+void Cache(BOC::ConverterParams &param);
 
 int main(int argc, const char** args){
 	//check memory leak in VC++
@@ -31,12 +33,17 @@ int main(int argc, const char** args){
 	//_CrtSetBreakAlloc(1698);  
 #endif
 
-    Params param;
+	string ioInfo;
+	IOInfo<float,char>::GetIOInfo(ioInfo);
+
+    ConverterParams param;
     if (param.Parse(argc,args) == false)
         return -1;
-	ToLowerCase(param.src_data_type);
-	ToLowerCase(param.dst_data_type);
-	if (param.dst_data_type == "cache"){
+	string src_type = param.StringValue("-st");
+	string dst_type = param.StringValue("-dt");
+	ToLowerCase(src_type);
+	ToLowerCase(dst_type);
+	if (dst_type == "binary"){
 		Cache(param);
 	}
 	else
@@ -44,33 +51,34 @@ int main(int argc, const char** args){
 	return 0;
 }
 
-void Cache(const Params &param){
+void Cache(ConverterParams &param){
 	cout<<"Caching file..."<<endl;
 	
-	OnlineDataSet<float, char> dt;
-	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.src_data_type);
-	if (reader == NULL){
-		return;
-	}
+	OnlineDataSet<float, char> dt(1, false,init_buf_size, init_chunk_size);
+	string src_file = param.StringValue("-i");
+    DataReader<float, char> *reader = (DataReader<float, char>*)Registry::CreateObject(param.StringValue("-st"), &src_file);
+    if (reader == NULL){
+		cerr << "create reader failed!" << endl;
+        return;
+    }
 
-	dt.Load(reader,param.out_fileName);
+	dt.Load(reader,param.StringValue("-o"));
 	size_t dataNum = 0;
 
 	size_t show_step = 1; //show information every show_step
 	size_t show_count = 2;
-	if(dt.Rewind()){
-		while(1){
-			const DataChunk<float, char> chunk = dt.GetChunk();
-			dataNum += chunk.dataNum;
-			if (chunk.dataNum == 0){
-				dt.FinishRead();
-				break;
-			}
+	dt.Rewind();
+	while (1){
+		const DataChunk<DataPoint<float, char> > chunk = dt.GetChunk();
+		dataNum += chunk.dataNum;
+		if (chunk.dataNum == 0){
 			dt.FinishRead();
-			if (show_count < dataNum){
-				printf("%lu samples cached\r",dataNum);
-				show_count = (size_t(1) << ++show_step);
-			}
+			break;
+		}
+		dt.FinishRead();
+		if (show_count < dataNum){
+			printf("%lu samples cached\r", dataNum);
+			show_count = (size_t(1) << ++show_step);
 		}
 	}
 	printf("%lu samples cached\n",dataNum);
@@ -90,21 +98,34 @@ IndexType GetDataDim(DataReader<FeatType, LabelType> * reader){
 	return featDim;
 }
 
-void Convert(const Params &param){
-	cout << "Convert file from "<<param.src_data_type<<" to " <<param.dst_data_type<< endl;
-	DataReader<float, char> *reader = getReader<float, char>(param.in_fileName, param.src_data_type);
-	if (reader->OpenReading() == false){
-		cerr << "open " << param.in_fileName << " failed!" << endl;
+void Convert(ConverterParams &param){
+	string src_type = param.StringValue("-st");
+	string dst_type = param.StringValue("-dt");
+	string in_file = param.StringValue("-i");
+	string out_file = param.StringValue("-o");
+
+	cout << "Convert file from "<<src_type<<" to " <<dst_type<< endl;
+    DataReader<float, char> *reader = (DataReader<float, char>*)Registry::CreateObject(src_type, &in_file);
+	if (reader == NULL){
 		return;
 	}
-	string tmp_filename = param.out_fileName + ".writing";
 
-	DataHandler<float, char> *writer = getWriter<float, char>(tmp_filename, param.dst_data_type);
+	string tmp_filename = out_file + ".writing";
+
+	DataHandler<float, char> *writer = (DataHandler<float, char>*)Registry::CreateObject(dst_type, &tmp_filename);
+	if (writer == NULL){
+		return;
+	}
 	if (writer->OpenWriting() == false){
 		cerr << "open output file" << tmp_filename << " failed!" << endl;
 		return;
 	}
-	if (param.dst_data_type == "csv"){
+	if (reader->OpenReading() == false){
+		cerr << "open " << in_file << " failed!" << endl;
+		return;
+	}
+
+	if (dst_type == "csv"){
 		IndexType featDim = GetDataDim<float, char>(reader);
 		if (writer->SetExtraInfo((const char*)(&featDim)) == false) {
 			delete reader;
@@ -135,7 +156,7 @@ void Convert(const Params &param){
 	}
 	writer->Close();
 	if (reader->Good() == true &&
-		rename_file(tmp_filename, param.out_fileName) == true)
+		rename_file(tmp_filename, out_file) == true)
 		printf("%lu samples (%lu features) converted\n", dataNum, featNum);
 	reader->Close();
 	delete reader;
