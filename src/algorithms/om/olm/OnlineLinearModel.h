@@ -68,7 +68,9 @@ namespace BOC {
 		/**
 		 * @Synopsis EndTrain called when a train ends
 		 */
-		virtual void EndTrain() { }
+		virtual void EndTrain() {
+			OnlineModel<FeatType, LabelType>::EndTrain();
+		}
 
 		/**
 		 * @Synopsis UpdateModelDimention update dimension of the model,
@@ -272,6 +274,28 @@ namespace BOC {
 			}
 
 			return true;
+		}
+
+		/**
+		 * @Synopsis newly defined functions
+		 */
+	public:
+
+		/**
+		 * @Synopsis GetNonZeroNum get the number of nonzero weights
+		 *
+		 * @Returns number of nonzero weights
+		 */
+		IndexType GetNonZeroNum()  const {
+			IndexType non_zeroNum(0);
+			if (this->weightDim == 1)
+				return 0;
+
+			for (IndexType i = 1; i < this->weightDim; i++) {
+				if (this->weightVec[i] != 0)
+					non_zeroNum++;
+			}
+			return non_zeroNum;
 		}
 
 	};

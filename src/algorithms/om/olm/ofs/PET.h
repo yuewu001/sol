@@ -8,7 +8,7 @@
 #ifndef HEADER_OPTIMISER_PET
 #define HEADER_OPTIMISER_PET
 
-#include "SparseOnlineLinearModel.h"
+#include "OnlineFeatureSelection.h"
 #include "../../../../utils/MinHeap.h"
 
 /**
@@ -16,23 +16,20 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class PET : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class PET : public OnlineFeatureSelection<FeatType, LabelType> {
 
 		DECLARE_CLASS
 
 	protected:
-		IndexType K; //keep top K elemetns
-
 		s_array<float> abs_weightVec;
 
 		MinHeap<float> minHeap;
 
 		float(*pEta_time)(size_t t, float pt);
+
 	public:
 		PET(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->K = 0;
-
+			OnlineFeatureSelection<FeatType, LabelType>(lossFunc) {
 				this->abs_weightVec.resize(this->weightDim);
 			}
 
@@ -44,28 +41,10 @@ namespace BOC {
 		 */
 	public:
 		/**
-		 * PrintModelSettings print the info of optimization algorithm
-		 */
-		virtual void PrintModelSettings() const {
-			SparseOnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
-			printf("\tK:\t%d\n", this->K);
-		}
-
-		/**
-		 * @Synopsis SetParameter set parameters for the learning model
-		 *
-		 * @Param param
-		 */
-		virtual void SetParameter(BOC::Params &param){
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->K = param.IntValue("-k");
-		}
-
-		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
-			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
+			OnlineFeatureSelection<FeatType, LabelType>::BeginTrain();
 
 			if (this->power_t == 0.5)
 				this->pEta_time = pEta_sqrt;
@@ -140,7 +119,7 @@ namespace BOC {
 
 				this->minHeap.UpdateDataNum(new_dim, this->abs_weightVec.begin + 1);
 
-				SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
+				OnlineFeatureSelection<FeatType, LabelType>::UpdateModelDimention(new_dim);
 			}
 		}
 	};

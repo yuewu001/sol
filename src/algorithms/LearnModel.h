@@ -10,6 +10,7 @@
 
 #include "../loss/LossFunction.h"
 #include "../utils/config.h"
+#include "../utils/util.h"
 #include "../utils/reflector.h"
 #include "../utils/Params.h"
 #include "../io/DataPoint.h"
@@ -33,8 +34,6 @@ namespace BOC {
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
 	{ return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
-
-
 
 	template <typename FeatType, typename LabelType>
 	//	class LearnModel : public Registry<FeatType, LabelType> {

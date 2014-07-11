@@ -8,7 +8,7 @@
 #ifndef HEADER_OPTIMISER_FOFS
 #define HEADER_OPTIMISER_FOFS
 
-#include "SparseOnlineLinearModel.h"
+#include "OnlineFeatureSelection.h"
 #include "../../../../utils/MinHeap.h"
 
 /**
@@ -16,13 +16,11 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class FOFS : public SparseOnlineLinearModel<FeatType, LabelType> {
+	class FOFS : public OnlineFeatureSelection<FeatType, LabelType> {
 
 		DECLARE_CLASS
 
 	protected:
-		IndexType K; //keep top K elemetns
-
 		float w_norm;
 		float norm_coeff;
 
@@ -34,8 +32,7 @@ namespace BOC {
 
 	public:
 		FOFS(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->K = 0;
+			OnlineFeatureSelection<FeatType, LabelType>(lossFunc) {
 				this->delta = 0;
 
 				this->abs_weightVec.resize(this->weightDim);
@@ -52,9 +49,8 @@ namespace BOC {
 		 * PrintModelSettings print the info of optimization algorithm
 		 */
 		virtual void PrintModelSettings() const {
-			SparseOnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
+			OnlineFeatureSelection<FeatType, LabelType>::PrintModelSettings();
 			printf("\tdelta:\t%.2f\n", this->delta);
-			printf("\tK:\t%d\n", this->K);
 		}
 
 		/**
@@ -64,15 +60,15 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->K = param.IntValue("-k");
 			this->delta = param.FloatValue("-delta");
+            INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
-			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
+			OnlineFeatureSelection<FeatType, LabelType>::BeginTrain();
 
 			this->w_norm = 0;
 			this->norm_coeff = 1.f / sqrtf(this->delta);
@@ -155,7 +151,7 @@ namespace BOC {
 
 				this->minHeap.UpdateDataNum(new_dim, this->abs_weightVec.begin + 1);
 
-				SparseOnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
+				OnlineFeatureSelection<FeatType, LabelType>::UpdateModelDimention(new_dim);
 			}
 		}
 	};

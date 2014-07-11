@@ -27,6 +27,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
 #define DELETE_ARRAY(pointer) \
 if (pointer != NULL){ \
@@ -39,6 +40,14 @@ if (pointer != NULL){ \
 	delete (pointer); \
 	pointer = NULL; \
 }
+
+//check if the argument is valid and throw exception otherwise
+#define INVALID_ARGUMENT_EXCEPTION(argu, condition, correctCondition) \
+    if ((condition) == false){ \
+        ostringstream oss; \
+        oss<<"Argument "<<#argu<<" must be "<<correctCondition<<". Input is "<< argu; \
+        throw invalid_argument(oss.str().c_str()); \
+    }
 
 
 template <typename T>

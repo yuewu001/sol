@@ -14,7 +14,7 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class OnlineModel : public LearnModel<FeatType, LabelType> {
+	class OnlineModel : public LearnModel < FeatType, LabelType > {
 
 	protected:
 		//iteration number
@@ -67,6 +67,12 @@ namespace BOC {
 		}
 
 		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() {
+		}
+
+		/**
 		 * @Synopsis newly defined functions
 		 */
 	public:
@@ -85,8 +91,11 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			this->initial_t = param.IntValue("-t0");
+			INVALID_ARGUMENT_EXCEPTION(initial_t, this->initial_t >= 0, "no smaller than 0");
 			this->power_t = param.FloatValue("-power_t");
+			INVALID_ARGUMENT_EXCEPTION(power_t, this->power_t >= 0, "no smaller than 0");
 			this->eta0 = param.FloatValue("-eta");
+			INVALID_ARGUMENT_EXCEPTION(eta0, this->eta0 >= 0, "no smaller than 0");
 		}
 	};
 

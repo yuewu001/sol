@@ -7,14 +7,20 @@ set (solm_files
     src/algorithms/om/olm/solm/CW_TG.h
     src/algorithms/om/olm/solm/DAROW.h
     src/algorithms/om/olm/solm/FOBOS.h
-    src/algorithms/om/olm/solm/FOFS.h
     src/algorithms/om/olm/solm/mRMR_OGD.h
-    src/algorithms/om/olm/solm/PET.h
     src/algorithms/om/olm/solm/RDA.h
-    src/algorithms/om/olm/solm/SOFS.h
     src/algorithms/om/olm/solm/STG.h
     src/algorithms/om/olm/solm/SparseOnlineLinearModel.h
     src/algorithms/om/olm/solm/solm_header.h
+    PARENT_SCOPE
+    )
+
+set (ofs_files
+    src/algorithms/om/olm/ofs/PET.h
+    src/algorithms/om/olm/ofs/FOFS.h
+    src/algorithms/om/olm/ofs/SOFS.h
+    src/algorithms/om/olm/ofs/OnlineFeatureSelection.h
+    src/algorithms/om/olm/ofs/ofs_header.h
     PARENT_SCOPE
     )
 

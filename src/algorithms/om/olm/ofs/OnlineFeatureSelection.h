@@ -1,34 +1,30 @@
 /*************************************************************************
-	> File Name: SparseOnlineLinearModel.h
+	> File Name: OnlineFeatureSelection.h
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-	> Created Time: 5/5/2014 4:54:43 PM
-	> Functions: interfaces for sparse linear online model
-	************************************************************************/
-#ifndef HEADER_SPARSE_LINEAR_ONLINE_MODEL
-#define HEADER_SPARSE_LINEAR_ONLINE_MODEL
+	> Created Time: 7/11/2014 11:45:56 AM
+	> Functions: base class for online feature selection
+ ************************************************************************/
 
-#include "../OnlineLinearModel.h"
+#ifndef HEADER_ONLINE_FEATURE_SELECTION
+#define HEADER_ONLINE_FEATURE_SELECTION
 
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class SparseOnlineLinearModel : public OnlineLinearModel<FeatType, LabelType> {
+	class OnlineFeatureSelection : public OnlineLinearModel<FeatType, LabelType> {
 	protected:
-		//L1 regularization parameter
-		float lambda;
-		//weights below this threshold will eliminated at the end of training
-		float sparse_soft_thresh;
+        //keep top K elemetns
+		IndexType K; 
 
 	public:
-		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) :
+		OnlineFeatureSelection(LossFunction<FeatType, LabelType> *lossFunc) :
 			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
-				this->lambda = 0;
-				this->sparse_soft_thresh = init_sparse_soft_thresh;
+                this->K = 1;
 			}
 
-		virtual ~SparseOnlineLinearModel() {
+		virtual ~OnlineFeatureSelection() {
 		}
 
 		//inherited functions
@@ -39,8 +35,8 @@ namespace BOC {
 		virtual void PrintModelSettings() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
 
-			printf("Linear Sparse Online Learning:\n");
-			printf("\tl1 regularization: %g\n", this->lambda);
+			printf("Linear Online Feature Selection:\n");
+			printf("\tK:\t%d\n", this->K);
 		}
 
 		/**
@@ -68,22 +64,21 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->lambda = param.FloatValue("-l1");
-			INVALID_ARGUMENT_EXCEPTION(lambda, this->lambda >= 0, "no smaller than 0");
+			this->K = param.IntValue("-k");
+            INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
+		}
+
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
 		}
 
 		/**
 		 * @Synopsis EndTrain called when a train ends
 		 */
-		virtual void EndTrain() {
-			//eliminate weights smaller than sparse_soft_thresh
-			for (IndexType i = 1; i < this->weightDim; i++){
-				if (this->weightVec[i] < this->sparse_soft_thresh &&
-					this->weightVec[i] > -this->sparse_soft_thresh){
-					this->weightVec[i] = 0;
-				}
-			}
-
+		virtual void EndTrain() { 
 			OnlineLinearModel<FeatType, LabelType>::EndTrain();
 		}
 
@@ -98,8 +93,8 @@ namespace BOC {
 		virtual bool SaveModelConfig(std::ofstream &os) {
 			OnlineLinearModel<FeatType, LabelType>::SaveModelConfig(os);
 
-			//l1 regularization
-			os << "lambda: " << this->lambda << "\n";
+			//select k features
+            os << "K : " << this->K<< "\n";
 
 			return true;
 		}
@@ -114,17 +109,15 @@ namespace BOC {
 		virtual bool LoadModelConfig(std::ifstream &is) {
 			OnlineLinearModel<FeatType, LabelType>::LoadModelConfig(is);
 
+			//select k features
 			string line;
-			//l1 regularization
 			getline(is, line, ':');
-			is >> this->lambda;
+			is >> this->K;
 			getline(is, line);
 
 			return true;
 		}
 	};
-
 }
-
 #endif
 

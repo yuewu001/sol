@@ -3,6 +3,7 @@
 
 #include "SGD.h"
 #include "solm/solm_header.h"
+#include "ofs/ofs_header.h"
 
 #include <string>
 
@@ -21,6 +22,7 @@ namespace BOC{
 			APPEND_INFO(info,SGD,FeatType, LabelType);
 
             SOLModelInfo<FeatType,LabelType>::GetModelInfo(info);
+            OFSModelInfo<FeatType, LabelType>::GetModelInfo(info);
 		}
 	};
 }

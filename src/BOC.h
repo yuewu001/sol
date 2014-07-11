@@ -151,7 +151,13 @@ namespace BOC{
 				return STATUS_INVALID_ARGUMENT;
 			}
 
-			this->pModel->SetParameter(param);
+			try{
+				this->pModel->SetParameter(param);
+			}
+			catch (invalid_argument &ex){
+				fprintf(stderr, "%s\n", ex.what());
+				return STATUS_INVALID_ARGUMENT;
+			}
 
 			return STATUS_OK;
 		}
