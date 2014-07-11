@@ -4,13 +4,14 @@
   > Created Time: Thu 24 Oct 2013 08:09:38 PM
   > Descriptions: analyse the sparsity of data
  ************************************************************************/
-#include "../io/DataPoint.h"
-#include "../io/DataReader.h"
-#include "../io/libsvm_io.h"
+
+#include "../io/io_header.h"
+
+#include "../utils/Params.h"
 
 #include <string>
 using namespace std;
-using namespace SOL;
+using namespace BOC;
 
 template <typename FeatType, typename LabelType>
 bool Analyze(DataReader<FeatType, LabelType> *reader) {
@@ -19,12 +20,12 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         return false;
     }
 
-	size_t max_show_count = 100000;
-	size_t show_count = 1000;
+    size_t max_show_count = 100000;
+    size_t show_count = 1000;
     size_t dataNum = 0;
     size_t featNum = 0;
-	size_t pos_num = 0;
-	size_t neg_num = 0;
+    size_t pos_num = 0;
+    size_t neg_num = 0;
     IndexType max_index = 0;
     s_array<char> index_set;
     DataPoint<FeatType, LabelType> data;
@@ -50,68 +51,87 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
-				if (data.label == 1)
-					pos_num++;
-				else if (data.label == -1)
-					neg_num++;
-				else{
-					cerr<<"\nunrecognized label!"<<endl;
-					break;
-				}
+                if (data.label == 1)
+                    pos_num++;
+                else if (data.label == -1)
+                    neg_num++;
+                else{
+                    cerr<<"\nunrecognized label!"<<endl;
+                    break;
+                }
 
                 featNum += data.indexes.size();
-                
-				if (dataNum % show_count == 0){
-					cerr<<"data number  : "<<dataNum<<"    ";
-					cerr<<"valid dim    : "<<max_index<<"\r";
-					show_count *= 2;
-					show_count = show_count > max_show_count ? 
-						max_show_count : show_count;
-				}
-			}
-			else
-				break;
-		}
-	}
-	else {
-		cerr<<"Can not open file to read!"<<endl;
-		return false;
-	}
-	cerr<<"\n";
-	reader->Close();
-	size_t valid_dim = 0;
-	for (size_t i = 0; i < index_set.size(); i++) {
-		if (index_set[i] == 1)
-			valid_dim++;
-	}
-	cout<<"data number  : "<<dataNum<<"\n";
-	cout<<"feat number  : "<<featNum<<"\n";
-	cout<<"valid dim    : "<<max_index<<"\n";
-	cout<<"nonzero feat : "<<valid_dim<<"\n";
-	cout<<"positive num	: "<<pos_num<<"\n";
-	cout<<"negtive num	: "<<neg_num<<"\n";
-	if (max_index > 0){
-		printf("data sparsity: %.2lf%%\n",100 - valid_dim * 100.0 / max_index);
-	}
 
-	return true;
+                if (dataNum % show_count == 0){
+                    cerr<<"data number  : "<<dataNum<<"    ";
+                    cerr<<"valid dim    : "<<max_index<<"\r";
+                    show_count *= 2;
+                    show_count = show_count > max_show_count ? 
+                        max_show_count : show_count;
+                }
+            }
+            else
+                break;
+        }
+    }
+    else {
+        cerr<<"Can not open file to read!"<<endl;
+        return false;
+    }
+    cerr<<"\n";
+    reader->Close();
+    size_t valid_dim = 0;
+    for (size_t i = 0; i < index_set.size(); i++) {
+        if (index_set[i] == 1)
+            valid_dim++;
+    }
+    cout<<"data number  : "<<dataNum<<"\n";
+    cout<<"feat number  : "<<featNum<<"\n";
+    cout<<"valid dim    : "<<max_index<<"\n";
+    cout<<"nonzero feat : "<<valid_dim<<"\n";
+    cout<<"positive num	: "<<pos_num<<"\n";
+    cout<<"negtive num	: "<<neg_num<<"\n";
+    if (max_index > 0){
+        printf("data sparsity: %.2lf%%\n",100 - valid_dim * 100.0 / max_index);
+    }
+
+    return true;
 }
 
-int main(int argc, char** args){ 
-	if (argc != 2){
-		cout<<"Usage: data_analysis data_file"<<endl;
-		return 0;
-	}
-	//check memory leak in VC++
+void InitParms(Params& param){
+
+	string overview = "Sparse Online Learning Library - Dataset Analyzer";
+	string syntax = "data_analysis -i input_file -st src_type";
+	string example = "data_analysis -i input_file -st libsvm";
+	param.Init(overview, syntax, example);
+
+	//input & output
+	param.add_option("", 1, 1, "input file", "-i", " ");
+	param.add_option("", 1, 1, "input dataset type", "-st", " ");
+}
+
+int main(int argc, const char** args){ 
+
+    //check memory leak in VC++
 #if defined(_MSC_VER) && defined(_DEBUG)
-	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
-	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
-	_CrtSetDbgFlag( tmpFlag );
+    int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+    tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+    _CrtSetDbgFlag( tmpFlag );
 #endif
-	string filename = args[1];
-	//string filename = "/home/matthew/work/Data/aut/aut_train";
-	libsvm_io reader(filename);
-	if (Analyze(&reader) == false)
-		cerr<<"analyze dataset failed!"<<endl;
-	return 0;
+	std::string ioInfo;
+	IOInfo<float,char>::GetIOInfo(ioInfo);
+
+    Params param;
+    InitParms(param);
+	if (param.Parse(argc, args) == false){ 
+		return -1;
+	}
+
+    string filename = param.StringValue("-i");
+	string src_type = param.StringValue("-st");
+    //string filename = "/home/matthew/work/Data/aut/aut_train";
+    DataReader<float, char> *reader = (DataReader<float, char>*)Registry::CreateObject(src_type, &filename);
+    if (Analyze(reader) == false)
+        cerr<<"analyze dataset failed!"<<endl;
+    return 0;
 }

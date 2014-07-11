@@ -40,7 +40,7 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		OnlineDataSet(int passes, bool is_norm = false, int buf_size = -1, int chunk_size = -1) :
+		OnlineDataSet(int passes, bool is_norm, int buf_size, int chunk_size) :
 			online_buf(NULL), DataSet<FeatType, LabelType>() {
 			if (passes < 1) {
 				std::ostringstream oss;
@@ -52,18 +52,18 @@ namespace BOC {
 			if (buf_size > 0 && chunk_size > 0){
 				this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
 			}
+			else{
+				throw invalid_argument("buffer size and chunk size must be larger than 0");
+			}
 		}
 
 		virtual ~OnlineDataSet() {
 			DELETE_POINTER(this->online_buf);
 		}
 
-		void ConfiBuffer(int buf_size, int chunk_size, const string& mp_buf_type, int mp_buf_size){
-			DELETE_POINTER(this->online_buf);
-			if (mp_buf_type == "none"){
-				this->online_buf = new OnlineBuffer<PointType>(buf_size, chunk_size);
-			}
-			else {
+		void ConfigBuffer(int buf_size, int chunk_size, const string& mp_buf_type, int mp_buf_size){
+			if (mp_buf_type != "none"){
+				DELETE_POINTER(this->online_buf);
 				this->online_buf = new OnlineMPBuffer<PointType>(buf_size, chunk_size);
 				((OnlineMPBuffer<PointType>*)this->online_buf)->ConfigMPBuffer(mp_buf_type, mp_buf_size);
 			}
@@ -151,7 +151,7 @@ namespace BOC {
 		 * @Synopsis EndWriteChunk Finish writing a chunk
 		 */
 		inline void EndWriteChunk(ChunkType& chunk){
-            //normalize the data
+			//normalize the data
 			if (this->is_norm == true){
 				for (int i = 0; i < chunk.dataNum; ++i){
 					chunk.data[i].Normalize();

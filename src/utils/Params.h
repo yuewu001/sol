@@ -57,9 +57,8 @@ namespace BOC {
 		bool BoolValue(const std::string& param_name);
 		const std::string& StringValue(const std::string& param_name);
 
-	private:
-		//void Init(const std::map<std::string, std::vector<std::string> > &algoLossList);
-		void Init();
+	public:
+		void Init(const string& overview, const string &syntax, const string& example);
 
 		void add_option(float default_val, bool is_required, int expectArgs,
 			const char* descr, const char* flag, const char* category = " ");

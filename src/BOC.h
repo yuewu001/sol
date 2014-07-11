@@ -122,19 +122,20 @@ namespace BOC{
 			string drt_type = param.StringValue("-drt");
 			ToLowerCase(drt_type);
 			if (drt_type == "online"){
-				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"), param.BoolValue("-norm"));
+				int buf_size = param.IntValue("-bs");
+				int chunk_size = param.IntValue("-cs");
+				this->pDataset = new OnlineDataSet<FeatType, LabelType>(param.IntValue("-passes"),
+					param.BoolValue("-norm"), buf_size, chunk_size);
 
 				if (this->pDataset == NULL){
 					fprintf(stderr, "Error %d: init dataset failed! (%s)\n", STATUS_INIT_FAIL, drt_type.c_str());
 					return STATUS_INIT_FAIL;
 				}
 
-				int buf_size = param.IntValue("-bs");
-				int chunk_size = param.IntValue("-cs");
 				const string& mp_buf_type = param.StringValue("-mbt");
 				int mp_buf_size = param.IntValue("-mbs");
 				try{
-					((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfiBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
+					((OnlineDataSet<FeatType, LabelType>*)this->pDataset)->ConfigBuffer(buf_size, chunk_size, mp_buf_type, mp_buf_size);
 				}
 				catch (std::invalid_argument& ex){
 					fprintf(stderr, "%s\n", ex.what());
@@ -267,6 +268,54 @@ namespace BOC{
 
 			return STATUS_OK;
 		}
+
+		public:
+			void InitParams(Params& param){
+				string overview = "Sparse Online Learning Library";
+				string syntax = "SOL [options] -i train_file";
+				string example = "SOL -i train_file -m SGD";
+
+				param.Init(overview, syntax, example);
+
+				param.add_option("", 0, 1, "help message (model, optimizer, loss, io)", "-help", " ");
+
+				//input & output
+				param.add_option("", 0, 1, "training file", "-i", "Input Output");
+				param.add_option("", 0, 1, "test file", "-t", "Input Output");
+				param.add_option("", 0, 1, "cached training file", "-c", "Input Output");
+				param.add_option("", 0, 1, "cached test file", "-tc", "Input Output");
+
+				param.add_option(init_data_format, 0, 1, "Dataset Format", "-df", "Input Output");
+				param.add_option(init_data_reader_type, 0, 1, "data reader type (online or batch)", "-drt", "Input Output");
+				param.add_option(init_buf_size, 0, 1, "Buffer Size: number of chunks for buffering", "-bs", "Input Output");
+				param.add_option(init_chunk_size, 0, 1, "Chunk Size: number of examples in a chunk", "-cs", "Input Output");
+				param.add_option(init_normalize, 0, 0, "whether normalize the data", "-norm", "Input Output");
+
+				//Training Settings
+				param.add_option("", false, 1, "input existing model", "-im", "Training Settings");
+				param.add_option("", false, 1, "output readable model", "-om", "Training Settings");
+				param.add_option(1, 0, 1, "number of passes", "-passes", "Training Settings");
+				param.add_option(init_mp_buf_type, 0, 1, "Multipass Buffer Type", "-mbt", "Training Settings");
+				param.add_option(init_mp_buf_size, 0, 1, "Multipass Buffer Size", "-mbs", "Training Settings");
+
+				//loss function
+				param.add_option(init_loss_type, 0, 1, "loss function type", "-loss", "Loss Functions");
+
+				//model setting
+				param.add_option(init_algo_method, 0, 1, "learning model:", "-m", "Model Settings");
+				param.add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
+				param.add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
+				param.add_option(init_initial_t, 0, 1, "initial iteration number", "-t0", "Model Settings");
+				param.add_option(init_lambda, 0, 1, "l1 regularization", "-l1", "Model Settings");
+				param.add_option(init_k, 0, 1,
+					"number of k in truncated gradient descent or feature selection", "-k", "Model Settings");
+				param.add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou", "Model Settings");
+				param.add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta", "Model Settings");
+				param.add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r", "Model Settings");
+
+				//optimizer
+				param.add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt", "Optimizer");
+			}
 	};
 
 

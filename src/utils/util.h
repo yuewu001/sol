@@ -121,24 +121,24 @@ inline void ToLowerCase(char* c_str) {
 	}
 }
 
-inline void ToUpperCase(string &str) {
-	string dst_str;
+inline void ToUpperCase(std::string &str) {
+	std::string dst_str;
 	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(toupper(str[i]));
 	std::swap(str, dst_str);
 }
 
-inline void ToLowerCase(string &str) {
-	string dst_str;
+inline void ToLowerCase(std::string &str) {
+	std::string dst_str;
 	int len = (int)(str.length());
 	for (int i = 0; i < len; i++)
 		dst_str.push_back(tolower(str[i]));
 	std::swap(str, dst_str);
 }
 
-inline bool rename_file(const string& src_filename, const string& dst_filename){
-	string cmd;
+inline bool rename_file(const std::string& src_filename, const std::string& dst_filename){
+	std::string cmd;
 	if (SOL_ACCESS(dst_filename.c_str()) == 0){
 		//del the original cache_file
 #if WIN32

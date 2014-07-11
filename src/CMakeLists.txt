@@ -109,3 +109,8 @@ set  (io_files
     src/io/parser.h
     PARENT_SCOPE
     )
+
+set (converter_files
+    src/converter/Converter.cpp
+    PARENT_SCOPE
+    )
