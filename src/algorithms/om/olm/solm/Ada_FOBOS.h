@@ -120,26 +120,29 @@ namespace BOC {
 				//update the time stamp
 				this->timeStamp[index_i] = this->curIterNum;
 			}
+
 			float y = this->Predict(x);
 			//get gradient
 			float gt = this->lossFunc->GetGradient(x.label, y);
-			float gt_i = 0;
+			if (gt != 0){
+				float gt_i = 0;
 
-			//update s[i]
-			for (size_t i = 0; i < featDim; i++) {
-				index_i = x.indexes[i];
-				gt_i = gt * x.features[i];
+				//update s[i]
+				for (size_t i = 0; i < featDim; i++) {
+					index_i = x.indexes[i];
+					gt_i = gt * x.features[i];
 
-				this->s[index_i] = sqrt(s[index_i] * s[index_i] + gt_i * gt_i);
-				float Htii = this->delta + s[index_i];
-				//obtain w_(t + 1),i
-				this->weightVec[index_i] -= this->eta0 * gt_i / Htii;
+					this->s[index_i] = sqrt(s[index_i] * s[index_i] + gt_i * gt_i);
+					float Htii = this->delta + s[index_i];
+					//obtain w_(t + 1),i
+					this->weightVec[index_i] -= this->eta0 * gt_i / Htii;
+				}
+
+				//bias term
+				this->s[0] = sqrt(s[0] * s[0] + gt * gt);
+				float Htii = this->delta + s[0];
+				this->weightVec[0] -= this->eta0 * gt / Htii;
 			}
-
-			//bias term
-			this->s[0] = sqrt(s[0] * s[0] + gt * gt);
-			float Htii = this->delta + s[0];
-			this->weightVec[0] -= this->eta0 * gt / Htii;
 
 			return y;
 		}
