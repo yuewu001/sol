@@ -13,6 +13,7 @@ static const int STATUS_ERROR = 1;
 static const int STATUS_INVALID_ARGUMENT = 2;
 static const int STATUS_INIT_FAIL = 3;
 static const int STATUS_IO_ERROR = 4;
+static const int STATUS_INVALID_FILE = 5;
 
 #endif
 

@@ -83,7 +83,7 @@ namespace BOC {
 		this->add_option("", 0, 1, "cached test file", "-tc", "Input Output");
 
 		this->add_option(init_data_format, 0, 1, "Dataset Format", "-df", "Input Output");
-		this->add_option(init_data_reader_type, 0, 1, "data reader type: ", "-drt", "Input Output");
+		this->add_option(init_data_reader_type, 0, 1, "data reader type (online or batch)", "-drt", "Input Output");
 		this->add_option(init_buf_size, 0, 1, "Buffer Size: number of chunks for buffering", "-bs", "Input Output");
 		this->add_option(init_chunk_size, 0, 1, "Chunk Size: number of examples in a chunk", "-cs", "Input Output");
 		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm", "Input Output");

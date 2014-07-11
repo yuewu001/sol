@@ -118,7 +118,8 @@ namespace BOC{
 				}
 			}
 			else if (drt_type == "batch"){
-				this->pDataset = NULL;
+				fprintf(stderr, "Error %d: batch dataset is not supported yet", STATUS_INVALID_ARGUMENT);
+				return STATUS_INVALID_ARGUMENT;
 			}
 			else{
 				fprintf(stderr, "Error %d: Unrecognized data reader type (%s)", STATUS_INVALID_ARGUMENT, drt_type);
