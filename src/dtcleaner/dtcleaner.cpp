@@ -11,10 +11,10 @@
 
 #include <string>
 using namespace std;
-using namespace SOL;
+using namespace BOC;
 
 bool Detect(const string& filename, s_array<char> &index_set) {
-	libsvm_io reader(filename);
+	libsvm_io<float, char> reader(filename);
 
 	size_t max_show_count = 100000;
 	size_t show_count = 1000;
@@ -76,7 +76,7 @@ bool Detect(const string& filename, s_array<char> &index_set) {
 	return true;
 }
 void Convert(const string& in_filename, const string& out_filename, const s_array<IndexType> &index_set){
-    libsvm_io reader(in_filename);
+    libsvm_io<float, char> reader(in_filename);
 
 	cout<<"remove useless features not appeared "<<endl;
 	if (reader.OpenReading() == false){
@@ -85,7 +85,7 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 	}
 	string tmp_filename = out_filename + ".writing";
 
-	libsvm_io writer(tmp_filename);
+	libsvm_io<float,char> writer(tmp_filename);
 	if(writer.OpenWriting() == false){
 		cerr<<"open output file" <<tmp_filename<<" failed!"<<endl;
 		return;
@@ -121,7 +121,7 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 
 int main(int argc, char** args){ 
 	if (argc < 3){
-		cout<<"Usage: dtcleaner in_file out_file [in_file2 out_file2]"<<endl;
+		cout<<"Usage: dtcleaner in_file out_file"<<endl;
 		return 0;
 	}
 	
@@ -133,12 +133,6 @@ int main(int argc, char** args){
 #endif
 	string filename = args[1];
 	string out_filename = args[2];
-	string in_filename2;
-	string out_filename2;
-	if (argc == 5){
-		in_filename2 = args[3];
-		out_filename2 = args[4];
-	}
 	//string filename = "/home/matthew/work/Data/aut/aut_train";
     s_array<char> index_set;
 	if (Detect(filename,index_set) == false)
@@ -154,7 +148,5 @@ int main(int argc, char** args){
         }
     }
 	Convert(filename, out_filename, new_index);
-	if (out_filename2.length() > 0)
-		Convert(in_filename2, out_filename2, new_index);
 	return 0;
 }

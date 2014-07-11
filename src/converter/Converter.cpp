@@ -10,10 +10,9 @@
 #include <crtdbg.h>
 #endif
 
-#include "ConverterParams.h"
-
 #include "../io/io_header.h"
 #include "../utils/init_param.h"
+#include "../utils/Params.h"
 
 #include <fstream>
 #include <cstdio>
@@ -21,8 +20,10 @@
 
 using namespace BOC;
 
-void Convert(BOC::ConverterParams &param);
-void Cache(BOC::ConverterParams &param);
+void Convert(BOC::Params &param);
+void Cache(BOC::Params &param);
+
+void InitParms(Params& param);
 
 int main(int argc, const char** args){
 	//check memory leak in VC++
@@ -36,7 +37,8 @@ int main(int argc, const char** args){
 	string ioInfo;
 	IOInfo<float,char>::GetIOInfo(ioInfo);
 
-    ConverterParams param;
+    Params param;
+	InitParms(param);
     if (param.Parse(argc,args) == false)
         return -1;
 	string src_type = param.StringValue("-st");
@@ -51,7 +53,21 @@ int main(int argc, const char** args){
 	return 0;
 }
 
-void Cache(ConverterParams &param){
+void InitParms(Params& param){
+
+	string overview = "Sparse Online Learning Library - Dataset Converter";
+	string syntax = "Converter -i input_file -o output_file -st src_type -dt dst_type";
+	string example = "Converter -i input_file -o output_file -st libsvm -dt csv";
+	param.Init(overview, syntax, example);
+
+	//input & output
+	param.add_option("", 1, 1, "input file", "-i", " ");
+	param.add_option("", 1, 1, "output file", "-o", " ");
+	param.add_option("", 1, 1, "input dataset type", "-st", " ");
+	param.add_option("", 1, 1, "output dataset type", "-dt", " ");
+}
+
+void Cache(Params &param){
 	cout<<"Caching file..."<<endl;
 	
 	OnlineDataSet<float, char> dt(1, false,init_buf_size, init_chunk_size);
@@ -98,7 +114,7 @@ IndexType GetDataDim(DataReader<FeatType, LabelType> * reader){
 	return featDim;
 }
 
-void Convert(ConverterParams &param){
+void Convert(Params &param){
 	string src_type = param.StringValue("-st");
 	string dst_type = param.StringValue("-dt");
 	string in_file = param.StringValue("-i");

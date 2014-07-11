@@ -71,7 +71,7 @@ namespace BOC{
 			return NULL;
 		}
 
-		static const string& GetName(const std::string& name) {
+		static const std::string& GetName(const std::string& name) {
 			std::map<std::string, ClassInfo* >::iterator iter = mapClassInfo.find(name);
 			if (iter != mapClassInfo.end()){
 				return ((ClassInfo*)(iter->second))->GetType();
@@ -79,7 +79,7 @@ namespace BOC{
 			return invalid_string;
 		}
 
-		static const string& GetDescr(const std::string& name) {
+		static const std::string& GetDescr(const std::string& name) {
 			std::map<std::string, ClassInfo* >::iterator iter = mapClassInfo.find(name);
 			if (iter != mapClassInfo.end()){
 				return ((ClassInfo*)(iter->second))->GetDescr();

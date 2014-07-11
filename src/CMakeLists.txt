@@ -111,9 +111,6 @@ set  (io_files
     )
 
 set (converter_files
-    src/converter/ConverterParams.h
-    src/converter/ConverterParams.cpp
-    src/converter/Converter.h
     src/converter/Converter.cpp
     PARENT_SCOPE
     )

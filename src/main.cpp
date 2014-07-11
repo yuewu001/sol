@@ -5,6 +5,7 @@
 	> Functions:
 	************************************************************************/
 #include "BOC.h"
+#include "utils/init_param.h"
 
 #include <string>
 #include <fstream>
@@ -25,11 +26,13 @@ int main(int argc, const char** args) {
 #endif
 
 	Params param;
+	LibBOC<FeatType, LabelType> libBoc;
+	libBoc.InitParams(param);
+
 	if (param.Parse(argc, args) == false){
 		return -1;
 	}
 
-	LibBOC<FeatType, LabelType> libBoc;
 	libBoc.ShowHelpInfo(param);
 	int errCode = libBoc.Initialize(param);
 	if ( errCode != 0){

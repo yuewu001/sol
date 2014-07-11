@@ -7,7 +7,6 @@
 #include "ezOptionParser.hpp"
 #include "Params.h"
 #include "util.h"
-#include "init_param.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -52,8 +51,6 @@ namespace BOC {
 		this->int_param_num = 0;
 		this->bool_param_num = 0;
 		this->string_param_num = 0;
-
-		this->Init();
 	}
 
 	Params::~Params(){
@@ -68,51 +65,13 @@ namespace BOC {
 	}
 
 	//void Params::Init(const std::map<std::string, std::vector<std::string> > &algoLossList){
-	void Params::Init() {
+	void Params::Init(const string& overview, const string &syntax, const string& example){
 		//initialize params
-		this->option->opt.overview = "Sparse Online Learning Library";
-		option->opt.syntax = "SOL [options] -i train_file";
-		option->opt.example = "SOL -i train_file -m SGD";
+		this->option->opt.overview = overview;
+		option->opt.syntax = syntax;
+		option->opt.example = example;
 
 		option->opt.add("", " ", 0, 0, ',', "help message", "-h", "--help");
-		this->add_option("", 0, 1, "help message (model, optimizer, loss, io)", "-help", " ");
-
-		//input & output
-		this->add_option("", 0, 1, "training file", "-i", "Input Output");
-		this->add_option("", 0, 1, "test file", "-t", "Input Output");
-		this->add_option("", 0, 1, "cached training file", "-c", "Input Output");
-		this->add_option("", 0, 1, "cached test file", "-tc", "Input Output");
-
-		this->add_option(init_data_format, 0, 1, "Dataset Format", "-df", "Input Output");
-		this->add_option(init_data_reader_type, 0, 1, "data reader type (online or batch)", "-drt", "Input Output");
-		this->add_option(init_buf_size, 0, 1, "Buffer Size: number of chunks for buffering", "-bs", "Input Output");
-		this->add_option(init_chunk_size, 0, 1, "Chunk Size: number of examples in a chunk", "-cs", "Input Output");
-		this->add_option(init_normalize, 0, 0, "whether normalize the data", "-norm", "Input Output");
-
-		//Training Settings
-		this->add_option("", false, 1, "input existing model", "-im", "Training Settings");
-		this->add_option("", false, 1, "output readable model", "-om", "Training Settings");
-		this->add_option(1, 0, 1, "number of passes", "-passes", "Training Settings");
-		this->add_option(init_mp_buf_type, 0, 1, "Multipass Buffer Type", "-mbt", "Training Settings");
-		this->add_option(init_mp_buf_size, 0, 1, "Multipass Buffer Size", "-mbs", "Training Settings");
-
-		//loss function
-		this->add_option(init_loss_type, 0, 1, "loss function type", "-loss", "Loss Functions");
-
-		//model setting
-		this->add_option(init_algo_method, 0, 1, "learning model:", "-m", "Model Settings");
-		this->add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
-		this->add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
-		this->add_option(init_initial_t, 0, 1, "initial iteration number", "-t0", "Model Settings");
-		this->add_option(init_lambda, 0, 1, "l1 regularization", "-l1", "Model Settings");
-		this->add_option(init_k, 0, 1,
-			"number of k in truncated gradient descent or feature selection", "-k", "Model Settings");
-		this->add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou", "Model Settings");
-		this->add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta", "Model Settings");
-		this->add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r", "Model Settings");
-
-		//optimizer
-		this->add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt", "Optimizer");
 	}
 
 	void Params::add_option(float default_val, bool is_required, int expectArgs,
