@@ -105,37 +105,32 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			size_t featDim = x.indexes.size();
-			IndexType index_i = 0;
-			float alpha = this->eta0 * this->lambda;
-			for (size_t i = 0; i < featDim; i++) {
-				index_i = x.indexes[i];
-				//update s[i]
-				float Ht0i = this->delta + s[index_i];
-
-				//to obtain w_(t + 1),i, first calculate w_t,i
-				this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
-					alpha * (this->curIterNum - this->timeStamp[index_i]) / Ht0i);
-
-				//update the time stamp
-				this->timeStamp[index_i] = this->curIterNum;
-			}
-
 			float y = this->Predict(x);
 			//get gradient
 			float gt = this->lossFunc->GetGradient(x.label, y);
 			if (gt != 0){
 				float gt_i = 0;
+				IndexType index_i = 0;
+				float alpha = this->eta0 * this->lambda;
+				size_t featDim = x.indexes.size();
 
 				//update s[i]
 				for (size_t i = 0; i < featDim; i++) {
 					index_i = x.indexes[i];
 					gt_i = gt * x.features[i];
 
+					float Ht0i = this->delta + s[index_i];
 					this->s[index_i] = sqrt(s[index_i] * s[index_i] + gt_i * gt_i);
 					float Htii = this->delta + s[index_i];
 					//obtain w_(t + 1),i
 					this->weightVec[index_i] -= this->eta0 * gt_i / Htii;
+
+					//to obtain w_(t + 1),i, first calculate w_t,i
+					this->weightVec[index_i] = trunc_weight(this->weightVec[index_i],
+						alpha * (this->curIterNum - this->timeStamp[index_i]) / Ht0i);
+
+					//update the time stamp
+					this->timeStamp[index_i] = this->curIterNum;
 				}
 
 				//bias term
