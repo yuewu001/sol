@@ -105,7 +105,7 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			//get gradient
 			float gt = this->lossFunc->GetGradient(x.label, y);
 			if (gt != 0){

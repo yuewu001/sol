@@ -18,6 +18,8 @@ namespace BOC {
 	class OnlineOptimizer : public Optimizer < FeatType, LabelType > {
 		//dynamic bindings
 		DECLARE_CLASS
+		OnlineModel<FeatType, LabelType> *p_onlineModel;
+		int (OnlineModel<FeatType, LabelType>::*pIterateDelegate)(const DataPoint<FeatType, LabelType> &x, float& predict);
 
 	protected:
 		typedef typename Optimizer<FeatType, LabelType>::PointType PointType;
@@ -28,6 +30,13 @@ namespace BOC {
 	public:
 		OnlineOptimizer(OnlineModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
 			Optimizer<FeatType, LabelType>(model, dataset){
+			p_onlineModel = static_cast<OnlineModel<FeatType, LabelType>*>(this->learnModel);
+			if (this->p_onlineModel->GetClassfierNum() == 1){
+				this->pIterateDelegate = &(OnlineModel<FeatType, LabelType>::IterateBC);
+			}
+			else{
+				this->pIterateDelegate = &(OnlineModel<FeatType, LabelType>::IterateMC);
+			}
 		}
 
 		virtual ~OnlineOptimizer() {
@@ -42,7 +51,6 @@ namespace BOC {
 			//reset
 			if (this->Reset() == false)
 				return 1.f;
-			OnlineModel<FeatType, LabelType> *p_onlineModel = static_cast<OnlineModel<FeatType, LabelType>*>(this->learnModel);
 			p_onlineModel->BeginTrain();
 			float errorNum(0);
 			size_t show_step = 1; //show information every show_step
@@ -52,6 +60,11 @@ namespace BOC {
 			//double train_time  = 0;
 			printf("\nIterations:\n");
 			printf("\nIterate No.\t\tError Rate\t\t\n");
+
+			float predictVal = 0;
+			int predictLabel = 0;
+
+
 			while (1) {
 				DataChunk<PointType> &chunk = this->dataSet->GetChunk();
 				//double time1 = get_current_time();
@@ -65,12 +78,14 @@ namespace BOC {
 					PointType &data = chunk.data[i];
 
 					p_onlineModel->UpdateModelDimention(data.dim());
-					float y = p_onlineModel->Iterate(data);
+					//int predictLabel = p_onlineModel->Iterate(data, predictVal);
+					int predictLabel = this->IterateDelegate(data, predictVal);
 					//loss
-					if (p_onlineModel->IsCorrect(data.label, y) == false){
+					if (predictLabel != data.label){
 						errorNum++;
-						data.margin = y * data.label;
+						data.margin = predictVal * data.label;
 					}
+
 					data_count++;
 					this->update_times++;
 					if (show_count == data_count){
@@ -86,6 +101,9 @@ namespace BOC {
 			p_onlineModel->EndTrain();
 			//cout<<"Purely Training Time: "<<train_time<<" s"<<endl;
 			return errorNum / this->update_times;
+		}
+		inline int IterateDelegate(const DataPoint<FeatType, LabelType> &x, float& predict){
+			return (this->p_onlineModel->*pIterateDelegate)(x, predict);
 		}
 	};
 

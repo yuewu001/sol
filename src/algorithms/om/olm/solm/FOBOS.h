@@ -87,7 +87,7 @@ namespace BOC {
 			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
 
 			size_t featDim = x.indexes.size();
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			float gt_i = this->eta * this->lossFunc->GetGradient(x.label, y);
 
 			IndexType index_i = 0;

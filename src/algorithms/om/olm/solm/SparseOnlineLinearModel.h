@@ -21,9 +21,12 @@ namespace BOC {
 		//weights below this threshold will eliminated at the end of training
 		float sparse_soft_thresh;
 
+		s_array<float>& weightVec;
+
 	public:
-		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) :
-			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
+		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) 
+			: OnlineLinearModel<FeatType, LabelType>(lossFunc) ,
+			weightVec(*this->pWeightVecBC){
 				this->lambda = 0;
 				this->sparse_soft_thresh = init_sparse_soft_thresh;
 			}
@@ -86,6 +89,59 @@ namespace BOC {
 
 			OnlineLinearModel<FeatType, LabelType>::EndTrain();
 		}
+
+
+
+		/**
+		 * @Synopsis IterateBC Iteration of online learning for binary classification
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  predicted class of the current example
+		 */
+		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
+			predict = this->Iterate(x);
+			int label = this->GetClassLabel(x);
+			if (this->IsCorrect(label, predict) == false){
+				return -label;
+			}
+			else{
+				return x.label;
+			}
+		}
+
+		/**
+		 * @Synopsis IterateMC Iteration of online learning for multiclass classification
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  predicted class of the current example
+		 */
+		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
+			fprintf(stderr, "multiclass is not supported yet!");
+			exit(1);
+		}
+
+	protected:
+		/**
+		 * @Synopsis Iterate Iteration of online learning
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  prediction of the current example
+		 */
+		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) = 0;
+
+		/**
+		 * @Synopsis UpdateWeightVec Update the weight vector
+		 *
+		 * @Param x current input data example
+		 * @Param weightVec weight vector to be updated
+		 * @param gt common part of the gradient
+		 * @Param beta extra multiplier for updating, if none, set it to 1
+		 *
+		 */
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt, float beta){}
 
 	protected:
 		/**

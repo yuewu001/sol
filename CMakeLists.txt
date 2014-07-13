@@ -19,7 +19,8 @@ set (CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/cmake)
 #SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(src)
-LIST(APPEND all_algo_files ${solm_files} ${ofs_files} ${olm_files} ${om_files} ${algo_files})
+#LIST(APPEND all_algo_files ${solm_files} ${ofs_files} ${olm_files} ${om_files} ${algo_files})
+LIST(APPEND all_algo_files ${solm_files} ${olm_files} ${om_files} ${algo_files})
 
 #grouping the files
 if (WIN32)

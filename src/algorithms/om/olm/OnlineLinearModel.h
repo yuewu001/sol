@@ -11,34 +11,44 @@
 
 #include <fstream>
 #include <string>
+#include <algorithm>
 
 /**
 *  namespace: Batch and Online Classification
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class OnlineLinearModel : public OnlineModel<FeatType, LabelType> {
+	class OnlineLinearModel : public OnlineModel < FeatType, LabelType > {
+#pragma region Class Members
 		//weight vector
 	protected:
 		//the first element is zero
-		s_array<float> weightVec;
+		vector<s_array<float> > weightMatrix;
+		//weight vector used for bc
+		s_array<float> *pWeightVecBC;
 		//weight dimension: can be the same to feature, or with an extra bias
 		IndexType weightDim;
+#pragma endregion Class Members
 
+#pragma region Constructors and Basic Functions
 	public:
-		OnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) : OnlineModel<FeatType, LabelType>(lossFunc) {
+		OnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc)
+			: OnlineModel<FeatType, LabelType>(lossFunc), pWeightVecBC(NULL) {
 			this->weightDim = 1;
-			//weight vector
-			this->weightVec.resize(this->weightDim);
+			this->weightMatrix.resize(this->classfier_num);
+
+			for (int i = 0; i < this->classfier_num; ++i){
+				//weight vector
+				this->weightMatrix[i].resize(this->weightDim);
+			}
+			if (this->classfier_num == 1){
+				this->pWeightVecBC = &this->weightMatrix[0];
+			}
 		}
 
 		virtual ~OnlineLinearModel() {
 		}
 
-		/**
-		 * @Synopsis inherited functions
-		 */
-	public:
 		/**
 		 * PrintModelSettings print the info of optimization algorithm
 		 */
@@ -54,89 +64,10 @@ namespace BOC {
 		virtual void PrintModelInfo() const {
 			printf("number of weights: %lu\n", static_cast<long int>(this->weightDim));
 		}
+#pragma endregion Constructors and Basic Functions
 
-		/**
-		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-		 */
-		virtual void BeginTrain() {
-			OnlineModel<FeatType, LabelType>::BeginTrain();
-
-			//reset weight vector
-			this->weightVec.set_value(0);
-		}
-
-		/**
-		 * @Synopsis EndTrain called when a train ends
-		 */
-		virtual void EndTrain() {
-			OnlineModel<FeatType, LabelType>::EndTrain();
-		}
-
-		/**
-		 * @Synopsis UpdateModelDimention update dimension of the model,
-		 * often caused by the increased dimension of data
-		 *
-		 * @Param new_dim new dimension
-		 */
-		virtual void UpdateModelDimention(IndexType new_dim) {
-			if (new_dim < this->weightDim)
-				return;
-			else {
-				new_dim++; //reserve the 0-th
-				this->weightVec.reserve(new_dim);
-				this->weightVec.resize(new_dim);
-				//set the new value to zero
-				this->weightVec.zeros(this->weightVec.begin + this->weightDim,
-					this->weightVec.end);
-				this->weightDim = new_dim;
-			}
-		}
-
-		/**
-		 * @Synopsis SetParameter set parameters for the learning model
-		 *
-		 */
-		virtual void SetParameter(BOC::Params &param){
-			OnlineModel<FeatType, LabelType>::SetParameter(param);
-		}
-
-		/**
-		 * @Synopsis Test_Predict prediction function for test
-		 *
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value
-		 */
-		virtual float Test_Predict(const DataPoint<FeatType, LabelType> &data) {
-			float predict = 0;
-			size_t dim = data.indexes.size();
-			IndexType index_i;
-			for (size_t i = 0; i < dim; i++){
-				index_i = data.indexes[i];
-				if (index_i < this->weightDim && this->weightVec[index_i] != 0)
-					predict += this->weightVec[index_i] * data.features[i];
-			}
-			predict += this->weightVec[0];
-			return predict;
-		}
-
-		/**
-		 * @Synopsis Predict prediction function for training
-		 *
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value
-		 */
-		virtual float Predict(const DataPoint<FeatType, LabelType> &data) {
-			float predict = 0;
-			size_t dim = data.indexes.size();
-			for (size_t i = 0; i < dim; i++){
-				predict += this->weightVec[data.indexes[i]] * data.features[i];
-			}
-			predict += this->weightVec[0];
-			return predict;
-		}
-
+#pragma region  IO related
+	public:
 		/**
 		 * @Synopsis SaveModel save model to disk
 		 *
@@ -242,12 +173,18 @@ namespace BOC {
 		virtual bool SaveModelValue(std::ofstream &os) {
 			//weight dimension
 			os << "[value]\n";
+			os << "classfier num: " << this->classfier_num << "\n";
 			os << "weight dimension: " << this->weightDim << "\n";
 			//weights
-			for (IndexType i = 0; i < this->weightDim; i++){
-				if (this->weightVec[i] != 0){
-					os << i << ":" << this->weightVec[i] << "\n";
+			for (int k = 0; k < this->classfier_num; ++k){
+				os << k << " | ";
+				s_array<float>& weightVec = this->weightMatrix[k];
+				for (IndexType i = 0; i < this->weightDim; i++){
+					if (weightVec[i] != 0){
+						os << i << ":" << weightVec[i] << "\t";
+					}
 				}
+				os << "\n";
 			}
 
 			return true;
@@ -263,18 +200,206 @@ namespace BOC {
 		virtual bool LoadModelValue(std::ifstream &is) {
 			//weight dimension
 			string line;
+
 			getline(is, line);
+			getline(is, line, ':');
+			is >> this->classfier_num;
+			getline(is, line);
+
 			getline(is, line, ':');
 			is >> this->weightDim;
 			getline(is, line);
 
-			//weights
-			for (IndexType i = 0; i < this->weightDim; i++){
-				is >> this->weightVec[i];
+			this->weightMatrix.resize(this->classfier_num);
+			for (int k = 0; k < this->classfier_num; ++k){
+				s_array<float>& weightVec = this->weightMatrix[k];
+				weightVec.resize(this->weightDim);
+				weightVec.zeros();
+				getline(is, line, '|');
+				//weights
+				getline(is, line);
 			}
 
 			return true;
 		}
+
+#pragma endregion  IO related
+
+#pragma region Train Related
+	public:
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			OnlineModel<FeatType, LabelType>::BeginTrain();
+
+			//reset weight vector
+			for (int i = 0; i < this->classfier_num; ++i){
+				this->weightMatrix[i].set_value(0);
+			}
+		}
+
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() {
+			OnlineModel<FeatType, LabelType>::EndTrain();
+		}
+
+		/**
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) {
+			if (new_dim < this->weightDim)
+				return;
+			else {
+				new_dim++; //reserve the 0-th
+				for (int i = 0; i < this->classfier_num; ++i){
+					s_array<float>& weightVec = this->weightMatrix[i];
+					weightVec.reserve(new_dim);
+					weightVec.resize(new_dim);
+					//set the new value to zero
+					weightVec.zeros(weightVec.begin + this->weightDim,
+						weightVec.end);
+				}
+				this->weightDim = new_dim;
+			}
+		}
+
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			OnlineModel<FeatType, LabelType>::SetParameter(param);
+		}
+
+		/**
+		 * @Synopsis IterateBC Iteration of online learning for binary classification
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  predicted class of the current example
+		 */
+		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
+			this->curIterNum++;
+			predict = this->TrainPredict(*this->pWeightVecBC, x);
+			int label = this->GetClassLabel(x);
+			float gt = this->lossFunc->GetGradient(label, predict);
+			if (gt != 0){
+				this->UpdateWeightVec(x, *this->pWeightVecBC, gt, 1);
+			}
+			if (this->IsCorrect(label, predict) == false){
+				return -label;
+			}
+			else{
+				return x.label;
+			}
+		}
+
+		/**
+		 * @Synopsis IterateMC Iteration of online learning for multiclass classification
+		 *
+		 * @Param x current input data example
+		 *
+		 * @Returns  predicted class of the current example
+		 */
+		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
+			this->curIterNum++;
+			predict = this->TrainPredict(*this->pWeightVecBC, x);
+			float gt = this->lossFunc->GetGradient(this->GetClassLabel(x), predict);
+			if (gt != 0){
+				this->UpdateWeightVec(x, *this->pWeightVecBC, gt, 1);
+			}
+			if (this->IsCorrect(x.label, predict) == false){
+				return -x.label;
+			}
+			else{
+				return x.label;
+			}
+		}
+
+	protected:
+		/**
+		 * @Synopsis TrainPredict prediction function for training
+		 *
+		 * @Param weightVec weight vector
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value
+		 */
+		virtual float TrainPredict(const s_array<float> &weightVec, const DataPoint<FeatType, LabelType> &data) {
+			float predict = 0;
+			size_t dim = data.indexes.size();
+			for (size_t i = 0; i < dim; i++){
+				predict += weightVec[data.indexes[i]] * data.features[i];
+			}
+			predict += weightVec[0];
+			return predict;
+		}
+
+		/**
+		 * @Synopsis UpdateWeightVec Update the weight vector
+		 *
+		 * @Param x current input data example
+		 * @Param weightVec weight vector to be updated
+		 * @param gt common part of the gradient
+		 * @Param beta extra multiplier for updating, if none, set it to 1
+		 *
+		 */
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt, float beta) = 0;
+#pragma endregion Train Related
+
+
+#pragma region	Test related
+	protected:
+		/**
+		 * @Synopsis TestPredict prediction function for test
+		 *
+		 * @Param weightVec weight vector
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value
+		 */
+		float TestPredict(const s_array<float> &weightVec, const DataPoint<FeatType, LabelType> &data) {
+			float predict = 0;
+			size_t dim = data.indexes.size();
+			for (size_t i = 0; i < dim; i++){
+				if (data.indexes[i] < this->weightDim){
+					predict += weightVec[data.indexes[i]] * data.features[i];
+				}
+			}
+			predict += weightVec[0];
+
+			return predict;
+		}
+
+		/**
+		 * @Synopsis PredictBC prediction function for test (binary classification)
+		 *
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value for the data 
+		 */
+		virtual float PredictBC(const DataPoint<FeatType, LabelType> &data) {
+			return this->TestPredict(*this->pWeightVecBC, data);
+		}
+
+		/**
+		 * @Synopsis PredictMC prediction function for test (multiclass classification)
+		 *
+         * @Param classId: specified classifer
+		 * @Param data input data sample
+		 *
+		 * @Returns predicted value for the data on the specified classifier
+		 */
+		virtual float PredictMC(int classId, const DataPoint<FeatType, LabelType> &data) {
+			return this->TestPredict(this->weightMatrix[classId], data);
+		}
+#pragma endregion	Test related
 
 		/**
 		 * @Synopsis newly defined functions
@@ -286,18 +411,9 @@ namespace BOC {
 		 *
 		 * @Returns number of nonzero weights
 		 */
-		IndexType GetNonZeroNum()  const {
-			IndexType non_zeroNum(0);
-			if (this->weightDim == 1)
-				return 0;
-
-			for (IndexType i = 1; i < this->weightDim; i++) {
-				if (this->weightVec[i] != 0)
-					non_zeroNum++;
-			}
-			return non_zeroNum;
+		virtual IndexType GetNonZeroNum()  const {
+			return 0;
 		}
-
 	};
 }
 

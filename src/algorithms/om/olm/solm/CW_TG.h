@@ -113,7 +113,7 @@ namespace BOC {
 			float* p_feat = x.features.begin;
 
 			//obtain w_t
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			float gt_i = this->lossFunc->GetGradient(x.label, y);
 			//update w_t
 			if (gt_i != 0){

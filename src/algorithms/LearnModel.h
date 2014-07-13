@@ -26,6 +26,8 @@ using std::string;
 */
 namespace BOC {
 
+#pragma region Macros for Reflector 
+
     //TO return the class infomation and create a new instance of the algorithm
 #define IMPLEMENT_MODEL_CLASS(name, descr) \
 	template <typename FeatType, typename LabelType> \
@@ -33,13 +35,16 @@ namespace BOC {
 	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
-	{ return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
+	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
+
+#pragma endregion Macros for Reflector 
 
 	template <typename FeatType, typename LabelType>
 	//	class LearnModel : public Registry<FeatType, LabelType> {
 	class LearnModel : public Registry {
+#pragma region Class Members
 	protected:
-        //name of the model
+		//name of the model
 		std::string modelName;
 		//type of the model: online
 		std::string modelType;
@@ -48,7 +53,9 @@ namespace BOC {
 
 	protected:
 		LossFunction<FeatType, LabelType> *lossFunc;
+#pragma endregion Class Members
 
+#pragma region Constructors and Basic Functions
 	public:
 		LearnModel(LossFunction<FeatType, LabelType> *lossFunc){
 			this->lossFunc = lossFunc;
@@ -73,49 +80,10 @@ namespace BOC {
 		 */
 		virtual void PrintModelInfo() const = 0;
 
+#pragma endregion Constructors and Basic Functions
+
+#pragma region IO related
 	public:
-		/**
-		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-		 */
-		virtual void BeginTrain() = 0;
-
-		/**
-		 * @Synopsis EndTrain called when a train ends
-		 */
-		virtual void EndTrain() = 0;
-
-		/**
-		 * @Synopsis UpdateModelDimention update dimension of the model,
-		 * often caused by the increased dimension of data
-		 *
-		 * @Param new_dim new dimension
-		 */
-		virtual void UpdateModelDimention(IndexType new_dim) = 0;
-
-		/**
-		 * @Synopsis SetParameter set the basic online learning parameters
-		 *
-		 */
-		virtual void SetParameter(BOC::Params &param) = 0;
-
-		/**
-		 * @Synopsis Test_Predict prediction function for test
-		 *
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value
-		 */
-		virtual float Test_Predict(const DataPoint<FeatType, LabelType> &data) = 0;
-
-		/**
-		 * @Synopsis Predict prediction function for training
-		 *
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value
-		 */
-		virtual float Predict(const DataPoint<FeatType, LabelType> &data) = 0;
-
 		/**
 		 * @Synopsis SaveModel save model to disk
 		 *
@@ -170,11 +138,10 @@ namespace BOC {
 		 * @Returns true if load successfully
 		 */
 		virtual bool LoadModelValue(std::ifstream &is) = 0;
+#pragma endregion IO related
 
-		/**
-		 * @Synopsis common functions
-		 */
-	public:
+#pragma region Common Functions for Train and Test
+	protected:
 		/**
 		 * @Synopsis IsCorrect Judge if the predict is correct
 		 *
@@ -186,6 +153,53 @@ namespace BOC {
 		virtual inline bool IsCorrect(LabelType label, float predict) {
 			return this->lossFunc->IsCorrect(label, predict);
 		}
+
+		/**
+		* @Synopsis: Get the class label for classifier
+		*
+		* @Param x current input data example
+		* @Param predict_label predicted label for x
+		*
+		* @Returns label of x, if predicted label is the same to label, return 1, otherwise return -1
+		*/
+		int GetClassLabel(const DataPoint<FeatType, LabelType>& x, int predict_label = 1){
+			return x.label == predict_label ? 1 : -1;
+		}
+#pragma endregion Common Functions for Train and Test
+
+#pragma region Train Related
+	public:
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() = 0;
+
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() = 0;
+
+		/**
+		 * @Synopsis SetParameter set the basic online learning parameters
+		 *
+		 */
+		virtual void SetParameter(BOC::Params &param) = 0;
+
+#pragma endregion Train Related
+
+#pragma region Test related
+	public:
+		/**
+		 * @Synopsis Predict prediction function for test
+		 *
+		 * @Param data input data sample
+		 * @Param predicts predicted values for each classifier
+		 *
+		 * @Returns predicted class
+		 */
+		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> predicts) = 0;
+#pragma endregion Test related
+
 	};
 }
 

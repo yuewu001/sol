@@ -62,6 +62,7 @@ namespace BOC{
 			float errorRate(0);
 			//double test_time = 0;
 			//test
+			vector<float> predicts(1);
 			while (1) {
 				const DataChunk<PointType> &chunk = testSet.GetChunk();
 				//double time1 = get_current_time();
@@ -70,8 +71,8 @@ namespace BOC{
 				for (size_t i = 0; i < chunk.dataNum; i++) {
 					const PointType &data = chunk.data[i];
 					//predict
-					float predict = this->learnModel->Test_Predict(data);
-					if (this->learnModel->IsCorrect(data.label, predict) == false)
+					int predict = this->learnModel->Predict(data, predicts);
+					if (predict != data.label)
 						errorRate++;
 				}
 				//double time2 = get_current_time();

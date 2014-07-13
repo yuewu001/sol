@@ -55,26 +55,24 @@ namespace BOC {
 		}
 
 		/**
-		 * @Synopsis Iterate Iteration of online learning
+		 * @Synopsis UpdateWeightVec Update the weight vector
 		 *
 		 * @Param x current input data example
+		 * @Param weightVec weight vector to be updated
+         * @param gt common part of the gradient
+         * @Param beta extra multiplier for updating, if none, set it to 1
 		 *
-		 * @Returns  prediction of the current example
 		 */
-		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			this->curIterNum++;
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt, float beta){
 			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
-
-			float y = this->Predict(x);
+			gt *= beta;
 			size_t featDim = x.indexes.size();
-			float gt_i = this->lossFunc->GetGradient(x.label, y);
 
 			for (size_t i = 0; i < featDim; i++)
-				this->weightVec[x.indexes[i]] -= this->eta * gt_i * x.features[i];
+				weightVec[x.indexes[i]] -= this->eta * gt * x.features[i];
 
 			//update bias 
-			this->weightVec[0] -= this->eta * gt_i;
-			return y;
+			weightVec[0] -= this->eta * gt;
 		}
 	};
 

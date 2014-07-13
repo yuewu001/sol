@@ -104,7 +104,7 @@ namespace BOC {
 			this->weightVec[0] = -this->eta * this->gtVec[0];
 
 			//predict
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			float gt_i = this->lossFunc->GetGradient(x.label, y);
 
 			//update the coeffs

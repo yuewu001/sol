@@ -97,7 +97,7 @@ namespace BOC {
 			}
 
 			//predict 
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec,x);
 			//get gradient
 			float gt = this->lossFunc->GetGradient(x.label, y);
 			if (gt != 0){

@@ -100,7 +100,7 @@ namespace BOC {
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
 			size_t featDim = x.indexes.size();
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			//calculate beta_t
 			float beta_t = this->r;
 			for (size_t i = 0; i < featDim; i++){
