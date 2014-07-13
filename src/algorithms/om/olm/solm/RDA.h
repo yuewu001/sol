@@ -61,7 +61,7 @@ namespace BOC {
 		 * @Param param
 		 */
 		virtual void SetParameter(BOC::Params &param){
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
 			this->gamma_rou = param.FloatValue("-grou");
 			INVALID_ARGUMENT_EXCEPTION(gamma_rou, this->gamma_rou >= 0, "no smaller than 0");
 		}
@@ -86,7 +86,7 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			this->curIterNum += 1;
+			this->curIterNum++;
 			float eta_coeff_time = pEta_sqrt(this->curIterNum, this->power_t);
 			this->eta = this->eta0 / eta_coeff_time;
 

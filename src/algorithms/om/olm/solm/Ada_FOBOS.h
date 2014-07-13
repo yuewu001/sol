@@ -64,7 +64,7 @@ namespace BOC {
 		 * @Param param
 		 */
 		virtual void SetParameter(BOC::Params &param){
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
 			this->delta = param.FloatValue("-delta");
 			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 		}
@@ -105,7 +105,9 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
+			this->curIterNum++;
 			float y = this->TrainPredict(this->weightVec, x);
+
 			//get gradient
 			float gt = this->lossFunc->GetGradient(x.label, y);
 			if (gt != 0){
