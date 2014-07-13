@@ -158,7 +158,6 @@ namespace BOC{
 		inline int InitModel(Params &param){
 			//check model type
 			string model = param.StringValue("-m");
-			ToUpperCase(model);
 			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc);
 			if (this->pModel == NULL){
 				fprintf(stderr, "Error %d: init online model failed! (%s)\n", STATUS_INIT_FAIL, model.c_str());

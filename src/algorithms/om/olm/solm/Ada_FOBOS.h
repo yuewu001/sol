@@ -64,7 +64,7 @@ namespace BOC {
 		 * @Param param
 		 */
 		virtual void SetParameter(BOC::Params &param){
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
 			this->delta = param.FloatValue("-delta");
 			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 		}
@@ -105,6 +105,7 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
+			this->curIterNum++;
 			size_t featDim = x.indexes.size();
 			IndexType index_i = 0;
 			float alpha = this->eta0 * this->lambda;

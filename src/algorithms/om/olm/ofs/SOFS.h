@@ -54,7 +54,7 @@ namespace BOC {
 		 * @Param param
 		 */
 		virtual void SetParameter(BOC::Params &param) {
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			OnlineFeatureSelection<FeatType, LabelType>::SetParameter(param);
 			this->r = param.FloatValue("-r");
 			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
 		}
