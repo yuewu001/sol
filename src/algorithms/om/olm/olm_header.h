@@ -22,7 +22,7 @@ namespace BOC{
 			APPEND_INFO(info,SGD,FeatType, LabelType);
 
             SOLModelInfo<FeatType,LabelType>::GetModelInfo(info);
-            //OFSModelInfo<FeatType, LabelType>::GetModelInfo(info);
+            OFSModelInfo<FeatType, LabelType>::GetModelInfo(info);
 		}
 	};
 }

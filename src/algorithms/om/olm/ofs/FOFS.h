@@ -93,7 +93,7 @@ namespace BOC {
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
 			//we use the oposite of w
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			size_t featDim = x.indexes.size();
 
 			float gt_i = this->lossFunc->GetGradient(x.label, y);

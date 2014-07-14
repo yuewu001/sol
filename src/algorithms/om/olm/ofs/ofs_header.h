@@ -8,8 +8,8 @@
 #define HEADER_OFS_MODEL_INFO
 
 #include "PET.h"
-#include "FOFS.h"
-#include "SOFS.h"
+//#include "FOFS.h"
+//#include "SOFS.h"
 
 #include <string>
 
@@ -26,8 +26,8 @@ namespace BOC{
 		static void GetModelInfo(std::string & info){
 			info.append("\nOnline Feature Selection  Algorithms:");
 			APPEND_INFO(info,PET,FeatType, LabelType);
-			APPEND_INFO(info,FOFS,FeatType, LabelType);
-			APPEND_INFO(info,SOFS,FeatType, LabelType);
+			//APPEND_INFO(info,FOFS,FeatType, LabelType);
+			//APPEND_INFO(info,SOFS,FeatType, LabelType);
 		}
 	};
 }

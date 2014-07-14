@@ -81,7 +81,7 @@ namespace BOC {
 		 * @Returns  prediction of the current example
 		 */
 		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			float y = this->Predict(x);
+			float y = this->TrainPredict(this->weightVec, x);
 			//y /= this->curIterNum;
 			float alpha_t = 1 - x.label * y;
 			if (alpha_t > 0){

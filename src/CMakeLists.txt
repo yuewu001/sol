@@ -17,8 +17,8 @@ set (solm_files
 
 set (ofs_files
     src/algorithms/om/olm/ofs/PET.h
-    src/algorithms/om/olm/ofs/FOFS.h
-    src/algorithms/om/olm/ofs/SOFS.h
+    #src/algorithms/om/olm/ofs/FOFS.h
+    #src/algorithms/om/olm/ofs/SOFS.h
     src/algorithms/om/olm/ofs/OnlineFeatureSelection.h
     src/algorithms/om/olm/ofs/ofs_header.h
     PARENT_SCOPE

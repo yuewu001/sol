@@ -52,15 +52,17 @@ namespace BOC {
 		virtual void PrintModelInfo() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
 
-			IndexType zeroNum = 0;
+			IndexType nonZeroNum = this->GetNonZeroNum();
+			printf("Non-Zero weight number: %u\n", nonZeroNum);
+
+			double sparseRate = 0;
 			if (this->weightDim == 1){
-				zeroNum = 1;
+				sparseRate = 0;
 			}
 			else{
-				zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
+				sparseRate = (this->weightDim - 1 - nonZeroNum) / (double)(this->weightDim - 1);
 			}
 
-			double sparseRate = zeroNum / (double)(this->weightDim - 1);
 			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 		}
 
@@ -138,10 +140,8 @@ namespace BOC {
 		 * @Param x current input data example
 		 * @Param weightVec weight vector to be updated
 		 * @param gt common part of the gradient
-		 * @Param beta extra multiplier for updating, if none, set it to 1
-		 *
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt, float beta){}
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt){}
 
 	protected:
 		/**
@@ -177,6 +177,22 @@ namespace BOC {
 			getline(is, line);
 
 			return true;
+		}
+
+	public:
+		/**
+		 * @Synopsis GetNonZeroNum get the number of nonzero weights
+		 *
+		 * @Returns number of nonzero weights
+		 */
+		IndexType GetNonZeroNum()  const {
+			IndexType nonZeroNum = 0;
+			for (IndexType i = 1; i < this->weightDim; ++i){
+				if (this->weightVec[i] != 0){
+					++nonZeroNum;
+				}
+			}
+			return nonZeroNum;
 		}
 	};
 

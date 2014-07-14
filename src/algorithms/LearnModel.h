@@ -197,7 +197,7 @@ namespace BOC {
 		 *
 		 * @Returns predicted class
 		 */
-		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> predicts) = 0;
+		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> &predicts) = 0;
 #pragma endregion Test related
 
 	};

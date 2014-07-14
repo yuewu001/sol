@@ -26,6 +26,11 @@ namespace BOC {
 		vector<s_array<float> > weightMatrix;
 		//weight vector used for bc
 		s_array<float> *pWeightVecBC;
+        //predicted values for multi-class
+		vector<float> mc_predicts;
+        //gradients for multi-class
+		vector<float> mc_gradients;
+
 		//weight dimension: can be the same to feature, or with an extra bias
 		IndexType weightDim;
 #pragma endregion Class Members
@@ -43,6 +48,10 @@ namespace BOC {
 			}
 			if (this->classfier_num == 1){
 				this->pWeightVecBC = &this->weightMatrix[0];
+			}
+			else{
+				this->mc_predicts.resize(this->classfier_num);
+				this->mc_gradients.resize(this->classfier_num);
 			}
 		}
 
@@ -290,7 +299,7 @@ namespace BOC {
 			int label = this->GetClassLabel(x);
 			float gt = this->lossFunc->GetGradient(label, predict);
 			if (gt != 0){
-				this->UpdateWeightVec(x, *this->pWeightVecBC, gt, 1);
+				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
 			}
 			if (this->IsCorrect(label, predict) == false){
 				return -label;
@@ -312,7 +321,7 @@ namespace BOC {
 			predict = this->TrainPredict(*this->pWeightVecBC, x);
 			float gt = this->lossFunc->GetGradient(this->GetClassLabel(x), predict);
 			if (gt != 0){
-				this->UpdateWeightVec(x, *this->pWeightVecBC, gt, 1);
+				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
 			}
 			if (this->IsCorrect(x.label, predict) == false){
 				return -x.label;
@@ -347,10 +356,9 @@ namespace BOC {
 		 * @Param x current input data example
 		 * @Param weightVec weight vector to be updated
 		 * @param gt common part of the gradient
-		 * @Param beta extra multiplier for updating, if none, set it to 1
 		 *
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt, float beta) = 0;
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt) = 0;
 #pragma endregion Train Related
 
 
@@ -401,19 +409,7 @@ namespace BOC {
 		}
 #pragma endregion	Test related
 
-		/**
-		 * @Synopsis newly defined functions
-		 */
-	public:
 
-		/**
-		 * @Synopsis GetNonZeroNum get the number of nonzero weights
-		 *
-		 * @Returns number of nonzero weights
-		 */
-		virtual IndexType GetNonZeroNum()  const {
-			return 0;
-		}
 	};
 }
 

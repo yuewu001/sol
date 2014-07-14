@@ -3,7 +3,7 @@
 	> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
 	> Created Time: 7/11/2014 11:45:56 AM
 	> Functions: base class for online feature selection
- ************************************************************************/
+	************************************************************************/
 
 #ifndef HEADER_ONLINE_FEATURE_SELECTION
 #define HEADER_ONLINE_FEATURE_SELECTION
@@ -13,21 +13,24 @@
 */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class OnlineFeatureSelection : public OnlineLinearModel<FeatType, LabelType> {
+	class OnlineFeatureSelection : public OnlineLinearModel < FeatType, LabelType > {
+#pragma region Class Members
 	protected:
-        //keep top K elemetns
-		IndexType K; 
+		//keep top K elemetns
+		IndexType K;
 
+#pragma endregion Class Members
+
+#pragma region Constructors and Basic Functions
 	public:
 		OnlineFeatureSelection(LossFunction<FeatType, LabelType> *lossFunc) :
 			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
-                this->K = 1;
-			}
+			this->K = 1;
+		}
 
 		virtual ~OnlineFeatureSelection() {
 		}
 
-		//inherited functions
 	public:
 		/**
 		 * PrintModelSettings print the info of optimization algorithm
@@ -56,32 +59,9 @@ namespace BOC {
 			double sparseRate = zeroNum / (double)(this->weightDim - 1);
 			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 		}
+#pragma endregion Constructors and Basic Functions
 
-		/**
-		 * @Synopsis SetParameter set parameters for the learning model
-		 *
-		 * @Param param
-		 */
-		virtual void SetParameter(BOC::Params &param){
-			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->K = param.IntValue("-k");
-            INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
-		}
-
-		/**
-		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
-		 */
-		virtual void BeginTrain() {
-			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
-		}
-
-		/**
-		 * @Synopsis EndTrain called when a train ends
-		 */
-		virtual void EndTrain() { 
-			OnlineLinearModel<FeatType, LabelType>::EndTrain();
-		}
-
+#pragma region  IO related
 	protected:
 		/**
 		 * @Synopsis SaveModelConfig save configuration of model to disk
@@ -94,7 +74,7 @@ namespace BOC {
 			OnlineLinearModel<FeatType, LabelType>::SaveModelConfig(os);
 
 			//select k features
-            os << "K : " << this->K<< "\n";
+			os << "K : " << this->K << "\n";
 
 			return true;
 		}
@@ -116,6 +96,55 @@ namespace BOC {
 			getline(is, line);
 
 			return true;
+		}
+
+
+#pragma endregion  IO related
+
+#pragma region Train Related
+	public:
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			this->K = param.IntValue("-k");
+			INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
+		}
+
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
+			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
+		}
+
+		/**
+		 * @Synopsis EndTrain called when a train ends
+		 */
+		virtual void EndTrain() {
+			OnlineLinearModel<FeatType, LabelType>::EndTrain();
+		}
+
+#pragma endregion Train Related
+
+	protected:
+		/**
+		 * @Synopsis GetNonZeroNum get the number of nonzero weights
+		 *
+		 * @Returns number of nonzero weights
+		 */
+		IndexType GetNonZeroNum()  const {
+			IndexType nonZeroNum = 0;
+			s_array<float> weightVec = this->weightMatrix[0];
+			for (IndexType i = 1; i < this->weightDim; ++i){
+				if (weightVec[i] != 0){
+					++nonZeroNum;
+				}
+			}
+			return nonZeroNum;
 		}
 	};
 }

@@ -48,7 +48,6 @@ namespace BOC {
 		 */
 		virtual void PrintModelSettings() const {
 			SparseOnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
-			printf("\tModel : %s\n", STG<FeatType, LabelType>::classInfo.GetType().c_str());
 			printf("\t\tk	: %d\n", this->K);
 		}
 		/**

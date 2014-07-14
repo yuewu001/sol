@@ -149,14 +149,14 @@ namespace BOC {
 #pragma region Test related
     public:
 		/**
-		 * @Synopsis Test_Predict prediction function for test
+		 * @Synopsis Predict prediction function for test
 		 *
 		 * @Param data input data sample
 		 * @Param predicts predicted values for each classifier
 		 *
 		 * @Returns predicted class
 		 */
-		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> predicts){
+		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> &predicts){
 			return this->PredictBC(data, predicts);
 		}
 
@@ -172,8 +172,9 @@ namespace BOC {
 		int PredictBC(const DataPoint<FeatType, LabelType> &data, vector<float>& predicts) {
 			predicts[0] = this->PredictBC(data);
 
-			if (this->IsCorrect(data.label, predicts[0]) == false){
-				return -data.label;
+			int label = this->GetClassLabel(data);
+			if (this->IsCorrect(label, predicts[0]) == false){
+				return -label;
 			}
 			else{
 				return data.label;
@@ -190,14 +191,14 @@ namespace BOC {
 		 */
 		int PredictMC(const DataPoint<FeatType, LabelType> &data, vector<float>& predicts) {
 			for (int k = 0; k < this->classfier_num; ++k){
-				predicts[k] = this->Test_PredictMC(k, data);
+				predicts[k] = this->PredictMC(k, data);
 			}
 
-			return std::max_element(predicts.begin(), predicts.end()) - predicts.begin() + 1;
+			return std::max_element(predicts.begin(), predicts.end()) - predicts.begin();
 		}
 
 		/**
-		 * @Synopsis Test_PredictBC prediction function for test (binary classification)
+		 * @Synopsis PredictBC prediction function for test (binary classification)
 		 *
 		 * @Param data input data sample
 		 *
@@ -206,7 +207,7 @@ namespace BOC {
 		virtual float PredictBC(const DataPoint<FeatType, LabelType> &data) = 0;
 
 		/**
-		 * @Synopsis Test_PredictMC prediction function for test (multiclass classification)
+		 * @Synopsis PredictMC prediction function for test (multiclass classification)
 		 *
          * @Param classId: specified classifer
 		 * @Param data input data sample
