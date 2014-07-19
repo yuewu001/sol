@@ -105,7 +105,8 @@ namespace BOC {
 
 			//predict
 			float y = this->TrainPredict(this->weightVec, x);
-			float gt_i = this->lossFunc->GetGradient(x.label, y);
+			float gt_i = 0;
+			this->lossFunc->GetGradient(x.label, &y, &gt_i);
 
 			//update the coeffs
 			for (size_t i = 0; i < featDim; i++)

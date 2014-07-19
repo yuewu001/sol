@@ -150,7 +150,7 @@ namespace BOC {
 		 *
 		 * @Returns true if correctly predicted
 		 */
-		virtual inline bool IsCorrect(LabelType label, float predict) {
+		virtual inline bool IsCorrect(LabelType label, float* predict) {
 			return this->lossFunc->IsCorrect(label, predict);
 		}
 

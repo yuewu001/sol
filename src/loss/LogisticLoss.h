@@ -16,23 +16,36 @@ namespace BOC {
 		DECLARE_CLASS
 
 	public:
-		virtual float GetLoss(LabelType label, float predict) {
-			float tmp = -predict * label;
-			if (tmp > 100.f) return tmp;
-			else if (tmp < -100.f) return 0.f;
-			else
-				return log(1.f + exp(tmp));
+		virtual bool IsCorrect(LabelType label, float* predict){
+			return Sign(*predict) == label ? true : false;
+		}
+
+		virtual void GetLoss(LabelType label, float *predict, float* loss) {
+			float tmp = -*predict * label;
+			if (tmp > 100.f){
+				*loss = tmp;
+			}
+			else if (tmp < -100.f){
+				*loss = 0.f;
+			}
+			else{
+				*loss = log(1.f + exp(tmp));
+			}
 		}
 
 		//aggressive learning 
-		virtual float GetGradient(LabelType label, float predict) {
-			float tmp = predict * label;
-			if (tmp > 100.f) //to reject numeric problems
-				return 0.f;
-			else if (tmp < -100.f)
-				return (float)(-label);
-			else
-				return -label / (1.f + exp(tmp));
+		virtual void GetGradient(LabelType label, float* predict, float* gradient) {
+			float tmp = *predict * label;
+			//to reject numeric problems
+			if (tmp > 100.f) {
+				*gradient = 0.f;
+			}
+			else if (tmp < -100.f){
+				*gradient = -(float)(label);
+			}
+			else{
+				*gradient = -label / (1.f + exp(tmp));
+			}
 		}
 	};
 	//for dynamic binding

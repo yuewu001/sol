@@ -97,7 +97,8 @@ namespace BOC {
 			//predict 
 			float y = this->TrainPredict(this->weightVec, x);
 			//get gradient
-			float gt = this->lossFunc->GetGradient(x.label, y);
+			float gt = 0;
+			this->lossFunc->GetGradient(x.label, &y, &gt);
 			if (gt != 0){
 				//calculate learning rate
 				this->eta = this->r;

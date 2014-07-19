@@ -12,20 +12,28 @@
 
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class HingeLoss : public LossFunction<FeatType, LabelType> {
+	class HingeLoss : public LossFunction < FeatType, LabelType > {
 		//for dynamic binding
 		DECLARE_CLASS
 
 	public:
-		virtual  float GetLoss(LabelType label, float predict) {
-			return max(0.0f, 1.f - predict * label);
+		virtual bool IsCorrect(LabelType label, float* predict){
+			return Sign(*predict) == label ? true : false;
 		}
 
-		virtual  float GetGradient(LabelType label, float predict) {
-			if (this->GetLoss(label, predict) > 0)
-				return (float)(-label);
-			else
-				return 0;
+		virtual  void GetLoss(LabelType label, float* predict, float* loss) {
+			*loss = max(0.0f, 1.f - *predict * label);
+		}
+
+		virtual  void GetGradient(LabelType label, float *predict, float* gradient) {
+			float loss = 0;
+			this->GetLoss(label, predict, &loss);
+			if (loss > 0){
+				*gradient = (float)(-label);
+			}
+			else{
+				*gradient = 0;
+			}
 		}
 	};
 

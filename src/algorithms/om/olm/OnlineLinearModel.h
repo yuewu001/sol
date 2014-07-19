@@ -297,11 +297,12 @@ namespace BOC {
 			this->curIterNum++;
 			predict = this->TrainPredict(*this->pWeightVecBC, x);
 			int label = this->GetClassLabel(x);
-			float gt = this->lossFunc->GetGradient(label, predict);
+			float gt = 0;
+			this->lossFunc->GetGradient(label, &predict, &gt);
 			if (gt != 0){
 				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
 			}
-			if (this->IsCorrect(label, predict) == false){
+			if (this->IsCorrect(label, &predict) == false){
 				return -label;
 			}
 			else{
@@ -319,11 +320,12 @@ namespace BOC {
 		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
 			this->curIterNum++;
 			predict = this->TrainPredict(*this->pWeightVecBC, x);
-			float gt = this->lossFunc->GetGradient(this->GetClassLabel(x), predict);
+			float gt = 0;
+			this->lossFunc->GetGradient(this->GetClassLabel(x), &predict, &gt);
 			if (gt != 0){
 				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
 			}
-			if (this->IsCorrect(x.label, predict) == false){
+			if (this->IsCorrect(x.label, &predict) == false){
 				return -x.label;
 			}
 			else{

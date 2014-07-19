@@ -104,7 +104,7 @@ namespace BOC {
 		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
 			predict = this->Iterate(x);
 			int label = this->GetClassLabel(x);
-			if (this->IsCorrect(label, predict) == false){
+			if (this->IsCorrect(label, &predict) == false){
 				return -label;
 			}
 			else{

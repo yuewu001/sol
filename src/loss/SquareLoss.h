@@ -16,12 +16,16 @@ namespace BOC {
 		//for dynamic binding
 		DECLARE_CLASS
 	public:
-		virtual float GetLoss(LabelType label, float predict) {
-			return (predict - label) * (predict - label);
+		virtual bool IsCorrect(LabelType label, float* predict){
+			return Sign(*predict) == label ? true : false;
 		}
 
-		virtual float GetGradient(LabelType label, float predict) {
-			return 2 * (predict - label);
+		virtual void GetLoss(LabelType label, float* predict, float* loss) {
+			*loss = (*predict - label) * (*predict - label);
+		}
+
+		virtual void GetGradient(LabelType label, float* predict, float* gradient) {
+			*gradient = 2 * (*predict - label);
 		}
 	};
 	//for dynamic binding

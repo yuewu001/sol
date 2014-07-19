@@ -122,7 +122,7 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		int IterateBCDelegate(const DataPoint<FeatType, LabelType> &x, float& predict){
+		inline int IterateBCDelegate(const DataPoint<FeatType, LabelType> &x, float& predict){
 			return this->IterateBC(x, predict);
 		}
 
@@ -173,7 +173,7 @@ namespace BOC {
 			predicts[0] = this->PredictBC(data);
 
 			int label = this->GetClassLabel(data);
-			if (this->IsCorrect(label, predicts[0]) == false){
+			if (this->IsCorrect(label, &predicts[0]) == false){
 				return -label;
 			}
 			else{

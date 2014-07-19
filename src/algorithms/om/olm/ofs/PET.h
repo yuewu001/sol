@@ -96,7 +96,8 @@ namespace BOC {
 			this->curIterNum++;
 			predict = this->TrainPredict(*this->pWeightVecBC, x);
 			int label = this->GetClassLabel(x);
-			float gt = this->lossFunc->GetGradient(label, predict);
+			float gt = 0;
+			this->lossFunc->GetGradient(label, &predict, &gt);
 
 			if (gt != 0){
 				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
@@ -120,7 +121,7 @@ namespace BOC {
 				}
 			}
 
-			if (this->IsCorrect(label, predict) == false){
+			if (this->IsCorrect(label, &predict) == false){
 				return -label;
 			}
 			else{

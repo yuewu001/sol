@@ -114,7 +114,8 @@ namespace BOC {
 
 			//obtain w_t
 			float y = this->TrainPredict(this->weightVec, x);
-			float gt_i = this->lossFunc->GetGradient(x.label, y);
+			float gt_i = 0;
+			this->lossFunc->GetGradient(x.label, &y, &gt_i);
 			//update w_t
 			if (gt_i != 0){
 				//calculate learning rate

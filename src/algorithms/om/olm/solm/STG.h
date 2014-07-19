@@ -99,7 +99,9 @@ namespace BOC {
 			float alpha = this->eta * this->lambda;
 
 			float y = this->TrainPredict(this->weightVec, x);
-			float gt_i = this->lossFunc->GetGradient(x.label, y) * this->eta;
+			float gt_i = 0;
+			this->lossFunc->GetGradient(x.label, &y, &gt_i);
+			gt_i *= this->eta;
 
 			size_t stepK = 0;
 			for (size_t i = 0; i < featDim; i++) {
