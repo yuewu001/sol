@@ -139,10 +139,8 @@ namespace BOC {
 		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
 			this->curIterNum++;
 			for (int k = 0; k < this->classfier_num; ++k){
-				this->mc_predicts[k] = this->TrainPredict(this->weightMatrix[k], x);
+				predict[k] = this->TrainPredict(this->weightMatrix[k], x);
 			}
-
-			this->mc_gradients;
 
 			//not correct
 			if (false){
@@ -176,7 +174,7 @@ namespace BOC {
 						}
 					}
 				}
-				return (std::max_element(this->mc_predicts.begin(), this->mc_predicts.end()) - this->mc_predicts.begin());
+				return (std::max_element(predict, predict + this->classfier_num) - predict);
 			}
 			return x.label;
 		}

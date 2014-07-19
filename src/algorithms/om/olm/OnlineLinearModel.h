@@ -27,8 +27,6 @@ namespace BOC {
 		vector<s_array<float> > weightMatrix;
 		//weight vector used for bc
 		s_array<float> *pWeightVecBC;
-		//predicted values for multi-class
-		vector<float> mc_predicts;
 		//gradients for multi-class
 		vector<float> mc_gradients;
 
@@ -51,7 +49,6 @@ namespace BOC {
 				this->pWeightVecBC = &this->weightMatrix[0];
 			}
 			else{
-				this->mc_predicts.resize(this->classfier_num);
 				this->mc_gradients.resize(this->classfier_num);
 			}
 		}

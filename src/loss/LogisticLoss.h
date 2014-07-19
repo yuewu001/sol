@@ -16,11 +16,7 @@ namespace BOC {
 		DECLARE_CLASS
 
 	public:
-		virtual bool IsCorrect(LabelType label, float* predict){
-			return Sign(*predict) == label ? true : false;
-		}
-
-		virtual void GetLoss(LabelType label, float *predict, float* loss) {
+		virtual void GetLoss(LabelType label, float *predict, float* loss, int len) {
 			float tmp = -*predict * label;
 			if (tmp > 100.f){
 				*loss = tmp;
@@ -34,7 +30,7 @@ namespace BOC {
 		}
 
 		//aggressive learning 
-		virtual void GetGradient(LabelType label, float* predict, float* gradient) {
+		virtual void GetGradient(LabelType label, float* predict, float* gradient, int len) {
 			float tmp = *predict * label;
 			//to reject numeric problems
 			if (tmp > 100.f) {

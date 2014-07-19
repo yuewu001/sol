@@ -17,17 +17,13 @@ namespace BOC {
 		DECLARE_CLASS
 
 	public:
-		virtual bool IsCorrect(LabelType label, float* predict){
-			return Sign(*predict) == label ? true : false;
-		}
-
-		virtual  void GetLoss(LabelType label, float* predict, float* loss) {
+		virtual  void GetLoss(LabelType label, float* predict, float* loss, int len) {
 			*loss = max(0.0f, 1.f - *predict * label);
 		}
 
-		virtual  void GetGradient(LabelType label, float *predict, float* gradient) {
+		virtual  void GetGradient(LabelType label, float *predict, float* gradient, int len) {
 			float loss = 0;
-			this->GetLoss(label, predict, &loss);
+			this->GetLoss(label, predict, &loss, len);
 			if (loss > 0){
 				*gradient = (float)(-label);
 			}

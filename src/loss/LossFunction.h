@@ -22,8 +22,8 @@ namespace BOC {
 
 	template <typename FeatType, typename LabelType>
 	class LossFunction : public Registry {
-	protected:
-		inline char Sign(float x) {
+	public:
+		inline static char Sign(float x) {
 			if (x >= 0.f)
 				return 1;
 			else
@@ -31,9 +31,8 @@ namespace BOC {
 		}
 
 	public:
-		virtual bool IsCorrect(LabelType label, float* predict) = 0;
-		virtual void GetLoss(LabelType label, float* predict, float* loss) = 0;
-		virtual void GetGradient(LabelType label, float* predict, float* gradient) = 0;
+		virtual void GetLoss(LabelType label, float* predict, float* loss, int len = 1) = 0;
+		virtual void GetGradient(LabelType label, float* predict, float* gradient, int len = 1) = 0;
 
 	public:
 		virtual ~LossFunction(){}

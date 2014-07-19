@@ -51,6 +51,7 @@ set (loss_files
     src/loss/LossFunction.h
     src/loss/SquaredHingeLoss.h
     src/loss/SquareLoss.h
+    src/loss/MaxScoreHingeLoss.h
     PARENT_SCOPE
     )
 

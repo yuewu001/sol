@@ -162,7 +162,17 @@ namespace BOC {
 		 * @Returns true if correctly predicted
 		 */
 		virtual inline bool IsCorrect(LabelType label, float* predict) {
-			return this->lossFunc->IsCorrect(label, predict);
+			if (this->classfier_num == 1){
+				return LossFunction<FeatType, LabelType>::Sign(*predict) == label ? true : false;
+			}
+			else{
+				for (int i = 0; i < this->classfier_num; ++i){
+					if (predict[i] > predict[label]){
+						return false;
+					}
+				}
+				return true;
+			}
 		}
 
 		/**
