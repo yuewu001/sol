@@ -14,6 +14,11 @@ namespace BOC {
 	class SquaredHingeLoss : public LossFunction<FeatType, LabelType> {
 		//for dynamic binding
 		DECLARE_CLASS
+
+	public:
+		SquaredHingeLoss() :
+			LossFunction<FeatType, LabelType>(BC_LOSS_TYPE){}
+
 	public:
 		virtual  void GetLoss(LabelType label, float* predict, float* loss, int len) {
 			*loss = max(0.0f, 1.f - *predict * label);

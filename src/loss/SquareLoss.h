@@ -15,6 +15,12 @@ namespace BOC {
 	class SquareLoss : public LossFunction<FeatType, LabelType> {
 		//for dynamic binding
 		DECLARE_CLASS
+
+	public:
+		SquareLoss() :
+			LossFunction<FeatType, LabelType>(BC_LOSS_TYPE){}
+
+
 	public:
 		virtual bool IsCorrect(LabelType label, float* predict, int len){
 			return Sign(*predict) == label ? true : false;

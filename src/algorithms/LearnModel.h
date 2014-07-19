@@ -65,6 +65,18 @@ namespace BOC {
 			lossFunc(lossFunc), class_num(classNum){
 			this->classfier_num = this->class_num == 2 ? 1 : this->class_num;
 			INVALID_ARGUMENT_EXCEPTION(class_num, class_num > 1, "no smaller than 2");
+
+            //check if the loss function is approariate
+			if (this->classfier_num == 1){
+				if (this->lossFunc->GetLossType() != BC_LOSS_TYPE){
+					throw invalid_argument("type of loss function (mc) is not consistent with the task (bc)");
+				}
+			}
+			else{
+				if (this->lossFunc->GetLossType() != MC_LOSS_TYPE){
+					throw invalid_argument("type of loss function (bc) is not consistent with the task (mc)");
+				}
+			}
 		}
 
 		virtual ~LearnModel() {

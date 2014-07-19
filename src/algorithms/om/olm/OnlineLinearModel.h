@@ -324,7 +324,7 @@ namespace BOC {
 			this->lossFunc->GetGradient(x.label, predict, &(this->mc_gradients[0]), this->classfier_num);
 
 			//not correct
-			if (this->mc_gradients[x.label] > 0){
+			if (this->mc_gradients[x.label] != 0){
 				this->UpdateWeightVec(x, &(this->mc_gradients[0]));
 				return (std::max_element(predict, predict + this->classfier_num) - predict);
 			}

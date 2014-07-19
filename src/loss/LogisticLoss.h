@@ -16,6 +16,10 @@ namespace BOC {
 		DECLARE_CLASS
 
 	public:
+		LogisticLoss() :
+			LossFunction<FeatType, LabelType>(BC_LOSS_TYPE){}
+
+	public:
 		virtual void GetLoss(LabelType label, float *predict, float* loss, int len) {
 			float tmp = -*predict * label;
 			if (tmp > 100.f){

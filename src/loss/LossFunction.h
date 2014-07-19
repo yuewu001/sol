@@ -20,8 +20,16 @@ namespace BOC {
 	void* className<FeatType, LabelType>::CreateObject(void *param1, void* param2, void* param3) \
 	{ return new className<FeatType, LabelType>; }
 
+	enum LossFunctionType{
+		//loss function for binary classification
+        BC_LOSS_TYPE = 0,
+		//loss function for binary classification
+		MC_LOSS_TYPE = 1,
+	};
+
 	template <typename FeatType, typename LabelType>
 	class LossFunction : public Registry {
+
 	public:
 		inline static char Sign(float x) {
 			if (x >= 0.f)
@@ -29,6 +37,15 @@ namespace BOC {
 			else
 				return -1;
 		}
+
+	protected:
+		LossFunctionType lossType;
+
+	public:
+		LossFunction(LossFunctionType type) :
+			lossType(type){ }
+
+		LossFunctionType GetLossType() const { return this->lossType; }
 
 	public:
 		virtual void GetLoss(LabelType label, float* predict, float* loss, int len = 1) = 0;

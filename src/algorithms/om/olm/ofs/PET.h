@@ -58,6 +58,7 @@ namespace BOC {
 			else
 				this->pEta_time = pEta_general;
 
+			this->weightMatrixPNorm.zeros();
 			if (this->K > 0){
 				if (this->weightDim < this->K + 1)
 					this->UpdateModelDimention(this->K);
@@ -116,7 +117,7 @@ namespace BOC {
 			}
 
 			for (int k = 0; k < this->classfier_num; ++k){
-				s_array<float> weightVec = this->weightMatrix[k];
+				s_array<float> &weightVec = this->weightMatrix[k];
 				for (size_t i = 0; i < featDim; ++i){
 					this->weightMatrixPNorm[x.indexes[i]] += weightVec[x.indexes[i]] * weightVec[x.indexes[i]];
 				}

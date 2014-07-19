@@ -20,8 +20,12 @@ namespace BOC {
 		DECLARE_CLASS
 
 	public:
+		MaxScoreHingeLoss() :
+			LossFunction<FeatType, LabelType>(MC_LOSS_TYPE){}
+
+	public:
 		virtual  void GetLoss(LabelType label, float* predict, float* loss, int len) {
-			float tempLoss = (std::numeric_limits<float>::min)();
+			float tempLoss = -(std::numeric_limits<float>::max)();
             for (int i = 0; i < len; ++i){
                 if (i == label)
                     continue;

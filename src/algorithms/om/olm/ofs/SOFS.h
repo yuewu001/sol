@@ -74,15 +74,35 @@ namespace BOC {
 		}
 
 		/**
-		 * @Synopsis Iterate Iteration of online learning
+		 * @Synopsis UpdateModelDimention update dimension of the model,
+		 * often caused by the increased dimension of data
+		 *
+		 * @Param new_dim new dimension
+		 */
+		virtual void UpdateModelDimention(IndexType new_dim) {
+			if (new_dim < this->weightDim)
+				return;
+			else {
+				this->sigma_w.reserve(new_dim + 1);
+				this->sigma_w.resize(new_dim + 1);  //reserve the 0-th
+				//set the rest to 1
+				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
+					this->sigma_w.end, 1);
+				heap.UpdateDataNum(new_dim, this->sigma_w.begin + 1);
+
+				OnlineFeatureSelection<FeatType, LabelType>::UpdateModelDimention(new_dim);
+			}
+		}
+
+	protected:
+		/**
+		 * @Synopsis UpdateWeightVec Update the weight vector
 		 *
 		 * @Param x current input data example
+		 * @Param gt common part of the gradient
 		 *
-		 * @Returns  prediction of the current example
 		 */
-		virtual float Iterate(const DataPoint<FeatType, LabelType> &x) {
-			float y = this->TrainPredict(this->weightVec, x);
-			//y /= this->curIterNum;
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, float* gt_t){
 			float alpha_t = 1 - x.label * y;
 			if (alpha_t > 0){
 				IndexType index_i = 0;
@@ -117,30 +137,7 @@ namespace BOC {
 				//this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
 				this->sigma_w[0] *= this->r / (this->r + this->sigma_w[0]);
 			}
-			return y;
 		}
-
-		/**
-		 * @Synopsis UpdateModelDimention update dimension of the model,
-		 * often caused by the increased dimension of data
-		 *
-		 * @Param new_dim new dimension
-		 */
-		virtual void UpdateModelDimention(IndexType new_dim) {
-			if (new_dim < this->weightDim)
-				return;
-			else {
-				this->sigma_w.reserve(new_dim + 1);
-				this->sigma_w.resize(new_dim + 1);  //reserve the 0-th
-				//set the rest to 1
-				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
-					this->sigma_w.end, 1);
-				heap.UpdateDataNum(new_dim, this->sigma_w.begin + 1);
-
-				OnlineFeatureSelection<FeatType, LabelType>::UpdateModelDimention(new_dim);
-			}
-		}
-
 	};
 
 	IMPLEMENT_MODEL_CLASS(SOFS, "Second Order Online Feature Selection")

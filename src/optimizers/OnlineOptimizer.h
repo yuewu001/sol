@@ -97,8 +97,7 @@ namespace BOC {
 					data_count++;
 					this->update_times++;
 					if (show_count == data_count){
-						printf("%lu\t\t\t%.6f\t\t\n", data_count,
-							errorNum / (float)(data_count));
+						printf("%lu\t\t\t%.6f\n", data_count, errorNum / (float)(data_count));
 						show_count = (size_t(1) << ++show_step);
 					}
 				}

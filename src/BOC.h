@@ -109,8 +109,10 @@ namespace BOC{
 
 	protected:
 		inline int InitLoss(Params &param){
+			string loss_type = param.StringValue("-loss");
+			ToLowerCase(loss_type);
 			this->pLossFunc = (LossFunction<FeatType, LabelType>*)
-				Registry::CreateObject(param.StringValue("-loss"));
+				Registry::CreateObject(loss_type);
 			if (this->pLossFunc == NULL) {
 				fprintf(stderr, "Error %d: Init loss function failed (%s)\n", STATUS_INIT_FAIL, param.StringValue("-loss").c_str());
 				return STATUS_INIT_FAIL;
