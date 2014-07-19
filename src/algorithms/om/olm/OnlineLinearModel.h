@@ -298,7 +298,7 @@ namespace BOC {
 			float gt = 0;
 			this->lossFunc->GetGradient(label, predict, &gt);
 			if (gt != 0){
-				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
+				this->UpdateWeightVec(x, &gt);
 			}
 			if (this->IsCorrect(label, predict) == false){
 				return -label;
@@ -316,7 +316,19 @@ namespace BOC {
 		 * @Returns  predicted class of the current example
 		 */
 		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
-			return 0;
+			this->curIterNum++;
+			for (int k = 0; k < this->classfier_num; ++k){
+				predict[k] = this->TrainPredict(this->weightMatrix[k], x);
+			}
+
+			this->lossFunc->GetGradient(x.label, predict, &(this->mc_gradients[0]), this->classfier_num);
+
+			//not correct
+			if (this->mc_gradients[x.label] > 0){
+				this->UpdateWeightVec(x, &(this->mc_gradients[0]));
+				return (std::max_element(predict, predict + this->classfier_num) - predict);
+			}
+			return x.label;
 		}
 
 	protected:
@@ -342,11 +354,10 @@ namespace BOC {
 		 * @Synopsis UpdateWeightVec Update the weight vector
 		 *
 		 * @Param x current input data example
-		 * @Param weightVec weight vector to be updated
-		 * @param gt common part of the gradient
+		 * @Param gt common part of the gradient
 		 *
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt) = 0;
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, float* gt) = 0;
 #pragma endregion Train Related
 
 
