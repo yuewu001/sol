@@ -95,17 +95,20 @@ namespace BOC {
 		 * @Param beta extra multiplier for updating, if none, set it to 1
 		 *
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt){
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, float* gt_t){
 			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
 			size_t featDim = x.indexes.size();
 
 			//update with sgd
-			for (size_t i = 0; i < featDim; i++) {
-				weightVec[x.indexes[i]] -= this->eta * gt * x.features[i];
+			for (int k = 0; k < this->classfier_num; ++k){
+				s_array<float> &weightVec = this->weightMatrix[k];
+				for (size_t i = 0; i < featDim; i++) {
+					weightVec[x.indexes[i]] -= this->eta * gt_t[k] * x.features[i];
+				}
+				//update bias 
+				weightVec[0] -= this->eta * gt_t[k];
 			}
 
-			//update bias 
-			weightVec[0] -= this->eta * gt;
 
 			//update pnorm
 			for (size_t i = 0; i < featDim; ++i){

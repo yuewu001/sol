@@ -58,20 +58,21 @@ namespace BOC {
 		 * @Synopsis UpdateWeightVec Update the weight vector
 		 *
 		 * @Param x current input data example
-		 * @Param weightVec weight vector to be updated
-         * @param gt common part of the gradient
+         * @Param gt common part of the gradient
 		 *
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt){
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, float* gt_t){
 			this->eta = this->eta0 / this->pEta_time(this->curIterNum, this->power_t);
 			size_t featDim = x.indexes.size();
 
-			for (size_t i = 0; i < featDim; i++){
-				weightVec[x.indexes[i]] -= this->eta * gt * x.features[i];
+			for (int k = 0; k < this->classfier_num; ++k){
+				s_array<float> &weightVec = this->weightMatrix[k];
+				for (size_t i = 0; i < featDim; i++) {
+					weightVec[x.indexes[i]] -= this->eta * gt_t[k] * x.features[i];
+				}
+				//update bias 
+				weightVec[0] -= this->eta * gt_t[k];
 			}
-
-			//update bias 
-			weightVec[0] -= this->eta * gt;
 		}
 	};
 

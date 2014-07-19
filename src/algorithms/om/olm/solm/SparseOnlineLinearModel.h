@@ -138,10 +138,9 @@ namespace BOC {
 		 * @Synopsis UpdateWeightVec Update the weight vector
 		 *
 		 * @Param x current input data example
-		 * @Param weightVec weight vector to be updated
-		 * @param gt common part of the gradient
+		 * @Param gt_t common part of the gradient
 		 */
-		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, s_array<float>& weightVec, float gt){}
+		virtual void UpdateWeightVec(const DataPoint<FeatType, LabelType> &x, float* gt_t){}
 
 	protected:
 		/**
