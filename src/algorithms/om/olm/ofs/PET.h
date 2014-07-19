@@ -85,100 +85,6 @@ namespace BOC {
 			}
 		}
 
-		/**
-		 * @Synopsis IterateBC Iteration of online learning for binary classification
-		 *
-		 * @Param x current input data example
-		 *
-		 * @Returns  predicted class of the current example
-		 */
-		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float* predict){
-			this->curIterNum++;
-			*predict = this->TrainPredict(*this->pWeightVecBC, x);
-			int label = this->GetClassLabel(x);
-			float gt = 0;
-			this->lossFunc->GetGradient(label, predict, &gt);
-
-			if (gt != 0){
-				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
-
-				//update pnorm
-				size_t featDim = x.indexes.size();
-				for (size_t i = 0; i < featDim; ++i){
-					this->weightMatrixPNorm[x.indexes[i]] = (*this->pWeightVecBC)[x.indexes[i]] * (*this->pWeightVecBC)[x.indexes[i]];
-				}
-
-				if (this->K > 0){
-					this->minHeap.BuildHeap();
-					//truncate
-					IndexType ret_id;
-					for (IndexType i = 0; i < this->weightDim - 1; i++){
-						if (this->minHeap.UpdateHeap(i, ret_id) == true){
-							(*this->pWeightVecBC)[ret_id + 1] = 0;
-							this->weightMatrixPNorm[ret_id + 1] = 0;
-						}
-					}
-				}
-			}
-
-			if (this->IsCorrect(label, predict) == false){
-				return -label;
-			}
-			else{
-				return x.label;
-			}
-		}
-
-		/**
-		 * @Synopsis IterateMC Iteration of online learning for multiclass classification
-		 *
-		 * @Param x current input data example
-		 *
-		 * @Returns  predicted class of the current example
-		 */
-		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
-			this->curIterNum++;
-			for (int k = 0; k < this->classfier_num; ++k){
-				predict[k] = this->TrainPredict(this->weightMatrix[k], x);
-			}
-
-			//not correct
-			if (false){
-				for (int k = 0; k < this->classfier_num; ++k){
-					this->UpdateWeightVec(x, this->weightMatrix[k], this->mc_gradients[k]);
-				}
-
-				//update pnorm
-				size_t featDim = x.indexes.size();
-				for (size_t i = 0; i < featDim; ++i){
-					this->weightMatrixPNorm[x.indexes[i]] = 0;
-				}
-
-				for (int k = 0; k < this->classfier_num; ++k){
-					s_array<float> weightVec = this->weightMatrix[k];
-					for (size_t i = 0; i < featDim; ++i){
-						this->weightMatrixPNorm[x.indexes[i]] += weightVec[x.indexes[i]] * weightVec[x.indexes[i]];
-					}
-				}
-
-				if (this->K > 0){
-					this->minHeap.BuildHeap();
-					//truncate
-					IndexType ret_id;
-					for (IndexType i = 0; i < this->weightDim - 1; i++){
-						if (this->minHeap.UpdateHeap(i, ret_id) == true){
-							for (int k = 0; k < this->classfier_num; ++k){
-								(this->weightMatrix[k])[ret_id + 1] = 0;
-							}
-							this->weightMatrixPNorm[ret_id + 1] = 0;
-						}
-					}
-				}
-				return (std::max_element(predict, predict + this->classfier_num) - predict);
-			}
-			return x.label;
-		}
-
 	protected:
 		/**
 		 * @Synopsis UpdateWeightVec Update the weight vector
@@ -200,8 +106,33 @@ namespace BOC {
 
 			//update bias 
 			weightVec[0] -= this->eta * gt;
-		}
 
+			//update pnorm
+			for (size_t i = 0; i < featDim; ++i){
+				this->weightMatrixPNorm[x.indexes[i]] = 0;
+			}
+
+			for (int k = 0; k < this->classfier_num; ++k){
+				s_array<float> weightVec = this->weightMatrix[k];
+				for (size_t i = 0; i < featDim; ++i){
+					this->weightMatrixPNorm[x.indexes[i]] += weightVec[x.indexes[i]] * weightVec[x.indexes[i]];
+				}
+			}
+
+			if (this->K > 0){
+				this->minHeap.BuildHeap();
+				//truncate
+				IndexType ret_id;
+				for (IndexType i = 0; i < this->weightDim - 1; i++){
+					if (this->minHeap.UpdateHeap(i, ret_id) == true){
+						for (int k = 0; k < this->classfier_num; ++k){
+							(this->weightMatrix[k])[ret_id + 1] = 0;
+						}
+						this->weightMatrixPNorm[ret_id + 1] = 0;
+					}
+				}
+			}
+		}
 	};
 
 	IMPLEMENT_MODEL_CLASS(PET, "Perceptron with Truncation")
