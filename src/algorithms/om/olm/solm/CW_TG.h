@@ -32,8 +32,8 @@ namespace BOC {
 		size_t iter_num;
 
 	public:
-		CW_TG(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		CW_TG(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "Cw-TG";
 			this->r = 0;
 			this->sigma_w.resize(this->weightDim);

@@ -62,7 +62,7 @@ namespace BOC{
 			float errorRate(0);
 			//double test_time = 0;
 			//test
-			vector<float> predicts(1);
+			float* predicts = new float[this->learnModel->GetClassfierNum()];
 			while (1) {
 				const DataChunk<PointType> &chunk = testSet.GetChunk();
 				//double time1 = get_current_time();

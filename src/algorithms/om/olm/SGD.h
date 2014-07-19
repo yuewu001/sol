@@ -26,8 +26,8 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		SGD(LossFunction<FeatType, LabelType> *lossFunc) :
-			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
+		SGD(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			OnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) {
 			this->modelName = "SGD";
 		}
 

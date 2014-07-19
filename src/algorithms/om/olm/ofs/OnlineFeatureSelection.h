@@ -23,8 +23,8 @@ namespace BOC {
 
 #pragma region Constructors and Basic Functions
 	public:
-		OnlineFeatureSelection(LossFunction<FeatType, LabelType> *lossFunc) :
-			OnlineLinearModel<FeatType, LabelType>(lossFunc) {
+		OnlineFeatureSelection(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			OnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) {
 			this->K = 1;
 		}
 

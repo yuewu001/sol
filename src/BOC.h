@@ -158,7 +158,7 @@ namespace BOC{
 		inline int InitModel(Params &param){
 			//check model type
 			string model = param.StringValue("-m");
-			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc);
+			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc, (void*)(param.IntValue("-cn")));
 			if (this->pModel == NULL){
 				fprintf(stderr, "Error %d: init online model failed! (%s)\n", STATUS_INIT_FAIL, model.c_str());
 				return STATUS_INIT_FAIL;
@@ -301,6 +301,7 @@ namespace BOC{
 				param.add_option(init_loss_type, 0, 1, "loss function type", "-loss", "Loss Functions");
 
 				//model setting
+				param.add_option(2, 0, 1, "class number:", "-cn", "Model Settings");
 				param.add_option(init_algo_method, 0, 1, "learning model:", "-m", "Model Settings");
 				param.add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
 				param.add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");

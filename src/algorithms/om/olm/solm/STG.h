@@ -29,8 +29,8 @@ namespace BOC {
 		float(*pEta_time)(size_t t, float pt);
 
 	public:
-		STG(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		STG(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "STG";
 			this->K = 10;
 			this->timeStamp.resize(this->weightDim);

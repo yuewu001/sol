@@ -32,8 +32,8 @@ namespace BOC {
 		float(*pEta_time)(size_t t, float pt);
 
 	public:
-		FOBOS(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		FOBOS(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "FOBOS";
 			this->timeStamp.resize(this->weightDim);
 		}

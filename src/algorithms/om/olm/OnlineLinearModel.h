@@ -19,6 +19,7 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class OnlineLinearModel : public OnlineModel < FeatType, LabelType > {
+
 #pragma region Class Members
 		//weight vector
 	protected:
@@ -26,9 +27,9 @@ namespace BOC {
 		vector<s_array<float> > weightMatrix;
 		//weight vector used for bc
 		s_array<float> *pWeightVecBC;
-        //predicted values for multi-class
+		//predicted values for multi-class
 		vector<float> mc_predicts;
-        //gradients for multi-class
+		//gradients for multi-class
 		vector<float> mc_gradients;
 
 		//weight dimension: can be the same to feature, or with an extra bias
@@ -37,8 +38,8 @@ namespace BOC {
 
 #pragma region Constructors and Basic Functions
 	public:
-		OnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc)
-			: OnlineModel<FeatType, LabelType>(lossFunc), pWeightVecBC(NULL) {
+		OnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum)
+			: OnlineModel<FeatType, LabelType>(lossFunc, classNum), pWeightVecBC(NULL) {
 			this->weightDim = 1;
 			this->weightMatrix.resize(this->classfier_num);
 
@@ -293,16 +294,16 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
+		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float* predict){
 			this->curIterNum++;
-			predict = this->TrainPredict(*this->pWeightVecBC, x);
+			*predict = this->TrainPredict(*this->pWeightVecBC, x);
 			int label = this->GetClassLabel(x);
 			float gt = 0;
-			this->lossFunc->GetGradient(label, &predict, &gt);
+			this->lossFunc->GetGradient(label, predict, &gt);
 			if (gt != 0){
 				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
 			}
-			if (this->IsCorrect(label, &predict) == false){
+			if (this->IsCorrect(label, predict) == false){
 				return -label;
 			}
 			else{
@@ -317,20 +318,8 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
-			this->curIterNum++;
-			predict = this->TrainPredict(*this->pWeightVecBC, x);
-			float gt = 0;
-			this->lossFunc->GetGradient(this->GetClassLabel(x), &predict, &gt);
-			if (gt != 0){
-				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
-			}
-			if (this->IsCorrect(x.label, &predict) == false){
-				return -x.label;
-			}
-			else{
-				return x.label;
-			}
+		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
+			return 0;
 		}
 
 	protected:
@@ -365,6 +354,33 @@ namespace BOC {
 
 
 #pragma region	Test related
+	public:
+		/**
+		 * @Synopsis Predict prediction function for test
+		 *
+		 * @Param data input data sample
+		 * @Param predicts predicted values for each classifier
+		 *
+		 * @Returns predicted class
+		 */
+		virtual int Predict(const DataPoint<FeatType, LabelType> &data, float* predicts){
+			for (int k = 0; k < this->classfier_num; ++k){
+				predicts[k] = this->TestPredict(this->weightMatrix[k], data);
+			}
+			if (this->classfier_num == 1){
+				int label = this->GetClassLabel(data);
+				if (this->IsCorrect(label, predicts) == false){
+					return -label;
+				}
+				else{
+					return data.label;
+				}
+			}
+			else{
+				return std::max_element(predicts, predicts + this->classfier_num) - predicts;
+			}
+		}
+
 	protected:
 		/**
 		 * @Synopsis TestPredict prediction function for test
@@ -387,30 +403,7 @@ namespace BOC {
 			return predict;
 		}
 
-		/**
-		 * @Synopsis PredictBC prediction function for test (binary classification)
-		 *
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value for the data 
-		 */
-		virtual float PredictBC(const DataPoint<FeatType, LabelType> &data) {
-			return this->TestPredict(*this->pWeightVecBC, data);
-		}
-
-		/**
-		 * @Synopsis PredictMC prediction function for test (multiclass classification)
-		 *
-         * @Param classId: specified classifer
-		 * @Param data input data sample
-		 *
-		 * @Returns predicted value for the data on the specified classifier
-		 */
-		virtual float PredictMC(int classId, const DataPoint<FeatType, LabelType> &data) {
-			return this->TestPredict(this->weightMatrix[classId], data);
-		}
 #pragma endregion	Test related
-
 
 	};
 }

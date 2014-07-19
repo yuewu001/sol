@@ -35,7 +35,7 @@ namespace BOC {
 	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
-	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc); }
+	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc, int(param2)); }
 
 #pragma endregion Macros for Reflector 
 
@@ -44,6 +44,10 @@ namespace BOC {
 	class LearnModel : public Registry {
 #pragma region Class Members
 	protected:
+		//number of classes
+		int class_num;
+        //number of weight vectors
+		int classfier_num;
 		//name of the model
 		std::string modelName;
 		//type of the model: online
@@ -57,8 +61,10 @@ namespace BOC {
 
 #pragma region Constructors and Basic Functions
 	public:
-		LearnModel(LossFunction<FeatType, LabelType> *lossFunc){
-			this->lossFunc = lossFunc;
+		LearnModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum):
+			lossFunc(lossFunc), class_num(classNum){
+			this->classfier_num = this->class_num == 2 ? 1 : this->class_num;
+			INVALID_ARGUMENT_EXCEPTION(class_num, class_num > 1, "no smaller than 2");
 		}
 
 		virtual ~LearnModel() {
@@ -79,6 +85,11 @@ namespace BOC {
 		 * PrintModelInfo print the info of trained model
 		 */
 		virtual void PrintModelInfo() const = 0;
+
+		/**
+		*  GetClassfierNum Get the number of classifiers
+		*/
+		int GetClassfierNum() const { return this->classfier_num; }
 
 #pragma endregion Constructors and Basic Functions
 
@@ -197,7 +208,7 @@ namespace BOC {
 		 *
 		 * @Returns predicted class
 		 */
-		virtual int Predict(const DataPoint<FeatType, LabelType> &data, vector<float> &predicts) = 0;
+		virtual int Predict(const DataPoint<FeatType, LabelType> &data, float* predicts) = 0;
 #pragma endregion Test related
 
 	};

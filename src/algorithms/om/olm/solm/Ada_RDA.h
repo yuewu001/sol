@@ -30,8 +30,8 @@ namespace BOC {
 		s_array<float> s;
 		s_array<float> u_t;
 	public:
-		Ada_RDA(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		Ada_RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "Ada-RDA";
 			this->delta = 0;;
 			this->s.resize(this->weightDim);

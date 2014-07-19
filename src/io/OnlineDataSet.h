@@ -153,7 +153,7 @@ namespace BOC {
 		inline void EndWriteChunk(ChunkType& chunk){
 			//normalize the data
 			if (this->is_norm == true){
-				for (int i = 0; i < chunk.dataNum; ++i){
+				for (size_t i = 0; i < chunk.dataNum; ++i){
 					chunk.data[i].Normalize();
 				}
 			}

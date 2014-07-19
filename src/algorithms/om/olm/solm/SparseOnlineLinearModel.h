@@ -24,8 +24,8 @@ namespace BOC {
 		s_array<float>& weightVec;
 
 	public:
-		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc) 
-			: OnlineLinearModel<FeatType, LabelType>(lossFunc) ,
+		SparseOnlineLinearModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum) 
+			: OnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) ,
 			weightVec(*this->pWeightVecBC){
 				this->lambda = 0;
 				this->sparse_soft_thresh = init_sparse_soft_thresh;
@@ -101,10 +101,10 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
-			predict = this->Iterate(x);
+		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float* predict){
+			*predict = this->Iterate(x);
 			int label = this->GetClassLabel(x);
-			if (this->IsCorrect(label, &predict) == false){
+			if (this->IsCorrect(label, predict) == false){
 				return -label;
 			}
 			else{
@@ -119,7 +119,7 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
+		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
 			fprintf(stderr, "multiclass is not supported yet!");
 			exit(1);
 		}

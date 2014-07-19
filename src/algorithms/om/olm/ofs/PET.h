@@ -31,8 +31,8 @@ namespace BOC {
 
 #pragma region Constructors and Basic Functions
 	public:
-		PET(LossFunction<FeatType, LabelType> *lossFunc) :
-			OnlineFeatureSelection<FeatType, LabelType>(lossFunc) {
+		PET(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			OnlineFeatureSelection<FeatType, LabelType>(lossFunc, classNum) {
 			this->modelName = "PET";
 			this->weightMatrixPNorm.resize(this->weightDim);
 		}
@@ -92,12 +92,12 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float& predict){
+		virtual int IterateBC(const DataPoint<FeatType, LabelType> &x, float* predict){
 			this->curIterNum++;
-			predict = this->TrainPredict(*this->pWeightVecBC, x);
+			*predict = this->TrainPredict(*this->pWeightVecBC, x);
 			int label = this->GetClassLabel(x);
 			float gt = 0;
-			this->lossFunc->GetGradient(label, &predict, &gt);
+			this->lossFunc->GetGradient(label, predict, &gt);
 
 			if (gt != 0){
 				this->UpdateWeightVec(x, *this->pWeightVecBC, gt);
@@ -121,7 +121,7 @@ namespace BOC {
 				}
 			}
 
-			if (this->IsCorrect(label, &predict) == false){
+			if (this->IsCorrect(label, predict) == false){
 				return -label;
 			}
 			else{
@@ -136,7 +136,7 @@ namespace BOC {
 		 *
 		 * @Returns  predicted class of the current example
 		 */
-		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float& predict){
+		virtual int IterateMC(const DataPoint<FeatType, LabelType> &x, float* predict){
 			this->curIterNum++;
 			for (int k = 0; k < this->classfier_num; ++k){
 				this->mc_predicts[k] = this->TrainPredict(this->weightMatrix[k], x);

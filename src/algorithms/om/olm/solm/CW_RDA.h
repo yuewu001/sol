@@ -26,8 +26,8 @@ namespace BOC {
 		float gravity;
 
 	public:
-		CW_RDA(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		CW_RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "CW-RDA";
 			this->r = 0;
 			this->u_t.resize(this->weightDim);

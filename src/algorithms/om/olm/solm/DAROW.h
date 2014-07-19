@@ -28,8 +28,8 @@ namespace BOC {
 		s_array<size_t> timeStamp;
 
 	public:
-		DAROW(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		DAROW(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "DAROW";
 			this->r = 0;
 			this->sigma_w.resize(this->weightDim);

@@ -31,8 +31,8 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		RDA(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc) {
+		RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) {
 			this->modelName = "RDA";
 			this->gamma_rou = 0;
 			this->gtVec.resize(this->weightDim);

@@ -34,8 +34,8 @@ namespace BOC {
 		 * @Synopsis Constructors
 		 */
 	public:
-		Ada_FOBOS(LossFunction<FeatType, LabelType> *lossFunc) :
-			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc){
+		Ada_FOBOS(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "Ada-FOBOS";
 			this->delta = 0;
 			this->timeStamp.resize(this->weightDim);

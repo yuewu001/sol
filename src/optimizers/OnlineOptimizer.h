@@ -16,10 +16,12 @@
 namespace BOC {
 	template <typename FeatType, typename LabelType>
 	class OnlineOptimizer : public Optimizer < FeatType, LabelType > {
+
 		//dynamic bindings
 		DECLARE_CLASS
+
 		OnlineModel<FeatType, LabelType> *p_onlineModel;
-		int (OnlineModel<FeatType, LabelType>::*pIterateDelegate)(const DataPoint<FeatType, LabelType> &x, float& predict);
+		int (OnlineModel<FeatType, LabelType>::*pIterateDelegate)(const DataPoint<FeatType, LabelType> &x, float* predict);
 
 	protected:
 		typedef typename Optimizer<FeatType, LabelType>::PointType PointType;
@@ -61,7 +63,8 @@ namespace BOC {
 			printf("\nIterations:\n");
 			printf("\nIterate No.\t\tError Rate\t\t\n");
 
-			float predictVal = 0;
+			int classNum = this->learnModel->GetClassfierNum();
+			float* predictVal = new float[classNum];
 			int predictLabel = 0;
 
 
@@ -83,7 +86,12 @@ namespace BOC {
 					//loss
 					if (predictLabel != data.label){
 						errorNum++;
-						data.margin = predictVal * data.label;
+						if (classNum == 1){
+							data.margin = *predictVal * data.label;
+						}
+						else{
+							data.margin = predictVal[predictLabel];
+						}
 					}
 
 					data_count++;
@@ -99,10 +107,13 @@ namespace BOC {
 				this->dataSet->FinishRead();
 			}
 			p_onlineModel->EndTrain();
+
+			delete[]predictVal;
 			//cout<<"Purely Training Time: "<<train_time<<" s"<<endl;
 			return errorNum / this->update_times;
 		}
-		inline int IterateDelegate(const DataPoint<FeatType, LabelType> &x, float& predict){
+
+		inline int IterateDelegate(const DataPoint<FeatType, LabelType> &x, float* predict){
 			return (this->p_onlineModel->*pIterateDelegate)(x, predict);
 		}
 	};

@@ -117,9 +117,9 @@ namespace BOC {
 					exit(STATUS_INVALID_FILE);
 				}
 
-				data.features.resize(featNum);
+				data.features.resize((size_t)featNum);
 				if (io_handler.read_data((char*)(data.features.begin),
-					sizeof(float)* featNum) == false){
+					sizeof(float)* size_t(featNum)) == false){
 					fprintf(stderr, "load features failed!\n");
 					exit(STATUS_INVALID_FILE);
 				}
