@@ -6,6 +6,7 @@
 #include "SquareLoss.h"
 #include "SquaredHingeLoss.h"
 #include "MaxScoreHingeLoss.h"
+#include "MaxScoreSquaredHingeLoss.h"
 
 namespace BOC{
 	template <typename FeatType, typename LabelType>
@@ -18,6 +19,7 @@ namespace BOC{
 			APPEND_INFO(info, SquareLoss, FeatType, LabelType);
 			APPEND_INFO(info, SquaredHingeLoss, FeatType, LabelType);
 			APPEND_INFO(info, MaxScoreHingeLoss, FeatType, LabelType);
+			APPEND_INFO(info, MaxScoreSquaredHingeLoss, FeatType, LabelType);
 		}
 	};
 }
