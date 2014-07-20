@@ -25,7 +25,7 @@ namespace BOC {
 			*loss *= *loss;
 		}
 
-		virtual  void GetGradient(LabelType label, float* predict, float* gradient, int len) {
+		virtual  void GetGradient(LabelType label, float* predict, float* gradient, float* classifier_weight,  int len) {
 			float loss = max(0.0f, 1.f - *predict * label);
 			if (loss > 0){
 				*gradient = -label * loss * 2.f;
@@ -37,7 +37,7 @@ namespace BOC {
 	};
 
 	//for dynamic binding
-	IMPLEMENT_LOSS_CLASS(SquaredHingeLoss, squareHinge)
+	IMPLEMENT_LOSS_CLASS(SquaredHingeLoss, SquaredHinge)
 }
 
 #endif

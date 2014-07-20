@@ -26,35 +26,44 @@ namespace BOC {
 	public:
 		virtual  void GetLoss(LabelType label, float* predict, float* loss, int len) {
 			float tempLoss = -(std::numeric_limits<float>::max)();
-            for (int i = 0; i < len; ++i){
-                if (i == label)
-                    continue;
-                if (tempLoss < predict[i]){
-                    tempLoss = predict[i];
-                }
-            }
-            *loss = max(0.0f, 1.f - predict[label] + tempLoss);
+			for (int i = 0; i < len; ++i){
+				if (i == label)
+					continue;
+				if (tempLoss < predict[i]){
+					tempLoss = predict[i];
+				}
+			}
+			*loss = max(0.0f, 1.f - predict[label] + tempLoss);
 		}
 
-        virtual  void GetGradient(LabelType label, float *predict, float* gradient, int len) {
-            float loss = 0;
-            this->GetLoss(label, predict, &loss, len);
-            if (loss > 0){
-                for (int i = 0; i < len; ++i){
-                    gradient[i]  = 1;
-                }
-                gradient[label] = -1;
-            }
-            else{
-                for (int i = 0; i < len; ++i){
-                    gradient[i] = 0;
-                }
-            }
-        }
+		virtual  void GetGradient(LabelType label, float *predict, float* gradient, float* classifier_weight, int len) {
+			float tempLoss = -(std::numeric_limits<float>::max)();
+			int tempLossId = -1;
+			for (int i = 0; i < len; ++i){
+				if (i == label)
+					continue;
+				if (tempLoss < predict[i]){
+					tempLoss = predict[i];
+					tempLossId = i;
+				}
+			}
+			float loss = max(0.0f, 1.f - predict[label] + tempLoss);
+
+			for (int i = 0; i < len; ++i){
+				gradient[i] = 0;
+				classifier_weight[i] = 0;
+			}
+			if (loss > 0){
+				gradient[tempLossId] = 1;
+				gradient[label] = -1;
+				classifier_weight[tempLossId] = 1;
+				classifier_weight[label] = 1;
+			}
+		}
 	};
 
 	//for dynamic binding
-    IMPLEMENT_LOSS_CLASS(MaxScoreHingeLoss, maxscorehinge)
+    IMPLEMENT_LOSS_CLASS(MaxScoreHingeLoss, MaxScoreHinge)
 }
 
 

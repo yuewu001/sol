@@ -25,7 +25,7 @@ namespace BOC {
 			*loss = max(0.0f, 1.f - *predict * label);
 		}
 
-		virtual  void GetGradient(LabelType label, float *predict, float* gradient, int len) {
+		virtual  void GetGradient(LabelType label, float *predict, float* gradient, float* classifier_weight, int len) {
 			float loss = 0;
 			this->GetLoss(label, predict, &loss, len);
 			if (loss > 0){
@@ -38,7 +38,7 @@ namespace BOC {
 	};
 
 	//for dynamic binding
-	IMPLEMENT_LOSS_CLASS(HingeLoss, hinge)
+	IMPLEMENT_LOSS_CLASS(HingeLoss, Hinge)
 }
 
 #endif

@@ -67,14 +67,18 @@ namespace BOC {
 			INVALID_ARGUMENT_EXCEPTION(class_num, class_num > 1, "no smaller than 2");
 
             //check if the loss function is approariate
-			if (this->classfier_num == 1){
-				if (this->lossFunc->GetLossType() != BC_LOSS_TYPE){
-					throw invalid_argument("type of loss function (mc) is not consistent with the task (bc)");
+			if (this->lossFunc != NULL){
+				if (this->classfier_num == 1){
+					if (this->lossFunc->GetLossType() != BC_LOSS_TYPE){
+						std::string errMsg = "type of loss function (mc) is not consistent with the task (bc)";
+						throw invalid_argument(errMsg);
+					}
 				}
-			}
-			else{
-				if (this->lossFunc->GetLossType() != MC_LOSS_TYPE){
-					throw invalid_argument("type of loss function (bc) is not consistent with the task (mc)");
+				else{
+					if (this->lossFunc->GetLossType() != MC_LOSS_TYPE){
+						std::string errMsg = "type of loss function (bc) is not consistent with the task (mc)";
+						throw invalid_argument(errMsg);
+					}
 				}
 			}
 		}

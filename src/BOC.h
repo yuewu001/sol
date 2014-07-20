@@ -110,7 +110,6 @@ namespace BOC{
 	protected:
 		inline int InitLoss(Params &param){
 			string loss_type = param.StringValue("-loss");
-			ToLowerCase(loss_type);
 			this->pLossFunc = (LossFunction<FeatType, LabelType>*)
 				Registry::CreateObject(loss_type);
 			if (this->pLossFunc == NULL) {
@@ -160,7 +159,18 @@ namespace BOC{
 		inline int InitModel(Params &param){
 			//check model type
 			string model = param.StringValue("-m");
-			this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc, (void*)(param.IntValue("-cn")));
+			try{
+				this->pModel = (LearnModel<FeatType, LabelType>*)Registry::CreateObject(model, this->pLossFunc, (void*)(param.IntValue("-cn")));
+			}
+			catch (invalid_argument &ex){
+				fprintf(stderr, "%s\n", ex.what());
+				return STATUS_INVALID_ARGUMENT;
+			}
+			catch (...){
+				fprintf(stderr, "Error %d: init online model failed! (%s)\n", STATUS_INIT_FAIL, model.c_str());
+				return STATUS_INIT_FAIL;
+			}
+
 			if (this->pModel == NULL){
 				fprintf(stderr, "Error %d: init online model failed! (%s)\n", STATUS_INIT_FAIL, model.c_str());
 				return STATUS_INIT_FAIL;

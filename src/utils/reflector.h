@@ -67,26 +67,13 @@ namespace BOC{
 				return ((ClassInfo*)(iter->second))->CreateObject(param1, param2, param3);
 			}
 			else{
-                std::fprintf(stderr, "Error: unrecognized class name %s!\n", name.c_str());
+				std::fprintf(stderr, "Error: unrecognized class name %s!\n", name.c_str());
 			}
 			return NULL;
 		}
 
-		static const std::string& GetName(const std::string& name) {
-			std::map<std::string, ClassInfo* >::iterator iter = mapClassInfo.find(name);
-			if (iter != mapClassInfo.end()){
-				return ((ClassInfo*)(iter->second))->GetType();
-			}
-			return invalid_string;
-		}
-
-		static const std::string& GetDescr(const std::string& name) {
-			std::map<std::string, ClassInfo* >::iterator iter = mapClassInfo.find(name);
-			if (iter != mapClassInfo.end()){
-				return ((ClassInfo*)(iter->second))->GetDescr();
-			}
-			return invalid_string;
-		}
+		virtual const std::string& GetType() const = 0;
+		virtual const std::string& GetDescription() const = 0;
 	};
 
 	std::string Registry::invalid_string;
@@ -100,7 +87,9 @@ protected: \
 	static ClassInfo classInfo; \
 public:\
 	static void* CreateObject(void *param1, void* param2, void* param3); \
-	static ClassInfo& GetClassMsg() { return classInfo; }
+	static ClassInfo& GetClassMsg() { return classInfo; } \
+    virtual const string& GetType() const { return classInfo.GetType();} \
+    const string& GetDescription() const { return classInfo.GetDescr();}
 
 
 #define APPEND_INFO(info,name,T1,T2) \

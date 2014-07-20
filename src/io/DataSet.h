@@ -11,8 +11,6 @@
 #include "DataPoint.h"
 #include "DataChunk.h"
 
-#include "../utils/reflector.h"
-
 #include <string>
 
 /**
@@ -22,7 +20,7 @@ namespace BOC {
 
 	//data set, can work in both read-and-write mode and read-once mode
 	template <typename FeatType, typename LabelType>
-	class DataSet : public Registry {
+	class DataSet {
 	protected:
 		std::string filename;
 		std::string cache_filename;

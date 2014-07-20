@@ -36,33 +36,34 @@ namespace BOC {
             (*loss) *= (*loss);
         }
 
-        virtual  void GetGradient(LabelType label, float *predict, float* gradient, int len) {
+        virtual  void GetGradient(LabelType label, float *predict, float* gradient, float* classifier_weight, int len) {
             float tempLoss = -(std::numeric_limits<float>::max)();
+			int tempLossId = -1;
             for (int i = 0; i < len; ++i){
                 if (i == label)
                     continue;
                 if (tempLoss < predict[i]){
                     tempLoss = predict[i];
+					tempLossId = i;
                 }
             }
             tempLoss = max(0.0f, 1.f - predict[label] + tempLoss);
 
-            if (tempLoss > 0){
-                for (int i = 0; i < len; ++i){
-                    gradient[i]  = 2.f * tempLoss;
-                }
-                gradient[label] = -2.f * tempLoss;
-            }
-            else{
-                for (int i = 0; i < len; ++i){
-                    gradient[i] = 0;
-                }
-            }
+			for (int i = 0; i < len; ++i){
+				gradient[i] = 0;
+				classifier_weight[i] = 0;
+			}
+			if (tempLoss > 0){
+				gradient[tempLossId] = 2.f * tempLoss;
+				gradient[label] = -2.f * tempLoss;
+				classifier_weight[tempLossId] = 1;
+				classifier_weight[label] = 1;
+			}
         }
 	};
 
 	//for dynamic binding
-    IMPLEMENT_LOSS_CLASS(MaxScoreSquaredHingeLoss, maxscoresquaredhinge)
+    IMPLEMENT_LOSS_CLASS(MaxScoreSquaredHingeLoss, MaxScoreSquaredHinge)
 }
 
 

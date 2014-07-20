@@ -12,7 +12,7 @@
 
 namespace BOC {
 
-#define IMPLEMENT_LOSS_CLASS(className,name) \
+#define IMPLEMENT_LOSS_CLASS(className, name) \
 	template <typename FeatType, typename LabelType> \
 	ClassInfo className<FeatType, LabelType>::classInfo(#name, "", className<FeatType, LabelType>::CreateObject); \
 	\
@@ -49,7 +49,7 @@ namespace BOC {
 
 	public:
 		virtual void GetLoss(LabelType label, float* predict, float* loss, int len = 1) = 0;
-		virtual void GetGradient(LabelType label, float* predict, float* gradient, int len = 1) = 0;
+		virtual void GetGradient(LabelType label, float* predict, float* gradient, float* classifier_weight = NULL, int len = 1) = 0;
 
 	public:
 		virtual ~LossFunction(){}

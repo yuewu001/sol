@@ -6,21 +6,25 @@
 #include "SquareLoss.h"
 #include "SquaredHingeLoss.h"
 #include "MaxScoreHingeLoss.h"
+#include "UniformHingeLoss.h"
 #include "MaxScoreSquaredHingeLoss.h"
+#include "UniformSquaredHingeLoss.h"
 
 namespace BOC{
 	template <typename FeatType, typename LabelType>
 	class LossInfo{
 	public:
-		static void GetLossInfo(std::string & info){
-			info.append("\nLoss Functions:");
-			APPEND_INFO(info, HingeLoss, FeatType, LabelType);
-			APPEND_INFO(info, LogisticLoss, FeatType, LabelType);
-			APPEND_INFO(info, SquareLoss, FeatType, LabelType);
-			APPEND_INFO(info, SquaredHingeLoss, FeatType, LabelType);
-			APPEND_INFO(info, MaxScoreHingeLoss, FeatType, LabelType);
-			APPEND_INFO(info, MaxScoreSquaredHingeLoss, FeatType, LabelType);
-		}
-	};
+        static void GetLossInfo(std::string & info) {
+            info.append("\nLoss Functions:");
+            APPEND_INFO(info, HingeLoss, FeatType, LabelType);
+            APPEND_INFO(info, LogisticLoss, FeatType, LabelType);
+            APPEND_INFO(info, SquareLoss, FeatType, LabelType);
+            APPEND_INFO(info, SquaredHingeLoss, FeatType, LabelType);
+            APPEND_INFO(info, MaxScoreHingeLoss, FeatType, LabelType);
+            APPEND_INFO(info, UniformHingeLoss, FeatType, LabelType);
+            APPEND_INFO(info, MaxScoreSquaredHingeLoss, FeatType, LabelType);
+            APPEND_INFO(info, UniformSquaredHingeLoss, FeatType, LabelType);
+        }
+    };
 }
 #endif

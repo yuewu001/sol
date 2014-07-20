@@ -28,7 +28,9 @@ namespace BOC {
 		//weight vector used for bc
 		s_array<float> *pWeightVecBC;
 		//gradients for multi-class
-		vector<float> mc_gradients;
+		s_array<float> mc_gradients;
+        //weight of classifier, used to denote the weights of each classifer during iteration
+		s_array<float> classifier_weight;
 
 		//weight dimension: can be the same to feature, or with an extra bias
 		IndexType weightDim;
@@ -51,6 +53,8 @@ namespace BOC {
 			else{
 				this->mc_gradients.resize(this->classfier_num);
 			}
+
+			this->classifier_weight.resize(this->classfier_num);
 		}
 
 		virtual ~OnlineLinearModel() {
@@ -244,6 +248,7 @@ namespace BOC {
 			for (int i = 0; i < this->classfier_num; ++i){
 				this->weightMatrix[i].set_value(0);
 			}
+			this->classifier_weight.set_value(1.f);
 		}
 
 		/**
@@ -321,11 +326,11 @@ namespace BOC {
 				predict[k] = this->TrainPredict(this->weightMatrix[k], x);
 			}
 
-			this->lossFunc->GetGradient(x.label, predict, &(this->mc_gradients[0]), this->classfier_num);
+			this->lossFunc->GetGradient(x.label, predict, this->mc_gradients.begin, this->classifier_weight.begin, this->classfier_num);
 
 			//not correct
 			if (this->mc_gradients[x.label] != 0){
-				this->UpdateWeightVec(x, &(this->mc_gradients[0]));
+				this->UpdateWeightVec(x, this->mc_gradients.begin);
 				return (std::max_element(predict, predict + this->classfier_num) - predict);
 			}
 			return x.label;

@@ -30,12 +30,12 @@ namespace BOC {
 			*loss = (*predict - label) * (*predict - label);
 		}
 
-		virtual void GetGradient(LabelType label, float* predict, float* gradient, int len) {
+		virtual void GetGradient(LabelType label, float* predict, float* gradient, float* classifier_weight, int len) {
 			*gradient = 2 * (*predict - label);
 		}
 	};
 	//for dynamic binding
-	IMPLEMENT_LOSS_CLASS(SquareLoss, square)
+	IMPLEMENT_LOSS_CLASS(SquareLoss, Square)
 }
 
 #endif 

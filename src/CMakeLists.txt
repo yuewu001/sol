@@ -52,6 +52,9 @@ set (loss_files
     src/loss/SquaredHingeLoss.h
     src/loss/SquareLoss.h
     src/loss/MaxScoreHingeLoss.h
+    src/loss/UniformHingeLoss.h
+    src/loss/MaxScoreSquaredHingeLoss.h
+    src/loss/UniformSquaredHingeLoss.h
     PARENT_SCOPE
     )
 

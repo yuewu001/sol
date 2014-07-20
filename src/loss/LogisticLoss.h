@@ -34,7 +34,7 @@ namespace BOC {
 		}
 
 		//aggressive learning 
-		virtual void GetGradient(LabelType label, float* predict, float* gradient, int len) {
+		virtual void GetGradient(LabelType label, float* predict, float* gradient, float* classifier_weight, int len) {
 			float tmp = *predict * label;
 			//to reject numeric problems
 			if (tmp > 100.f) {
@@ -49,7 +49,7 @@ namespace BOC {
 		}
 	};
 	//for dynamic binding
-	IMPLEMENT_LOSS_CLASS(LogisticLoss, logistic)
+	IMPLEMENT_LOSS_CLASS(LogisticLoss, Logistic)
 }
 
 #endif
