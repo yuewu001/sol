@@ -8,7 +8,7 @@
 #ifndef HEADER_LEARN_MODEL
 #define HEADER_LEARN_MODEL
 
-#include "../loss/LossFunction.h"
+#include "../loss/loss_header.h"
 #include "../utils/config.h"
 #include "../utils/util.h"
 #include "../utils/reflector.h"
@@ -35,7 +35,7 @@ namespace BOC {
 	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
-	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc, int(param2)); }
+	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc, *(int*)(&param2)); }
 
 #pragma endregion Macros for Reflector 
 

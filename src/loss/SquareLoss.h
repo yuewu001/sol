@@ -22,10 +22,6 @@ namespace BOC {
 
 
 	public:
-		virtual bool IsCorrect(LabelType label, float* predict, int len){
-			return Sign(*predict) == label ? true : false;
-		}
-
 		virtual void GetLoss(LabelType label, float* predict, float* loss, int len) {
 			*loss = (*predict - label) * (*predict - label);
 		}
