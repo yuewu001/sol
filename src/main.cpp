@@ -34,6 +34,12 @@ int main(int argc, const char** args) {
 	}
 
 	libBoc.ShowHelpInfo(param);
+
+    //exit if no input is specified!
+	if (param.StringValue("-i").length() == 0 && param.StringValue("-c").length() == 0){
+		return 0;
+	}
+
 	int errCode = libBoc.Initialize(param);
 	if ( errCode != 0){
 		fprintf(stderr, "Initialization failed, error code %d\n", errCode);

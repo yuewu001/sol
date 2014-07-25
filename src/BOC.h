@@ -97,7 +97,7 @@ namespace BOC{
 			printf("Models:\n%s\n", modelInfo.c_str());
 		}
 		inline void ShowLossInfo() const {
-			printf("Loss Functions:\n%s\n", lossInfo.c_str());
+			printf("%s\n", lossInfo.c_str());
 		}
 
 		inline void ShowOptimizers() const{

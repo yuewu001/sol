@@ -59,7 +59,7 @@ namespace BOC {
 	static const float init_ofs_delta = 0.01f;
 	static const float init_ofs_eta = 0.2f;
 
-	static const char* const init_loss_type = "hinge";
+	static const char* const init_loss_type = "Hinge";
 	static const char* const init_data_format = "libsvm";
 	static const char* const init_algo_method = "SGD";
 	static const char* const init_data_reader_type = "online"; //init data reader type
