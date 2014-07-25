@@ -10,6 +10,8 @@
 #include "../utils/Params.h"
 
 #include <string>
+#include <map>
+
 using namespace std;
 using namespace BOC;
 
@@ -24,10 +26,10 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
     size_t show_count = 1000;
     size_t dataNum = 0;
     size_t featNum = 0;
-    size_t pos_num = 0;
-    size_t neg_num = 0;
     IndexType max_index = 0;
     s_array<char> index_set;
+	map<int, size_t> map_class_sample_num;
+
     DataPoint<FeatType, LabelType> data;
     if (reader->OpenReading() == true) {
         reader->Rewind();
@@ -51,14 +53,14 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
                 }
 
                 dataNum++;
-                if (data.label == 1)
-                    pos_num++;
-                else if (data.label == -1)
-                    neg_num++;
-                else{
-                    cerr<<"\nunrecognized label!"<<endl;
-                    break;
-                }
+
+				int label = data.label;
+				if (map_class_sample_num.find(label) != map_class_sample_num.end()){
+					map_class_sample_num[label] += 1;
+				}
+				else{
+					map_class_sample_num[label] = 1;
+				}
 
                 featNum += data.indexes.size();
 
@@ -85,17 +87,30 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
         if (index_set[i] == 1)
             valid_dim++;
     }
-    cout<<"data number  : "<<dataNum<<"\n";
-    cout<<"feat number  : "<<featNum<<"\n";
-    cout<<"valid dim    : "<<max_index<<"\n";
-    cout<<"nonzero feat : "<<valid_dim<<"\n";
-    cout<<"positive num	: "<<pos_num<<"\n";
-    cout<<"negtive num	: "<<neg_num<<"\n";
-    if (max_index > 0){
-        printf("data sparsity: %.2lf%%\n",100 - valid_dim * 100.0 / max_index);
-    }
+	cout << "data number  : " << dataNum << "\n";
+	cout << "feat number  : " << featNum << "\n";
+	cout << "dimension    : " << max_index << "\n";
+	cout << "nonzero feat : " << valid_dim << "\n";
+	cout << "class num    : " << map_class_sample_num.size() << "\n";
+	if (map_class_sample_num.size() == 2){
+		if (map_class_sample_num.find(1) != map_class_sample_num.end()) {
+			int pos_num = map_class_sample_num[1];
+			cout << "positive num	: " << pos_num << "\n";
+		}
+		if (map_class_sample_num.find(0) != map_class_sample_num.end()) {
+			int neg_num = map_class_sample_num[0];
+			cout << "negtive num	: " << neg_num << "\n";
+		}
+		else if (map_class_sample_num.find(-1) != map_class_sample_num.end()) {
+			int neg_num = map_class_sample_num[-1];
+			cout << "negtive num	: " << neg_num << "\n";
+		}
+	}
+	if (max_index > 0){
+		printf("data sparsity: %.2lf%%\n", 100 - valid_dim * 100.0 / max_index);
+	}
 
-    return true;
+	return true;
 }
 
 void InitParms(Params& param){
@@ -110,28 +125,28 @@ void InitParms(Params& param){
 	param.add_option("", 1, 1, "input dataset type", "-st", " ");
 }
 
-int main(int argc, const char** args){ 
+int main(int argc, const char** args){
 
-    //check memory leak in VC++
+	//check memory leak in VC++
 #if defined(_MSC_VER) && defined(_DEBUG)
-    int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
-    tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
-    _CrtSetDbgFlag( tmpFlag );
+	int tmpFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+	_CrtSetDbgFlag(tmpFlag);
 #endif
 	std::string ioInfo;
-	IOInfo<float,char>::GetIOInfo(ioInfo);
+	IOInfo<float, char>::GetIOInfo(ioInfo);
 
-    Params param;
-    InitParms(param);
-	if (param.Parse(argc, args) == false){ 
+	Params param;
+	InitParms(param);
+	if (param.Parse(argc, args) == false){
 		return -1;
 	}
 
-    string filename = param.StringValue("-i");
+	string filename = param.StringValue("-i");
 	string src_type = param.StringValue("-st");
-    //string filename = "/home/matthew/work/Data/aut/aut_train";
-    DataReader<float, char> *reader = (DataReader<float, char>*)Registry::CreateObject(src_type, &filename);
-    if (Analyze(reader) == false)
-        cerr<<"analyze dataset failed!"<<endl;
-    return 0;
+	//string filename = "/home/matthew/work/Data/aut/aut_train";
+	DataReader<float, char> *reader = (DataReader<float, char>*)Registry::CreateObject(src_type, &filename);
+	if (Analyze(reader) == false)
+		cerr << "analyze dataset failed!" << endl;
+	return 0;
 }

@@ -48,17 +48,20 @@ namespace BOC {
 		virtual void PrintModelInfo() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
 
-			IndexType zeroNum = 0;
+			IndexType nonZeroNum = this->GetNonZeroNum();
+			printf("Number of NonZero weight: %u\n", nonZeroNum);
+
+			double sparseRate = 0;
 			if (this->weightDim == 1){
-				zeroNum = 1;
+				sparseRate = 0;
 			}
 			else{
-				zeroNum = this->weightDim - 1 - this->GetNonZeroNum();
+				sparseRate = (this->weightDim - 1 - nonZeroNum) / (double)(this->weightDim - 1);
 			}
 
-			double sparseRate = zeroNum / (double)(this->weightDim - 1);
 			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 		}
+
 #pragma endregion Constructors and Basic Functions
 
 #pragma region  IO related

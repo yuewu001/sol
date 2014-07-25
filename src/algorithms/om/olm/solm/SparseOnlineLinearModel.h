@@ -53,7 +53,7 @@ namespace BOC {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
 
 			IndexType nonZeroNum = this->GetNonZeroNum();
-			printf("Non-Zero weight number: %u\n", nonZeroNum);
+			printf("Number of NonZero weight: %u\n", nonZeroNum);
 
 			double sparseRate = 0;
 			if (this->weightDim == 1){

@@ -251,8 +251,8 @@ namespace BOC{
 
 			double time2 = get_current_time();
 			printf("\nData number: %lu\n", this->pDataset->size());
-			printf("Learn error rate: %.2f %%\n", l_errRate * 100);
-			printf("Learning time: %.3f s\n", (float)(time2 - time1));
+			printf("Training error rate: %.2f %%\n", l_errRate * 100);
+			printf("Training time: %.3f s\n", (float)(time2 - time1));
 			this->pModel->PrintModelInfo();
 
 			//test
