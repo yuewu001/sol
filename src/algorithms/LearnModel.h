@@ -35,7 +35,8 @@ namespace BOC {
 	\
 	template <typename FeatType, typename LabelType> \
 	void* name<FeatType, LabelType>::CreateObject(void *lossFunc, void* param2, void* param3) \
-	    { return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc, *(int*)(&param2)); }
+	    {  int classNum = *(int*)(&param2); \
+	return new name<FeatType, LabelType>((LossFunction<FeatType, LabelType>*)lossFunc, classNum); }
 
 #pragma endregion Macros for Reflector 
 
@@ -46,7 +47,7 @@ namespace BOC {
 	protected:
 		//number of classes
 		int class_num;
-        //number of weight vectors
+		//number of weight vectors
 		int classfier_num;
 		//name of the model
 		std::string modelName;
@@ -61,12 +62,12 @@ namespace BOC {
 
 #pragma region Constructors and Basic Functions
 	public:
-		LearnModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum):
+		LearnModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			lossFunc(lossFunc), class_num(classNum){
 			this->classfier_num = this->class_num == 2 ? 1 : this->class_num;
 			INVALID_ARGUMENT_EXCEPTION(class_num, class_num > 1, "no smaller than 2");
 
-            //check if the loss function is approariate
+			//check if the loss function is approariate
 			if (this->lossFunc != NULL){
 				if (this->classfier_num == 1){
 					if (this->lossFunc->GetLossType() != BC_LOSS_TYPE){

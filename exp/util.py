@@ -2,15 +2,24 @@
 
 import platform
 import re
+import os
 
 #get platform
 def get_platform():
     return platform.system()
 
+def get_train_cmd(train_file, test_file, is_cache):
+    cmd = ' -i \"{0}\" -t \"{1}\" '.format(train_file, test_file)
+    if is_cache == True:
+        cmd += ' -c \"{0}\" -tc \"{1}\" '.format(train_file + '_cache', test_file + '_cache')
+
+    cmd = cmd.replace('/',os.sep)
+    return cmd
+
 #definition of the result of training results
 class ResultItem(object):
     __slots__ = ('train_error', 'test_error','train_time','test_time',
-            'non_zero_num', 'sparse_rate','train_iter_error_list')
+            'non_zero_num', 'sparse_rate')
 
     def __init__(self):
         for name in ResultItem.__slots__:
@@ -58,6 +67,12 @@ class ResultItem(object):
                 val = [val[i] / divider for i in range(0,len(val))]
                 self.__setattr__(name,val)
 
+    #add a value to the give attribute
+    def append_value(self, name, val):
+        val_list = self.__getattribute__(name)
+        val_list.append(val)
+        self.__setattr__(name,val_list)
+
     #parse the ofs training result 
     #@param input_file: file contains the training result
     def parse_ofs_result(self, input_file):
@@ -93,6 +108,19 @@ class ResultItem(object):
         else:
             fh.close()
 
+    #get the result with different items in a group
+    def get_result(self):
+        item_num = len(self.GetValue('train_error'))
+        result = [ResultItem() for k in range(0,item_num)]
+
+        for name in ResultItem.__slots__:
+            val = self.__getattribute__(name)
+            if len(val) == 0:
+                continue
+            [result[k].append_value(name,val[k]) for k in range(0,item_num)]
+
+        return result
+
     #save the result to local disk
     def save_result(self, output_file):
         open(output_file,'w').close()
@@ -115,13 +143,58 @@ class ResultItem(object):
                     val = self.__getattribute__(name)
                     if len(val) == 0:
                         continue
-                    file_handler.write(str(val[k]) + ' ')
+                    file_handler.write('%.2f' %val[k] + ' ')
                 file_handler.write('\n')
         except IOError as e:
             print "I/O error ({0}): {1}".format(e.errno,e.strerror)
             sys.exit()
         else:
             file_handler.close()
+
+
+#run the cv-train-algorithm
+#@param train_file: training file
+#@param test_file: testing file
+#@param class_num: number of classes of the data
+#@param param_config: parameter configuration
+#@param model: model to train 
+#@param config: cnfiguration to train the model
+#@param output_file: output file to save the results
+def run(train_file, test_file, class_num, param_config, model, config, output_file):
+    #ofs executable
+    if get_platform() == 'Windows':
+        ofs_exe = r'..\install\bin\SOL.exe'
+    else:
+        ofs_exe = '../install/bin/SOL'
+
+    #evaluate the result
+    cmd_postfix = ' >> %s' %output_file
+
+    dt_cmd = get_train_cmd(train_file, test_file, config['cache'])
+    if class_num > 2:
+        if model == 'DAROW':
+            loss_cmd = ' -loss MaxScoreSquaredHinge '
+        else:
+            loss_cmd = ' -loss {0} '.format(config['mc_loss'])
+    else:
+        if model == 'DAROW':
+            loss_cmd = ' -loss SquaredHinge '
+        else:
+            loss_cmd = ' -loss {0} '.format(config['bc_loss'])
+
+    norm_cmd = ' -norm ' if config['norm'] == True else '' 
+
+    cmd_prefix  = ofs_exe + dt_cmd + loss_cmd + norm_cmd  + ' -m %s ' %model
+
+    cmd = cmd_prefix + param_config + cmd_postfix
+    print cmd
+    os.system(cmd)
+
+    #parse the result
+    result = ResultItem()
+    result.parse_ofs_result(output_file)
+
+    return result
 
 #test code
 #a = ResultItem()
@@ -133,3 +206,4 @@ class ResultItem(object):
 #a.Display()
 #
 #a.save_result('output.txt')
+

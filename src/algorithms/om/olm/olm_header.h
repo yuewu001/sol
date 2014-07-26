@@ -2,6 +2,8 @@
 #define HEADER_OL_MODEL_INFO
 
 #include "SGD.h"
+#include "DAROW.h"
+
 #include "solm/solm_header.h"
 #include "ofs/ofs_header.h"
 
@@ -20,6 +22,7 @@ namespace BOC{
 		static void GetModelInfo(std::string & info){
 			info.append("\nOnline Learning Algorithms:");
 			APPEND_INFO(info,SGD,FeatType, LabelType);
+			APPEND_INFO(info,DAROW,FeatType, LabelType);
 
             SOLModelInfo<FeatType,LabelType>::GetModelInfo(info);
             OFSModelInfo<FeatType, LabelType>::GetModelInfo(info);

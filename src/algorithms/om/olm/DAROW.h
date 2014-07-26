@@ -1,54 +1,44 @@
 /*************************************************************************
-> File Name: Sparse Diagonal AROW
-> Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
-> Created Time: 2013/8/18 Sunday 17:25:54
-> Functions: second order online feature selection
-************************************************************************/
+  > File Name: Diagonal AROW
+  > Copyright (C) 2013 Yue Wu<yuewu@outlook.com>
+  > Created Time: 2013/8/18 Sunday 17:25:54
+  > Functions: Diagonal Adaptive Regularization of Weight Vectors
+  > Reference:
+  Crammer, Koby, Alex Kulesza, and Mark Dredze. "Adaptive regularization
+  of weight vectors." Machine Learning (2009): 1-33.
+  ************************************************************************/
 
-#ifndef HEADER_SOFS
-#define HEADER_SOFS
+#ifndef HEADER_D_AROW
+#define HEADER_D_AROW
 
-#include "OnlineFeatureSelection.h"
-#include "../../../../utils/MaxHeap.h"
-
-#include <sstream>
+#include "OnlineLinearModel.h"
 
 /**
-*  namespace: Batch and Online Classification
-*/
+ *  namespace: Batch and Online Classification
+ */
 namespace BOC {
 	template <typename FeatType, typename LabelType>
-	class SOFS : public OnlineFeatureSelection < FeatType, LabelType > {
+	class DAROW : public OnlineLinearModel < FeatType, LabelType > {
 
 		DECLARE_CLASS
 
-#pragma region Class Members
 	protected:
 		float r;
 		vector<s_array<float> > sigmaWMatrix;
-		s_array<float> sigmaWSum;
-		MaxHeap<float> heap;
 
-        //accepted loss functions
+		//accepted loss functions
 		vector<string> bc_loss_funcs;
 		vector<string> mc_loss_funcs;
-
-#pragma endregion Class Members
-
-
-#pragma region Constructors and Basic Functions
 	public:
-		SOFS(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
-			OnlineFeatureSelection<FeatType, LabelType>(lossFunc, classNum) {
-			this->modelName = "SOFS";
+		DAROW(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
+			OnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
+			this->modelName = "DAROW";
 			this->r = 0;
 
 			this->sigmaWMatrix.resize(this->classfier_num);
 			for (int k = 0; k < this->classfier_num; ++k){
 				this->sigmaWMatrix[k].resize(this->weightDim);
 			}
-
-			this->sigmaWSum.resize(this->weightDim);
 
 			this->bc_loss_funcs.push_back(SquaredHingeLoss<FeatType, LabelType>::GetClassMsg().GetType());
 			this->mc_loss_funcs.push_back(MaxScoreSquaredHingeLoss<FeatType, LabelType>::GetClassMsg().GetType());
@@ -78,7 +68,7 @@ namespace BOC {
 			}
 		}
 
-		virtual ~SOFS(){
+		virtual ~DAROW(){
 		}
 
 		/**
@@ -89,21 +79,17 @@ namespace BOC {
 		 * PrintModelSettings print the info of optimization algorithm
 		 */
 		virtual void PrintModelSettings() const {
-			OnlineFeatureSelection<FeatType, LabelType>::PrintModelSettings();
+			OnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
 			printf("\tr:\t%g\n", this->r);
 		}
 
-#pragma region Constructors and Basic Functions
-
-#pragma region Train Related
-	public:
 		/**
 		 * @Synopsis SetParameter set parameters for the learning model
 		 *
 		 * @Param param
 		 */
-		virtual void SetParameter(BOC::Params &param) {
-			OnlineFeatureSelection<FeatType, LabelType>::SetParameter(param);
+		virtual void SetParameter(BOC::Params &param){
+			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
 			this->r = param.FloatValue("-r");
 			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
 		}
@@ -112,19 +98,11 @@ namespace BOC {
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
-			OnlineFeatureSelection<FeatType, LabelType>::BeginTrain();
-
-			if (this->weightDim < this->K + 1){
-				this->UpdateModelDimention(this->K); //remove the bais term
-			}
+			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			for (int i = 0; i < this->classfier_num; ++i){
 				this->sigmaWMatrix[i].set_value(1);
 			}
-
-			this->sigmaWSum.set_value((float)(this->classfier_num));
-
-			heap.Init(this->weightDim - 1, this->K, this->sigmaWSum.begin + 1);
 		}
 
 		/**
@@ -146,14 +124,7 @@ namespace BOC {
 					sigma_w.set_value(sigma_w.begin + this->weightDim, sigma_w.end, 1);
 				}
 
-				this->sigmaWSum.reserve(new_dim + 1);
-				this->sigmaWSum.resize(new_dim + 1);  //reserve the 0-th
-				//set the rest to 1
-				this->sigmaWSum.set_value(this->sigmaWSum.begin + this->weightDim,
-					this->sigmaWSum.end, (float)this->classfier_num);
-				heap.UpdateDataNum(new_dim, this->sigmaWSum.begin + 1);
-
-				OnlineFeatureSelection<FeatType, LabelType>::UpdateModelDimention(new_dim);
+				OnlineLinearModel<FeatType, LabelType>::UpdateModelDimention(new_dim);
 			}
 		}
 
@@ -197,19 +168,13 @@ namespace BOC {
 				s_array<float>& sigma_w = this->sigmaWMatrix[k];
 				for (size_t i = 0; i < featDim; ++i){
 					index_i = x.indexes[i];
-					if (this->heap.is_topK(index_i - 1)){
-						//update u_t
-						weightVec[index_i] -= beta_t * sigma_w[index_i] * gt_t[k] * x.features[i];
-					}
-					else{
-						weightVec[index_i] = 0;
-					}
+					//update u_t
+					weightVec[index_i] -= beta_t * sigma_w[index_i] * gt_t[k] * x.features[i];
+
 
 					//update sigma_w
-					this->sigmaWSum[index_i] -= sigma_w[index_i];
 					sigma_w[index_i] *= this->r / (this->r +
 						sigma_w[index_i] * x.features[i] * x.features[i] * cw);
-					this->sigmaWSum[index_i] += sigma_w[index_i];
 				}
 
 				//bias term
@@ -217,17 +182,10 @@ namespace BOC {
 				//this->sigma_w[0] -= beta_t * this->sigma_w[0] * this->sigma_w[0];
 				sigma_w[0] *= this->r / (this->r + sigma_w[0] * cw);
 			}
-
-			//update the heap
-			for (size_t i = 0; i < featDim; i++){
-				IndexType ret_id;
-				this->heap.UpdateHeap(x.indexes[i] - 1, ret_id);
-			}
 		}
-#pragma endregion Train Related
-
 	};
 
-	IMPLEMENT_MODEL_CLASS(SOFS, "Second Order Online Feature Selection")
+	IMPLEMENT_MODEL_CLASS(DAROW, "Diagonal AROW")
 }
+
 #endif

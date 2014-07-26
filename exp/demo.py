@@ -24,10 +24,15 @@ ds_list = ['aut','a9a']
 ds_list = ['aut']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 1
+rand_num = 3
 #extra command sent to SOL
-model_config = {'cache':True,'norm':False,'bc_loss':'Hinge',
-'mc_loss':'MaxScoreHinge', 'rand_num':rand_num}
+model_config = {
+'cache':True,
+'norm':False,
+'bc_loss':'Hinge',
+'mc_loss':'MaxScoreHinge',
+'rand_num':rand_num
+}
 
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
@@ -68,12 +73,14 @@ def train_model(dataset):
             #clear the file if it already exists
             open(result_file,'w').close()
 
+            param_config = ''
             #get parameters
             if is_default_param == False:
-                pass
-            
-            result_once = run_ofs.run(dataset,model, model_config,result_file)
-            
+                param_config = dataset.get_best_param(model)
+
+            result_once = run_ofs.run(dataset,model, model_config,
+                    param_config, result_file)
+
             model_result_dict[model].Add(result_once)
 
     #average the result

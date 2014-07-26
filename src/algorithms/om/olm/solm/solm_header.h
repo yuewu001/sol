@@ -5,7 +5,6 @@
 #include "Ada_RDA.h"
 #include "CW_RDA.h"
 #include "CW_TG.h"
-#include "DAROW.h"
 #include "FOBOS.h"
 #include "RDA.h"
 #include "STG.h"
@@ -29,7 +28,6 @@ namespace BOC{
 			APPEND_INFO(info,Ada_RDA,FeatType, LabelType);
 			APPEND_INFO(info,CW_RDA,FeatType, LabelType);
 			APPEND_INFO(info,CW_TG,FeatType, LabelType);
-			APPEND_INFO(info,DAROW,FeatType, LabelType);
 			APPEND_INFO(info,FOBOS,FeatType, LabelType);
 			APPEND_INFO(info,RDA,FeatType, LabelType);
 			APPEND_INFO(info,STG,FeatType, LabelType);

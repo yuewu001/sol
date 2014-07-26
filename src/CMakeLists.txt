@@ -5,7 +5,6 @@ set (solm_files
     src/algorithms/om/olm/solm/Ada_RDA.h
     src/algorithms/om/olm/solm/CW_RDA.h
     src/algorithms/om/olm/solm/CW_TG.h
-    src/algorithms/om/olm/solm/DAROW.h
     src/algorithms/om/olm/solm/FOBOS.h
     src/algorithms/om/olm/solm/mRMR_OGD.h
     src/algorithms/om/olm/solm/RDA.h
@@ -28,6 +27,7 @@ set (olm_files
     src/algorithms/om/olm/olm_header.h
     src/algorithms/om/olm/OnlineLinearModel.h
     src/algorithms/om/olm/SGD.h
+    src/algorithms/om/olm/DAROW.h
     PARENT_SCOPE
     )
 

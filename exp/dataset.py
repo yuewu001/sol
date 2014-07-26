@@ -38,20 +38,23 @@ class DataSet(object):
         self.l0_list = [self.dim * 0.1 * x for x in range(1,10)]
 
     def __del__(self):
-        self.del_cache()
+        self.del_rand_file()
 
     #delete rand file and  the corresponding cache file
-    def del_cache(self):
+    def del_rand_file(self):
         rand_file = self.train_file + '_rand'
 
-        #only delete cache file when rand file exists
-        if os.path.exists(rand_file):
-            self.__del_file(rand_file)
+        self.del_file_and_cache(rand_file)
 
-            cache_file = self.train_file + '_cache'
-            self.__del_file(cache_file)
-            cache_file = self.test_file + '_cache'
-            self.__del_file(cache_file)
+
+    #delete rand file and  the corresponding cache file
+    def del_file_and_cache(self, filename):
+        self.__del_file(filename)
+        self.del_cache(filename)
+
+    def del_cache(self, filename):
+        cache_file = filename + '_cache'
+        self.__del_file(cache_file)
 
     def __del_file(self, filename):
         if os.path.exists(filename):
@@ -65,18 +68,34 @@ class DataSet(object):
     def set_fs_rate(self, fs_rate):
         self.l0_list = [self.dim * x for x in fs_rate]
 
+
     #get the training cmd in the format of '-i -t '
     def get_train_cmd(self, rand_num, is_cache = True):
         if rand_num > 1:
-            cmd = ' -i \"{0}_rand\" -t \"{1}\" '.format(self.train_file, self.test_file)
+            return util.get_train_cmd(self.train_file + '_rand',self.test_file, is_cache)
         else:
-            cmd = ' -i \"{0}\" -t \"{1}\" '.format(self.train_file, self.test_file)
+            return util.get_train_cmd(self.train_file,self.test_file, is_cache)
 
-        if is_cache == True:
-            cmd += ' -c \"{0}\" -tc \"{1}\" '.format(self.train_file + '_cache', self.test_file + 'cache')
+    def get_best_param(self, model):
+        cv_file = '{0}/cv/cv_{1}_result.txt'.format(self.name, model)
+        dec_pattern = "\d+\.?\d*"
+        pattern = re.compile(r'(?<=Best Result:).+(?=:)'.format(dec_pattern))
 
-        cmd = cmd.replace('/',os.sep)
-        return cmd
+        try:
+            cv_file = cv_file.replace('/',os.sep)
+            fh = open(cv_file,'r')
+            file_content = fh.readline()
+
+            result = pattern.findall (file_content)
+            if len(result) == 0:
+                raise 'cross validation file is incorrect!'
+
+        except IOError as e:
+            print 'Error {0}: {1}'.format(e.errno, e.strerror)
+        else:
+            fh.close()
+
+        return result[0]
 
     #analyze the dataset to obtain dim and class number
     def __analyze_dataset(self):
@@ -174,7 +193,7 @@ class DataSet(object):
     #shuffle a data file
     def shuffle_file(self):
         #delete previous cache (rand file and its cache file)
-        self.del_cache()
+        self.del_rand_file()
 
         in_filename = self.train_file
         out_filename = in_filename + '_rand'
@@ -208,9 +227,8 @@ class DataSet(object):
 dt_dict = {}
 
 aut = DataSet('aut')
-aut.set_fs_rate([0.1])
 dt_dict['aut'] = aut
 
-a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
+#a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
 #dt_dict['a9a'] = a9a
 
