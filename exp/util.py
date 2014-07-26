@@ -173,18 +173,20 @@ def run(train_file, test_file, class_num, param_config, model, config, output_fi
     dt_cmd = get_train_cmd(train_file, test_file, config['cache'])
     if class_num > 2:
         if model == 'DAROW':
-            loss_cmd = ' -loss MaxScoreSquaredHinge '
+            loss_cmd = ' -cn %d -loss MaxScoreSquaredHinge ' %(class_num)
         else:
-            loss_cmd = ' -loss {0} '.format(config['mc_loss'])
+            loss_cmd = ' -cn {0} -loss {1} '.format(class_num, config['mc_loss'])
     else:
         if model == 'DAROW':
-            loss_cmd = ' -loss SquaredHinge '
+            loss_cmd = ' -cn 2 -loss SquaredHinge ' 
         else:
-            loss_cmd = ' -loss {0} '.format(config['bc_loss'])
+            loss_cmd = ' -cn 2 -loss {0} '.format(config['bc_loss'])
 
     norm_cmd = ' -norm ' if config['norm'] == True else '' 
 
     cmd_prefix  = ofs_exe + dt_cmd + loss_cmd + norm_cmd  + ' -m %s ' %model
+    if 'passes' in config:
+        cmd_prefix += ' -passes %d ' %config['passes']
 
     cmd = cmd_prefix + param_config + cmd_postfix
     print cmd

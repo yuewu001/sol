@@ -68,6 +68,9 @@ class DataSet(object):
     def set_fs_rate(self, fs_rate):
         self.l0_list = [self.dim * x for x in fs_rate]
 
+    #set the feature selection rate
+    def set_fs_num(self, fs_num):
+        self.l0_list = [x for x in fs_num if (x > 0 and x < self.dim)]
 
     #get the training cmd in the format of '-i -t '
     def get_train_cmd(self, rand_num, is_cache = True):
@@ -228,6 +231,10 @@ dt_dict = {}
 
 aut = DataSet('aut')
 dt_dict['aut'] = aut
+
+caltech = DataSet('caltech')
+caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
+dt_dict['caltech'] = caltech
 
 #a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
 #dt_dict['a9a'] = a9a

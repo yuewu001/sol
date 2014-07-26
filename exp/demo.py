@@ -11,7 +11,6 @@ import run_ofs
 model_list = ['liblinear','fgm','mRMR']
 #online algorithm
 model_list = ['SOFS','FOFS','PET']
-model_list = ['SOFS']
 
 #dataset list
 #synthetic data
@@ -21,22 +20,23 @@ ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
 #large data
 ds_list = ['news','rcv1']
 ds_list = ['aut','a9a']
-ds_list = ['aut']
+ds_list = ['caltech']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 3
+rand_num = 10
 #extra command sent to SOL
 model_config = {
 'cache':True,
 'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
-'rand_num':rand_num
+'rand_num':rand_num,
+'passes':10
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
-is_default_param = False
+is_default_param = True
 
 #train model
 def train_model(dataset):

@@ -29,18 +29,21 @@ def run(dataset, model, config, param_config, output_file):
     dt_cmd = dataset.get_train_cmd( config['rand_num'],config['cache'])
     if dataset.class_num > 2:
         if model == 'SOFS':
-            loss_cmd = ' -loss MaxScoreSquaredHinge '
+            loss_cmd = ' -cn %d -loss MaxScoreSquaredHinge ' %(dataset.class_num)
         else:
-            loss_cmd = ' -loss {0} '.format(config['mc_loss'])
+            loss_cmd = ' -cn {0} -loss {1} '.format(dataset.class_num, config['mc_loss'])
     else:
         if model == 'SOFS':
-            loss_cmd = ' -loss SquaredHinge '
+            loss_cmd = ' -cn 2 -loss SquaredHinge '
         else:
-            loss_cmd = ' -loss {0} '.format(config['bc_loss'])
+            loss_cmd = ' -cn 2 -loss {0} '.format(config['bc_loss'])
 
     norm_cmd = ' -norm ' if config['norm'] == True else '' 
 
     cmd_prefix  = ofs_exe + dt_cmd + loss_cmd + norm_cmd  + ' -m %s ' %model + param_config
+
+    if 'passes' in config:
+        cmd_prefix += ' -passes %d ' %config['passes']
 
     for sel_num in sel_feat_num_list:
         cmd = cmd_prefix + ' -k %d' %sel_num + cmd_postfix
