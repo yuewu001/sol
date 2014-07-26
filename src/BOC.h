@@ -214,6 +214,7 @@ namespace BOC{
 	public:
 		int Initialize(Params &param){
 			this->Release();
+
 			int errCode = STATUS_OK;
 			errCode = this->InitDataSet(param);
 			if (errCode == STATUS_OK){

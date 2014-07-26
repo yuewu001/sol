@@ -75,17 +75,11 @@ namespace BOC {
 			if (this->ReleaseBuffer() == false)
 				return false;
 
-			mutex_lock(&this->data_lock);
-			if (this->ReleaseBuffer() == false){
-				mutex_unlock(&this->data_lock);
-				return false;
-			}
-
 			if (buf_size <= 0 || chunk_size <= 0){
-				mutex_unlock(&this->data_lock);
 				return false;
 			}
 
+			mutex_lock(&this->data_lock);
 			this->buf_size = buf_size;
 			this->chunk_size = chunk_size;
 

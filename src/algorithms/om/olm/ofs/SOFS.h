@@ -79,10 +79,6 @@ namespace BOC {
 		}
 
 		virtual ~SOFS(){
-			if (this->lossFunc != NULL){
-				delete this->lossFunc;
-				this->lossFunc = NULL;
-			}
 		}
 
 		/**
