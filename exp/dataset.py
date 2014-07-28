@@ -10,8 +10,8 @@ import util
 
 class DataSet(object):
     #constraint: only 
-    __slots__ = ('root_dir','name','train_file','test_file', 'dim',
-            'class_num','lambda_list', 'l0_list','c_list')
+    __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
+            'class_num','lambda_list', 'l0_list','c_list', 'mrmr_list')
 
     root_dir = 'D:/Data/libsvm/'
 
@@ -41,6 +41,10 @@ class DataSet(object):
         #set c_list: for liblinear
         self.c_list = [pow(10,x) for x in range(-3,3,1)]
         self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
+
+        #set mrmr_list
+        self.mrmr_list = [50,100,150,200,250,300,350,400,450,500]
+
 
     def __del__(self):
         self.del_rand_file()
@@ -80,6 +84,10 @@ class DataSet(object):
     #set the c parameter for liblinear
     def set_c_list(self,c_list):
         self.c_list = c_list
+
+    # set the mrmr list
+    def set_mrmr_list(self,mrmr_list):
+        self.mrmr_list = mrmr_list
 
     #get the train file
     def get_train_file(self, rand_num):
@@ -134,6 +142,16 @@ class DataSet(object):
             cmd = '{0} -i \"{1}\" -st libsvm >> {2}'.format(exe_name,self.train_file,info_file)
             print cmd
             os.system(cmd)
+
+        #parse data num
+        pattern = re.compile(r'data number\s*:\s*(\d+)')
+        result_list = pattern.findall(open(info_file,'r').read())
+        if len(result_list) != 1:
+            print result_list
+            print 'parse failed'
+            sys.exit()
+    
+        self.data_num = (int)(result_list[0])
 
         #parse dimension
         pattern = re.compile(r'dimension\s*:\s*(\d+)')
@@ -250,6 +268,7 @@ dt_dict['aut'] = aut
 
 a9a = DataSet('a9a','a9a/a9a','a9a/a9a.t')
 a9a.set_fs_num([10,20])
+a9a.set_mrmr_list([20])
 dt_dict['a9a'] = a9a
 
 caltech = DataSet('caltech')

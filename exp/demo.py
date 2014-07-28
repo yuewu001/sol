@@ -4,16 +4,18 @@ import sys
 
 import dataset
 import util
+
 import run_ofs
 import run_liblinear
 import run_fgm
+import run_mRMR
 
 #model list
 #batch algorithm
 model_list = ['liblinear','fgm','mRMR']
 #online algorithm
 model_list = ['SOFS','FOFS','PET']
-model_list = ['FGM']
+model_list = ['mRMR','SOFS']
 
 #dataset list
 #synthetic data
@@ -80,6 +82,13 @@ def train_model(dataset):
                 result_once = run_liblinear.run(dataset, model_config, result_file)
             elif model == 'FGM':
                 result_once = run_fgm.run(dataset, model_config, result_file)
+            elif model == 'mRMR':
+                param_config = ''
+                #get parameters
+                if is_default_param == False:
+                    param_config = dataset.get_best_param('SGD')
+
+                result_once = run_mRMR.run(dataset, model_config,param_config, result_file)
             else:
                 param_config = ''
                 #get parameters

@@ -10,6 +10,7 @@
 #include "PET.h"
 #include "FOFS.h"
 #include "SOFS.h"
+#include "PreSelOGD.h"
 
 #include <string>
 
@@ -28,6 +29,7 @@ namespace BOC{
 			APPEND_INFO(info,PET,FeatType, LabelType);
 			APPEND_INFO(info,FOFS,FeatType, LabelType);
 			APPEND_INFO(info,SOFS,FeatType, LabelType);
+			APPEND_INFO(info,PreSelOGD,FeatType, LabelType);
 		}
 	};
 }

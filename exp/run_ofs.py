@@ -54,6 +54,10 @@ def run(dataset, model, config, param_config, output_file):
     result = util.ResultItem()
     result.parse_ofs_result(output_file)
 
+    print '\nTraining Result: '
+    result.Display()
+    print '\n'
+
     return result
 
 

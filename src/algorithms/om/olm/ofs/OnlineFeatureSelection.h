@@ -8,6 +8,8 @@
 #ifndef HEADER_ONLINE_FEATURE_SELECTION
 #define HEADER_ONLINE_FEATURE_SELECTION
 
+#include "../OnlineLinearModel.h"
+
 /**
 *  namespace: Batch and Online Classification
 */

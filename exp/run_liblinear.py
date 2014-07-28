@@ -16,15 +16,13 @@ def run(dataset, model_config, output_file):
         exe_dir = '../extern/liblinear/windows/'
         raise Exception('path to liblinear in linux is not set yet!')
 
-
-    c_list = dataset.c_list
-
     dst_folder = dataset.name + '/liblinear'
     if os.path.exists(dst_folder) == False:
         os.makedirs(dst_folder)
 
     result = util.ResultItem()
 
+    c_list = dataset.c_list
     for c in c_list:
         model_file =  dst_folder + '/model_%g.txt' %(c)
         predict_file   = dst_folder + '/predict_%g.txt' %(c)

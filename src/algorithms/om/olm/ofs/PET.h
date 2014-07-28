@@ -137,6 +137,7 @@ namespace BOC {
 				}
 			}
 		}
+#pragma endregion Train Related
 	};
 
 	IMPLEMENT_MODEL_CLASS(PET, "Perceptron with Truncation")

@@ -6,7 +6,6 @@ set (solm_files
     src/algorithms/om/olm/solm/CW_RDA.h
     src/algorithms/om/olm/solm/CW_TG.h
     src/algorithms/om/olm/solm/FOBOS.h
-    src/algorithms/om/olm/solm/mRMR_OGD.h
     src/algorithms/om/olm/solm/RDA.h
     src/algorithms/om/olm/solm/STG.h
     src/algorithms/om/olm/solm/SparseOnlineLinearModel.h
@@ -18,6 +17,7 @@ set (ofs_files
     src/algorithms/om/olm/ofs/PET.h
     src/algorithms/om/olm/ofs/FOFS.h
     src/algorithms/om/olm/ofs/SOFS.h
+    src/algorithms/om/olm/ofs/PreSelOGD.h
     src/algorithms/om/olm/ofs/OnlineFeatureSelection.h
     src/algorithms/om/olm/ofs/ofs_header.h
     PARENT_SCOPE
