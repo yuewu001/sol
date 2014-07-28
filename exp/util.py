@@ -56,6 +56,7 @@ class ResultItem(object):
                 else:
                     val = [val1[i] + val2[i] for i in range(0,len(val2))]
                     self.__setattr__(name,val)
+
     #divide by a value
     def Divide(self, divider):
         for name in ResultItem.__slots__:
@@ -66,6 +67,20 @@ class ResultItem(object):
             else:
                 val = [val[i] / divider for i in range(0,len(val))]
                 self.__setattr__(name,val)
+
+    #append another result item
+    def Append(self, other):
+        for name in ResultItem.__slots__:
+            val1 = self.__getattribute__(name)
+            val2 = other.GetValue(name)
+
+            if type(val2) is not list:
+                raise ValueError('only list objects are suported!')
+            else:
+                if len(val2) == 0:
+                    continue
+
+                [val1.append(val2[i]) for i in range(0,len(val2))]
 
     #add a value to the give attribute
     def append_value(self, name, val):

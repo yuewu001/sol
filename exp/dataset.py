@@ -10,7 +10,8 @@ import util
 
 class DataSet(object):
     #constraint: only 
-    __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'class_num','lambda_list', 'l0_list')
+    __slots__ = ('root_dir','name','train_file','test_file', 'dim',
+            'class_num','lambda_list', 'l0_list','c_list')
 
     root_dir = 'D:/Data/libsvm/'
 
@@ -36,6 +37,10 @@ class DataSet(object):
 
         #set l0 list
         self.l0_list = [self.dim * 0.1 * x for x in range(1,10)]
+
+        #set c_list: for liblinear
+        self.c_list = [pow(10,x) for x in range(-3,3,1)]
+        self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
 
     def __del__(self):
         self.del_rand_file()
@@ -71,6 +76,17 @@ class DataSet(object):
     #set the feature selection rate
     def set_fs_num(self, fs_num):
         self.l0_list = [x for x in fs_num if (x > 0 and x < self.dim)]
+
+    #set the c parameter for liblinear
+    def set_c_list(self,c_list):
+        self.c_list = c_list
+
+    #get the train file
+    def get_train_file(self, rand_num):
+        if rand_num > 1:
+            return self.train_file + '_rand'
+        else:
+            return self.train_file
 
     #get the training cmd in the format of '-i -t '
     def get_train_cmd(self, rand_num, is_cache = True):
@@ -232,8 +248,13 @@ dt_dict = {}
 aut = DataSet('aut')
 dt_dict['aut'] = aut
 
+a9a = DataSet('a9a','a9a/a9a','a9a/a9a.t')
+a9a.set_fs_num([10,20])
+dt_dict['a9a'] = a9a
+
 caltech = DataSet('caltech')
-caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
+#caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
+#caltech.set_c_list([0.1,1,10])
 dt_dict['caltech'] = caltech
 
 #a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')

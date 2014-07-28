@@ -5,12 +5,15 @@ import sys
 import dataset
 import util
 import run_ofs
+import run_liblinear
+import run_fgm
 
 #model list
 #batch algorithm
 model_list = ['liblinear','fgm','mRMR']
 #online algorithm
 model_list = ['SOFS','FOFS','PET']
+model_list = ['FGM']
 
 #dataset list
 #synthetic data
@@ -20,10 +23,10 @@ ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
 #large data
 ds_list = ['news','rcv1']
 ds_list = ['aut','a9a']
-ds_list = ['caltech']
+ds_list = ['a9a']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
 'cache':True,
@@ -40,11 +43,6 @@ is_default_param = True
 
 #train model
 def train_model(dataset):
-    #create destination folder
-    dst_folder = dataset.name
-    if os.path.exists(dst_folder) == False:
-        os.makedirs(dst_folder)
-
     #random the file
     if rand_num > 1:
         rand_file = dataset.train_file + '_rand'  
@@ -67,19 +65,30 @@ def train_model(dataset):
             print ' Experiment on %s' %model + ' Random %d' %k 
             print '-----------------------------------'
 
+            #create destination folder
+            dst_folder = dataset.name + '/%s' %model
+            if os.path.exists(dst_folder) == False:
+                os.makedirs(dst_folder)
+
             #output file
             result_file = '{0}/{1}_result_{2}.txt'.format(dst_folder,model, k)
             result_file = result_file.replace('/',os.sep)
             #clear the file if it already exists
             open(result_file,'w').close()
 
-            param_config = ''
-            #get parameters
-            if is_default_param == False:
-                param_config = dataset.get_best_param(model)
+            if model == 'liblinear':
+                result_once = run_liblinear.run(dataset, model_config, result_file)
+            elif model == 'FGM':
+                result_once = run_fgm.run(dataset, model_config, result_file)
+            else:
+                param_config = ''
+                #get parameters
+                if is_default_param == False:
+                    param_config = dataset.get_best_param(model)
 
-            result_once = run_ofs.run(dataset,model, model_config,
-                    param_config, result_file)
+                result_once = run_ofs.run(dataset,model, model_config,
+                        param_config, result_file)
+
 
             model_result_dict[model].Add(result_once)
 
