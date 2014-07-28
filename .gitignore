@@ -15,5 +15,4 @@ build/
 *.toc
 data/
 install
-extern
 /build*
