@@ -27,6 +27,9 @@ for dt in ds_list:
         if model == 'SOFS':
             real_model = model
             model = 'DAROW'
+        elif model == 'PET':
+            real_model = model
+            model = 'SGD'
 
         if  model == 'CW_TG' or model == 'CW_RDA' or model == 'DAROW':
             param_config = ' {0} {1}'.format('-r',r_search)

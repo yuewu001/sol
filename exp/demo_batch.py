@@ -11,13 +11,13 @@ import run_fgm
 import run_mRMR
 
 #model list
-model_list = ['SOFS','PET']
+model_list = ['liblinear','mRMR','FGM']
 
 #dataset list
 ds_list = ['caltech']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
 'cache':True,

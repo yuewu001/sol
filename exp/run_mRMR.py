@@ -28,7 +28,7 @@ def run(dataset,model_config, param_config, output_file):
 
     #bs_list = l1_def.get_lambda_list(ds,'mRMR')
 
-    sel_feat_num_list = dataset.mrmr_list
+    sel_feat_num_list = [x for x in dataset.l0_list if x <= 500]
     
     #clear the file if it already exists
     open(output_file,'w').close()
@@ -73,7 +73,7 @@ def run(dataset,model_config, param_config, output_file):
         #train with OGD
         dt_cmd = dataset.get_train_cmd(model_config['rand_num'],model_config['cache'])
         if dataset.class_num > 2:
-            loss_cmd = ' -cn {0} -loss {1} '.format(dataset.class_num, config['mc_loss'])
+            loss_cmd = ' -cn {0} -loss {1} '.format(dataset.class_num, model_config['mc_loss'])
         else:
             loss_cmd = ' -cn 2 -loss {0} '.format(model_config['bc_loss'])
 

@@ -9,7 +9,7 @@ import util
 
 def run(dataset, model_config, output_file):
     if util.get_platform() == 'Windows':
-        exe_dir = '../extern/FGM_V2/x64/'
+        exe_dir = '../extern/FGM_V2/x86/'
         train_exe = exe_dir + 'FGM.exe'
         test_exe = exe_dir + 'Predict.exe'
     else:

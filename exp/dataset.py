@@ -11,9 +11,9 @@ import util
 class DataSet(object):
     #constraint: only 
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
-            'class_num','lambda_list', 'l0_list','c_list', 'mrmr_list')
+            'class_num','lambda_list', 'l0_list','c_list')
 
-    root_dir = 'D:/Data/libsvm/'
+    root_dir = 'E:/v-wuyue/data/'
 
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
@@ -41,10 +41,6 @@ class DataSet(object):
         #set c_list: for liblinear
         self.c_list = [pow(10,x) for x in range(-3,3,1)]
         self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
-
-        #set mrmr_list
-        self.mrmr_list = [50,100,150,200,250,300,350,400,450,500]
-
 
     def __del__(self):
         self.del_rand_file()
@@ -84,10 +80,6 @@ class DataSet(object):
     #set the c parameter for liblinear
     def set_c_list(self,c_list):
         self.c_list = c_list
-
-    # set the mrmr list
-    def set_mrmr_list(self,mrmr_list):
-        self.mrmr_list = mrmr_list
 
     #get the train file
     def get_train_file(self, rand_num):
@@ -263,17 +255,16 @@ class DataSet(object):
 #initialize dataset
 dt_dict = {}
 
-aut = DataSet('aut')
-dt_dict['aut'] = aut
+#aut = DataSet('aut')
+#dt_dict['aut'] = aut
 
-a9a = DataSet('a9a','a9a/a9a','a9a/a9a.t')
-a9a.set_fs_num([10,20])
-a9a.set_mrmr_list([20])
-dt_dict['a9a'] = a9a
+#a9a = DataSet('a9a','a9a/a9a','a9a/a9a.t')
+#a9a.set_fs_num([10,20])
+#dt_dict['a9a'] = a9a
 
 caltech = DataSet('caltech')
-#caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
-#caltech.set_c_list([0.1,1,10])
+caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
+caltech.set_c_list([0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256])
 dt_dict['caltech'] = caltech
 
 #a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
