@@ -4,11 +4,8 @@ import CV
 import dataset
 
 model_list = ['SOFS','PET','FOFS']
-model_list = ['SOFS']
 
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-
-ds_list = ['aut']
 
 fold_num = 5
 

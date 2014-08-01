@@ -79,7 +79,7 @@ class CV(object):
         final_file = self.dst_folder +'/cv_{0}_result.txt'.format(self.model)
         if os.path.exists(final_file):
             print 'file already exists, skip cross validation'
-            #return
+            return
 
         #split the dataset
         self.dataset.split(self.fold_num)

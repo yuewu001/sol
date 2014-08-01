@@ -11,14 +11,10 @@ import run_fgm
 import run_mRMR
 
 #model list
-model_list = ['mRMR','FGM','liblinear']
-model_list = ['mRMR', 'liblinear']
-model_list = ['mRMR','FGM','liblinear']
+model_list = ['FGM','liblinear','mRMR']
 
 #dataset list
-ds_list = ['caltech']
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['relathe']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
