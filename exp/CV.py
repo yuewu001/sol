@@ -10,10 +10,10 @@ import search_space
 #extra command sent to SOL
 model_config = {
 'cache':True,
-'norm':False,
+'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
-'passes':10
+'passes':1
 }
 
 #definition of cross validation class
@@ -79,7 +79,7 @@ class CV(object):
         final_file = self.dst_folder +'/cv_{0}_result.txt'.format(self.model)
         if os.path.exists(final_file):
             print 'file already exists, skip cross validation'
-            return
+            #return
 
         #split the dataset
         self.dataset.split(self.fold_num)
@@ -109,7 +109,7 @@ class CV(object):
         self.min_result_val = util.ResultItem()
 
         for k,v in param_result.iteritems():
-            if len(self.min_result_val.test_error) == 0 or self.min_result_val.test_error[0] >  v.test_error:
+            if len(self.min_result_val.test_error) == 0 or self.min_result_val.test_error[0] >  v.test_error[0]:
                 self.min_result_val = v
                 self.min_result_key = k
 

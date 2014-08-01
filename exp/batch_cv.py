@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 """bach cross validation"""
 import CV
+import dataset
 
 model_list = ['SOFS','PET','FOFS']
+model_list = ['SOFS']
 
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['news','rcv1','url']
-ds_list = ['synthetic_100_10K_100K','synthetic_200_20K_100K']
-ds_list = ['caltech']
+
+ds_list = ['aut']
 
 fold_num = 5
 
@@ -52,3 +53,5 @@ for dt in ds_list:
                 content = rfh.read()
                 with open(dst_out_file,'w') as wfh:
                     wfh.writelines(content)
+
+    dataset.dt_dict[dt].del_split_files(fold_num)

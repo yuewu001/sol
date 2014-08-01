@@ -11,9 +11,9 @@ import util
 class DataSet(object):
     #constraint: only 
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
-            'class_num','lambda_list', 'l0_list','c_list')
+            'class_num','lambda_list', 'l0_list','c_list','mrmr_l0_list')
 
-    root_dir = 'E:/v-wuyue/data/'
+    root_dir = 'D:/users/v-wuyue/data/'
 
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
@@ -36,7 +36,12 @@ class DataSet(object):
         self.lambda_list = [pow(10,x) for x in range(-8,0,1)]
 
         #set l0 list
-        self.l0_list = [self.dim * 0.1 * x for x in range(1,10)]
+        self.set_fs_rate([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.975, 0.99,0.995])
+        #self.l0_list = [self.dim * 0.1 * x for x in range(1,10)]
+
+        #set mrmr list
+        #self.set_mrmr_l0_list([self.dim * x for x in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.975, 0.99,0.995]])
+        self.set_mrmr_l0_list([50,100,150,200,250,300,350,400,450,500])
 
         #set c_list: for liblinear
         self.c_list = [pow(10,x) for x in range(-3,3,1)]
@@ -76,6 +81,10 @@ class DataSet(object):
     #set the feature selection rate
     def set_fs_num(self, fs_num):
         self.l0_list = [x for x in fs_num if (x > 0 and x < self.dim)]
+
+    #set number of selected features for mrmr
+    def set_mrmr_l0_list(self, mrmr_num):
+        self.mrmr_l0_list = [x for x in mrmr_num if (x > 0 and x < self.dim)]
 
     #set the c parameter for liblinear
     def set_c_list(self,c_list):
@@ -197,6 +206,13 @@ class DataSet(object):
                         line = rfh.readline()
                         wfh.write(line)
 
+    #delete the splitted files
+    def del_split_files(self, fold_num):
+        in_filename = self.train_file
+        for i in range(0,fold_num):
+            out_filename = '{0}_{1}'.format(in_filename,i) 
+            self.__del_file(out_filename)
+
     #merge different files together
     #return: merged file name
     def merge_files(self, fold_id_list):
@@ -255,6 +271,24 @@ class DataSet(object):
 #initialize dataset
 dt_dict = {}
 
+relathe = DataSet('relathe')
+dt_dict['relathe'] = relathe
+
+pcmac = DataSet('pcmac')
+dt_dict['pcmac'] = pcmac
+
+basehock = DataSet('basehock')
+dt_dict['basehock'] = basehock
+
+ccat = DataSet('ccat')
+dt_dict['ccat'] = ccat
+
+aut = DataSet('aut')
+dt_dict['aut'] = aut
+
+real_sim = DataSet('real-sim')
+dt_dict['real-sim'] = real_sim
+
 #aut = DataSet('aut')
 #dt_dict['aut'] = aut
 
@@ -262,10 +296,10 @@ dt_dict = {}
 #a9a.set_fs_num([10,20])
 #dt_dict['a9a'] = a9a
 
-caltech = DataSet('caltech')
-caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
-caltech.set_c_list([0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256])
-dt_dict['caltech'] = caltech
+#caltech = DataSet('caltech')
+#caltech.set_fs_num([50,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500,4000])
+#caltech.set_c_list([0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256])
+#dt_dict['caltech'] = caltech
 
 #a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
 #dt_dict['a9a'] = a9a

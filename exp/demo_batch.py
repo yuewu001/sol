@@ -15,6 +15,8 @@ model_list = ['liblinear','mRMR','FGM']
 
 #dataset list
 ds_list = ['caltech']
+ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
+ds_list = ['relathe']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
@@ -25,7 +27,7 @@ model_config = {
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
-'passes':10
+'passes':1
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,

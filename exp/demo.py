@@ -11,21 +11,22 @@ import run_fgm
 import run_mRMR
 
 #model list
-model_list = ['SOFS','PET']
+model_list = ['SOFS','PET','FOFS']
 
 #dataset list
 ds_list = ['caltech']
+ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 10
 #extra command sent to SOL
 model_config = {
 'cache':True,
-'norm':False,
+'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
-'passes':10
+'passes':1
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,

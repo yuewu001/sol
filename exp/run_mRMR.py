@@ -28,7 +28,7 @@ def run(dataset,model_config, param_config, output_file):
 
     #bs_list = l1_def.get_lambda_list(ds,'mRMR')
 
-    sel_feat_num_list = [x for x in dataset.l0_list if x <= 500]
+    sel_feat_num_list = [x for x in dataset.mrmr_l0_list if x <= 500]
     
     #clear the file if it already exists
     open(output_file,'w').close()
