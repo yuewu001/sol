@@ -2,6 +2,9 @@
 #define _LIBLINEAR_H
 
 #include <math.h>
+#include <cmath>
+
+using std::abs;
 
 #ifdef __cplusplus
 extern "C" {
