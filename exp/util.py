@@ -175,7 +175,6 @@ class ResultItem(object):
 
             #input header
             headers = filter(None,file_handler.readline().strip().split(' '))
-            print headers
 
             #input value
             while True:

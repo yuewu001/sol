@@ -35,7 +35,7 @@ def run(dataset, model_config, output_file):
 
         result_once = util.ResultItem()
 
-        if os.path.exists(result_once) == True:
+        if os.path.exists(result_file) == True:
             result_once.load_result(result_file)
         else:
             #evaluate the result

@@ -17,10 +17,10 @@ model_list = ['SOFS','PET']
 ds_list = ['caltech']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
-'cache':True,
+'cache':False,
 'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
