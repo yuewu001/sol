@@ -18,10 +18,10 @@ ds_list = ['caltech']
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
-'cache':True,
+'cache':False,
 'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
