@@ -42,7 +42,7 @@ public:
 
 	~FGM();
 	void FGM_init();
-	void FGM::most_violated_(int iteration);
+	void most_violated_(int iteration);
 	void most_violated(int iteration);//worst-case analysis
 	void most_violated_w_poly(int iteration);
 	int cutting_set_evolve();
@@ -76,18 +76,18 @@ public:
 	void most_violated_pursuit_B(int iteration);
 	//void prune_feature_init();
 	int  matching_puit_evolve();
-	int FGM::FGM_train_one(double &run_time);
-	int FGM::cutting_set_prox_logistic_evolve(double &run_time);
-	int FGM::cutting_set_prox_logistic_evolve();
-	int FGM::cutting_set_prox_svm_evolve();
-	int FGM::cutting_set_prox_svm_evolve(double &run_time);
-	int FGM::cutting_set_stoch_prox_svm_evolve();
-    void FGM::normalize();
-	void FGM::most_violated(int iteration, double &run_time);
-    int FGM::remove_redunt(weight *w2b_temp,double s,int w_size_temp,int i_feat);
+	int FGM_train_one(double &run_time);
+	int cutting_set_prox_logistic_evolve(double &run_time);
+	int cutting_set_prox_logistic_evolve();
+	int cutting_set_prox_svm_evolve();
+	int cutting_set_prox_svm_evolve(double &run_time);
+	int cutting_set_stoch_prox_svm_evolve();
+    void normalize();
+	void most_violated(int iteration, double &run_time);
+    int remove_redunt(weight *w2b_temp,double s,int w_size_temp,int i_feat);
 
 	//for poly
-	void FGM::markov_sample_hash(weight *w2s, double *wlinear, int B,int iteration);
+	void markov_sample_hash(weight *w2s, double *wlinear, int B,int iteration);
 	
 private:
 	const parameter		*param;
