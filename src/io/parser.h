@@ -148,7 +148,7 @@ namespace BOC{
 		exp_acc -= num_dec;
 		*end = p;
 		if (exp_acc == 0){
-			return s * acc;
+			return float(s * acc);
 		}
 		else{
 			return s * acc * powf(10.f, (float)(exp_acc));
