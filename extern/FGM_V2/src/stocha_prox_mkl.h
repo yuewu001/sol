@@ -41,47 +41,47 @@ public:
 		}
 	}
 	~StochProxMKL();
-	int StochProxMKL::proximity_L1squared(int d, double* x0, double lambda, double* x);
-	int StochProxMKL::compare (const void * a, const void * b);
-	//int StochProxMKL::mkl_online_linear();
-	void StochProxMKL::StochProxMKL_allocate();
-    void StochProxMKL::sort_rs(doubleIntPair* x0abs,int n_rsi);
-	void StochProxMKL::warm_start_model(int num_kernel_);
-	void StochProxMKL::smoothmkl_init();
-	void StochProxMKL::calculate_alpha();
-	void StochProxMKL::return_model();
-	void StochProxMKL::mkl_svm_train();
+	int proximity_L1squared(int d, double* x0, double lambda, double* x);
+	int compare (const void * a, const void * b);
+	//int mkl_online_linear();
+	void StochProxMKL_allocate();
+    void sort_rs(doubleIntPair* x0abs,int n_rsi);
+	void warm_start_model(int num_kernel_);
+	void smoothmkl_init();
+	void calculate_alpha();
+	void return_model();
+	void mkl_svm_train();
 
-    int StochProxMKL::mkl_online_linear_l1svm();
-	int StochProxMKL::mkl_online_linear_l2svm();
-	int StochProxMKL::mkl_batch_linear_l2svm();
-	int StochProxMKL::mkl_prox_linear_l2svm();
-	void StochProxMKL::calucate_gwx(double *gw);
-	int StochProxMKL::stoch_mkl_prox_linear_l2svm();
-    int StochProxMKL::stoch_mkl_prox_linear_lr();
+    int mkl_online_linear_l1svm();
+	int mkl_online_linear_l2svm();
+	int mkl_batch_linear_l2svm();
+	int mkl_prox_linear_l2svm();
+	void calucate_gwx(double *gw);
+	int stoch_mkl_prox_linear_l2svm();
+    int stoch_mkl_prox_linear_lr();
 	
-	void StochProxMKL::calculate_wx_gwx(double s);
-	double StochProxMKL::calculate_gradient(double *gw,double *w);
-    double StochProxMKL::line_search(double *v, double *gw, 
+	void calculate_wx_gwx(double s);
+	double calculate_gradient(double *gw,double *w);
+    double line_search(double *v, double *gw, 
 							double *normsq, double *normsq_search,	double tau, double *b0,double *b, double *upd_t, double fv,double lambda,double &f_w_);
-	double StochProxMKL::line_search_complex(double *v, double *gw, 
+	double line_search_complex(double *v, double *gw, 
 							double *normsq,	double *normsq_search,double tau, double *b0,double *b, double *upd_t, double fv,double lambda);
 
-	int StochProxMKL::mkl_online_linear_logistic();
-	double StochProxMKL::calculate_gradient_logistic(double *gw, double *v);
-	int StochProxMKL::mkl_prox_linear_logistic();
-	double StochProxMKL::line_search_logistic(double *v, double *gw, 
+	int mkl_online_linear_logistic();
+	double calculate_gradient_logistic(double *gw, double *v);
+	int mkl_prox_linear_logistic();
+	double line_search_logistic(double *v, double *gw, 
 							double *normsq,	double *normsq_search,double tau, double *b0,double *b, double *upd_t, double fv,double lambda,double &f_w_);
 
-	double StochProxMKL::line_search_logistic(double *v, double *gw, 
+	double line_search_logistic(double *v, double *gw, 
 							double *normsq,	double *normsq_search,double tau, double *b0,double *b, double *upd_t, double fv,double lambda,double &f_w_, int *work_set);
 
-	double StochProxMKL::calculate_gradient(double *gw, double *v, int *work_set);
-    double StochProxMKL::line_search(double *v, double *gw, double *normsq, double *normsq_search,	
+	double calculate_gradient(double *gw, double *v, int *work_set);
+    double line_search(double *v, double *gw, double *normsq, double *normsq_search,	
 		 double tau, double *b0,double *b, double *upd_t, double fv,double lambda,double &f_w_, int *work_set);
-	void StochProxMKL::calculate_wx_gwx(double s, int *work_set);
-	void StochProxMKL::calucate_gwx(double *gw,int *work_set);
-	double StochProxMKL::calculate_gradient_logistic(double *gw, double *v,int *work_set);
+	void calculate_wx_gwx(double s, int *work_set);
+	void calucate_gwx(double *gw,int *work_set);
+	double calculate_gradient_logistic(double *gw, double *v,int *work_set);
 	protected:
 	const parameter		*svm_param;
 	problem				*prob;
