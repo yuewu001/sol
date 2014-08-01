@@ -70,7 +70,7 @@ struct weight
 	}*/
 };
 
-	struct solution
+	struct solution_struct
 	{
 		weight *w_FGM; 
 		weight *w_FGM_retrain;
@@ -139,7 +139,7 @@ doubleIntPair;
 		double *sigma;
 		int n_kernel;
 		weight *w2s; 
-		solution *solution_;
+		solution_struct *solution_;
 		int *count; //for uBalanced problem
 		int w_size;
 		int feature_pair;

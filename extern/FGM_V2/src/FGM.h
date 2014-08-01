@@ -99,7 +99,7 @@ private:
 	int                 n_ITER;
 	int					elements;
 	feature_node		**sub_x_space;//
-	solution			solution;
+	solution_struct			solution;
 	double              *alpha;
 	int					B;
 	model				*svm_model;

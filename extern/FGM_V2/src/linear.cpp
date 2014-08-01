@@ -812,7 +812,7 @@ model* FGM_train(struct problem *prob, const struct parameter *param)
 	model_->count = NULL;
 	model_->alpha = NULL;
 	model_->sigma						= Malloc(double,max_iteration+1);
-	model_->solution_					= Malloc(solution,1);
+	model_->solution_					= Malloc(solution_struct,1);
 	model_->alpha                       = Malloc(double,model_->l+1);
 
 	if(param->solver_type>7)
@@ -1212,7 +1212,7 @@ struct model *load_model_poly(const char *model_file_name)
 	model_->w2s = NULL;
 	model_->alpha = NULL;
 	model_->sigma = NULL;
-	model_->solution_ = Malloc(solution,1);
+	model_->solution_ = Malloc(solution_struct,1);
 	model_->solution_->w_FGM_retrain = NULL;
 	model_->solution_->w_FGM_B = NULL;
 	param.flag_poly = 0;
