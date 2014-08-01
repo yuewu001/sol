@@ -73,7 +73,7 @@ namespace BOC {
 		 * PrintModelInfo print the info of trained model
 		 */
 		virtual void PrintModelInfo() const {
-			printf("Number of weights: %lu\n", static_cast<long int>(this->weightDim));
+			printf("Number of weights: %lu\n", static_cast<long int>(this->weightDim - 1));
 		}
 #pragma endregion Constructors and Basic Functions
 

@@ -118,10 +118,15 @@ namespace BOC {
 					this->is_good = false;
 					return false;
 				}
+				p = strip_line(endptr);
+				if (*p != ':'){
+					fprintf(stderr, "incorrect input file!\n%s", p);
+					this->is_good = false;
+					return false;
+				}
+				++p;
 
-				p = endptr;
 				feat = parseFloat(p, &endptr);
-				//feat =(float)(strtod(val,&endptr));
 				if (endptr == p) {
 					fprintf(stderr, "parse feature value failed!\n");
 					this->is_good = false;
