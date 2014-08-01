@@ -33,47 +33,47 @@ def run(dataset, model_config, output_file):
         result_file   = dst_folder + '/result_%d.txt' %(sel_feat_num)
         test_file   = dst_folder + '/test_%d.txt' %(sel_feat_num)
 
-        #clear the file if it already exists
-        open(test_file,'w').close()
-
         result_once = util.ResultItem()
 
-        #evaluate the result
-        train_cmd = train_exe + ' -s 12 -c 10 -B %d' %sel_feat_num + ' %s' %dataset.get_train_file(model_config['rand_num']) + ' %s' %model_file 
-        train_cmd = train_cmd.replace('/',os.sep)
+        if os.path.exists(result_once) == True:
+            result_once.load_result(result_file)
+        else:
+            #evaluate the result
+            train_cmd = train_exe + ' -s 12 -c 10 -B %d' %sel_feat_num + ' %s' %dataset.get_train_file(model_config['rand_num']) + ' %s' %model_file 
+            train_cmd = train_cmd.replace('/',os.sep)
 
-        print train_cmd
-        start_time =time.time()
-        os.system(train_cmd)
-        end_time = time.time()
+            print train_cmd
+            start_time =time.time()
+            os.system(train_cmd)
+            end_time = time.time()
 
-        #hard to evaluate train_error, set to zero
-        result_once.append_value('train_error',0)
+            #hard to evaluate train_error, set to zero
+            result_once.append_value('train_error',0)
 
-        #parse learning time
-        train_time = (float)(end_time - start_time) 
-        result_once.append_value('train_time',train_time)
+            #parse learning time
+            train_time = (float)(end_time - start_time) 
+            result_once.append_value('train_time',train_time)
 
-        #predict
-        test_cmd = test_exe + ' %s' %dataset.test_file + ' %s' %model_file + ' %s' %predict_file + '>> %s' %test_file
-        test_cmd = test_cmd.replace('/',os.sep)
-        print test_cmd
-        start_time =time.time()
-        os.system(test_cmd)
-        end_time = time.time()
-        test_time = (float)(end_time - start_time) 
+            #predict
+            test_cmd = test_exe + ' %s' %dataset.test_file + ' %s' %model_file + ' %s' %predict_file + '> %s' %test_file
+            test_cmd = test_cmd.replace('/',os.sep)
+            print test_cmd
+            start_time =time.time()
+            os.system(test_cmd)
+            end_time = time.time()
+            test_time = (float)(end_time - start_time) 
 
-        result_once.append_value('test_time',test_time)
+            result_once.append_value('test_time',test_time)
 
-        test_error = parse_test_error_rate(test_file)
-        result_once.append_value('test_error',test_error)
+            test_error = parse_test_error_rate(test_file)
+            result_once.append_value('test_error',test_error)
 
-        result_once.append_value('non_zero_num',sel_feat_num)
+            result_once.append_value('non_zero_num',sel_feat_num)
 
-        sparse_rate = 100.0 - sel_feat_num * 100.0 / dataset.dim
-        result_once.append_value('sparse_rate', sparse_rate)
+            sparse_rate = 100.0 - sel_feat_num * 100.0 / dataset.dim
+            result_once.append_value('sparse_rate', sparse_rate)
 
-        result_once.save_result(result_file)
+            result_once.save_result(result_file)
 
         result.Append(result_once)
 

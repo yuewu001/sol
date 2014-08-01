@@ -11,7 +11,9 @@ import run_fgm
 import run_mRMR
 
 #model list
-model_list = ['liblinear','mRMR','FGM']
+model_list = ['mRMR','FGM','liblinear']
+model_list = ['mRMR', 'liblinear']
+model_list = ['mRMR','FGM','liblinear']
 
 #dataset list
 ds_list = ['caltech']

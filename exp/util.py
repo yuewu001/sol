@@ -3,6 +3,7 @@
 import platform
 import re
 import os
+import sys
 
 #get platform
 def get_platform():
@@ -166,6 +167,35 @@ class ResultItem(object):
         else:
             file_handler.close()
 
+    #save the result to local disk
+    def load_result(self, input_file):
+        print 'load result from %s\n' %input_file
+        try:
+            file_handler = open(input_file,'r')
+
+            #input header
+            headers = filter(None,file_handler.readline().strip().split(' '))
+            print headers
+
+            #input value
+            while True:
+                values = filter(None,file_handler.readline().strip().split(' '))
+                if len(values) == 0:
+                    break
+                if len(values) != len(headers):
+                    raise ValueError("value and header are not consistent");
+
+                for k in range(0,len(values)):
+                    name = headers[k]
+                    val = self.__getattribute__(name)
+                    val.append(float(values[k]))
+
+        except IOError as e:
+            print "I/O error ({0}): {1}".format(e.errno,e.strerror)
+            sys.exit()
+        else:
+            file_handler.close()
+
 
 #run the cv-train-algorithm
 #@param train_file: training file
@@ -215,8 +245,8 @@ def run(train_file, test_file, class_num, param_config, model, config, output_fi
 
 #test code
 #a = ResultItem()
-#b = ResultItem()
-#b.parse_ofs_result('tmp.txt')
+#a.load_result(r'E:\v-wuyue\sol\exp\caltech\liblinear\result_0.25.txt')
+#a.Display()
 #a.Add(b)
 #a.Add(b)
 #a.Divide(2)
