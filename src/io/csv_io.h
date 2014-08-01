@@ -98,7 +98,7 @@ namespace BOC {
 			char* p = line, *endptr = NULL;
 			if (*p == '\0')
 				return false;
-			labelVal = (LabelType)parseInt_CSV(p, &endptr);
+			labelVal = (LabelType)parseInt(p, &endptr);
 			if (endptr == p) {
 				fprintf(stderr, "parse label failed.\n");
 				this->is_good = false;
@@ -123,7 +123,7 @@ namespace BOC {
 					return false;
 				}
 				p = strip_line(p);
-				feat = parseFloat_CSV(p, &endptr);
+				feat = parseFloat(p, &endptr);
 				//feat =(float)(strtod(val,&endptr));
 				if (endptr == p) {
 					fprintf(stderr, "parse feature value failed!\n");
@@ -142,12 +142,14 @@ namespace BOC {
 			size_t featNum = data.indexes.size();
 			fprintf(writer_handler, "%d", data.label);
 			IndexType i = 0, j = 1;
-			for (; i < featNum, j <= featDim; j++){
+			for (; i < featNum && j <= featDim; j++){
 				fprintf(writer_handler, ",");
-				if (data.indexes[i] == j)
+				if (data.indexes[i] == j){
 					fprintf(writer_handler, "%g", data.features[i++]);
-				else
+				}
+				else{
 					fprintf(writer_handler, "0");
+				}
 			}
 			for (; j <= featDim; j++)
 				fprintf(writer_handler, ",0");

@@ -9,6 +9,7 @@
 
 #include "OnlineFeatureSelection.h"
 #include "../../../../io/basic_io.h"
+#include "../../../../io/parser.h"
 
 #include <string>
 
@@ -119,8 +120,11 @@ namespace BOC {
 			size_t dst_len = 64;
 			char* line = new char[dst_len];
 			while (io_handler.read_line(line, dst_len) != NULL){
-				if (line[0] == '\n' || line[0] == '\r')
+				line = strip_line(line);
+                //skip comments and empty lines
+				if (line[0] == '\0' || line[0] == '#')
 					continue;
+
 				featIndex = (IndexType)(atoi(line));
 				if (featIndex == 0){
 					fprintf(stderr, "parse index %s failed!\n", line);
