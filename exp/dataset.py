@@ -13,7 +13,7 @@ class DataSet(object):
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
             'class_num','lambda_list', 'l0_list','c_list','mrmr_l0_list')
 
-    root_dir = 'D:/users/v-wuyue/data/'
+    root_dir = 'D:/Data/libsvm/'
 
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
@@ -271,28 +271,29 @@ class DataSet(object):
 #initialize dataset
 dt_dict = {}
 
-relathe = DataSet('relathe')
-dt_dict['relathe'] = relathe
+#relathe = DataSet('relathe')
+#dt_dict['relathe'] = relathe
+#
+#pcmac = DataSet('pcmac')
+#dt_dict['pcmac'] = pcmac
+#
+#basehock = DataSet('basehock')
+#dt_dict['basehock'] = basehock
+#
+#ccat = DataSet('ccat')
+#dt_dict['ccat'] = ccat
+#
+#aut = DataSet('aut')
+#dt_dict['aut'] = aut
+#
+#real_sim = DataSet('real-sim')
+#dt_dict['real-sim'] = real_sim
 
-pcmac = DataSet('pcmac')
-dt_dict['pcmac'] = pcmac
-
-basehock = DataSet('basehock')
-dt_dict['basehock'] = basehock
-
-ccat = DataSet('ccat')
-dt_dict['ccat'] = ccat
-
-aut = DataSet('aut')
-dt_dict['aut'] = aut
-
-real_sim = DataSet('real-sim')
-dt_dict['real-sim'] = real_sim
-
-#caltech = DataSet('caltech')
-#caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
-#caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
-#dt_dict['caltech'] = caltech
+caltech = DataSet('caltech')
+caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
+caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
+caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
+dt_dict['caltech'] = caltech
 
 #a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
 #dt_dict['a9a'] = a9a

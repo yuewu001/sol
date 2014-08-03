@@ -12,9 +12,11 @@ import run_mRMR
 
 #model list
 model_list = ['FGM','liblinear','mRMR']
+model_list = ['mRMR']
 
 #dataset list
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
+ds_list = ['caltech']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
@@ -77,7 +79,8 @@ def train_model(dataset):
                 if is_default_param == False:
                     param_config = dataset.get_best_param('SGD')
 
-                result_once = run_mRMR.run(dataset, model_config,param_config, result_file)
+                run_mRMR.run(dataset, model_config,param_config, result_file)
+                continue
             else:
                 param_config = ''
                 #get parameters
@@ -92,8 +95,8 @@ def train_model(dataset):
 
     #average the result
     if (rand_num > 1):
-        for model in model_list:
-            model_result_dict[model].Divide(rand_num)
+        for key,val in model_result_dict.iteritems():
+            val.Divide(rand_num)
 
     return model_result_dict 
 

@@ -77,49 +77,14 @@ def run(dataset,model_config, param_config, output_file):
             if os.path.exists(model_file) == False:
                 #parse result
                 parse_model_file(raw_model_file,model_file, mrmr_train_time);
-            else:
-                with open(model_file,'rb') as rfh:
-                    line = rfh.readline().strip()
-                    if len(line) == 0 or line[0] != '#':
-                        raise IOError('model file is incorrect')
-                    mrmr_train_time = float((line.split(':')[1]).strip())
 
-            #train with OGD
-            dt_cmd = dataset.get_train_cmd(model_config['rand_num'],model_config['cache'])
-            if dataset.class_num > 2:
-                loss_cmd = ' -cn {0} -loss {1} '.format(dataset.class_num, model_config['mc_loss'])
-            else:
-                loss_cmd = ' -cn 2 -loss {0} '.format(model_config['bc_loss'])
-
-            norm_cmd = ' -norm ' if model_config['norm'] == True else '' 
-
-            cmd_prefix  = sol_exe + dt_cmd + loss_cmd + norm_cmd  + ' -m PreSelOGD '  + param_config
-
-            if 'passes' in model_config:
-                cmd_prefix += ' -passes %d ' %model_config['passes']
-
-            cmd_postfix = ' >> %s' %ogd_result_file
-
-            cmd = cmd_prefix + ' -im %s' %model_file + cmd_postfix
-
-            print cmd
-            os.system(cmd)
-
-            #parse the result
-            result.parse_ofs_result(ogd_result_file)
-            result.train_time[0] += mrmr_train_time
-
-            result.save_result(result_file)
-
-        print '\nTraining Result: '
-        result.Display()
-        print '\n'
-
-        result_all.Append(result)
-
-    result_all.save_result(output_file)
-    return result_all
-
+def parse_train_time(model_file):
+    with open(model_file,'rb') as rfh:
+        line = rfh.readline().strip()
+        if len(line) == 0 or line[0] != '#':
+            raise IOError('model file is incorrect')
+        mrmr_train_time = float((line.split(':')[1]).strip())
+    return mrmr_train_time
 
 def parse_model_file(model_file,parse_file, train_time):
     print 'parse model file of mRMR%s\n' %model_file

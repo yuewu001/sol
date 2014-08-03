@@ -11,22 +11,23 @@ import run_fgm
 import run_mRMR
 
 #model list
-model_list = ['SOFS','PET','FOFS']
+model_list = ['SOFS','PET','PreSelOGD']
+model_list = ['SOFS', 'PreSelOGD']
 
 #dataset list
-ds_list = ['caltech']
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
+ds_list = ['caltech']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 10
 #extra command sent to SOL
 model_config = {
 'cache':False,
-'norm':True,
+'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
-'passes':1
+'passes':10
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,
@@ -78,7 +79,8 @@ def train_model(dataset):
                 if is_default_param == False:
                     param_config = dataset.get_best_param('SGD')
 
-                result_once = run_mRMR.run(dataset, model_config,param_config, result_file)
+                run_mRMR.run(dataset, model_config,param_config, result_file)
+                continue
             else:
                 param_config = ''
                 #get parameters
@@ -93,8 +95,8 @@ def train_model(dataset):
 
     #average the result
     if (rand_num > 1):
-        for model in model_list:
-            model_result_dict[model].Divide(rand_num)
+        for key,val in model_result_dict.iteritems():
+            val.Divide(rand_num)
 
     return model_result_dict 
 
