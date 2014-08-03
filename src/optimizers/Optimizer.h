@@ -13,6 +13,9 @@
 
 #include "../utils/reflector.h"
 
+
+#include <fstream>
+
 /**
 *  namespace: Batch and Online Classification
 */
@@ -57,7 +60,7 @@ namespace BOC{
 		 *
 		 * @Returns
 		 */
-		float Test(DataSet<FeatType, LabelType> &testSet) {
+		float Test(DataSet<FeatType, LabelType> &testSet ) {
 			testSet.Rewind();
 			float errorRate(0);
 			//double test_time = 0;
@@ -74,6 +77,43 @@ namespace BOC{
 					int predict = this->learnModel->Predict(data, predicts);
 					if (predict != data.label)
 						errorRate++;
+				}
+				//double time2 = get_current_time();
+				//test_time += time2 - time1;
+				testSet.FinishRead();
+			}
+			//printf("accumulated test time %lf ms\n",test_time);
+			errorRate /= testSet.size();
+			return errorRate;
+		}
+
+		/**
+		 * @Synopsis Test test the performance on the given set
+		 *
+		 * @Param testSet
+		 * @Param os output stream to save the predicted values
+		 *
+		 * @Returns
+		 */
+		float Test(DataSet<FeatType, LabelType> &testSet, std::ostream& os) {
+			testSet.Rewind();
+			float errorRate(0);
+			//double test_time = 0;
+			//test
+			float* predicts = new float[this->learnModel->GetClassfierNum()];
+			while (1) {
+				const DataChunk<PointType> &chunk = testSet.GetChunk();
+				//double time1 = get_current_time();
+				if (chunk.dataNum == 0) //"all the data has been processed!"
+					break;
+				for (size_t i = 0; i < chunk.dataNum; i++) {
+					const PointType &data = chunk.data[i];
+					//predict
+					int predict = this->learnModel->Predict(data, predicts);
+					os << predict << "\t"<<(int)(data.label)<<"\n";
+					if (predict != data.label){
+						errorRate++;
+					}
 				}
 				//double time2 = get_current_time();
 				//test_time += time2 - time1;

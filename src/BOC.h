@@ -17,6 +17,7 @@
 
 #include <string>
 #include <stdio.h>
+#include <fstream>
 
 namespace BOC{
 //information of algorithms
@@ -267,7 +268,23 @@ namespace BOC{
 				if (testset.Load(this->pParam->StringValue("-t"), this->pParam->StringValue("-tc"),
 					this->pParam->StringValue("-df")) == true) {
 					float t_errRate(0);	//test error rate
-					t_errRate = this->pOpti->Test(testset);
+
+					const string& predict_file = this->pParam->StringValue("-op");
+					if (predict_file.length() == 0){
+						t_errRate = this->pOpti->Test(testset);
+					}
+					else{
+						std::ofstream outfile(predict_file.c_str(), std::ios::out);
+						if (outfile){
+							t_errRate = this->pOpti->Test(testset, outfile);
+						}
+						else{
+							fprintf(stderr, "Error: open predict file %s failed!\n", predict_file.c_str());
+							t_errRate = this->pOpti->Test(testset);
+						}
+						outfile.close();
+					}
+
 					time3 = get_current_time();
 
 					printf("Test error rate: %.2f %%\n", t_errRate * 100);
@@ -296,6 +313,7 @@ namespace BOC{
 				param.add_option("", 0, 1, "test file", "-t", "Input Output");
 				param.add_option("", 0, 1, "cached training file", "-c", "Input Output");
 				param.add_option("", 0, 1, "cached test file", "-tc", "Input Output");
+				param.add_option("", 0, 1, "predict file", "-op", "Input Output");
 
 				param.add_option(init_data_format, 0, 1, "Dataset Format", "-df", "Input Output");
 				param.add_option(init_data_reader_type, 0, 1, "data reader type (online or batch)", "-drt", "Input Output");
