@@ -4,9 +4,10 @@ import CV
 import dataset
 
 model_list = ['SOFS','PET','PreSelOGD']
+model_list = ['PreSelOGD-mRMR','PreSelOGD-BIF']
 
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['caltech']
+ds_list = ['a9a']
 
 fold_num = 5
 
@@ -26,7 +27,7 @@ for dt in ds_list:
         if model == 'SOFS':
             real_model = model
             model = 'DAROW'
-        elif model == 'PET' or model == 'PreSelOGD':
+        elif model == 'PET' or 'PreSelOGD' in model:
             real_model = model
             model = 'SGD'
 

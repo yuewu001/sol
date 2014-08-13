@@ -76,7 +76,7 @@ class DataSet(object):
 
     #set the feature selection rate
     def set_fs_rate(self, fs_rate):
-        self.l0_list = [self.dim * x for x in fs_rate]
+        self.l0_list = [int(self.dim * x) for x in fs_rate]
 
     #set the feature selection rate
     def set_fs_num(self, fs_num):
@@ -274,8 +274,8 @@ dt_dict = {}
 #relathe = DataSet('relathe')
 #dt_dict['relathe'] = relathe
 #
-#pcmac = DataSet('pcmac')
-#dt_dict['pcmac'] = pcmac
+pcmac = DataSet('pcmac')
+dt_dict['pcmac'] = pcmac
 #
 #basehock = DataSet('basehock')
 #dt_dict['basehock'] = basehock
@@ -295,6 +295,6 @@ caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,7
 caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
 dt_dict['caltech'] = caltech
 
-#a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
-#dt_dict['a9a'] = a9a
+a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
+dt_dict['a9a'] = a9a
 

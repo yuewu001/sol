@@ -118,7 +118,7 @@ namespace BOC {
 
 			//load feature indexes
 			size_t dst_len = 64;
-			char* line = new char[dst_len];
+			char* line = (char*)malloc(sizeof(char) * dst_len);
 			while (io_handler.read_line(line, dst_len) != NULL){
 				line = strip_line(line);
                 //skip comments and empty lines
@@ -137,7 +137,8 @@ namespace BOC {
 					if (--k == 0)break;
 				}
 			}
-			delete[]line;
+			if (line != NULL)
+				free(line);
 
 			//find the max index
 			this->max_index = *std::max_element(featVec.begin(), featVec.end());

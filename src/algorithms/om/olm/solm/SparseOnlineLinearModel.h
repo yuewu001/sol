@@ -52,18 +52,7 @@ namespace BOC {
 		virtual void PrintModelInfo() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
 
-			IndexType nonZeroNum = this->GetNonZeroNum();
-			printf("Number of NonZero weight: %u\n", nonZeroNum);
-
-			double sparseRate = 0;
-			if (this->weightDim == 1){
-				sparseRate = 0;
-			}
-			else{
-				sparseRate = (this->weightDim - 1 - nonZeroNum) / (double)(this->weightDim - 1);
-			}
-
-			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
+			
 		}
 
 		/**
@@ -176,22 +165,6 @@ namespace BOC {
 			getline(is, line);
 
 			return true;
-		}
-
-	public:
-		/**
-		 * @Synopsis GetNonZeroNum get the number of nonzero weights
-		 *
-		 * @Returns number of nonzero weights
-		 */
-		IndexType GetNonZeroNum()  const {
-			IndexType nonZeroNum = 0;
-			for (IndexType i = 1; i < this->weightDim; ++i){
-				if (this->weightVec[i] != 0){
-					++nonZeroNum;
-				}
-			}
-			return nonZeroNum;
 		}
 	};
 

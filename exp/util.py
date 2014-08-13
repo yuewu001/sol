@@ -253,3 +253,11 @@ def run(train_file, test_file, class_num, param_config, model, config, output_fi
 #
 #a.save_result('output.txt')
 
+def parse_train_time(model_file):
+    with open(model_file,'rb') as rfh:
+        line = rfh.readline().strip()
+        if len(line) == 0 or line[0] != '#':
+            raise IOError('model file is incorrect')
+        train_time = float((line.split(':')[1]).strip())
+    return train_time
+

@@ -7,21 +7,17 @@ import re
 
 import util
 
-def run(dataset,model_config, param_config, output_file):
+def run(dataset,model_config):
     if util.get_platform() == 'Windows':
         mrmr_exe = '../extern/mRMR/mrmr_win32.exe'
         converter_exe = '../install/bin/Converter.exe'
-        sol_exe = r'..\install\bin\SOL.exe'
     else:
         mrmr_exe = '../extern/mRMR/mrmr_redhat_32'
         converter_exe = '../install/bin/Converter'
-        sol_exe = '../install/bin/SOL'
 
     dst_folder = dataset.name + '/mRMR'
     if os.path.exists(dst_folder) == False:
         os.makedirs(dst_folder)
-
-    result = util.ResultItem()
 
     data_dim = dataset.dim
     data_num = dataset.data_num
@@ -30,61 +26,40 @@ def run(dataset,model_config, param_config, output_file):
 
     sel_feat_num_list = [x for x in dataset.mrmr_l0_list if x <= 500]
     
-    result_all = util.ResultItem()
     for sel_feat_num in sel_feat_num_list:
-        result = util.ResultItem()
-        result_file   = dst_folder + '/result_%d.txt' %(sel_feat_num)
+        raw_model_file = dst_folder + '/raw_model_%d' %sel_feat_num
+        model_file = dst_folder + '/model_%d' %sel_feat_num
 
-        if os.path.exists(result_file):
-            result.load_result(result_file)
-        else:
-            raw_model_file = dst_folder + '/raw_model_%d' %sel_feat_num
-            model_file = dst_folder + '/model_%d' %sel_feat_num
-            ogd_result_file   = dst_folder + '/ogd_result_%d.txt' %(sel_feat_num)
-
-            #clear the file if it already exists
-            open(ogd_result_file,'w').close()
-            open(result_file,'w').close()
-
-            #run mRMR
-
-            mrmr_train_time  = 0
-            #prepare training data
-            if os.path.exists(raw_model_file) == False:
-                train_file = dataset.get_train_file(model_config['rand_num'])
-                csv_train_file =  train_file + '.csv'
-                if os.path.exists(csv_train_file) == False:
-                    #convert data
-                    print 'convert data'
-                    cmd = converter_exe + ' -i %s' %train_file + ' -o %s' %csv_train_file
-                    cmd += ' -st libsvm -dt csv'
-                    cmd = cmd.replace('/',os.sep)
-                    print cmd
-                    os.system(cmd)
-
-
-                prev_cmd = mrmr_exe + ' -v %d' %data_dim + ' -t 0.5 -i %s' %csv_train_file 
-                cmd = prev_cmd + ' -n %d' %sel_feat_num + ' > %s' %raw_model_file
+        #run mRMR
+        mrmr_train_time  = 0
+        #prepare training data
+        if os.path.exists(raw_model_file) == False:
+            train_file = dataset.get_train_file(model_config['rand_num'])
+            csv_train_file =  train_file + '.csv'
+            if os.path.exists(csv_train_file) == False:
+                #convert data
+                print 'convert data'
+                cmd = converter_exe + ' -i %s' %train_file + ' -o %s' %csv_train_file
+                cmd += ' -st libsvm -dt csv'
                 cmd = cmd.replace('/',os.sep)
                 print cmd
-                start_time =time.time()
                 os.system(cmd)
-                end_time = time.time()
 
-                #parse learning time
-                mrmr_train_time = (float)(end_time - start_time)
 
-            if os.path.exists(model_file) == False:
-                #parse result
-                parse_model_file(raw_model_file,model_file, mrmr_train_time);
+            prev_cmd = mrmr_exe + ' -v %d' %data_dim + ' -t 0.5 -i %s' %csv_train_file 
+            cmd = prev_cmd + ' -n %d' %sel_feat_num + ' > %s' %raw_model_file
+            cmd = cmd.replace('/',os.sep)
+            print cmd
+            start_time =time.time()
+            os.system(cmd)
+            end_time = time.time()
 
-def parse_train_time(model_file):
-    with open(model_file,'rb') as rfh:
-        line = rfh.readline().strip()
-        if len(line) == 0 or line[0] != '#':
-            raise IOError('model file is incorrect')
-        mrmr_train_time = float((line.split(':')[1]).strip())
-    return mrmr_train_time
+            #parse learning time
+            mrmr_train_time = (float)(end_time - start_time)
+
+        if os.path.exists(model_file) == False:
+            #parse result
+            parse_model_file(raw_model_file,model_file, mrmr_train_time);
 
 def parse_model_file(model_file,parse_file, train_time):
     print 'parse model file of mRMR%s\n' %model_file

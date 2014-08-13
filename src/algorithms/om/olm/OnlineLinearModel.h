@@ -74,7 +74,37 @@ namespace BOC {
 		 */
 		virtual void PrintModelInfo() const {
 			printf("Number of weights: %lu\n", static_cast<long int>(this->weightDim - 1));
+			IndexType nonZeroNum = this->GetNonZeroNum();
+			printf("Number of NonZero weight: %u\n", nonZeroNum);
+
+			double sparseRate = 0;
+			if (this->weightDim == 1){
+				sparseRate = 0;
+			}
+			else{
+				sparseRate = (this->weightDim - 1 - nonZeroNum) / (double)(this->weightDim - 1);
+			}
+
+			printf("Sparsification Rate: %g %%\n", sparseRate * 100);
 		}
+
+	protected:
+		/**
+		 * @Synopsis GetNonZeroNum get the number of nonzero weights
+		 *
+		 * @Returns number of nonzero weights
+		 */
+		IndexType GetNonZeroNum()  const {
+			IndexType nonZeroNum = 0;
+			s_array<float> weightVec = this->weightMatrix[0];
+			for (IndexType i = 1; i < this->weightDim; ++i){
+				if (weightVec[i] != 0){
+					++nonZeroNum;
+				}
+			}
+			return nonZeroNum;
+		}
+
 #pragma endregion Constructors and Basic Functions
 
 #pragma region  IO related

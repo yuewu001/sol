@@ -90,7 +90,7 @@ namespace BOC{
 	 */
 	char* basic_io::read_line(char* &dst, size_t &dst_len){
 		static size_t len(0);
-		if (fgets(dst, static_cast<int>(dst_len), file) == NULL)//note: there may exist problem here if dst_len > int_max
+		if (fgets(dst, int(dst_len), file) == NULL)//note: there may exist problem here if dst_len > int_max
 			return NULL;
 		while (strrchr(dst, '\n') == NULL) {
 			dst_len *= 2;

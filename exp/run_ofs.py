@@ -6,6 +6,7 @@ import os
 import util
 
 import run_mRMR
+import run_bif
 
 #run the online feature selection experiment
 #@param dataset: DataSet instance
@@ -23,7 +24,12 @@ def run(dataset, model, config, param_config, output_file):
     #get the dimension of the data
     data_dim = dataset.dim
 
-    if model == 'PreSelOGD':
+    if '+' in model:
+        [model,pre_model] = filter(None,model.split('+'))
+    else:
+        pre_model = ''
+
+    if pre_model == 'mRMR':
         sel_feat_num_list = dataset.mrmr_l0_list
     else:
         sel_feat_num_list = dataset.l0_list
@@ -31,7 +37,7 @@ def run(dataset, model, config, param_config, output_file):
     #evaluate the result
     cmd_postfix = ' >> %s' %output_file
 
-    dt_cmd = dataset.get_train_cmd( config['rand_num'],config['cache'])
+    dt_cmd = dataset.get_train_cmd(config['rand_num'],config['cache'])
     if dataset.class_num > 2:
         if model == 'SOFS':
             loss_cmd = ' -cn %d -loss MaxScoreSquaredHinge ' %(dataset.class_num)
@@ -50,26 +56,29 @@ def run(dataset, model, config, param_config, output_file):
     if 'passes' in config:
         cmd_prefix += ' -passes %d ' %config['passes']
 
-    mrmr_dst_folder = dataset.name + '/mRMR'
     for sel_num in sel_feat_num_list:
         cmd = cmd_prefix + ' -k %d' %sel_num 
-        if model == 'PreSelOGD':
-            model_file = mrmr_dst_folder + '/model_%d' %sel_num
+        if len(pre_model) != 0:
+            model_file = dataset.name + '/%s/model_%d' %(pre_model,sel_num)
             cmd += ' -im %s ' %(model_file)
         #predict file
-        predict_file   = dataset.name + '/%s/predict_%g.txt' %(model, sel_num)
+        predict_file   = dataset.name + '/%s+%s/predict_%g.txt' %(model,pre_model, sel_num)
         cmd += ' -op %s ' %predict_file
         cmd += cmd_postfix
+        cmd = cmd.replace('/',os.sep)
         print cmd
         os.system(cmd)
 
     #parse the result
     result = util.ResultItem()
+    print output_file
     result.parse_ofs_result(output_file)
-    if model == 'PreSelOGD':
+    result.Display()
+
+    if len(pre_model) != 0:
         for k in range(0,len(sel_feat_num_list)):
-            model_file = mrmr_dst_folder + '/model_%d' %sel_feat_num_list[k]
-            result.train_time[k] += run_mRMR.parse_train_time(model_file)
+            model_file = dataset.name + '/%s/model_%d' %(pre_model,sel_feat_num_list[k])
+            result.train_time[k] += util.parse_train_time(model_file)
 
     print '\nTraining Result: '
     result.Display()
