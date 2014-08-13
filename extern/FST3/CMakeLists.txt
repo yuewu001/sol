@@ -16,6 +16,9 @@ else()
     set (CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/linux)
 endif()
 
+if (NOT DEFINED BOOST_DIR)
+    message(FATAL_ERROR "Boost Dir is not specified!")
+endif (NOT DEFINED BOOST_DIR)
 
 FILE(GLOB src_criteria _src_criteria/*.hpp)
 source_group("src_criteria" FILES ${src_cirteria})
@@ -36,7 +39,7 @@ set (libsvm
 source_group("libsvm" FILES ${libsvm})
 
 include_directories(
-    D:/Programs/boost
+    ${BOOST_DIR}
     _src_criteria
     _src_dataio
     _src_global

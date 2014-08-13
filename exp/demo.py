@@ -15,18 +15,18 @@ import run_bif
 model_list = ['SOFS','PET','PreSelOGD-mRMR']
 
 model_list = ['SOFS','PET','mRMR','BIF','PreSelOGD-mRMR','PreSelOGD-BIF']
-model_list = ['SGD+BIF']
+model_list = ['BIF']
 
 #dataset list
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['a9a']
+ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim','news','rcv1','url'] 
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
 'cache':False,
-'norm':False,
+'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
@@ -35,7 +35,7 @@ model_config = {
 
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
-is_default_param = True
+is_default_param = False
 
 #train model
 def train_model(dataset):

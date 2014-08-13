@@ -63,6 +63,8 @@ class CV(object):
         #train
         for k in range(0, self.search_space.size):
             param_cmd  = self.search_space.get_param_cmd(k)
+            #does not select features
+            param_cmd += ' -k %d ' %(self.dataset.dim)
         
             result_once = util.run(train_file, test_file, self.dataset.class_num,
                     param_cmd, self.model, model_config, result_file)

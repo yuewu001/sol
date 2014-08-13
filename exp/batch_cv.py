@@ -3,7 +3,7 @@
 import CV
 import dataset
 
-model_list = ['SOFS','FOFS','PET','PreSelOGD']
+model_list = ['SOFS','FOFS','PET']
 
 ds_list = ['rcv1','news','url']
 ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
@@ -26,7 +26,7 @@ for dt in ds_list:
         if model == 'SOFS':
             real_model = model
             model = 'DAROW'
-        elif model == 'PET' or 'PreSelOGD' in model:
+        elif model == 'PET': 
             real_model = model
             model = 'SGD'
 

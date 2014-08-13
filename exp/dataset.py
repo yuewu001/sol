@@ -274,12 +274,19 @@ dt_dict = {}
 
 #synthetic
 synthetic_10K = DataSet('synthetic_10K','synthetic_10K/synthetic_train', 'synthetic_10K/synthetic_test')
+synthetic_10K.set_c_list([0.00001,0.0001,0.00025,0.0005,0.00075,0.001,0.01,0.015,0.016,0.017,0.018,0.019,0.02])
+synthetic_10K.set_fs_num([50,60,70,80,90,100,120,140,160,180,200])
+synthetic_10K.set_mrmr_l0_list([50,60,70,80,90,100,120,140,160,180,200])
 dt_dict['synthetic_10K'] = synthetic_10K
 
 synthetic_20K = DataSet('synthetic_20K','synthetic_20K/synthetic_train','synthetic_20K/synthetic_test')
+synthetic_20K.set_c_list([0.0001,0.0002,0.0003,0.0004,0.0005,0.0006,0.0008,0.0007,0.0009,0.001,0.01,0.012,0.013,0.014,0.015,0.016,0.018,0.02])
+synthetic_20K.set_fs_num([150,160,170,180,190,200,220,240,260,280,300,400])
+synthetic_20K.set_mrmr_l0_list([150,160,170,180,190,200,220,240,260,280,300,400])
 dt_dict['synthetic_20K'] = synthetic_20K
 
 synthetic_1B = DataSet('synthetic_1B','synthetic_1B/synthetic_train','synthetic_1B/synthetic_test')
+synthetic_1B.set_fs_num([500])
 dt_dict['synthetic_1B'] = synthetic_1B
 
 #media scale data
