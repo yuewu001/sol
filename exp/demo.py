@@ -9,14 +9,17 @@ import run_ofs
 import run_liblinear
 import run_fgm
 import run_mRMR
+import run_bif
 
 #model list
-model_list = ['SOFS','PET','PreSelOGD']
-model_list = ['SOFS', 'PreSelOGD']
+model_list = ['SOFS','PET','PreSelOGD-mRMR']
+
+model_list = ['SOFS','PET','mRMR','BIF','PreSelOGD-mRMR','PreSelOGD-BIF']
+model_list = ['SGD+BIF']
 
 #dataset list
 ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['caltech']
+ds_list = ['a9a']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 10
@@ -27,12 +30,12 @@ model_config = {
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
-'passes':10
+'passes':1
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,
 #parameters will obtained from get_model_param in dataset.py
-is_default_param = False
+is_default_param = True
 
 #train model
 def train_model(dataset):
@@ -55,25 +58,29 @@ def train_model(dataset):
             if os.path.exists(dst_folder) == False:
                 os.makedirs(dst_folder)
 
-            #output file
-            result_file = '{0}/{1}_result_{2}.txt'.format(dst_folder,model, k)
-            result_file = result_file.replace('/',os.sep)
-            #clear the file if it already exists
-            open(result_file,'w').close()
-
             if model == 'liblinear':
+                #output file
+                result_file = '{0}/{1}_result_{2}.txt'.format(dst_folder,model, k)
+                result_file = result_file.replace('/',os.sep)
+                #clear the file if it already exists
+                open(result_file,'w').close()
+
                 result_once = run_liblinear.run(dataset, model_config, result_file)
             elif model == 'FGM':
                 result_once = run_fgm.run(dataset, model_config, result_file)
             elif model == 'mRMR':
-                param_config = ''
-                #get parameters
-                if is_default_param == False:
-                    param_config = dataset.get_best_param('SGD')
-
-                run_mRMR.run(dataset, model_config,param_config, result_file)
+                run_mRMR.run(dataset, model_config)
+                continue
+            elif model == 'BIF':
+                run_bif.run(dataset, model_config)
                 continue
             else:
+                #output file
+                result_file = '{0}/{1}_result_{2}.txt'.format(dst_folder,model, k)
+                result_file = result_file.replace('/',os.sep)
+                #clear the file if it already exists
+                open(result_file,'w').close()
+
                 param_config = ''
                 #get parameters
                 if is_default_param == False:
@@ -95,7 +102,6 @@ def train_model(dataset):
 
 #train the model
 for ds in ds_list:
-
     dt = dataset.dt_dict[ds]
     model_result_dict = train_model(dt)
 

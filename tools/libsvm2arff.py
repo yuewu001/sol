@@ -7,6 +7,10 @@ import re
 def Usage():
     print 'libsvm2arff.py input_file output_file'
 
+if len(sys.argv) != 3:
+    Usage()
+    sys.exit()
+
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 

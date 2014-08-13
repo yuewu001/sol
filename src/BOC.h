@@ -209,6 +209,11 @@ namespace BOC{
 				fprintf(stderr, "Error %d: init optimizer failed! (%s)\n", STATUS_INIT_FAIL, optType.c_str());
 				return STATUS_INIT_FAIL;
 			}
+
+			const string& pre_sel_feat_file = param.StringValue("-im");
+			if (pre_sel_feat_file.length() > 0){
+				return this->pOpti->LoadPreSelFeatures(pre_sel_feat_file);
+			}
 			return STATUS_OK;
 		}
 

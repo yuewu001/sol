@@ -34,6 +34,12 @@ namespace BOC{
 		DataSet<FeatType, LabelType> *dataSet;
 		//number of iterations
 		size_t update_times;
+
+		//pre-selected features
+		s_array<char> sel_feat_flag_vec;
+		IndexType max_index;
+
+
 		/**
 		 * @Synopsis Constructors
 		 */
@@ -41,6 +47,7 @@ namespace BOC{
 		Optimizer(LearnModel<FeatType, LabelType> *model, DataSet<FeatType, LabelType> *dataset) :
 			learnModel(model), dataSet(dataset) {
 			this->update_times = 0;
+			this->max_index = 0;
 		}
 
 		virtual ~Optimizer() {
@@ -60,7 +67,7 @@ namespace BOC{
 		 *
 		 * @Returns
 		 */
-		float Test(DataSet<FeatType, LabelType> &testSet ) {
+		float Test(DataSet<FeatType, LabelType> &testSet) {
 			testSet.Rewind();
 			float errorRate(0);
 			//double test_time = 0;
@@ -110,7 +117,7 @@ namespace BOC{
 					const PointType &data = chunk.data[i];
 					//predict
 					int predict = this->learnModel->Predict(data, predicts);
-					os << predict << "\t"<<(int)(data.label)<<"\n";
+					os << predict << "\t" << (int)(data.label) << "\n";
 					if (predict != data.label){
 						errorRate++;
 					}
@@ -141,6 +148,77 @@ namespace BOC{
 			this->update_times = 0;
 			this->dataSet->Rewind();
 			return true;
+		}
+
+	public:
+		/**
+		 * @Synopsis load the feature selection result
+		 *
+		 * @Returns  error code, zero if sucussful
+		 */
+		int LoadPreSelFeatures(const string& filename){
+			this->max_index = 0;
+			this->sel_feat_flag_vec.erase();
+
+			basic_io io_handler;
+			io_handler.open_file(filename.c_str(), "r");
+			int err_code = io_handler.good();
+			if (err_code != 0){
+				fprintf(stderr, "open file %s failed, error code: %d\n!", filename.c_str(), err_code);
+				return err_code;
+			}
+
+			IndexType featIndex = 0;
+			vector<IndexType> featVec;
+
+			//load feature indexes
+			size_t dst_len = 64;
+			char* line = (char*)malloc(sizeof(char) * dst_len);
+			while (io_handler.read_line(line, dst_len) != NULL){
+				line = strip_line(line);
+				//skip comments and empty lines
+				if (line[0] == '\0' || line[0] == '#')
+					continue;
+
+				featIndex = (IndexType)(atoi(line));
+				if (featIndex == 0){
+					fprintf(stderr, "parse index %s failed!\n", line);
+					err_code = 1;
+					break;
+				}
+				featVec.push_back(featIndex);
+			}
+			if (line != NULL)
+				free(line);
+
+			//find the max index
+			this->max_index = *std::max_element(featVec.begin(), featVec.end());
+			this->sel_feat_flag_vec.resize(this->max_index + 1);
+			this->sel_feat_flag_vec.zeros();
+
+			for (vector<IndexType>::iterator iter = featVec.begin(); iter != featVec.end(); ++iter){
+				this->sel_feat_flag_vec[*iter] = 1;
+			}
+
+			return err_code;
+		}
+
+	protected:
+		/**
+		 * @Synopsis load the feature selection result
+		 *
+		 * @Returns  error code, zero if sucussful
+		 */
+		void FilterFeatures(PointType& data){
+			if (this->max_index == 0){
+				return;
+			}
+			size_t featNum = data.indexes.size();
+			for (size_t i = 0; i < featNum; ++i){
+				if (!(data.indexes[i] <= this->max_index && this->sel_feat_flag_vec[data.indexes[i]] != 0)){
+					data.features[i] = 0;
+				}
+			}
 		}
 	};
 }

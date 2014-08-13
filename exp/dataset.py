@@ -77,7 +77,7 @@ class DataSet(object):
 
     #set the feature selection rate
     def set_fs_rate(self, fs_rate):
-        self.l0_list = [self.dim * x for x in fs_rate]
+        self.l0_list = [int(self.dim * x) for x in fs_rate]
 
     #set the feature selection rate
     def set_fs_num(self, fs_num):
@@ -316,4 +316,3 @@ caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0
 caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
 caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
 dt_dict['caltech'] = caltech
-

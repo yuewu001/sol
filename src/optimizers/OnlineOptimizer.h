@@ -79,6 +79,7 @@ namespace BOC {
 
 				for (size_t i = 0; i < chunk.dataNum; i++) {
 					PointType &data = chunk.data[i];
+					this->FilterFeatures(data);
 
 					p_onlineModel->UpdateModelDimention(data.dim());
 					//int predictLabel = p_onlineModel->Iterate(data, predictVal);
