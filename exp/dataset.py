@@ -13,7 +13,7 @@ class DataSet(object):
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
             'class_num','lambda_list', 'l0_list','c_list','mrmr_l0_list')
 
-    root_dir = 'D:/Data/libsvm/'
+    root_dir = 'D:/users/v-wuyue/data/'
 
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
@@ -48,7 +48,8 @@ class DataSet(object):
         self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
 
     def __del__(self):
-        self.del_rand_file()
+        #self.del_rand_file()
+        pass
 
     #delete rand file and  the corresponding cache file
     def del_rand_file(self):
@@ -271,30 +272,48 @@ class DataSet(object):
 #initialize dataset
 dt_dict = {}
 
-#relathe = DataSet('relathe')
-#dt_dict['relathe'] = relathe
-#
-#pcmac = DataSet('pcmac')
-#dt_dict['pcmac'] = pcmac
-#
-#basehock = DataSet('basehock')
-#dt_dict['basehock'] = basehock
-#
-#ccat = DataSet('ccat')
-#dt_dict['ccat'] = ccat
-#
-#aut = DataSet('aut')
-#dt_dict['aut'] = aut
-#
-#real_sim = DataSet('real-sim')
-#dt_dict['real-sim'] = real_sim
+#synthetic
+synthetic_10K = DataSet('synthetic_10K','synthetic_10K/synthetic_train', 'synthetic_10K/synthetic_test')
+dt_dict['synthetic_10K'] = synthetic_10K
+
+synthetic_20K = DataSet('synthetic_20K','synthetic_20K/synthetic_train','synthetic_20K/synthetic_test')
+dt_dict['synthetic_20K'] = synthetic_20K
+
+synthetic_1B = DataSet('synthetic_1B','synthetic_1B/synthetic_train','synthetic_1B/synthetic_test')
+dt_dict['synthetic_1B'] = synthetic_1B
+
+#media scale data
+relathe = DataSet('relathe')
+dt_dict['relathe'] = relathe
+
+pcmac = DataSet('pcmac')
+dt_dict['pcmac'] = pcmac
+
+basehock = DataSet('basehock')
+dt_dict['basehock'] = basehock
+
+ccat = DataSet('ccat')
+dt_dict['ccat'] = ccat
+
+aut = DataSet('aut')
+dt_dict['aut'] = aut
+
+real_sim = DataSet('real-sim')
+dt_dict['real-sim'] = real_sim
+
+#large scale data
+news = DataSet('news')
+dt_dict['news'] = news
+
+rcv1  = DataSet('rcv1')
+dt_dict['rcv1'] = rcv1
+
+url = DataSet('url')
+dt_dict['url'] = url
 
 caltech = DataSet('caltech')
 caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
 caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
 caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
 dt_dict['caltech'] = caltech
-
-#a9a = DataSet('a9a','a9a/a9a', 'a9a/a9a.t')
-#dt_dict['a9a'] = a9a
 

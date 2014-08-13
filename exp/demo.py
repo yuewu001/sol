@@ -36,14 +36,6 @@ is_default_param = False
 
 #train model
 def train_model(dataset):
-    #random the file
-    if rand_num > 1:
-        rand_file = dataset.train_file + '_rand'  
-    else:
-        rand_file = dataset.train_file
-
-    rand_file_cache = rand_file + '_cache'
-
     model_result_dict = {}
     for model in model_list:
         model_result_dict[model] = util.ResultItem()
@@ -92,6 +84,7 @@ def train_model(dataset):
 
 
             model_result_dict[model].Add(result_once)
+        dataset.del_rand_file()
 
     #average the result
     if (rand_num > 1):
