@@ -97,8 +97,10 @@ namespace BOC {
 			dstPt.max_index = this->max_index;
 			dstPt.sum_sq = this->sum_sq;
 			dstPt.margin = this->margin;
+			dstPt.indexes.reserve(this->indexes.size());
 			dstPt.indexes.resize(this->indexes.size());
 			memcpy(dstPt.indexes.begin, this->indexes.begin, this->indexes.size() * sizeof(IndexType));
+			dstPt.features.reserve(this->features.size());
 			dstPt.features.resize(this->features.size());
 			memcpy(dstPt.features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
 		}
@@ -109,8 +111,10 @@ namespace BOC {
 			newPt.max_index = this->max_index;
 			newPt.sum_sq = this->sum_sq;
 			newPt.margin = this->margin;
+			newPt.indexes.reserve(this->indexes.size());
 			newPt.indexes.resize(this->indexes.size());
 			memcpy(newPt.indexes.begin, this->indexes.begin, this->indexes.size() * sizeof(IndexType));
+			newPt.features.reserve(this->features.size());
 			newPt.features.resize(this->features.size());
 			memcpy(newPt.features.begin, this->features.begin, this->features.size() * sizeof(FeatType));
 			return newPt;

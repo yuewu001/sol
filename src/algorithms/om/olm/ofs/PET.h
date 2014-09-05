@@ -76,7 +76,6 @@ namespace BOC {
 			if (new_dim < this->weightDim)
 				return;
 			else {
-				this->weightMatrixPNorm.reserve(new_dim + 1);
 				this->weightMatrixPNorm.resize(new_dim + 1);
 				this->weightMatrixPNorm.zeros(this->weightMatrixPNorm.begin + this->weightDim, this->weightMatrixPNorm.end);
 

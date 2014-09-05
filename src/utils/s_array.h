@@ -63,8 +63,15 @@ namespace BOC{
 		}
 
 		void resize(size_t newSize) {
+			static size_t max_size = 1 << 30;
+
 			if (capacity < newSize){ //allocate more memory
-				this->allocate(newSize);
+				size_t alloc_size = this->capacity;
+				do{
+					alloc_size += (alloc_size < max_size ? alloc_size : max_size) + 3;
+				} while (alloc_size < newSize);
+
+				this->allocate(alloc_size);
 			}
 			end = begin + newSize;
 		}
@@ -80,11 +87,7 @@ namespace BOC{
 
 		void reserve(size_t new_size){
 			if (this->capacity < new_size){
-				size_t alloc_size = this->capacity;
-				do{
-					alloc_size = 2 * alloc_size + 3;
-				} while (alloc_size < new_size);
-				this->allocate(alloc_size);
+				this->allocate(new_size);
 			}
 		}
 

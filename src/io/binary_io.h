@@ -105,6 +105,7 @@ namespace BOC {
 					fprintf(stderr, "read coded index length failed!\n");
 					exit(STATUS_INVALID_FILE);
 				}
+				this->comp_codes.reserve(code_len);
 				this->comp_codes.resize(code_len);
 				if (io_handler.read_data(this->comp_codes.begin,
 					code_len) == false){
@@ -117,6 +118,7 @@ namespace BOC {
 					exit(STATUS_INVALID_FILE);
 				}
 
+				data.features.reserve((size_t)featNum);
 				data.features.resize((size_t)featNum);
 				if (io_handler.read_data((char*)(data.features.begin),
 					sizeof(float)* size_t(featNum)) == false){

@@ -127,7 +127,6 @@ namespace BOC {
 			if (new_dim < this->weightDim)
 				return;
 			else {
-				this->gtVec.reserve(new_dim + 1);
 				this->gtVec.resize(new_dim + 1);
 				this->gtVec.zeros(this->gtVec.begin + this->weightDim,
 					this->gtVec.end);

@@ -301,7 +301,6 @@ namespace BOC {
 				new_dim++; //reserve the 0-th
 				for (int i = 0; i < this->classfier_num; ++i){
 					s_array<float>& weightVec = this->weightMatrix[i];
-					weightVec.reserve(new_dim);
 					weightVec.resize(new_dim);
 					//set the new value to zero
 					weightVec.zeros(weightVec.begin + this->weightDim,

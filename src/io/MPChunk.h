@@ -62,6 +62,7 @@ namespace BOC{
 			static float max_float;
 		public:
 			MPChunk_LARGE_MARGIN(size_t bufSize = init_mp_buf_size) : MPChunk<PointType>(bufSize){
+				this->marginVec.reserve(bufSize);
 				this->marginVec.resize(bufSize);
 				for (s_array<float>::iterator iter = this->marginVec.begin;
 					iter != this->marginVec.end; iter++)

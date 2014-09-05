@@ -119,7 +119,6 @@ namespace BOC {
 				for (int i = 0; i < this->classfier_num; ++i){
 					s_array<float>& sigma_w = this->sigmaWMatrix[i];
 
-					sigma_w.reserve(new_dim + 1);
 					sigma_w.resize(new_dim + 1);
 					sigma_w.set_value(sigma_w.begin + this->weightDim, sigma_w.end, 1);
 				}

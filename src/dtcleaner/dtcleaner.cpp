@@ -33,7 +33,6 @@ bool Detect(const string& filename, s_array<char> &index_set) {
                 }
                 size_t prev_size = index_set.size();
                 if (max_index > prev_size){
-                    index_set.reserve(max_index);
                     index_set.resize(max_index);
                     //set the new value to zero
                     index_set.zeros(index_set.begin + prev_size, 

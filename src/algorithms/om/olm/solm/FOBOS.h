@@ -124,7 +124,6 @@ namespace BOC {
 			if (new_dim < this->weightDim)
 				return;
 			else {
-				this->timeStamp.reserve(new_dim + 1);
 				this->timeStamp.resize(new_dim + 1);
 				//set the rest to zero
 				this->timeStamp.zeros(this->timeStamp.begin + this->weightDim,

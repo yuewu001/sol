@@ -141,13 +141,11 @@ namespace BOC {
 			if (new_dim < this->weightDim)
 				return;
 			else {
-				this->sigma_w.reserve(new_dim + 1);
 				this->sigma_w.resize(new_dim + 1);
 				//set the rest to one
 				this->sigma_w.set_value(this->sigma_w.begin + this->weightDim,
 					this->sigma_w.end, 1);
 
-				this->u_t.reserve(new_dim + 1);
 				this->u_t.resize(new_dim + 1);
 				//set the rest to zero
 				this->u_t.zeros(this->u_t.begin + this->weightDim,

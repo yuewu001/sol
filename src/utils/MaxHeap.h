@@ -145,7 +145,6 @@ namespace BOC{
 			else if (newK == this->K)
 				return;
 
-			this->pos2id_map.reserve(newK);
 			this->pos2id_map.resize(newK);
 			//update id2pos for those ids not in the heap
 			//update pos2id fr new added pos

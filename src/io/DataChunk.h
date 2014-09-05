@@ -37,6 +37,7 @@ namespace BOC {
 				exit(2);
 			}
 			try{
+				this->data.reserve(this->chunk_size);// = new DataPoint<FeatType, LabelType>[this->chunk_size];
 				this->data.resize(this->chunk_size);// = new DataPoint<FeatType, LabelType>[this->chunk_size];
 			}
 			catch (std::bad_alloc &ex){
