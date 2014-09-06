@@ -143,8 +143,9 @@ namespace BOC {
 		void Normalize(){
 			if (this->sum_sq != 0){
 				size_t featNum = this->indexes.size();
+                float norm = sqrtf(this->sum_sq);
 				for (size_t i = 0; i < featNum; ++i){
-					this->features[i] /= this->sum_sq;
+					this->features[i] /= norm;
 				}
 			}
 		}
