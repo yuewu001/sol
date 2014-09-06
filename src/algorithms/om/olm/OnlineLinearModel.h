@@ -360,7 +360,7 @@ namespace BOC {
 			//not correct
 			if (this->mc_gradients[x.label] != 0){
 				this->UpdateWeightVec(x, this->mc_gradients.begin);
-				return (std::max_element(predict, predict + this->classfier_num) - predict);
+				return int(std::max_element(predict, predict + this->classfier_num) - predict);
 			}
 			return x.label;
 		}
@@ -419,7 +419,7 @@ namespace BOC {
 				}
 			}
 			else{
-				return std::max_element(predicts, predicts + this->classfier_num) - predicts;
+				return int(std::max_element(predicts, predicts + this->classfier_num) - predicts);
 			}
 		}
 

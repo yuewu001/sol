@@ -1452,7 +1452,7 @@ void ezOptionParser::add(const char * defaults, const char* category, bool requi
 	}
 
 	g->category = category;
-	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
+	this->optionCategory2GroupIds[g->category].push_back(static_cast<int>(this->groups.size()) - 1);
 }
 
 /* ################################################################### */
@@ -1483,7 +1483,7 @@ void ezOptionParser::add(const char * defaults, const char* category, bool requi
         groupValidators[id] = -1;
     }
 	g->category = category;
-	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
+	this->optionCategory2GroupIds[g->category].push_back(int(this->groups.size()) - 1);
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help, 
@@ -1516,7 +1516,7 @@ void ezOptionParser::add(const char * defaults, const char* category, bool requi
         groupValidators[id] = -1;
     }
 	g->category = category;
-	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
+	this->optionCategory2GroupIds[g->category].push_back(int(this->groups.size()) - 1);
 };
 /* ################################################################### */
 void ezOptionParser::add(const char * defaults, const char* category, bool required, int expectArgs, char delim, const char * help,
@@ -1552,7 +1552,7 @@ void ezOptionParser::add(const char * defaults, const char* category, bool requi
         groupValidators[id] = -1;
     }
 	g->category = category;
-	this->optionCategory2GroupIds[g->category].push_back(this->groups.size() - 1);
+	this->optionCategory2GroupIds[g->category].push_back(int(this->groups.size()) - 1);
 };
 /* ################################################################### */
 bool ezOptionParser::exportFile(const char * filename, bool all) {

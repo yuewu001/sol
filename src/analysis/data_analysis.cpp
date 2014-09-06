@@ -93,15 +93,15 @@ bool Analyze(DataReader<FeatType, LabelType> *reader) {
 	cout << "class num    : " << map_class_sample_num.size() << "\n";
 	if (map_class_sample_num.size() == 2){
 		if (map_class_sample_num.find(1) != map_class_sample_num.end()) {
-			int pos_num = map_class_sample_num[1];
+			size_t pos_num = map_class_sample_num[1];
 			cout << "positive num	: " << pos_num << "\n";
 		}
 		if (map_class_sample_num.find(0) != map_class_sample_num.end()) {
-			int neg_num = map_class_sample_num[0];
+			size_t neg_num = map_class_sample_num[0];
 			cout << "negtive num	: " << neg_num << "\n";
 		}
 		else if (map_class_sample_num.find(-1) != map_class_sample_num.end()) {
-			int neg_num = map_class_sample_num[-1];
+			size_t neg_num = map_class_sample_num[-1];
 			cout << "negtive num	: " << neg_num << "\n";
 		}
 	}
