@@ -13,7 +13,7 @@ model_config = {
 'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
-'passes':1
+'passes':20
 }
 
 #definition of cross validation class

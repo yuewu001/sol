@@ -14,10 +14,11 @@ import run_bif
 #model list
 model_list = ['mRMR','BIF']
 model_list = ['FGM','liblinear']
-model_list = ['SOFS','PET','FOFS','SGD+mRMR','SGD+BIF']
+model_list = ['SGD','DAROW','SOFS']
 
 #dataset list
-ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
+ds_list = ['rcv1','news','url']
+ds_list = ['synthetic_1B']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 10
@@ -79,9 +80,7 @@ def train_model(dataset):
                 if is_default_param == False:
                     param_config = dataset.get_best_param(model)
 
-                result_once = run_ofs.run(dataset,model, model_config,
-                        param_config, result_file)
-
+                result_once = run_ofs.run(dataset,model, model_config, param_config, result_file)
 
             model_result_dict[model].Add(result_once)
         dataset.del_rand_file()

@@ -9,21 +9,21 @@ import run_ofs
 import run_liblinear
 import run_fgm
 import run_mRMR
+import run_bif
 
 #model list
-model_list = ['FGM','liblinear','mRMR']
-model_list = ['mRMR']
+model_list = ['mRMR','BIF']
+model_list = ['FGM']
 
 #dataset list
-ds_list = ['relathe','pcmac','basehock','ccat','aut','real-sim']
-ds_list = ['caltech']
+ds_list = ['rcv1','news']
 
 #number of times to randomize a dataset for averaged results
 rand_num = 1
 #extra command sent to SOL
 model_config = {
-'cache':True,
-'norm':False,
+'cache':False,
+'norm':True,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
@@ -36,14 +36,6 @@ is_default_param = False
 
 #train model
 def train_model(dataset):
-    #random the file
-    if rand_num > 1:
-        rand_file = dataset.train_file + '_rand'  
-    else:
-        rand_file = dataset.train_file
-
-    rand_file_cache = rand_file + '_cache'
-
     model_result_dict = {}
     for model in model_list:
         model_result_dict[model] = util.ResultItem()
@@ -70,16 +62,15 @@ def train_model(dataset):
             open(result_file,'w').close()
 
             if model == 'liblinear':
+
                 result_once = run_liblinear.run(dataset, model_config, result_file)
             elif model == 'FGM':
                 result_once = run_fgm.run(dataset, model_config, result_file)
             elif model == 'mRMR':
-                param_config = ''
-                #get parameters
-                if is_default_param == False:
-                    param_config = dataset.get_best_param('SGD')
-
-                run_mRMR.run(dataset, model_config,param_config, result_file)
+                run_mRMR.run(dataset, model_config)
+                continue
+            elif model == 'BIF':
+                run_bif.run(dataset, model_config)
                 continue
             else:
                 param_config = ''
@@ -92,6 +83,7 @@ def train_model(dataset):
 
 
             model_result_dict[model].Add(result_once)
+        dataset.del_rand_file()
 
     #average the result
     if (rand_num > 1):
@@ -102,7 +94,6 @@ def train_model(dataset):
 
 #train the model
 for ds in ds_list:
-
     dt = dataset.dt_dict[ds]
     model_result_dict = train_model(dt)
 

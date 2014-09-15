@@ -13,14 +13,14 @@ import run_bif
 
 #model list
 model_list = ['mRMR','BIF']
-model_list = ['FGM','liblinear']
-model_list = ['SOFS','PET','FOFS','SGD+mRMR','SGD+BIF']
+model_list = ['SOFS','PET','SGD+mRMR','SGD+BIF']
+model_list = ['SOFS']
 
 #dataset list
-ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
+ds_list = ['caltech_new']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
 'cache':False,
@@ -28,7 +28,7 @@ model_config = {
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
-'passes':1
+'passes':20
 }
 
 #whether to use the default parameter settings of each algorithm, otherwise,
