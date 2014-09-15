@@ -25,7 +25,10 @@ def run(dataset,model_config):
     #bs_list = l1_def.get_lambda_list(ds,'mRMR')
 
     sel_feat_num_list = [x for x in dataset.mrmr_l0_list if x <= 500]
-    
+
+    train_file = dataset.train_file
+    csv_train_file =  train_file + '.csv'
+
     for sel_feat_num in sel_feat_num_list:
         raw_model_file = dst_folder + '/raw_model_%d' %sel_feat_num
         model_file = dst_folder + '/model_%d' %sel_feat_num
@@ -34,8 +37,6 @@ def run(dataset,model_config):
         mrmr_train_time  = 0
         #prepare training data
         if os.path.exists(raw_model_file) == False:
-            train_file = dataset.get_train_file(model_config['rand_num'])
-            csv_train_file =  train_file + '.csv'
             if os.path.exists(csv_train_file) == False:
                 #convert data
                 print 'convert data'
@@ -60,6 +61,10 @@ def run(dataset,model_config):
         if os.path.exists(model_file) == False:
             #parse result
             parse_model_file(raw_model_file,model_file, mrmr_train_time);
+
+    if os.path.exists(csv_train_file) == True:
+        os.remove(csv_train_file)
+
 
 def parse_model_file(model_file,parse_file, train_time):
     print 'parse model file of mRMR%s\n' %model_file
@@ -92,7 +97,7 @@ def parse_model_file(model_file,parse_file, train_time):
         file_handler = open(parse_file,'w')
 
         file_handler.write('#Training time: %f\n' %train_time)
-    
+
         for k in range(0,len(c_feat)):
             file_handler.write('%d\n' %c_feat[k])
     except IOError as e:
@@ -100,7 +105,5 @@ def parse_model_file(model_file,parse_file, train_time):
         sys.exit()
     else:
         file_handler.close()
+
     return c_feat
-    
-
-

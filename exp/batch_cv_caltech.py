@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """bach cross validation"""
-import CV
+import CV_caltech
 import dataset
 
-model_list = ['SOFS','PET','FOFS']
+model_list = ['SOFS','PET']
 
-ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
+ds_list = ['caltech'] 
 
 fold_num = 5
 
@@ -40,7 +40,7 @@ for dt in ds_list:
         else:
             param_config = ' {0} {1}'.format('-eta',eta_search)
 
-        cv = CV.CV(dt,model,fold_num,param_config)
+        cv = CV_caltech.CV(dt,model,fold_num,param_config)
         cv.run()
 
         if real_model != '':

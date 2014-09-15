@@ -36,7 +36,7 @@ class DataSet(object):
         self.lambda_list = [pow(10,x) for x in range(-8,0,1)]
 
         #set l0 list
-        self.set_fs_rate([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.975, 0.99,0.995])
+        self.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
         #self.l0_list = [self.dim * 0.1 * x for x in range(1,10)]
 
         #set mrmr list
@@ -106,7 +106,10 @@ class DataSet(object):
             return util.get_train_cmd(self.train_file,self.test_file, is_cache)
 
     def get_best_param(self, model):
-        cv_file = '{0}/cv/cv_{1}_result.txt'.format(self.name, model)
+        if '+' in model:
+            cv_file = '{0}/cv/cv_{1}_result.txt'.format(self.name, model.split('+')[0])
+        else:
+            cv_file = '{0}/cv/cv_{1}_result.txt'.format(self.name, model)
         dec_pattern = "\d+\.?\d*"
         pattern = re.compile(r'(?<=Best Result:).+(?=:)'.format(dec_pattern))
 
@@ -177,6 +180,7 @@ class DataSet(object):
 
 
     def split(self, fold_num):
+        print 'split files...'
         in_filename = self.train_file
         #count line number
         line_num = 0
@@ -192,6 +196,7 @@ class DataSet(object):
             sys.exit()
         else:
             file.close()
+        print line_num, " lines in file"
 
         #get the file length of splitted files
         split_file_len_list = [line_num / fold_num for i in range(0,fold_num - 1)]
@@ -217,19 +222,22 @@ class DataSet(object):
     #merge different files together
     #return: merged file name
     def merge_files(self, fold_id_list):
+        print 'merge files...'
         out_file = self.train_file + '_' + ''.join([str(item) for item in fold_id_list])
 
         wfh = open(out_file,'wb') 
         for fold_id in fold_id_list:
+            print fold_id
             in_file = '{0}_{1}'.format(self.train_file,fold_id)
             try:
                 rfh = open(in_file, 'rb')
-                lines = rfh.readlines()
-                #remove empty lines
-                while len(lines) > 0 and (lines[-1] == '\n' or lines[-1] == '\r\n'):
-                    lines = lines[0:-1]
-                #write the lines
-                wfh.writelines(lines)
+                while True:
+                    line = rfh.readline()
+                    #remove empty lines
+                    if len(line) == 0 or line == '\n' or line == '\r\n':
+                        break
+                    #write the line
+                    wfh.write(line)
             except IOError as e:
                 print 'Error {0}: {1}'.format(e.errno, e.strerror)
             else:
@@ -245,7 +253,13 @@ class DataSet(object):
         out_filename = in_filename + '_rand'
         try:
             file = open(in_filename, 'rb')
-            lines = file.readlines()
+            lines = []
+            while True:
+                line = file.readline()
+                if len(line) == 0:
+                    break
+                lines.append(line)
+
             if len(lines) == 0:
                 print 'empty file'
                 file.close()
@@ -310,12 +324,15 @@ dt_dict['real-sim'] = real_sim
 
 #large scale data
 news = DataSet('news')
+news.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
 dt_dict['news'] = news
 
 rcv1  = DataSet('rcv1')
+rcv1.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
 dt_dict['rcv1'] = rcv1
 
 url = DataSet('url')
+url.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
 dt_dict['url'] = url
 
 caltech = DataSet('caltech')

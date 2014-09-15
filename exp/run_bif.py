@@ -9,7 +9,7 @@ import util
 
 def run(dataset,model_config):
     if util.get_platform() == 'Windows':
-        bif_exe = '../extern/FST3/x86/BIF.exe'
+        bif_exe = '../extern/FST3/x64/BIF.exe'
     else:
         bif_exe = '../extern/FST3/linux/BIF'
 
@@ -25,7 +25,10 @@ def run(dataset,model_config):
     #bs_list = l1_def.get_lambda_list(ds,'bif')
 
     sel_feat_num_list = [x for x in dataset.l0_list] 
-    
+
+    train_file = dataset.train_file
+    arff_train_file =  train_file + '.arff'
+
     for sel_feat_num in sel_feat_num_list:
         model_file = dst_folder + '/model_%d' %sel_feat_num
 
@@ -33,8 +36,6 @@ def run(dataset,model_config):
         train_time  = 0
         #prepare training data
         if os.path.exists(model_file) == False:
-            train_file = dataset.get_train_file(model_config['rand_num'])
-            arff_train_file =  train_file + '.arff'
             if os.path.exists(arff_train_file) == False:
                 #convert data
                 print 'convert data'
@@ -42,7 +43,6 @@ def run(dataset,model_config):
                 cmd = cmd.replace('/',os.sep)
                 print cmd
                 os.system(cmd)
-
 
             cmd = bif_exe + ' %s %d %s' %(arff_train_file, sel_feat_num, model_file)
             cmd = cmd.replace('/',os.sep)
@@ -54,4 +54,6 @@ def run(dataset,model_config):
             #parse learning time
             bif_train_time = (float)(end_time - start_time)
 
+    if os.path.exists(arff_train_file) == True:
+        os.remove(arff_train_file)
 

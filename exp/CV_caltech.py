@@ -10,10 +10,10 @@ import search_space
 #extra command sent to SOL
 model_config = {
 'cache':True,
-'norm':True,
+'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
-'passes':1
+'passes':10
 }
 
 #definition of cross validation class

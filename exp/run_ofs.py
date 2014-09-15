@@ -62,7 +62,9 @@ def run(dataset, model, config, param_config, output_file):
             model_file = dataset.name + '/%s/model_%d' %(pre_model,sel_num)
             cmd += ' -im %s ' %(model_file)
         #predict file
-        predict_file   = dataset.name + '/%s+%s/predict_%g.txt' %(model,pre_model, sel_num)
+            predict_file   = dataset.name + '/%s+%s/predict_%g.txt' %(model,pre_model, sel_num)
+        else:
+            predict_file   = dataset.name + '/%s/predict_%g.txt' %(model,sel_num)
         cmd += ' -op %s ' %predict_file
         cmd += cmd_postfix
         cmd = cmd.replace('/',os.sep)

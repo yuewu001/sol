@@ -3,9 +3,9 @@
 import CV
 import dataset
 
-model_list = ['SOFS','PET','FOFS']
+model_list = ['SOFS','PET']
 
-ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
+ds_list = ['rcv1','news','url','synthetic_1B']
 
 fold_num = 5
 

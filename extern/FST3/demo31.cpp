@@ -201,6 +201,7 @@ int main(int argc, char** args)
 
 		std::ofstream outFile(out_file.c_str(), std::ios::out);
 		if (outFile){
+            std::cout<<"Save result to "<<out_file<<std::endl;
 			outFile << "#Train time: " << endTime - startTime << std::endl;
 
 			outFile << *sub;
