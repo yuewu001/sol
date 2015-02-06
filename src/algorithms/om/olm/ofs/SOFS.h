@@ -195,6 +195,9 @@ namespace BOC {
 				s_array<float>& sigma_w = this->sigmaWMatrix[k];
 				for (size_t i = 0; i < featDim; ++i){
 					index_i = x.indexes[i];
+					//update u_t
+					weightVec[index_i] -= beta_t * sigma_w[index_i] * gt_t[k] * x.features[i];
+					/*
 					if (this->heap.is_topK(index_i - 1)){
 						//update u_t
 						weightVec[index_i] -= beta_t * sigma_w[index_i] * gt_t[k] * x.features[i];
@@ -202,6 +205,7 @@ namespace BOC {
 					else{
 						weightVec[index_i] = 0;
 					}
+					*/
 
 					//update sigma_w
 					this->sigmaWSum[index_i] -= sigma_w[index_i];
@@ -219,7 +223,12 @@ namespace BOC {
 			//update the heap
 			for (size_t i = 0; i < featDim; i++){
 				IndexType ret_id;
-				this->heap.UpdateHeap(x.indexes[i] - 1, ret_id);
+				if (this->heap.UpdateHeap(x.indexes[i] - 1, ret_id) == true){
+					++ret_id;
+					for (int k = 0; k < this->classfier_num; ++k){
+						this->weightMatrix[k][ret_id] = 0;
+					}
+				}
 			}
 		}
 #pragma endregion Train Related
