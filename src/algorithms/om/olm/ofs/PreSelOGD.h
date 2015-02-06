@@ -46,7 +46,7 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param) {
 			OnlineFeatureSelection<FeatType, LabelType>::SetParameter(param);
-			const std::string& modelFileName = param.StringValue("-im");
+			const std::string& modelFileName = param.StringValue("-pf");
 
 			if (this->LoadFSResult(modelFileName) != STATUS_OK){
 				throw invalid_argument("load input model file failed!");

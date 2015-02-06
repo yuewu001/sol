@@ -188,6 +188,14 @@ namespace BOC{
 				return STATUS_INVALID_ARGUMENT;
 			}
 
+			//load existing model
+			const string& input_model_file = param.StringValue("-im");
+			if (input_model_file.length() > 0){
+				if (this->pModel->LoadModel(input_model_file) == false){
+					return STATUS_INVALID_FILE;
+				}
+			}
+			//set parameter
 			try{
 				this->pModel->SetParameter(param);
 			}
@@ -210,7 +218,7 @@ namespace BOC{
 				return STATUS_INIT_FAIL;
 			}
 
-			const string& pre_sel_feat_file = param.StringValue("-im");
+			const string& pre_sel_feat_file = param.StringValue("-pf");
 			if (pre_sel_feat_file.length() > 0){
 				return this->pOpti->LoadPreSelFeatures(pre_sel_feat_file);
 			}
@@ -239,68 +247,87 @@ namespace BOC{
 			return errCode;
 		}
 
-		int Run(){
+
+		int Train() {
 			if (this->pDataset->Load(this->pParam->StringValue("-i"), this->pParam->StringValue("-c"),
 				this->pParam->StringValue("-df")) == false){
 				fprintf(stderr, "Error %d: Load dataset failed\n", STATUS_IO_ERROR);
 				return STATUS_IO_ERROR;
 			}
 
-			this->pModel->PrintModelSettings();
 			//learning the model
 			double time1 = get_current_time();
 
 			float l_errRate = this->pOpti->Train();
 
-			if (this->pParam->StringValue("-om").length() > 0){
-				this->pModel->SaveModel(this->pParam->StringValue("-om"));
-			}
-
 			double time2 = get_current_time();
 			printf("\nData number: %lu\n", this->pDataset->size());
 			printf("Training error rate: %.2f %%\n", l_errRate * 100);
 			printf("Training time: %.3f s\n", (float)(time2 - time1));
-			this->pModel->PrintModelInfo();
+			return STATUS_OK;
+		}
 
-			//test
+		int Test() {
+			double time2 = get_current_time();
 			double time3 = 0;
 			//test the model
-			bool is_test = this->pParam->StringValue("-tc").length() > 0 ||
-				this->pParam->StringValue("-t").length() > 0;
-			if (is_test) {
-				OnlineDataSet<FeatType, LabelType> testset(1, this->pParam->BoolValue("-norm"),
-					this->pParam->IntValue("-bs"), this->pParam->IntValue("-cs"));
-				if (testset.Load(this->pParam->StringValue("-t"), this->pParam->StringValue("-tc"),
-					this->pParam->StringValue("-df")) == true) {
-					float t_errRate(0);	//test error rate
+			OnlineDataSet<FeatType, LabelType> testset(1, this->pParam->BoolValue("-norm"),
+				this->pParam->IntValue("-bs"), this->pParam->IntValue("-cs"));
+			if (testset.Load(this->pParam->StringValue("-t"),
+				this->pParam->StringValue("-tc"),
+				this->pParam->StringValue("-df")) == true) {
+				float t_errRate(0);	//test error rate
 
-					const string& predict_file = this->pParam->StringValue("-op");
-					if (predict_file.length() == 0){
-						t_errRate = this->pOpti->Test(testset);
-					}
-					else{
-						std::ofstream outfile(predict_file.c_str(), std::ios::out);
-						if (outfile){
-							t_errRate = this->pOpti->Test(testset, outfile);
-						}
-						else{
-							fprintf(stderr, "Error: open predict file %s failed!\n", predict_file.c_str());
-							t_errRate = this->pOpti->Test(testset);
-						}
-						outfile.close();
-					}
-
-					time3 = get_current_time();
-
-					printf("Test error rate: %.2f %%\n", t_errRate * 100);
-					printf("Test time: %.3f s\n", (float)(time3 - time2));
+				const string& predict_file = this->pParam->StringValue("-op");
+				if (predict_file.length() == 0){
+					t_errRate = this->pOpti->Test(testset);
 				}
 				else{
-					fprintf(stderr, "load test set failed!\n");
+					std::ofstream outfile(predict_file.c_str(), std::ios::out);
+					if (outfile){
+						t_errRate = this->pOpti->Test(testset, outfile);
+					}
+					else{
+						fprintf(stderr, "Error: open predict file %s failed!\n", predict_file.c_str());
+						t_errRate = this->pOpti->Test(testset);
+					}
+					outfile.close();
 				}
+
+				time3 = get_current_time();
+
+				printf("Test error rate: %.2f %%\n", t_errRate * 100);
+				printf("Test time: %.3f s\n", (float)(time3 - time2));
+			}
+			else{
+				fprintf(stderr, "load test set failed!\n");
+				return STATUS_IO_ERROR;
+			}
+			return STATUS_OK;
+		}
+
+		int Run(){
+			this->pModel->PrintModelSettings();
+
+			int ret = STATUS_OK;
+			//train
+			bool is_train = this->pParam->StringValue("-i").length() > 0 || 
+				this->pParam->StringValue("-c").length() > 0;
+			if (ret == STATUS_OK && is_train) {
+				ret = Train();
 			}
 
-			return STATUS_OK;
+			this->pModel->PrintModelInfo();
+			if (this->pParam->StringValue("-om").length() > 0){
+				this->pModel->SaveModel(this->pParam->StringValue("-om"));
+			}
+			//test
+			bool is_test = this->pParam->StringValue("-tc").length() > 0 ||
+				this->pParam->StringValue("-t").length() > 0;
+			if (ret == STATUS_OK && is_test) {
+				ret = Test();
+			}
+			return ret;
 		}
 
 		public:
@@ -339,18 +366,19 @@ namespace BOC{
 				//model setting
 				param.add_option(2, 0, 1, "class number:", "-cn", "Model Settings");
 				param.add_option(init_algo_method, 0, 1, "learning model:", "-m", "Model Settings");
-				param.add_option(init_eta, 0, 1, "learning rate", "-eta", "Model Settings");
-				param.add_option(init_power_t, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
-				param.add_option(init_initial_t, 0, 1, "initial iteration number", "-t0", "Model Settings");
-				param.add_option(init_lambda, 0, 1, "l1 regularization", "-l1", "Model Settings");
-				param.add_option(init_k, 0, 1,
+				param.add_option(-1.f, 0, 1, "learning rate", "-eta", "Model Settings");
+				param.add_option(-1.f, 0, 1, "power t of decaying learning rate", "-power_t", "Model Settings");
+				param.add_option(-1, 0, 1, "initial iteration number", "-t0", "Model Settings");
+				param.add_option(-1.f, 0, 1, "l1 regularization", "-l1", "Model Settings");
+				param.add_option(-1, 0, 1,
 					"number of k in truncated gradient descent or feature selection", "-k", "Model Settings");
-				param.add_option(init_gammarou, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou", "Model Settings");
-				param.add_option(init_delta, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta", "Model Settings");
-				param.add_option(init_r, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r", "Model Settings");
+				param.add_option(-1.f, 0, 1, "gamma times rou in enhanced RDA (RDA_E)", "-grou", "Model Settings");
+				param.add_option(-1.f, 0, 1, "delta in Adaptive algorithms(Ada-)", "-delta", "Model Settings");
+				param.add_option(-1.f, 0, 1, "r in Confidence weighted algorithms and SOSOL", "-r", "Model Settings");
 
 				//optimizer
 				param.add_option(init_opt_type, 0, 1, "optimization algorithm", "-opt", "Optimizer");
+				param.add_option("", false, 1, "pre-selected features", "-pf", "Optimizer");
 			}
 	};
 

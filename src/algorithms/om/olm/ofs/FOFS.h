@@ -61,8 +61,10 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			OnlineFeatureSelection<FeatType, LabelType>::SetParameter(param);
-			this->delta = param.FloatValue("-delta");
-			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
+			float val = param.FloatValue("-delta");
+			if (val >= 0) {
+				this->delta = val;
+			}
 			this->power_t = 0;
 		}
 
@@ -70,6 +72,7 @@ namespace BOC {
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 			OnlineFeatureSelection<FeatType, LabelType>::BeginTrain();
 
 			this->w_norm = 0;

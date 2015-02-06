@@ -51,8 +51,6 @@ namespace BOC {
 		 */
 		virtual void PrintModelInfo() const {
 			OnlineLinearModel<FeatType, LabelType>::PrintModelInfo();
-
-			
 		}
 
 		/**
@@ -62,8 +60,18 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->lambda = param.FloatValue("-l1");
+			float val = param.FloatValue("-l1");
+			if (val >= 0) {
+				this->lambda = val;
+			}
+		}
+
+		/**
+		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
+		 */
+		virtual void BeginTrain() {
 			INVALID_ARGUMENT_EXCEPTION(lambda, this->lambda >= 0, "no smaller than 0");
+			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
 		}
 
 		/**

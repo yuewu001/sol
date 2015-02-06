@@ -34,7 +34,7 @@ namespace BOC {
 		RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) {
 			this->modelName = "RDA";
-			this->gamma_rou = 0;
+			this->gamma_rou = init_gammarou;
 			this->gtVec.resize(this->weightDim);
 			//initail_t should be no less than 1,for the safety of update at the first step
 			this->initial_t = 1;
@@ -62,14 +62,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->gamma_rou = param.FloatValue("-grou");
-			INVALID_ARGUMENT_EXCEPTION(gamma_rou, this->gamma_rou >= 0, "no smaller than 0");
+			float val = param.FloatValue("-grou");;
+			if (val >= 0){
+				this->gamma_rou = val;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(gamma_rou, this->gamma_rou >= 0, "no smaller than 0");
 			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			this->gtVec.zeros();

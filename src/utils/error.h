@@ -14,6 +14,7 @@ static const int STATUS_INVALID_ARGUMENT = 2;
 static const int STATUS_INIT_FAIL = 3;
 static const int STATUS_IO_ERROR = 4;
 static const int STATUS_INVALID_FILE = 5;
+static const int STATUS_END_OF_FILE = 6;
 
 #endif
 

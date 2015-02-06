@@ -33,7 +33,7 @@ namespace BOC {
 		Ada_RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "Ada-RDA";
-			this->delta = 0;;
+			this->delta = init_delta;
 			this->s.resize(this->weightDim);
 			this->u_t.resize(this->weightDim);
 		}
@@ -60,14 +60,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->delta = param.FloatValue("-delta");
-			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
+			float val = param.FloatValue("-delta");
+			if (val >= 0){
+				this->delta = val;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(delta, this->delta >= 0, "no smaller than 0");
 			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			//reset time stamp

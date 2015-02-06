@@ -49,8 +49,8 @@ namespace BOC {
 	public:
 		OnlineModel(LossFunction<FeatType, LabelType> *lossFunc, int classNum)
 			: LearnModel<FeatType, LabelType>(lossFunc, classNum),
-			power_t(0), eta0(0), eta(0),
-			curIterNum(0), initial_t(0) {
+			power_t(init_power_t), eta0(init_eta), eta(0),
+			curIterNum(0), initial_t(init_initial_t) {
 			this->modelType = "online";
 		}
 
@@ -79,6 +79,9 @@ namespace BOC {
 		 */
 		virtual void BeginTrain() {
 			this->curIterNum = this->initial_t;
+			INVALID_ARGUMENT_EXCEPTION(initial_t, this->initial_t >= 0, "no smaller than 0");
+			INVALID_ARGUMENT_EXCEPTION(power_t, this->power_t >= 0, "no smaller than 0");
+			INVALID_ARGUMENT_EXCEPTION(eta0, this->eta0 >= 0, "no smaller than 0");
 		}
 
 		/**
@@ -99,12 +102,18 @@ namespace BOC {
 		 *
 		 */
 		virtual void SetParameter(BOC::Params &param){
-			this->initial_t = param.IntValue("-t0");
-			INVALID_ARGUMENT_EXCEPTION(initial_t, this->initial_t >= 0, "no smaller than 0");
-			this->power_t = param.FloatValue("-power_t");
-			INVALID_ARGUMENT_EXCEPTION(power_t, this->power_t >= 0, "no smaller than 0");
-			this->eta0 = param.FloatValue("-eta");
-			INVALID_ARGUMENT_EXCEPTION(eta0, this->eta0 >= 0, "no smaller than 0");
+			int it = param.IntValue("-t0");
+			if (it > 0) {
+				this->initial_t = it;
+			}
+			float val = param.FloatValue("-power_t");
+			if (val > 0){
+				this->power_t = val;
+			}
+			val = param.FloatValue("-eta");
+			if (val > 0) {
+				this->eta0 = val;
+			}
 		}
 
 		/**

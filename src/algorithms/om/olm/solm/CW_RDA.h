@@ -29,7 +29,7 @@ namespace BOC {
 		CW_RDA(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "CW-RDA";
-			this->r = 0;
+			this->r = init_r;
 			this->u_t.resize(this->weightDim);
 			this->sigma_w.resize(this->weightDim);
 			this->lossFunc = new SquaredHingeLoss < FeatType, LabelType > ;
@@ -61,14 +61,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->r = param.FloatValue("-r");
-			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
+			float val = param.FloatValue("-r");
+			if (val >= 0){
+				this->r = val;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
 			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 			this->u_t.zeros();
 			this->sigma_w.set_value(1);

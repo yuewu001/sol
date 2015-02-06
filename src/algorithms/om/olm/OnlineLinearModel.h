@@ -242,7 +242,9 @@ namespace BOC {
 			//weight dimension
 			string line;
 
-			getline(is, line);
+			while ((line == "[value]") == false){
+				getline(is, line);
+			}
 			getline(is, line, ':');
 			is >> this->classfier_num;
 			getline(is, line);
@@ -256,13 +258,74 @@ namespace BOC {
 				s_array<float>& weightVec = this->weightMatrix[k];
 				weightVec.resize(this->weightDim);
 				weightVec.zeros();
-				getline(is, line, '|');
-				//weights
-				getline(is, line);
 			}
-
-			return true;
+			//load weights
+			int ret = STATUS_OK;
+			do{
+				getline(is, line);
+				ret = LoadWeights(line.c_str());
+			} while (ret == STATUS_OK);
+			if (ret == STATUS_END_OF_FILE){
+				return true;
+			}
+			else{
+				return false;
+			}
 		}
+
+		protected:
+			int LoadWeights(const char* line){
+				int classifier_id;
+				char* p = const_cast<char*>(line), *endptr = NULL;
+				p = strip_line(p); 
+				if (*p == '\0'){
+					return STATUS_END_OF_FILE;
+				}
+				classifier_id = parseInt(p, &endptr);
+				if (endptr == p) {
+					fprintf(stderr, "parse classifier index failed.\n");
+					return STATUS_INVALID_FILE;
+				}
+				p = strip_line(endptr);
+				if (*p != '|'){
+					fprintf(stderr, "incorrect weight format.\n");
+					return STATUS_INVALID_FILE;
+				}
+				else{
+					endptr = ++p;
+				}
+
+				s_array<float>& weightVec = this->weightMatrix[classifier_id];
+
+				IndexType index;
+				FeatType feat;
+				// features
+				while (1) {
+					p = strip_line(endptr);
+					if (*p == '\0')
+						break;
+					index = (IndexType)(parseUint(p, &endptr));
+					if (endptr == p) { //parse index failed
+						fprintf(stderr, "parse index value failed!\n%s", p);
+						return STATUS_INVALID_FILE;
+					}
+					p = strip_line(endptr);
+					if (*p != ':') {
+						fprintf(stderr, "incorrect input file!\n%s", p);
+						return STATUS_INVALID_FILE;
+					}
+					++p;
+
+					feat = parseFloat(p, &endptr);
+					if (endptr == p) {
+						fprintf(stderr, "parse feature value failed!\n");
+						return STATUS_INVALID_FILE;
+					}
+					weightVec[index] = feat;
+				}
+
+				return STATUS_OK;
+			}
 
 #pragma endregion  IO related
 

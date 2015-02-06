@@ -27,7 +27,7 @@ namespace BOC {
 	public:
 		OnlineFeatureSelection(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			OnlineLinearModel<FeatType, LabelType>(lossFunc, classNum) {
-			this->K = 1;
+			this->K = init_k;
 		}
 
 		virtual ~OnlineFeatureSelection() {
@@ -80,7 +80,6 @@ namespace BOC {
 		 */
 		virtual bool LoadModelConfig(std::ifstream &is) {
 			OnlineLinearModel<FeatType, LabelType>::LoadModelConfig(is);
-
 			//select k features
 			string line;
 			getline(is, line, ':');
@@ -102,14 +101,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			OnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->K = param.IntValue("-k");
-			INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
+			int k = param.IntValue("-k");
+			if (k > 0) {
+				this->K = k;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
 			OnlineLinearModel<FeatType, LabelType>::BeginTrain();
 		}
 

@@ -35,7 +35,7 @@ namespace BOC {
 		CW_TG(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			SparseOnlineLinearModel<FeatType, LabelType>(lossFunc, classNum){
 			this->modelName = "Cw-TG";
-			this->r = 0;
+			this->r = init_r;
 			this->sigma_w.resize(this->weightDim);
 			this->timeStamp.resize(this->weightDim);
 			this->lossFunc = new SquaredHingeLoss < FeatType, LabelType > ;
@@ -66,14 +66,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param){
 			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
-			this->r = param.FloatValue("-r");
-			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
+			float val = param.FloatValue("-r");
+			if (val >= 0){
+				this->r = val;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
 			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			this->timeStamp.zeros();

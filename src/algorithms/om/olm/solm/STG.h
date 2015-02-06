@@ -50,10 +50,25 @@ namespace BOC {
 			SparseOnlineLinearModel<FeatType, LabelType>::PrintModelSettings();
 			printf("\t\tk	: %d\n", this->K);
 		}
+
+		/**
+		 * @Synopsis SetParameter set parameters for the learning model
+		 *
+		 * @Param param
+		 */
+		virtual void SetParameter(BOC::Params &param){
+			SparseOnlineLinearModel<FeatType, LabelType>::SetParameter(param);
+			int val = param.IntValue("-k");
+			if (val > 0) {
+				this->K = val;
+			}
+		}
+
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(K, this->K > 0, "larger than 0");
 			SparseOnlineLinearModel<FeatType, LabelType>::BeginTrain();
 
 			//reset time stamp

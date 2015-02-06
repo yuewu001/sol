@@ -41,7 +41,7 @@ namespace BOC {
 		SOFS(LossFunction<FeatType, LabelType> *lossFunc, int classNum) :
 			OnlineFeatureSelection<FeatType, LabelType>(lossFunc, classNum) {
 			this->modelName = "SOFS";
-			this->r = 0;
+			this->r = init_r;
 
 			this->sigmaWMatrix.resize(this->classfier_num);
 			for (int k = 0; k < this->classfier_num; ++k){
@@ -104,14 +104,17 @@ namespace BOC {
 		 */
 		virtual void SetParameter(BOC::Params &param) {
 			OnlineFeatureSelection<FeatType, LabelType>::SetParameter(param);
-			this->r = param.FloatValue("-r");
-			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
+			float val = param.FloatValue("-r");
+			if (val >= 0){
+				this->r = val;
+			}
 		}
 
 		/**
 		 * @Synopsis BeginTrain Reset the optimizer to the initialization status of training
 		 */
 		virtual void BeginTrain() {
+			INVALID_ARGUMENT_EXCEPTION(r, this->r >= 0, "no smaller than 0");
 			OnlineFeatureSelection<FeatType, LabelType>::BeginTrain();
 
 			if (this->weightDim < this->K + 1){
