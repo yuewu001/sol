@@ -370,3 +370,7 @@ dt_dict['url'] = url
 #caltech.set_fs_num([1000,2000,3000,4000,5000,6000,7000,8000,9000])
 #caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
 #dt_dict['caltech_new'] = caltech
+
+
+webspam = DataSet('webspam')
+dt_dict['webspam'] = webspam

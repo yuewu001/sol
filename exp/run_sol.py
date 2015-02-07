@@ -3,7 +3,7 @@
 # FILE:     run_sol.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-02-08 00:41:09
-# MODIFIED: 2015-02-08 01:29:05
+# MODIFIED: 2015-02-08 01:36:26
 #This script is to run experiment automatically to test the performance of the algorithm
 
 import sys
