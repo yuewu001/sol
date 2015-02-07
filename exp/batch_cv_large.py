@@ -4,8 +4,12 @@ import CV
 import dataset
 
 model_list = ['SOFS','PET']
+model_list = ['CW_TG','Ada_FOBOS']
+model_list = ['CW_RDA','STG','FOBOS','RDA','Ada_RDA']
+model_list = ['RDA']
 
 ds_list = ['rcv1','news','url','synthetic_1B']
+ds_list = ['url']
 
 fold_num = 5
 

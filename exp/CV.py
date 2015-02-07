@@ -10,7 +10,7 @@ import search_space
 #extra command sent to SOL
 model_config = {
 'cache':True,
-'norm':True,
+'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'passes':1
@@ -28,7 +28,7 @@ class CV(object):
             raise ValueError('dataset {0} does not exist!'.format(dt_name))
 
         #for cv, no feature selection or l1 regularization is required
-        self.dataset.set_lambda_list([0])
+        self.dataset.set_lambda_list(model,[0])
         self.dataset.set_fs_rate([1])
 
         self.model = model
@@ -64,6 +64,9 @@ class CV(object):
             param_cmd  = self.search_space.get_param_cmd(k)
             #does not select features
             param_cmd += ' -k %d ' %(self.dataset.dim)
+
+            if self.model == 'RDA':
+                param_cmd += ' -grou 0 '
 
             result_once = util.run(train_file, test_file, self.dataset.class_num,
                     param_cmd, self.model, model_config, result_file)

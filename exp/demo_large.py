@@ -6,6 +6,7 @@ import dataset
 import util
 
 import run_ofs
+import run_sol
 import run_liblinear
 import run_fgm
 import run_mRMR
@@ -15,17 +16,19 @@ import run_bif
 model_list = ['mRMR','BIF']
 model_list = ['FGM','liblinear']
 model_list = ['SGD','DAROW','SOFS']
+model_list = ['CW_TG','CW_RDA','STG','FOBOS','RDA','Ada_FOBOS','Ada_RDA']
+model_list = ['RDA']
 
 #dataset list
 ds_list = ['rcv1','news','url']
-ds_list = ['synthetic_1B']
+ds_list = ['url']
 
 #number of times to randomize a dataset for averaged results
-rand_num = 10
+rand_num = 1
 #extra command sent to SOL
 model_config = {
-'cache':False,
-'norm':True,
+'cache':True,
+'norm':False,
 'bc_loss':'Hinge',
 'mc_loss':'MaxScoreHinge',
 'rand_num':rand_num,
@@ -80,7 +83,10 @@ def train_model(dataset):
                 if is_default_param == False:
                     param_config = dataset.get_best_param(model)
 
-                result_once = run_ofs.run(dataset,model, model_config, param_config, result_file)
+                if model == 'SOFS' or model == 'PET' or model == 'FOFS':
+                    result_once = run_ofs.run(dataset,model, model_config, param_config, result_file)
+                else:
+                    result_once = run_sol.run(dataset,model, model_config, param_config, result_file)
 
             model_result_dict[model].Add(result_once)
         dataset.del_rand_file()

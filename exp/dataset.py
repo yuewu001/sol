@@ -11,9 +11,9 @@ import util
 class DataSet(object):
     #constraint: only 
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
-            'class_num','lambda_list', 'l0_list','c_list','mrmr_l0_list')
+            'class_num','lambda_list', 'lambda_dict','l0_list','c_list','mrmr_l0_list')
 
-    root_dir = 'D:/users/v-wuyue/data/'
+    root_dir = 'D:/Data/libsvm/'
 
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
@@ -34,6 +34,8 @@ class DataSet(object):
 
         #set the lambda list
         self.lambda_list = [pow(10,x) for x in range(-8,0,1)]
+
+        self.lambda_dict = {}
 
         #set l0 list
         self.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
@@ -72,8 +74,17 @@ class DataSet(object):
             os.remove(filename)
 
     #set the lambda list
-    def set_lambda_list(self, l1_list):
+    def set_lambda_list0(self, l1_list):
         self.lambda_list = l1_list
+
+    def set_lambda_list(self, algo, l1_list):
+        self.lambda_dict[algo] = l1_list
+
+    def get_lambda_list(self, algo):
+        if algo in self.lambda_dict:
+            return self.lambda_dict[algo]
+        else:
+            return self.lambda_list
 
     #set the feature selection rate
     def set_fs_rate(self, fs_rate):
@@ -286,58 +297,76 @@ class DataSet(object):
 #initialize dataset
 dt_dict = {}
 
-#synthetic
-synthetic_10K = DataSet('synthetic_10K','synthetic_10K/synthetic_train', 'synthetic_10K/synthetic_test')
-synthetic_10K.set_c_list([0.00001,0.0001,0.00025,0.0005,0.00075,0.001,0.01,0.015,0.016,0.017,0.018,0.019,0.02])
-synthetic_10K.set_fs_num([50,60,70,80,90,100,120,140,160,180,200])
-synthetic_10K.set_mrmr_l0_list([50,60,70,80,90,100,120,140,160,180,200])
-dt_dict['synthetic_10K'] = synthetic_10K
-
-synthetic_20K = DataSet('synthetic_20K','synthetic_20K/synthetic_train','synthetic_20K/synthetic_test')
-synthetic_20K.set_c_list([0.0001,0.0002,0.0003,0.0004,0.0005,0.0006,0.0008,0.0007,0.0009,0.001,0.01,0.012,0.013,0.014,0.015,0.016,0.018,0.02])
-synthetic_20K.set_fs_num([150,160,170,180,190,200,220,240,260,280,300,400])
-synthetic_20K.set_mrmr_l0_list([150,160,170,180,190,200,220,240,260,280,300,400])
-dt_dict['synthetic_20K'] = synthetic_20K
-
-synthetic_1B = DataSet('synthetic_1B','synthetic_1B/synthetic_train','synthetic_1B/synthetic_test')
-synthetic_1B.set_fs_num([500])
-dt_dict['synthetic_1B'] = synthetic_1B
-
-#media scale data
-relathe = DataSet('relathe')
-dt_dict['relathe'] = relathe
-
-pcmac = DataSet('pcmac')
-dt_dict['pcmac'] = pcmac
-
-basehock = DataSet('basehock')
-dt_dict['basehock'] = basehock
-
-ccat = DataSet('ccat')
-dt_dict['ccat'] = ccat
-
-aut = DataSet('aut')
-dt_dict['aut'] = aut
-
-real_sim = DataSet('real-sim')
-dt_dict['real-sim'] = real_sim
-
-#large scale data
-news = DataSet('news')
-news.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
-dt_dict['news'] = news
-
-rcv1  = DataSet('rcv1')
-rcv1.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
-dt_dict['rcv1'] = rcv1
-
+##synthetic
+#synthetic_10K = DataSet('synthetic_10K','synthetic_10K/synthetic_train', 'synthetic_10K/synthetic_test')
+#synthetic_10K.set_c_list([0.00001,0.0001,0.00025,0.0005,0.00075,0.001,0.01,0.015,0.016,0.017,0.018,0.019,0.02])
+#synthetic_10K.set_fs_num([50,60,70,80,90,100,120,140,160,180,200])
+#synthetic_10K.set_mrmr_l0_list([50,60,70,80,90,100,120,140,160,180,200])
+#dt_dict['synthetic_10K'] = synthetic_10K
+#
+#synthetic_20K = DataSet('synthetic_20K','synthetic_20K/synthetic_train','synthetic_20K/synthetic_test')
+#synthetic_20K.set_c_list([0.0001,0.0002,0.0003,0.0004,0.0005,0.0006,0.0008,0.0007,0.0009,0.001,0.01,0.012,0.013,0.014,0.015,0.016,0.018,0.02])
+#synthetic_20K.set_fs_num([150,160,170,180,190,200,220,240,260,280,300,400])
+#synthetic_20K.set_mrmr_l0_list([150,160,170,180,190,200,220,240,260,280,300,400])
+#dt_dict['synthetic_20K'] = synthetic_20K
+#
+#synthetic_1B = DataSet('synthetic_1B','synthetic_1B/synthetic_train','synthetic_1B/synthetic_test')
+#synthetic_1B.set_fs_num([500])
+#dt_dict['synthetic_1B'] = synthetic_1B
+#
+##media scale data
+#relathe = DataSet('relathe')
+#dt_dict['relathe'] = relathe
+#
+#pcmac = DataSet('pcmac')
+#dt_dict['pcmac'] = pcmac
+#
+#basehock = DataSet('basehock')
+#dt_dict['basehock'] = basehock
+#
+#ccat = DataSet('ccat')
+#dt_dict['ccat'] = ccat
+#
+#aut = DataSet('aut')
+#dt_dict['aut'] = aut
+#
+#real_sim = DataSet('real-sim')
+#dt_dict['real-sim'] = real_sim
+#
+##large scale data
+#news = DataSet('news')
+#news.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
+#dt_dict['news'] = news
+#
+#rcv1  = DataSet('rcv1')
+#rcv1.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
+#dt_dict['rcv1'] = rcv1
+#
 url = DataSet('url')
 url.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
-dt_dict['url'] = url
+url.set_lambda_list('CW_TG', [0,1e-8,1e-7,5e-7, 
+    1e-6, 2e-6,3e-6,4e-6,5e-6,6e-6,7e-6,8e-6,9e-6,
+    1e-5,2e-5,4e-5,6e-5,8e-5,
+    1e-4,2e-4,4e-4,6e-4,8e-4,
+    1e-3,2.5e-3,5e-3,7.5e-3,
+    1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
 
-caltech = DataSet('caltech_new','caltech/caltech.train.libsvm','caltech/caltech.test.libsvm')
-caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
-#caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
-caltech.set_fs_num([1000,2000,3000,4000,5000,6000,7000,8000,9000])
-caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
-dt_dict['caltech_new'] = caltech
+url.set_lambda_list('CW_RDA', [0,1e-7,
+    1e-6,2.5e-6,5e-6,7.5e-6,1e-5,2.5e-5,5e-5,7.5e-5,
+    1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3,7.5e-3,
+    1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
+
+url.set_lambda_list('STG', [0,1.25e-6,1.5e-6,1.75e-6,
+    2.5e-6,5e-6, 1e-5,1.5e-5,2.5e-5,5e-5,7.5e-5,
+    1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3, 1e-2,2.5e-2])
+
+url.set_lambda_list('FOBOS', url.get_lambda_list('STG'))
+
+dt_dict['url'] = url
+#
+#caltech = DataSet('caltech_new','caltech/caltech.train.libsvm','caltech/caltech.test.libsvm')
+#caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
+##caltech.set_fs_num([50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,700,800,900,1000,1500,2000,2500,3000,3500])
+#caltech.set_fs_num([1000,2000,3000,4000,5000,6000,7000,8000,9000])
+#caltech.set_mrmr_l0_list([50,60,70,80,90,100,150,200,250,300,350,400,450,500])
+#dt_dict['caltech_new'] = caltech
