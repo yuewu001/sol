@@ -28,16 +28,16 @@ try:
         line = in_file.readline()
         if len(line) == 0:
             break;
-	line_num += 1
-	if line_num % 1000 == 0:
-	    print 'line number	: %d' %line_num
-	    print 'sample number	: %d' %sample_num
+        line_num += 1
+        if line_num % 1000 == 0:
+            print 'line number	: %d' %line_num
+            print 'sample number	: %d' %sample_num
         if line.startswith(pattern):
             if random.randint(1,sample_rate) != sample_rate:
                 continue;
-	    else:
-        	out_file.write(line)
-	        sample_num += 1
+        else:
+            out_file.write(line)
+            sample_num += 1
 
 except IOError as e:
     print "I/O error ({0}: {1})".format(e.errno, e.stderror)
