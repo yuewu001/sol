@@ -98,7 +98,7 @@ void Convert(const string& in_filename, const string& out_filename, const s_arra
 
         size_t featNum = data.indexes.size();
         for (size_t i = 0; i < featNum; i++){
-			if (data.indexes[i] < index_set.size() && index_set[data.indexes[i] - 1] != 0)
+			if (index_set[data.indexes[i] - 1] != 0)
 				data.indexes[i] = index_set[data.indexes[i] - 1];
         }
 
