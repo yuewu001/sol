@@ -40,9 +40,10 @@ class DataSet(object):
         else:
             self.test_file = self.root_dir + test_file
 
-        if os.path.exists(self.train_file) == False or os.path.exists(self.test_file) == False:
-            print 'train file or test file not found!'
-            raise Exception('train file or test file not found!')
+        if self.check_exists(self.train_file):
+            raise Exception('file not found!')
+        if self.check_exists(self.test_file):
+            raise Exception('file not found!')
 
         #analyze the dataset
         self.__analyze_dataset()
@@ -63,6 +64,13 @@ class DataSet(object):
         #set c_list: for liblinear
         self.c_list = [pow(10,x) for x in range(-3,3,1)]
         self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
+
+    def check_exists(path):
+        if os.path.exists(path) == False: 
+            print path, ' not found!'
+            return False
+        else:
+            return True
 
     def __del__(self):
         #self.del_rand_file()
