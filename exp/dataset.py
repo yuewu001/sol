@@ -41,6 +41,7 @@ class DataSet(object):
             self.test_file = self.root_dir + test_file
 
         if os.path.exists(self.train_file) == False or os.path.exists(self.test_file) == False:
+            print 'train file or test file not found!'
             raise Exception('train file or test file not found!')
 
         #analyze the dataset
