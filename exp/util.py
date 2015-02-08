@@ -229,6 +229,10 @@ def run(train_file, test_file, class_num, param_config, model, config, output_fi
     norm_cmd = ' -norm ' if config['norm'] == True else '' 
 
     cmd_prefix  = ofs_exe + dt_cmd + loss_cmd + norm_cmd  + ' -m %s ' %model
+
+    if model == 'RDA':
+        cmd_prefix += ' -grou 0 '
+
     if 'passes' in config:
         cmd_prefix += ' -passes %d ' %config['passes']
 

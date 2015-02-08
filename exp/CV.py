@@ -65,8 +65,6 @@ class CV(object):
             #does not select features
             param_cmd += ' -k %d ' %(self.dataset.dim)
 
-            if self.model == 'RDA':
-                param_cmd += ' -grou 0 '
 
             result_once = util.run(train_file, test_file, self.dataset.class_num,
                     param_cmd, self.model, model_config, result_file)

@@ -8,13 +8,27 @@ import random
 
 import util
 
+def load_root_dir():
+    print 'load path.txt'
+    try:
+        with open('path.txt', 'r') as fh:
+            root_dir = fh.readline()[0:-1]
+            if os.path.exists(root_dir) == False:
+                print 'dataset dir %s not exist' %(root_dir)
+                sys.exit()
+    except:
+        print 'open or load path.txt failed!'
+        print sys.exc_info()[0]
+        sys.exit()
+    return root_dir
+
+
 class DataSet(object):
     #constraint: only 
     __slots__ = ('root_dir','name','train_file','test_file', 'dim', 'data_num',
             'class_num','lambda_list', 'lambda_dict','l0_list','c_list','mrmr_l0_list')
 
-    root_dir = 'D:/Data/libsvm/'
-
+    root_dir = load_root_dir()
     def __init__(self, dt_name, train_file = '', test_file = ''):
         self.name = dt_name
         if train_file == '':
@@ -164,7 +178,7 @@ class DataSet(object):
         result_list = pattern.findall(open(info_file,'r').read())
         if len(result_list) != 1:
             print result_list
-            print 'parse failed'
+            print 'parse data number failed'
             sys.exit()
     
         self.data_num = (int)(result_list[0])
@@ -174,7 +188,7 @@ class DataSet(object):
         result_list = pattern.findall(open(info_file,'r').read())
         if len(result_list) != 1:
             print result_list
-            print 'parse failed'
+            print 'parse dimension failed'
             sys.exit()
     
         self.dim = (int)(result_list[0])
@@ -184,7 +198,7 @@ class DataSet(object):
         result_list = pattern.findall(open(info_file,'r').read())
         if len(result_list) != 1:
             print result_list
-            print 'parse failed'
+            print 'parse class num failed'
             sys.exit()
     
         self.class_num = (int)(result_list[0])
@@ -294,8 +308,6 @@ class DataSet(object):
         else:
             file.close()
 
-#initialize dataset
-dt_dict = {}
 
 ##synthetic
 #synthetic_10K = DataSet('synthetic_10K','synthetic_10K/synthetic_train', 'synthetic_10K/synthetic_test')
@@ -338,31 +350,7 @@ dt_dict = {}
 #news.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
 #dt_dict['news'] = news
 #
-#rcv1  = DataSet('rcv1')
-#rcv1.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
-#dt_dict['rcv1'] = rcv1
 #
-url = DataSet('url')
-url.set_fs_rate([0.005,0.01,0.025,0.05,0.1,0.2])
-url.set_lambda_list('CW_TG', [0,1e-8,1e-7,5e-7, 
-    1e-6, 2e-6,3e-6,4e-6,5e-6,6e-6,7e-6,8e-6,9e-6,
-    1e-5,2e-5,4e-5,6e-5,8e-5,
-    1e-4,2e-4,4e-4,6e-4,8e-4,
-    1e-3,2.5e-3,5e-3,7.5e-3,
-    1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
-
-url.set_lambda_list('CW_RDA', [0,1e-7,
-    1e-6,2.5e-6,5e-6,7.5e-6,1e-5,2.5e-5,5e-5,7.5e-5,
-    1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3,7.5e-3,
-    1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
-
-url.set_lambda_list('STG', [0,1.25e-6,1.5e-6,1.75e-6,
-    2.5e-6,5e-6, 1e-5,1.5e-5,2.5e-5,5e-5,7.5e-5,
-    1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3, 1e-2,2.5e-2])
-
-url.set_lambda_list('FOBOS', url.get_lambda_list('STG'))
-
-dt_dict['url'] = url
 #
 #caltech = DataSet('caltech_new','caltech/caltech.train.libsvm','caltech/caltech.test.libsvm')
 #caltech.set_c_list([0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.06])
@@ -372,5 +360,54 @@ dt_dict['url'] = url
 #dt_dict['caltech_new'] = caltech
 
 
-webspam = DataSet('webspam')
-dt_dict['webspam'] = webspam
+#ijcai 2015, configurations
+def init_dataset(dt_dict):
+    try:
+        url = DataSet('url')
+        url.set_lambda_list('CW_TG', [0,1e-8,1e-7,5e-7, 
+            1e-6, 2e-6,3e-6,4e-6,5e-6,6e-6,7e-6,8e-6,9e-6,
+            1e-5,2e-5,4e-5,6e-5,8e-5,
+            1e-4,2e-4,4e-4,6e-4,8e-4,
+            1e-3,2.5e-3,5e-3,7.5e-3,
+            1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
+
+        url.set_lambda_list('CW_RDA', [0,1e-7,
+            1e-6,2.5e-6,5e-6,7.5e-6,1e-5,2.5e-5,5e-5,7.5e-5,
+            1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3,7.5e-3,
+            1e-2,2.5e-2,5e-2,7.5e-2,1e-1])
+
+        url.set_lambda_list('STG', [0,1.25e-6,1.5e-6,1.75e-6,
+            2.5e-6,5e-6, 1e-5,1.5e-5,2.5e-5,5e-5,7.5e-5,
+            1e-4,2.5e-4,5e-4,7.5e-4,1e-3,2.5e-3,5e-3, 1e-2,2.5e-2])
+
+        url.set_lambda_list('FOBOS', url.get_lambda_list('STG'))
+        url.set_lambda_list('RDA',
+                [0,7.5e-7,5e-6,5e-5
+                    ,1e-4,5e-4,1e-3,5e-3,1e-2,2e-2,4e-2,5e-2])
+        url.set_lambda_list('Ada_RDA',
+                [0,2.5e-7,3.5e-7,5.5e-7,7e-7,5e-6,1e-5,1e-4,5e-4,1e-3,5e-3,1.5e-2,2e-2,2.5e-2,5e-2])
+        url.set_lambda_list('Ada_FOBOS',
+                [0,2e-8,4e-8,6e-8,8e-8,5e-7,1e-6,5e-6,1e-5,1e-4,1e-3,2.5e-3,5e-3,1e-2,5e-2,1e-1])
+
+        dt_dict['url'] = url
+    except:
+        pass
+
+    try:
+        rcv1  = DataSet('rcv1')
+        dt_dict['rcv1'] = rcv1
+    except:
+        pass
+
+    try:
+        webspam = DataSet('webspam')
+        dt_dict['webspam'] = webspam
+    except:
+        pass
+
+#dataset
+dt_dict = {}
+
+if len(dt_dict) == 0:
+    print 'initialize dataset'
+    init_dataset(dt_dict)

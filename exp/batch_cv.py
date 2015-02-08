@@ -3,9 +3,12 @@
 import CV
 import dataset
 
-model_list = ['SOFS','PET','FOFS']
+model_list = ['SOFS','PET']
+model_list = ['CW_TG','Ada_FOBOS']
+model_list = ['CW_TG','STG','FOBOS','RDA','Ada_FOBOS','Ada_RDA']
 
-ds_list = ['synthetic_10K', 'synthetic_20K', 'relathe','pcmac','basehock','ccat','aut','real-sim'] 
+ds_list = ['rcv1','news','url','synthetic_1B']
+ds_list = ['rcv1']
 
 fold_num = 5
 
@@ -22,14 +25,14 @@ for dt in ds_list:
         print '----------------------------------------------'
 
         real_model = ''
-        if model == 'SOFS':
+        if model == 'SOFS' or model == 'CW_TG':
             real_model = model
             model = 'DAROW'
-        elif model == 'PET': 
+        elif model == 'PET' or model == 'STG' or model == 'FOBOS': 
             real_model = model
             model = 'SGD'
 
-        if  model == 'CW_TG' or model == 'CW_RDA' or model == 'DAROW':
+        if  model == 'CW_RDA' or model == 'DAROW':
             param_config = ' {0} {1}'.format('-r',r_search)
         elif 'Ada' in model: 
             param_config = ' {0} {1}'.format('-delta',delta_search)
