@@ -12,7 +12,7 @@ def load_root_dir():
     print 'load path.txt'
     try:
         with open('path.txt', 'r') as fh:
-            root_dir = fh.readline()[0:-1]
+            root_dir = fh.readline().strip()
             if os.path.exists(root_dir) == False:
                 print 'dataset dir %s not exist' %(root_dir)
                 sys.exit()
@@ -40,9 +40,9 @@ class DataSet(object):
         else:
             self.test_file = self.root_dir + test_file
 
-        if self.check_exists(self.train_file) == False:
+        if self.is_exist(self.train_file) == False:
             raise Exception('file not found!')
-        if self.check_exists(self.test_file) == False:
+        if self.is_exist(self.test_file) == False:
             raise Exception('file not found!')
 
         #analyze the dataset
@@ -65,7 +65,7 @@ class DataSet(object):
         self.c_list = [pow(10,x) for x in range(-3,3,1)]
         self.c_list = [0.015625,0.03125,0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,9182,18364]
 
-    def check_exists(path):
+    def is_exist(self,path):
         if os.path.exists(path) == False: 
             print path, ' not found!'
             return False
