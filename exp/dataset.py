@@ -391,19 +391,19 @@ def init_dataset(dt_dict):
 
         dt_dict['url'] = url
     except:
-        pass
+        print 'init url failed'
 
     try:
         rcv1  = DataSet('rcv1')
         dt_dict['rcv1'] = rcv1
     except:
-        pass
+        print 'init rcv1 failed'
 
     try:
         webspam = DataSet('webspam')
         dt_dict['webspam'] = webspam
     except:
-        pass
+        print 'init webspam failed'
 
 #dataset
 dt_dict = {}
