@@ -9,7 +9,7 @@
 #define HEADER_S_ARRAY
 
 #include <iostream>
-#include <string>
+#include <cstring>
 #include <stdexcept>
 #include <stdlib.h>
 
@@ -54,7 +54,7 @@ namespace BOC{
 
 			size_t old_len = this->size();
 			//copy data
-			memcpy(new_begin, begin, sizeof(T)* old_len);
+			std::memcpy(new_begin, begin, sizeof(T)* old_len);
 			if (begin != NULL)
 				delete[]begin;
 			begin = new_begin;
@@ -106,7 +106,7 @@ namespace BOC{
 
 		//reset all the elements in the array to zero
 		void zeros(){
-			memset(this->begin, 0, sizeof(T)* this->size());
+			std::memset(this->begin, 0, sizeof(T)* this->size());
 		}
 
 		//TIM: need?
@@ -118,7 +118,7 @@ namespace BOC{
 
 		//reset all the elements in the array to zero
 		void zeros(T* iter_begin, T* iter_end){
-			memset(iter_begin, 0, sizeof(T)* (iter_end - iter_begin));
+			std::memset(iter_begin, 0, sizeof(T)* (iter_end - iter_begin));
 		}
 
 		//set the elements in the array to val

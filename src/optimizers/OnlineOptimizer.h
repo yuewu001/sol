@@ -34,10 +34,10 @@ namespace BOC {
 			Optimizer<FeatType, LabelType>(model, dataset){
 			p_onlineModel = static_cast<OnlineModel<FeatType, LabelType>*>(this->learnModel);
 			if (this->p_onlineModel->GetClassfierNum() == 1){
-				this->pIterateDelegate = &(OnlineModel<FeatType, LabelType>::IterateBC);
+				this->pIterateDelegate = &OnlineModel<FeatType, LabelType>::IterateBC;
 			}
 			else{
-				this->pIterateDelegate = &(OnlineModel<FeatType, LabelType>::IterateMC);
+				this->pIterateDelegate = &OnlineModel<FeatType, LabelType>::IterateMC;
 			}
 		}
 
