@@ -73,7 +73,7 @@ SOL features a very simple installation procedure. The project is managed by Cma
 
     2. make a folder for building the project, like  `mkdir build`
 
-    3. `cd` to the folder above and call cmake 
+    3. `cd` to the folder above and call `cmake  ..`
 
     4. `make` and you will get an executable `SOL` in the `bin` folder
 
