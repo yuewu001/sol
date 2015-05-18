@@ -118,7 +118,7 @@ The dataset we use will be `a6a`. Note that only LibSVM datasets are supported b
 
 The command for training wit default algorithm is as the following shows.
     
-    ./SOL -i a6a -opt SGD
+    ./SOL -i a6a -m SGD
 
 In this part, we will explain how to induce sparsity of the weight vector and how to tune parameters of algorithms.
 In STG, we can induce sparsity by:
